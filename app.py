@@ -9,15 +9,15 @@ TOKEN = os.environ["TRELLO_TOKEN"]
 TARGET_CARD_ID = os.environ["TARGET_CARD_ID"]
 TARGET_CHECKLIST_NAME = os.environ.get("TARGET_CHECKLIST_NAME", "Kupit")
 
+# 🔴 NOVÉ – filtrujeme len jeden list
+ALLOWED_LIST_ID = os.environ["ALLOWED_LIST_ID"]
+
 BASE = "https://api.trello.com/1"
 
 
 def trello_get(path, params=None):
     params = params or {}
-    params.update({
-        "key": API_KEY,
-        "token": TOKEN,
-    })
+    params.update({"key": API_KEY, "token": TOKEN})
     r = requests.get(f"{BASE}{path}", params=params, timeout=30)
     r.raise_for_status()
     return r.json()
@@ -25,19 +25,16 @@ def trello_get(path, params=None):
 
 def trello_post(path, params=None):
     params = params or {}
-    params.update({
-        "key": API_KEY,
-        "token": TOKEN,
-    })
+    params.update({"key": API_KEY, "token": TOKEN})
     r = requests.post(f"{BASE}{path}", params=params, timeout=30)
     r.raise_for_status()
     return r.json()
 
 
-def get_or_create_target_checklist():
+def get_or_create_checklist():
     checklists = trello_get(f"/cards/{TARGET_CARD_ID}/checklists")
     for cl in checklists:
-        if cl["name"].strip().lower() == TARGET_CHECKLIST_NAME.strip().lower():
+        if cl["name"].lower() == TARGET_CHECKLIST_NAME.lower():
             return cl["id"]
 
     created = trello_post(f"/cards/{TARGET_CARD_ID}/checklists", {
@@ -46,23 +43,9 @@ def get_or_create_target_checklist():
     return created["id"]
 
 
-def item_already_exists(checklist_id, item_name):
+def item_exists(checklist_id, name):
     items = trello_get(f"/checklists/{checklist_id}/checkItems")
-    wanted = item_name.strip().lower()
-    return any((x.get("name", "").strip().lower() == wanted) for x in items)
-
-
-def add_item_to_target_checklist(item_name):
-    checklist_id = get_or_create_target_checklist()
-
-    # nech nevznikajú duplikáty
-    if item_already_exists(checklist_id, item_name):
-        return {"ok": True, "skipped": "duplicate", "item": item_name}
-
-    created = trello_post(f"/checklists/{checklist_id}/checkItems", {
-        "name": item_name
-    })
-    return {"ok": True, "created": created.get("id"), "item": item_name}
+    return any(x["name"].lower() == name.lower() for x in items)
 
 
 @app.route("/", methods=["GET"])
@@ -71,31 +54,48 @@ def health():
 
 
 @app.route("/trello-webhook", methods=["HEAD"])
-def trello_head():
-    # Trello overuje callback URL cez HEAD
+def head():
     return "", 200
 
 
 @app.route("/trello-webhook", methods=["POST"])
-def trello_webhook():
-    data = request.get_json(silent=True) or {}
+def webhook():
+    data = request.json or {}
+
     action = data.get("action", {})
     action_type = action.get("type", "")
 
-    # zaujíma nás zmena checklist itemu
     if action_type != "updateCheckItem":
-        return jsonify({"ok": True, "ignored": action_type})
+        return jsonify({"ignored": action_type})
 
     action_data = action.get("data", {})
-    check_item = action_data.get("checkItem", {})
-    item_name = check_item.get("name", "").strip()
+    item = action_data.get("checkItem", {})
+    name = item.get("name", "")
 
-    if not item_name:
-        return jsonify({"ok": True, "ignored": "empty name"})
+    if "[kupit]" not in name.lower():
+        return jsonify({"ignored": "no tag"})
 
-    # len položky s [kupit]
-    if "[kupit]" not in item_name.lower():
-        return jsonify({"ok": True, "ignored": "no [kupit]"})
+    # 🔴 zisti kartu
+    card = action_data.get("card", {})
+    card_id = card.get("id")
 
-    result = add_item_to_target_checklist(item_name)
-    return jsonify(result)
+    if not card_id:
+        return jsonify({"ignored": "no card"})
+
+    # 🔴 filtruj podľa listu
+    card_info = trello_get(f"/cards/{card_id}", {"fields": "idList,name"})
+    if card_info.get("idList") != ALLOWED_LIST_ID:
+        return jsonify({"ignored": "wrong list"})
+
+    clean_name = name.replace("[kupit]", "").strip()
+
+    checklist_id = get_or_create_checklist()
+
+    if item_exists(checklist_id, clean_name):
+        return jsonify({"skipped": "duplicate"})
+
+    trello_post(f"/checklists/{checklist_id}/checkItems", {
+        "name": f"{card_info['name']} - {clean_name}"
+    })
+
+    return jsonify({"ok": True})
