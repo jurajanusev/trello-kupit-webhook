@@ -7,17 +7,11 @@ app = Flask(__name__)
 API_KEY = os.environ["TRELLO_KEY"]
 TOKEN = os.environ["TRELLO_TOKEN"]
 
-# Stará funkcionalita - checklist
 TARGET_CARD_ID = os.environ["TARGET_CARD_ID"]
 TARGET_CHECKLIST_NAME = os.environ.get("TARGET_CHECKLIST_NAME", "Kupit")
-
-# Nová funkcionalita - karta
 TARGET_LIST_ID = os.environ["TARGET_LIST_ID"]
-
-# Povolený vstupný list
 ALLOWED_LIST_ID = os.environ["ALLOWED_LIST_ID"]
 
-# Tagy
 CHECKLIST_TAG = os.environ.get("CHECKLIST_TAG", "[kupit]")
 CARD_TAG = os.environ.get("CARD_TAG", "[karta]")
 
@@ -96,8 +90,9 @@ def trello_webhook():
     action = data["action"]
     action_type = action.get("type", "")
 
+    # reagujeme LEN na vytvorenie novej checklist polozky
     if action_type != "createCheckItem":
-    return jsonify({"status": "ignored", "reason": f"unsupported action {action_type}"}), 200
+        return jsonify({"status": "ignored", "reason": f"unsupported action {action_type}"}), 200
 
     action_data = action.get("data", {})
     card = action_data.get("card")
@@ -124,7 +119,7 @@ def trello_webhook():
     checklist_tag_lower = CHECKLIST_TAG.lower()
     card_tag_lower = CARD_TAG.lower()
 
-    # 1. STARÁ LOGIKA - položka ide do checklistu
+    # [kupit] -> pridaj do centralneho checklistu
     if checklist_tag_lower in item_lower:
         clean_name = clean_item_name(checkitem_name, CHECKLIST_TAG)
 
@@ -151,7 +146,7 @@ def trello_webhook():
         except Exception as e:
             return jsonify({"status": "error", "reason": f"checklist mode failed: {str(e)}"}), 500
 
-    # 2. NOVÁ LOGIKA - položka vytvorí novú kartu
+    # [karta] -> vytvor novu kartu
     elif card_tag_lower in item_lower:
         clean_name = clean_item_name(checkitem_name, CARD_TAG)
 
