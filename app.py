@@ -221,13 +221,25 @@ def trello_webhook():
             print("NEW CARD NAME:", new_card_name)
             print("TARGET_LIST_ID:", TARGET_LIST_ID)
 
+            matching_cards = find_cards_with_term_in_checklists(
+                clean_name,
+                exclude_card_id=card_id
+            )
+
+            if matching_cards:
+                found_text = ", ".join(matching_cards)
+            else:
+                found_text = "nenájdené"
+
             new_card_desc = (
                 f"Vytvorené automaticky z checklist položky.\n\n"
                 f"Pôvodná karta: {card_info['name']}\n"
                 f"Odkaz na pôvodnú kartu: {card_info['shortUrl']}\n\n"
-                f"Pôvodná checklist položka: {checkitem_name}"
+                f"Pôvodná checklist položka: {checkitem_name}\n\n"
+                f"Nájdené v kartách:\n{found_text}"
             )
             print("CARD DESC READY")
+            print("MATCHING CARDS:", matching_cards)
 
             print("BEFORE CARD EXISTS CHECK")
             exists = card_exists_in_list(TARGET_LIST_ID, new_card_name)
