@@ -202,19 +202,19 @@ def trello_webhook():
         if not clean_name:
             return jsonify({"status": "ignored", "reason": "empty name"}), 200
 
-#        try:
- #           target_checklists = get_checklists_on_card(TARGET_CARD_ID)
-  #          target_checklist = find_checklist_by_name(target_checklists, TARGET_CHECKLIST_NAME)
-#
- #           if not target_checklist:
-  #              print("ERROR: target checklist not found")
-   #         else:
-    #            new_item_text = f"{clean_name} - {card_info['name']}"
-     #           add_checkitem_to_checklist(target_checklist["id"], new_item_text)
-      #          print("CHECKLIST CREATED:", new_item_text)
-#
-#        except Exception as e:
-  #          return jsonify({"status": "error", "reason": f"checklist failed: {str(e)}"}), 500
+        # try:
+        #     target_checklists = get_checklists_on_card(TARGET_CARD_ID)
+        #     target_checklist = find_checklist_by_name(target_checklists, TARGET_CHECKLIST_NAME)
+        
+        #     if not target_checklist:
+        #         print("ERROR: target checklist not found")
+        #     else:
+        #         new_item_text = f"{clean_name} - {card_info['name']}"
+        #         add_checkitem_to_checklist(target_checklist["id"], new_item_text)
+        #         print("CHECKLIST CREATED:", new_item_text)
+        
+        # except Exception as e:
+        #     return jsonify({"status": "error", "reason": f"checklist failed: {str(e)}"}), 500
 
         try:
             new_card_name = f"{clean_name} - {card_info['name']}"
