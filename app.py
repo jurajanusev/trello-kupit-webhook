@@ -9,7 +9,6 @@ TOKEN = os.environ["TRELLO_TOKEN"]
 TARGET_CARD_ID = os.environ["TARGET_CARD_ID"]
 TARGET_CHECKLIST_NAME = os.environ.get("TARGET_CHECKLIST_NAME", "Kupit")
 
-# 🔴 NOVÉ – filtrujeme len jeden list
 ALLOWED_LIST_ID = os.environ["ALLOWED_LIST_ID"]
 
 BASE = "https://api.trello.com/1"
@@ -75,27 +74,26 @@ def webhook():
     if "[kupit]" not in name.lower():
         return jsonify({"ignored": "no tag"})
 
-    # 🔴 zisti kartu
     card = action_data.get("card", {})
     card_id = card.get("id")
 
     if not card_id:
         return jsonify({"ignored": "no card"})
 
-    # 🔴 filtruj podľa listu
     card_info = trello_get(f"/cards/{card_id}", {"fields": "idList,name"})
     if card_info.get("idList") != ALLOWED_LIST_ID:
         return jsonify({"ignored": "wrong list"})
 
     clean_name = name.replace("[kupit]", "").strip()
+    new_item_text = f"{clean_name} - {card_info['name']}"
 
     checklist_id = get_or_create_checklist()
 
-    if item_exists(checklist_id, clean_name):
+    if item_exists(checklist_id, new_item_text):
         return jsonify({"skipped": "duplicate"})
 
     trello_post(f"/checklists/{checklist_id}/checkItems", {
-        "name": f"{card_info['name']} - {clean_name}"
+        "name": new_item_text
     })
 
     return jsonify({"ok": True})
