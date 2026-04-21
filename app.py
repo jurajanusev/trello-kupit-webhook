@@ -208,6 +208,8 @@ def trello_webhook():
 
         try:
             new_card_name = f"{clean_name} - {card_info['name']}"
+            print("NEW CARD NAME:", new_card_name)
+            print("TARGET_LIST_ID:", TARGET_LIST_ID)
 
             matching_cards = find_cards_with_term_in_checklists(
                 clean_name,
@@ -219,6 +221,8 @@ def trello_webhook():
             else:
                 found_text = "nenájdené"
 
+            print("FOUND TEXT:", found_text)
+
             new_card_desc = (
                 f"Vytvorené automaticky z checklist položky.\n\n"
                 f"Pôvodná karta: {card_info['name']}\n"
@@ -227,16 +231,18 @@ def trello_webhook():
                 f"Nájdené v kartách:\n{found_text}"
             )
 
-            create_card(TARGET_LIST_ID, new_card_name, new_card_desc)
-            print("CARD CREATED:", new_card_name)
+            print("ABOUT TO CREATE CARD")
+
+            created_card = create_card(TARGET_LIST_ID, new_card_name, new_card_desc)
+            print("CARD CREATED RESPONSE:", created_card)
 
         except Exception as e:
+            print("CARD FAILED FULL:", repr(e))
             return jsonify({"status": "error", "reason": f"card failed: {str(e)}"}), 500
 
         return jsonify({"status": "ok", "mode": "both"}), 200
 
     return jsonify({"status": "ignored", "reason": "no matching tag"}), 200
-
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
