@@ -22,7 +22,7 @@ BASE = "https://api.trello.com/1"
 def trello_get(path, params=None):
     params = params or {}
     params.update({"key": API_KEY, "token": TOKEN})
-    r = requests.get(f"{BASE}{path}", params=params, timeout=30)
+    r = requests.get(f"{BASE}{path}", params=params, timeout=10)
     r.raise_for_status()
     return r.json()
 
@@ -30,7 +30,7 @@ def trello_get(path, params=None):
 def trello_post(path, params=None):
     params = params or {}
     params.update({"key": API_KEY, "token": TOKEN})
-    r = requests.post(f"{BASE}{path}", params=params, timeout=30)
+    r = requests.post(f"{BASE}{path}", params=params, timeout=10)
     r.raise_for_status()
     return r.json()
 
@@ -93,20 +93,18 @@ def find_cards_with_term_in_checklists(search_term, exclude_card_id=None):
         "fields": "name"
     })
 
-    print("CARDS LOADED:", len(cards))
-
     search_term_lower = search_term.strip().lower()
 
-    for card in cards:
-        print("CHECKING CARD:", card["name"])
+    for i, card in enumerate(cards):
+        if i >= 15:
+            print("STOP: reached search limit")
+            break
 
         if exclude_card_id and card["id"] == exclude_card_id:
-            print("SKIP SAME CARD")
             continue
 
         try:
             checklists = get_checklists_on_card(card["id"])
-            print("CHECKLIST COUNT:", len(checklists))
 
             for checklist in checklists:
                 for item in checklist.get("checkItems", []):
@@ -115,9 +113,7 @@ def find_cards_with_term_in_checklists(search_term, exclude_card_id=None):
                     if "[" in item_name:
                         item_name = item_name.split("[")[0].strip()
 
-                    print("COMPARE:", search_term_lower, "vs", item_name.lower())
-
-                   if item_name.lower().startswith(search_term_lower):
+                    if search_term_lower in item_name.lower():
                         print("MATCH FOUND IN CARD:", card["name"])
                         matching_cards.append(card["name"])
                         break
@@ -130,7 +126,6 @@ def find_cards_with_term_in_checklists(search_term, exclude_card_id=None):
 
     print("FINAL MATCHING CARDS:", matching_cards)
     return matching_cards
-
 @app.route("/", methods=["GET"])
 def home():
     return "Trello webhook server is running", 200
