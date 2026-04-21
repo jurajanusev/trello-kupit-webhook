@@ -6,10 +6,20 @@ app = Flask(__name__)
 
 API_KEY = os.environ["TRELLO_KEY"]
 TOKEN = os.environ["TRELLO_TOKEN"]
+
+# Stará funkcionalita - checklist
 TARGET_CARD_ID = os.environ["TARGET_CARD_ID"]
 TARGET_CHECKLIST_NAME = os.environ.get("TARGET_CHECKLIST_NAME", "Kupit")
 
+# Nová funkcionalita - karta
+TARGET_LIST_ID = os.environ["TARGET_LIST_ID"]
+
+# Povolený vstupný list
 ALLOWED_LIST_ID = os.environ["ALLOWED_LIST_ID"]
+
+# Tagy
+CHECKLIST_TAG = os.environ.get("CHECKLIST_TAG", "[kupit]")
+CARD_TAG = os.environ.get("CARD_TAG", "[karta]")
 
 BASE = "https://api.trello.com/1"
 
@@ -30,70 +40,149 @@ def trello_post(path, params=None):
     return r.json()
 
 
-def get_or_create_checklist():
-    checklists = trello_get(f"/cards/{TARGET_CARD_ID}/checklists")
-    for cl in checklists:
-        if cl["name"].lower() == TARGET_CHECKLIST_NAME.lower():
-            return cl["id"]
-
-    created = trello_post(f"/cards/{TARGET_CARD_ID}/checklists", {
-        "name": TARGET_CHECKLIST_NAME
+def get_card(card_id):
+    return trello_get(f"/cards/{card_id}", {
+        "fields": "name,idList,shortUrl,desc"
     })
-    return created["id"]
 
 
-def item_exists(checklist_id, name):
-    items = trello_get(f"/checklists/{checklist_id}/checkItems")
-    return any(x["name"].lower() == name.lower() for x in items)
+def get_checklists_on_card(card_id):
+    return trello_get(f"/cards/{card_id}/checklists")
+
+
+def find_checklist_by_name(checklists, checklist_name):
+    for cl in checklists:
+        if cl["name"].strip().lower() == checklist_name.strip().lower():
+            return cl
+    return None
+
+
+def add_checkitem_to_checklist(checklist_id, item_name):
+    return trello_post(f"/checklists/{checklist_id}/checkItems", {
+        "name": item_name
+    })
+
+
+def create_card(list_id, name, desc=""):
+    return trello_post("/cards", {
+        "idList": list_id,
+        "name": name,
+        "desc": desc,
+        "pos": "bottom"
+    })
+
+
+def clean_item_name(item_name, tag):
+    return item_name.replace(tag, "").strip()
 
 
 @app.route("/", methods=["GET"])
-def health():
-    return "OK", 200
+def home():
+    return "Trello webhook server is running", 200
 
 
 @app.route("/trello-webhook", methods=["HEAD"])
-def head():
+def trello_head():
     return "", 200
 
 
 @app.route("/trello-webhook", methods=["POST"])
-def webhook():
-    data = request.json or {}
+def trello_webhook():
+    data = request.json
 
-    action = data.get("action", {})
+    if not data or "action" not in data:
+        return jsonify({"status": "ignored", "reason": "no action"}), 200
+
+    action = data["action"]
     action_type = action.get("type", "")
 
-    if action_type != "updateCheckItem":
-        return jsonify({"ignored": action_type})
+    if action_type not in ["createCheckItem", "updateCheckItem", "updateCheckItemStateOnCard"]:
+        return jsonify({"status": "ignored", "reason": f"unsupported action {action_type}"}), 200
 
     action_data = action.get("data", {})
-    item = action_data.get("checkItem", {})
-    name = item.get("name", "")
+    card = action_data.get("card")
+    checkitem = action_data.get("checkItem")
 
-    if "[k]" not in name.lower():
-        return jsonify({"ignored": "no tag"})
+    if not card or not checkitem:
+        return jsonify({"status": "ignored", "reason": "missing card or checkitem"}), 200
 
-    card = action_data.get("card", {})
-    card_id = card.get("id")
+    card_id = card["id"]
+    checkitem_name = checkitem.get("name", "").strip()
 
-    if not card_id:
-        return jsonify({"ignored": "no card"})
+    if not checkitem_name:
+        return jsonify({"status": "ignored", "reason": "empty checkitem name"}), 200
 
-    card_info = trello_get(f"/cards/{card_id}", {"fields": "idList,name"})
-    if card_info.get("idList") != ALLOWED_LIST_ID:
-        return jsonify({"ignored": "wrong list"})
+    try:
+        card_info = get_card(card_id)
+    except Exception as e:
+        return jsonify({"status": "error", "reason": f"failed to load card: {str(e)}"}), 500
 
-    clean_name = name.replace("[k]", "").strip()
-    new_item_text = f"{clean_name} - {card_info['name']}"
+    if card_info["idList"] != ALLOWED_LIST_ID:
+        return jsonify({"status": "ignored", "reason": "card not in allowed list"}), 200
 
-    checklist_id = get_or_create_checklist()
+    item_lower = checkitem_name.lower()
+    checklist_tag_lower = CHECKLIST_TAG.lower()
+    card_tag_lower = CARD_TAG.lower()
 
-    if item_exists(checklist_id, new_item_text):
-        return jsonify({"skipped": "duplicate"})
+    # 1. STARÁ LOGIKA - položka ide do checklistu
+    if checklist_tag_lower in item_lower:
+        clean_name = clean_item_name(checkitem_name, CHECKLIST_TAG)
 
-    trello_post(f"/checklists/{checklist_id}/checkItems", {
-        "name": new_item_text
-    })
+        if not clean_name:
+            return jsonify({"status": "ignored", "reason": "empty checklist item after cleanup"}), 200
 
-    return jsonify({"ok": True})
+        try:
+            target_checklists = get_checklists_on_card(TARGET_CARD_ID)
+            target_checklist = find_checklist_by_name(target_checklists, TARGET_CHECKLIST_NAME)
+
+            if not target_checklist:
+                return jsonify({"status": "error", "reason": "target checklist not found"}), 500
+
+            new_item_text = f"{clean_name} - {card_info['name']}"
+            created_item = add_checkitem_to_checklist(target_checklist["id"], new_item_text)
+
+            return jsonify({
+                "status": "ok",
+                "mode": "checklist",
+                "created_checkitem_id": created_item["id"],
+                "created_checkitem_name": created_item["name"]
+            }), 200
+
+        except Exception as e:
+            return jsonify({"status": "error", "reason": f"checklist mode failed: {str(e)}"}), 500
+
+    # 2. NOVÁ LOGIKA - položka vytvorí novú kartu
+    elif card_tag_lower in item_lower:
+        clean_name = clean_item_name(checkitem_name, CARD_TAG)
+
+        if not clean_name:
+            return jsonify({"status": "ignored", "reason": "empty card name after cleanup"}), 200
+
+        new_card_name = f"{clean_name} - {card_info['name']}"
+        new_card_desc = (
+            f"Vytvorené automaticky z checklist položky.\n\n"
+            f"Pôvodná karta: {card_info['name']}\n"
+            f"Odkaz na pôvodnú kartu: {card_info['shortUrl']}\n\n"
+            f"Pôvodná checklist položka: {checkitem_name}"
+        )
+
+        try:
+            created_card = create_card(TARGET_LIST_ID, new_card_name, new_card_desc)
+
+            return jsonify({
+                "status": "ok",
+                "mode": "card",
+                "created_card_id": created_card["id"],
+                "created_card_name": created_card["name"]
+            }), 200
+
+        except Exception as e:
+            return jsonify({"status": "error", "reason": f"card mode failed: {str(e)}"}), 500
+
+    else:
+        return jsonify({"status": "ignored", "reason": "no matching tag"}), 200
+
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
