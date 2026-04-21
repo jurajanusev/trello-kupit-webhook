@@ -71,6 +71,42 @@ def clean_item_name(item_name, tag):
     return item_name.replace(tag, "").strip()
 
 
+def find_cards_with_term_in_checklists(search_term, exclude_card_id=None):
+    matching_cards = []
+    cards = trello_get(f"/lists/{ALLOWED_LIST_ID}/cards", {
+        "fields": "name"
+    })
+
+    search_term_lower = search_term.strip().lower()
+
+    for card in cards:
+        if exclude_card_id and card["id"] == exclude_card_id:
+            continue
+
+        try:
+            checklists = get_checklists_on_card(card["id"])
+
+            for checklist in checklists:
+                for item in checklist.get("checkItems", []):
+                    item_name = item.get("name", "").strip()
+
+                    # odstráni tagy ako [S], [X]
+                    if "[" in item_name:
+                        item_name = item_name.split("[")[0].strip()
+
+                    if search_term_lower == item_name.lower():
+                        matching_cards.append(card["name"])
+                        break
+                else:
+                    continue
+                break
+
+        except Exception as e:
+            print(f"ERROR reading card {card.get('name')}: {str(e)}")
+
+    return matching_cards
+
+
 @app.route("/", methods=["GET"])
 def home():
     return "Trello webhook server is running", 200
@@ -172,11 +208,23 @@ def trello_webhook():
 
         try:
             new_card_name = f"{clean_name} - {card_info['name']}"
+
+            matching_cards = find_cards_with_term_in_checklists(
+                clean_name,
+                exclude_card_id=card_id
+            )
+
+            if matching_cards:
+                found_text = ", ".join(matching_cards)
+            else:
+                found_text = "nenájdené"
+
             new_card_desc = (
                 f"Vytvorené automaticky z checklist položky.\n\n"
                 f"Pôvodná karta: {card_info['name']}\n"
-                f"Odkaz na pôvodnú kartu: {card_info['shortUrl']}\n\n"
-                f"Pôvodná checklist položka: {checkitem_name}"
+                f"Odkaz na pôvodnú kartu: {card_info['shortUrl']}\n"
+                f"Pôvodná checklist položka: {checkitem_name}\n\n"
+                f"Nájdené v kartách:\n{found_text}"
             )
 
             create_card(TARGET_LIST_ID, new_card_name, new_card_desc)
