@@ -110,6 +110,13 @@ def trello_webhook():
         print(f"IGNORED: unsupported action type {action_type}")
         return jsonify({"status": "ignored", "reason": f"unsupported action {action_type}"}), 200
 
+    # pri updateCheckItem reaguj LEN na zmenu názvu
+    if action_type == "updateCheckItem":
+        old = action.get("data", {}).get("old", {})
+        if "name" not in old:
+            print("IGNORED: update not changing name")
+            return jsonify({"status": "ignored", "reason": "not a name change"}), 200
+
     action_data = action.get("data", {})
     card = action_data.get("card")
     checkitem = action_data.get("checkItem")
