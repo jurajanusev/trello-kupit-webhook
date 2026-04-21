@@ -14,8 +14,7 @@ TARGET_CHECKLIST_NAME = os.environ.get("TARGET_CHECKLIST_NAME", "Kupit")
 TARGET_LIST_ID = os.environ["TARGET_LIST_ID"]
 ALLOWED_LIST_ID = os.environ["ALLOWED_LIST_ID"]
 
-CHECKLIST_TAG = os.environ.get("CHECKLIST_TAG", "[kupit]")
-CARD_TAG = os.environ.get("CARD_TAG", "[karta]")
+CHECKLIST_TAG = os.environ.get("CHECKLIST_TAG", "[Z]")
 
 BASE = "https://api.trello.com/1"
 
@@ -101,15 +100,14 @@ def trello_webhook():
     if not action_id:
         return jsonify({"status": "ignored", "reason": "missing action id"}), 200
 
-# 🔴 deduplikácia
     if action_id in processed_actions:
         print(f"SKIP duplicate action: {action_id}")
         return jsonify({"status": "ignored", "reason": "duplicate action"}), 200
 
     processed_actions.add(action_id)
 
-    # reagujeme LEN na vytvorenie novej checklist polozky
     if action_type != "createCheckItem":
+        print(f"IGNORED: unsupported action type {action_type}")
         return jsonify({"status": "ignored", "reason": f"unsupported action {action_type}"}), 200
 
     action_data = action.get("data", {})
@@ -141,18 +139,15 @@ def trello_webhook():
 
     item_lower = checkitem_name.lower()
     checklist_tag_lower = CHECKLIST_TAG.lower()
-    card_tag_lower = CARD_TAG.lower()
 
     print("ITEM:", checkitem_name)
     print("CHECKLIST TAG:", CHECKLIST_TAG)
-    print("CARD TAG:", CARD_TAG)
 
-    # [kupit] -> pridaj do centralneho checklistu
     if checklist_tag_lower in item_lower:
         clean_name = clean_item_name(checkitem_name, CHECKLIST_TAG)
 
         if not clean_name:
-            return jsonify({"status": "ignored", "reason": "empty checklist item after cleanup"}), 200
+            return jsonify({"status": "ignored", "reason": "empty name"}), 200
 
         try:
             target_checklists = get_checklists_on_card(TARGET_CARD_ID)
@@ -162,48 +157,30 @@ def trello_webhook():
                 return jsonify({"status": "error", "reason": "target checklist not found"}), 500
 
             new_item_text = f"{clean_name} - {card_info['name']}"
-            created_item = add_checkitem_to_checklist(target_checklist["id"], new_item_text)
-
-            return jsonify({
-                "status": "ok",
-                "mode": "checklist",
-                "created_checkitem_id": created_item["id"],
-                "created_checkitem_name": created_item["name"]
-            }), 200
+            add_checkitem_to_checklist(target_checklist["id"], new_item_text)
+            print("CHECKLIST CREATED:", new_item_text)
 
         except Exception as e:
-            return jsonify({"status": "error", "reason": f"checklist mode failed: {str(e)}"}), 500
-
-    # [karta] -> vytvor novu kartu
-    elif card_tag_lower in item_lower:
-        clean_name = clean_item_name(checkitem_name, CARD_TAG)
-
-        if not clean_name:
-            return jsonify({"status": "ignored", "reason": "empty card name after cleanup"}), 200
-
-        new_card_name = f"{clean_name} - {card_info['name']}"
-        new_card_desc = (
-            f"Vytvorené automaticky z checklist položky.\n\n"
-            f"Pôvodná karta: {card_info['name']}\n"
-            f"Odkaz na pôvodnú kartu: {card_info['shortUrl']}\n\n"
-            f"Pôvodná checklist položka: {checkitem_name}"
-        )
+            return jsonify({"status": "error", "reason": f"checklist failed: {str(e)}"}), 500
 
         try:
-            created_card = create_card(TARGET_LIST_ID, new_card_name, new_card_desc)
+            new_card_name = f"{clean_name} - {card_info['name']}"
+            new_card_desc = (
+                f"Vytvorené automaticky z checklist položky.\n\n"
+                f"Pôvodná karta: {card_info['name']}\n"
+                f"Odkaz na pôvodnú kartu: {card_info['shortUrl']}\n\n"
+                f"Pôvodná checklist položka: {checkitem_name}"
+            )
 
-            return jsonify({
-                "status": "ok",
-                "mode": "card",
-                "created_card_id": created_card["id"],
-                "created_card_name": created_card["name"]
-            }), 200
+            create_card(TARGET_LIST_ID, new_card_name, new_card_desc)
+            print("CARD CREATED:", new_card_name)
 
         except Exception as e:
-            return jsonify({"status": "error", "reason": f"card mode failed: {str(e)}"}), 500
+            return jsonify({"status": "error", "reason": f"card failed: {str(e)}"}), 500
 
-    else:
-        return jsonify({"status": "ignored", "reason": "no matching tag"}), 200
+        return jsonify({"status": "ok", "mode": "both"}), 200
+
+    return jsonify({"status": "ignored", "reason": "no matching tag"}), 200
 
 
 if __name__ == "__main__":
