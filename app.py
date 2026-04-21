@@ -85,14 +85,18 @@ def trello_head():
 @app.route("/trello-webhook", methods=["POST"])
 def trello_webhook():
     data = request.json
+    print("RAW DATA:", data)
 
     if not data or "action" not in data:
+        print("IGNORED: no action")
         return jsonify({"status": "ignored", "reason": "no action"}), 200
 
     action = data["action"]
     action_type = action.get("type", "")
-
     action_id = action.get("id")
+
+    print("ACTION TYPE:", action_type)
+    print("ACTION ID:", action_id)
 
     if not action_id:
         return jsonify({"status": "ignored", "reason": "missing action id"}), 200
@@ -112,6 +116,9 @@ def trello_webhook():
     card = action_data.get("card")
     checkitem = action_data.get("checkItem")
 
+    print("CARD:", card)
+    print("CHECKITEM:", checkitem)
+
     if not card or not checkitem:
         return jsonify({"status": "ignored", "reason": "missing card or checkitem"}), 200
 
@@ -123,15 +130,22 @@ def trello_webhook():
 
     try:
         card_info = get_card(card_id)
+        print("CARD INFO:", card_info)
     except Exception as e:
+        print("ERROR loading card:", str(e))
         return jsonify({"status": "error", "reason": f"failed to load card: {str(e)}"}), 500
 
     if card_info["idList"] != ALLOWED_LIST_ID:
+        print("IGNORED: wrong list", card_info["idList"], "!=", ALLOWED_LIST_ID)
         return jsonify({"status": "ignored", "reason": "card not in allowed list"}), 200
 
     item_lower = checkitem_name.lower()
     checklist_tag_lower = CHECKLIST_TAG.lower()
     card_tag_lower = CARD_TAG.lower()
+
+    print("ITEM:", checkitem_name)
+    print("CHECKLIST TAG:", CHECKLIST_TAG)
+    print("CARD TAG:", CARD_TAG)
 
     # [kupit] -> pridaj do centralneho checklistu
     if checklist_tag_lower in item_lower:
