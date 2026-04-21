@@ -1,8 +1,8 @@
+processed_actions = set()
+
 from flask import Flask, request, jsonify
 import requests
 import os
-
-processed_actions = set()
 
 app = Flask(__name__)
 
@@ -14,8 +14,7 @@ TARGET_CHECKLIST_NAME = os.environ.get("TARGET_CHECKLIST_NAME", "Kupit")
 TARGET_LIST_ID = os.environ["TARGET_LIST_ID"]
 ALLOWED_LIST_ID = os.environ["ALLOWED_LIST_ID"]
 
-CHECKLIST_TAG = os.environ.get("CHECKLIST_TAG", "[kupit]")
-CARD_TAG = os.environ.get("CARD_TAG", "[karta]")
+CHECKLIST_TAG = os.environ.get("CHECKLIST_TAG", "[Z]")
 
 BASE = "https://api.trello.com/1"
 
@@ -72,30 +71,6 @@ def clean_item_name(item_name, tag):
     return item_name.replace(tag, "").strip()
 
 
-def checklist_item_exists(checklist_id, item_name):
-    print("CHECK EXISTING ITEM IN CHECKLIST:", checklist_id, item_name)
-    items = trello_get(f"/checklists/{checklist_id}/checkItems")
-    print("CHECKLIST ITEMS:", items)
-
-    for item in items:
-        if item["name"].strip().lower() == item_name.strip().lower():
-            return True
-
-    return False
-
-
-def card_exists(list_id, card_name):
-    print("CHECK EXISTING CARD IN LIST:", list_id, card_name)
-    cards = trello_get(f"/lists/{list_id}/cards")
-    print("LIST CARDS:", cards)
-
-    for card in cards:
-        if card["name"].strip().lower() == card_name.strip().lower():
-            return True
-
-    return False
-
-
 @app.route("/", methods=["GET"])
 def home():
     return "Trello webhook server is running", 200
@@ -123,7 +98,6 @@ def trello_webhook():
     print("ACTION ID:", action_id)
 
     if not action_id:
-        print("IGNORED: missing action id")
         return jsonify({"status": "ignored", "reason": "missing action id"}), 200
 
     if action_id in processed_actions:
@@ -132,10 +106,16 @@ def trello_webhook():
 
     processed_actions.add(action_id)
 
-    # reagujeme na vytvorenie alebo update checklist polozky
     if action_type not in ["createCheckItem", "updateCheckItem"]:
         print(f"IGNORED: unsupported action type {action_type}")
         return jsonify({"status": "ignored", "reason": f"unsupported action {action_type}"}), 200
+
+    # pri updateCheckItem reaguj LEN na zmenu názvu
+    if action_type == "updateCheckItem":
+        old = action.get("data", {}).get("old", {})
+        if "name" not in old:
+            print("IGNORED: update not changing name")
+            return jsonify({"status": "ignored", "reason": "not a name change"}), 200
 
     action_data = action.get("data", {})
     card = action_data.get("card")
@@ -145,14 +125,12 @@ def trello_webhook():
     print("CHECKITEM:", checkitem)
 
     if not card or not checkitem:
-        print("IGNORED: missing card or checkitem")
         return jsonify({"status": "ignored", "reason": "missing card or checkitem"}), 200
 
     card_id = card["id"]
     checkitem_name = checkitem.get("name", "").strip()
 
     if not checkitem_name:
-        print("IGNORED: empty checkitem name")
         return jsonify({"status": "ignored", "reason": "empty checkitem name"}), 200
 
     try:
@@ -168,106 +146,48 @@ def trello_webhook():
 
     item_lower = checkitem_name.lower()
     checklist_tag_lower = CHECKLIST_TAG.lower()
-    card_tag_lower = CARD_TAG.lower()
 
     print("ITEM:", checkitem_name)
     print("CHECKLIST TAG:", CHECKLIST_TAG)
-    print("CARD TAG:", CARD_TAG)
 
-    # [kupit] -> pridaj do centralneho checklistu
     if checklist_tag_lower in item_lower:
-        print("MATCH: checklist mode")
         clean_name = clean_item_name(checkitem_name, CHECKLIST_TAG)
-        print("CLEAN NAME:", clean_name)
 
         if not clean_name:
-            print("IGNORED: empty checklist item after cleanup")
-            return jsonify({"status": "ignored", "reason": "empty checklist item after cleanup"}), 200
+            return jsonify({"status": "ignored", "reason": "empty name"}), 200
 
         try:
-            print("TARGET_CARD_ID:", TARGET_CARD_ID)
-            print("TARGET_CHECKLIST_NAME:", TARGET_CHECKLIST_NAME)
-
             target_checklists = get_checklists_on_card(TARGET_CARD_ID)
-            print("TARGET CHECKLISTS:", target_checklists)
-
             target_checklist = find_checklist_by_name(target_checklists, TARGET_CHECKLIST_NAME)
-            print("FOUND TARGET CHECKLIST:", target_checklist)
 
             if not target_checklist:
-                print("ERROR: target checklist not found")
                 return jsonify({"status": "error", "reason": "target checklist not found"}), 500
 
             new_item_text = f"{clean_name} - {card_info['name']}"
-            print("NEW ITEM TEXT:", new_item_text)
-
-            if checklist_item_exists(target_checklist["id"], new_item_text):
-                print(f"SKIP existing item: {new_item_text}")
-                return jsonify({
-                    "status": "ignored",
-                    "reason": "item already exists"
-                }), 200
-
-            created_item = add_checkitem_to_checklist(target_checklist["id"], new_item_text)
-            print("CREATED ITEM:", created_item)
-
-            return jsonify({
-                "status": "ok",
-                "mode": "checklist",
-                "created_checkitem_id": created_item["id"],
-                "created_checkitem_name": created_item["name"]
-            }), 200
+            add_checkitem_to_checklist(target_checklist["id"], new_item_text)
+            print("CHECKLIST CREATED:", new_item_text)
 
         except Exception as e:
-            print("CHECKLIST MODE FAILED:", str(e))
-            return jsonify({"status": "error", "reason": f"checklist mode failed: {str(e)}"}), 500
-
-    # [karta] -> vytvor novu kartu
-    elif card_tag_lower in item_lower:
-        print("MATCH: card mode")
-        clean_name = clean_item_name(checkitem_name, CARD_TAG)
-        print("CLEAN NAME:", clean_name)
-
-        if not clean_name:
-            print("IGNORED: empty card name after cleanup")
-            return jsonify({"status": "ignored", "reason": "empty card name after cleanup"}), 200
-
-        new_card_name = f"{clean_name} - {card_info['name']}"
-        new_card_desc = (
-            f"Vytvorené automaticky z checklist položky.\n\n"
-            f"Pôvodná karta: {card_info['name']}\n"
-            f"Odkaz na pôvodnú kartu: {card_info['shortUrl']}\n\n"
-            f"Pôvodná checklist položka: {checkitem_name}"
-        )
+            return jsonify({"status": "error", "reason": f"checklist failed: {str(e)}"}), 500
 
         try:
-            print("TARGET_LIST_ID:", TARGET_LIST_ID)
-            print("NEW CARD NAME:", new_card_name)
+            new_card_name = f"{clean_name} - {card_info['name']}"
+            new_card_desc = (
+                f"Vytvorené automaticky z checklist položky.\n\n"
+                f"Pôvodná karta: {card_info['name']}\n"
+                f"Odkaz na pôvodnú kartu: {card_info['shortUrl']}\n\n"
+                f"Pôvodná checklist položka: {checkitem_name}"
+            )
 
-            if card_exists(TARGET_LIST_ID, new_card_name):
-                print(f"SKIP existing card: {new_card_name}")
-                return jsonify({
-                    "status": "ignored",
-                    "reason": "card already exists"
-                }), 200
-
-            created_card = create_card(TARGET_LIST_ID, new_card_name, new_card_desc)
-            print("CREATED CARD:", created_card)
-
-            return jsonify({
-                "status": "ok",
-                "mode": "card",
-                "created_card_id": created_card["id"],
-                "created_card_name": created_card["name"]
-            }), 200
+            create_card(TARGET_LIST_ID, new_card_name, new_card_desc)
+            print("CARD CREATED:", new_card_name)
 
         except Exception as e:
-            print("CARD MODE FAILED:", str(e))
-            return jsonify({"status": "error", "reason": f"card mode failed: {str(e)}"}), 500
+            return jsonify({"status": "error", "reason": f"card failed: {str(e)}"}), 500
 
-    else:
-        print("IGNORED: no matching tag")
-        return jsonify({"status": "ignored", "reason": "no matching tag"}), 200
+        return jsonify({"status": "ok", "mode": "both"}), 200
+
+    return jsonify({"status": "ignored", "reason": "no matching tag"}), 200
 
 
 if __name__ == "__main__":
