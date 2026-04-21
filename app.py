@@ -1,3 +1,5 @@
+processed_actions = set()
+
 from flask import Flask, request, jsonify
 import requests
 import os
@@ -89,6 +91,18 @@ def trello_webhook():
 
     action = data["action"]
     action_type = action.get("type", "")
+
+    action_id = action.get("id")
+
+if not action_id:
+    return jsonify({"status": "ignored", "reason": "missing action id"}), 200
+
+# 🔴 deduplikácia
+if action_id in processed_actions:
+    print(f"SKIP duplicate action: {action_id}")
+    return jsonify({"status": "ignored", "reason": "duplicate action"}), 200
+
+processed_actions.add(action_id)
 
     # reagujeme LEN na vytvorenie novej checklist polozky
     if action_type != "createCheckItem":
