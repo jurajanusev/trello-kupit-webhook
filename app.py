@@ -41,6 +41,12 @@ def get_card(card_id):
     })
 
 
+def get_cards_in_list(list_id):
+    return trello_get(f"/lists/{list_id}/cards", {
+        "fields": "name,shortUrl"
+    })
+
+
 def get_checklists_on_card(card_id):
     return trello_get(f"/cards/{card_id}/checklists")
 
@@ -69,6 +75,91 @@ def create_card(list_id, name, desc=""):
 
 def clean_item_name(item_name, tag):
     return item_name.replace(tag, "").strip()
+
+
+def normalize_item_name(name):
+    return name.strip().lower()
+
+
+def checklist_item_exists(checklist_id, item_name):
+    items = trello_get(f"/checklists/{checklist_id}/checkItems")
+    for item in items:
+        if item["name"].strip().lower() == item_name.strip().lower():
+            return True
+    return False
+
+
+def card_exists_in_list(list_id, card_name):
+    cards = trello_get(f"/lists/{list_id}/cards", {"fields": "name"})
+    for card in cards:
+        if card["name"].strip().lower() == card_name.strip().lower():
+            return True
+    return False
+
+
+def find_cards_with_same_item(search_name):
+    """
+    Prehľadá všetky karty v ALLOWED_LIST_ID a nájde tie,
+    kde sa v ľubovoľnom checkliste nachádza rovnaká položka.
+    Porovnávame po očistení tagu [Z].
+    """
+    matches = []
+    search_normalized = normalize_item_name(search_name)
+
+    try:
+        cards = get_cards_in_list(ALLOWED_LIST_ID)
+    except Exception as e:
+        print("ERROR loading source cards:", str(e))
+        return matches
+
+    for card in cards:
+        card_id = card["id"]
+        card_name = card.get("name", "")
+        card_url = card.get("shortUrl", "")
+
+        try:
+            checklists = get_checklists_on_card(card_id)
+        except Exception as e:
+            print(f"ERROR loading checklists for card {card_id}: {str(e)}")
+            continue
+
+        found_in_this_card = False
+
+        for checklist in checklists:
+            checklist_name = checklist.get("name", "")
+            check_items = checklist.get("checkItems", [])
+
+            for item in check_items:
+                original_item_name = item.get("name", "").strip()
+                cleaned_item_name = clean_item_name(original_item_name, CHECKLIST_TAG)
+                cleaned_normalized = normalize_item_name(cleaned_item_name)
+
+                if cleaned_normalized == search_normalized:
+                    matches.append({
+                        "card_name": card_name,
+                        "card_url": card_url,
+                        "checklist_name": checklist_name,
+                        "item_name": original_item_name
+                    })
+                    found_in_this_card = True
+                    break
+
+            if found_in_this_card:
+                break
+
+    return matches
+
+
+def build_locations_text(matches):
+    if not matches:
+        return "Nenašli sa žiadne ďalšie karty s rovnakou položkou."
+
+    lines = []
+    for m in matches:
+        lines.append(
+            f"- Karta: {m['card_name']} | Checklist: {m['checklist_name']} | Link: {m['card_url']}"
+        )
+    return "\n".join(lines)
 
 
 @app.route("/", methods=["GET"])
@@ -156,6 +247,10 @@ def trello_webhook():
         if not clean_name:
             return jsonify({"status": "ignored", "reason": "empty name"}), 200
 
+        # Nájde všetky karty, kde sa nachádza tá istá položka
+        matches = find_cards_with_same_item(clean_name)
+        locations_text = build_locations_text(matches)
+
         try:
             target_checklists = get_checklists_on_card(TARGET_CARD_ID)
             target_checklist = find_checklist_by_name(target_checklists, TARGET_CHECKLIST_NAME)
@@ -164,8 +259,12 @@ def trello_webhook():
                 return jsonify({"status": "error", "reason": "target checklist not found"}), 500
 
             new_item_text = f"{clean_name} - {card_info['name']}"
-            add_checkitem_to_checklist(target_checklist["id"], new_item_text)
-            print("CHECKLIST CREATED:", new_item_text)
+
+            if not checklist_item_exists(target_checklist["id"], new_item_text):
+                add_checkitem_to_checklist(target_checklist["id"], new_item_text)
+                print("CHECKLIST CREATED:", new_item_text)
+            else:
+                print("CHECKLIST SKIPPED, already exists:", new_item_text)
 
         except Exception as e:
             return jsonify({"status": "error", "reason": f"checklist failed: {str(e)}"}), 500
@@ -176,11 +275,16 @@ def trello_webhook():
                 f"Vytvorené automaticky z checklist položky.\n\n"
                 f"Pôvodná karta: {card_info['name']}\n"
                 f"Odkaz na pôvodnú kartu: {card_info['shortUrl']}\n\n"
-                f"Pôvodná checklist položka: {checkitem_name}"
+                f"Pôvodná checklist položka: {checkitem_name}\n\n"
+                f"Kde sa táto položka nachádza:\n"
+                f"{locations_text}"
             )
 
-            create_card(TARGET_LIST_ID, new_card_name, new_card_desc)
-            print("CARD CREATED:", new_card_name)
+            if not card_exists_in_list(TARGET_LIST_ID, new_card_name):
+                create_card(TARGET_LIST_ID, new_card_name, new_card_desc)
+                print("CARD CREATED:", new_card_name)
+            else:
+                print("CARD SKIPPED, already exists:", new_card_name)
 
         except Exception as e:
             return jsonify({"status": "error", "reason": f"card failed: {str(e)}"}), 500
