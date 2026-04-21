@@ -77,34 +77,48 @@ def card_exists_in_list(list_id, card_name):
 
     return False
     
-def clean_item_name(item_name, tag):
-    return item_name.replace(tag, "").strip()
+def clean_item_name(item_name, tag=None):
+    cleaned = item_name.strip()
 
+    if "[" in cleaned:
+        cleaned = cleaned.split("[")[0].strip()
 
+    return cleaned
+    
 def find_cards_with_term_in_checklists(search_term, exclude_card_id=None):
+    print("SEARCH TERM:", search_term)
     matching_cards = []
+
     cards = trello_get(f"/lists/{ALLOWED_LIST_ID}/cards", {
         "fields": "name"
     })
 
+    print("CARDS LOADED:", len(cards))
+
     search_term_lower = search_term.strip().lower()
 
     for card in cards:
+        print("CHECKING CARD:", card["name"])
+
         if exclude_card_id and card["id"] == exclude_card_id:
+            print("SKIP SAME CARD")
             continue
 
         try:
             checklists = get_checklists_on_card(card["id"])
+            print("CHECKLIST COUNT:", len(checklists))
 
             for checklist in checklists:
                 for item in checklist.get("checkItems", []):
                     item_name = item.get("name", "").strip()
 
-                    # odstráni tagy ako [S], [X]
                     if "[" in item_name:
                         item_name = item_name.split("[")[0].strip()
 
+                    print("COMPARE:", search_term_lower, "vs", item_name.lower())
+
                     if search_term_lower == item_name.lower():
+                        print("MATCH FOUND IN CARD:", card["name"])
                         matching_cards.append(card["name"])
                         break
                 else:
@@ -114,8 +128,8 @@ def find_cards_with_term_in_checklists(search_term, exclude_card_id=None):
         except Exception as e:
             print(f"ERROR reading card {card.get('name')}: {str(e)}")
 
+    print("FINAL MATCHING CARDS:", matching_cards)
     return matching_cards
-
 
 @app.route("/", methods=["GET"])
 def home():
@@ -198,6 +212,7 @@ def trello_webhook():
 
     if checklist_tag_lower in item_lower:
         clean_name = clean_item_name(checkitem_name, CHECKLIST_TAG)
+        print("CLEAN NAME:", clean_name)
 
         if not clean_name:
             return jsonify({"status": "ignored", "reason": "empty name"}), 200
