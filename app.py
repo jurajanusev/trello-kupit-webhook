@@ -117,7 +117,7 @@ def find_cards_with_term_in_checklists(search_term, exclude_card_id=None):
 
                     print("COMPARE:", search_term_lower, "vs", item_name.lower())
 
-                    if search_term_lower == item_name.lower():
+                   if item_name.lower().startswith(search_term_lower):
                         print("MATCH FOUND IN CARD:", card["name"])
                         matching_cards.append(card["name"])
                         break
