@@ -94,15 +94,15 @@ def trello_webhook():
 
     action_id = action.get("id")
 
-if not action_id:
-    return jsonify({"status": "ignored", "reason": "missing action id"}), 200
+    if not action_id:
+        return jsonify({"status": "ignored", "reason": "missing action id"}), 200
 
 # 🔴 deduplikácia
-if action_id in processed_actions:
-    print(f"SKIP duplicate action: {action_id}")
-    return jsonify({"status": "ignored", "reason": "duplicate action"}), 200
+    if action_id in processed_actions:
+        print(f"SKIP duplicate action: {action_id}")
+        return jsonify({"status": "ignored", "reason": "duplicate action"}), 200
 
-processed_actions.add(action_id)
+    processed_actions.add(action_id)
 
     # reagujeme LEN na vytvorenie novej checklist polozky
     if action_type != "createCheckItem":
