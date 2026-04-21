@@ -106,7 +106,7 @@ def trello_webhook():
 
     processed_actions.add(action_id)
 
-    if action_type != "createCheckItem":
+    if action_type not in ["createCheckItem", "updateCheckItem"]:
         print(f"IGNORED: unsupported action type {action_type}")
         return jsonify({"status": "ignored", "reason": f"unsupported action {action_type}"}), 200
 
