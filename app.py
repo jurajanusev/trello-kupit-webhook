@@ -197,31 +197,35 @@ def trello_webhook():
             target_checklist = find_checklist_by_name(target_checklists, TARGET_CHECKLIST_NAME)
 
             if not target_checklist:
-                return jsonify({"status": "error", "reason": "target checklist not found"}), 500
-
-            new_item_text = f"{clean_name} - {card_info['name']}"
-            add_checkitem_to_checklist(target_checklist["id"], new_item_text)
-            print("CHECKLIST CREATED:", new_item_text)
+                print("ERROR: target checklist not found")
+            else:
+                new_item_text = f"{clean_name} - {card_info['name']}"
+                add_checkitem_to_checklist(target_checklist["id"], new_item_text)
+                print("CHECKLIST CREATED:", new_item_text)
 
         except Exception as e:
             return jsonify({"status": "error", "reason": f"checklist failed: {str(e)}"}), 500
-
         try:
             new_card_name = f"{clean_name} - {card_info['name']}"
             print("NEW CARD NAME:", new_card_name)
             print("TARGET_LIST_ID:", TARGET_LIST_ID)
 
-            matching_cards = find_cards_with_term_in_checklists(
-                clean_name,
-                exclude_card_id=card_id
-            )
+            found_text = "nenájdené"
 
-            if matching_cards:
-                found_text = ", ".join(matching_cards)
-            else:
+            try:
+                matching_cards = find_cards_with_term_in_checklists(
+                    clean_name,
+                    exclude_card_id=card_id
+                )
+
+                if matching_cards:
+                    found_text = ", ".join(matching_cards)
+
+                print("FOUND TEXT:", found_text)
+
+            except Exception as e:
+                print("SEARCH FAILED:", repr(e))
                 found_text = "nenájdené"
-
-            print("FOUND TEXT:", found_text)
 
             new_card_desc = (
                 f"Vytvorené automaticky z checklist položky.\n\n"
@@ -239,6 +243,7 @@ def trello_webhook():
         except Exception as e:
             print("CARD FAILED FULL:", repr(e))
             return jsonify({"status": "error", "reason": f"card failed: {str(e)}"}), 500
+       
 
         return jsonify({"status": "ok", "mode": "both"}), 200
 
