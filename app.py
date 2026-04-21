@@ -66,7 +66,17 @@ def create_card(list_id, name, desc=""):
         "pos": "bottom"
     })
 
+def card_exists_in_list(list_id, card_name):
+    cards = trello_get(f"/lists/{list_id}/cards", {
+        "fields": "name"
+    })
 
+    for card in cards:
+        if card["name"].strip().lower() == card_name.strip().lower():
+            return True
+
+    return False
+    
 def clean_item_name(item_name, tag):
     return item_name.replace(tag, "").strip()
 
@@ -205,50 +215,38 @@ def trello_webhook():
 
         except Exception as e:
             return jsonify({"status": "error", "reason": f"checklist failed: {str(e)}"}), 500
+
         try:
             new_card_name = f"{clean_name} - {card_info['name']}"
             print("NEW CARD NAME:", new_card_name)
             print("TARGET_LIST_ID:", TARGET_LIST_ID)
 
-            found_text = "nenájdené"
-
-            try:
-                matching_cards = find_cards_with_term_in_checklists(
-                    clean_name,
-                    exclude_card_id=card_id
-                )
-
-                if matching_cards:
-                    found_text = ", ".join(matching_cards)
-
-                print("FOUND TEXT:", found_text)
-
-            except Exception as e:
-                print("SEARCH FAILED:", repr(e))
-                found_text = "nenájdené"
-
             new_card_desc = (
                 f"Vytvorené automaticky z checklist položky.\n\n"
                 f"Pôvodná karta: {card_info['name']}\n"
-                f"Odkaz na pôvodnú kartu: {card_info['shortUrl']}\n"
-                f"Pôvodná checklist položka: {checkitem_name}\n\n"
-                f"Nájdené v kartách:\n{found_text}"
+                f"Odkaz na pôvodnú kartu: {card_info['shortUrl']}\n\n"
+                f"Pôvodná checklist položka: {checkitem_name}"
             )
+            print("CARD DESC READY")
 
-            print("ABOUT TO CREATE CARD")
+            print("BEFORE CARD EXISTS CHECK")
+            exists = card_exists_in_list(TARGET_LIST_ID, new_card_name)
+            print("CARD EXISTS RESULT:", exists)
 
-            created_card = create_card(TARGET_LIST_ID, new_card_name, new_card_desc)
-            print("CARD CREATED RESPONSE:", created_card)
+            if exists:
+                print("SKIP existing card:", new_card_name)
+            else:
+                print("BEFORE CREATE_CARD")
+                created_card = create_card(TARGET_LIST_ID, new_card_name, new_card_desc)
+                print("CARD CREATED:", created_card)
 
         except Exception as e:
-            print("CARD FAILED FULL:", repr(e))
+            print("CARD ERROR:", repr(e))
             return jsonify({"status": "error", "reason": f"card failed: {str(e)}"}), 500
-       
 
         return jsonify({"status": "ok", "mode": "both"}), 200
 
     return jsonify({"status": "ignored", "reason": "no matching tag"}), 200
-
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
