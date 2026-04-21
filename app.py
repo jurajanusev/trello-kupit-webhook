@@ -96,8 +96,8 @@ def trello_webhook():
     action = data["action"]
     action_type = action.get("type", "")
 
-    if action_type not in ["createCheckItem", "updateCheckItem", "updateCheckItemStateOnCard"]:
-        return jsonify({"status": "ignored", "reason": f"unsupported action {action_type}"}), 200
+    if action_type != "createCheckItem":
+    return jsonify({"status": "ignored", "reason": f"unsupported action {action_type}"}), 200
 
     action_data = action.get("data", {})
     card = action_data.get("card")
