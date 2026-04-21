@@ -71,7 +71,7 @@ def webhook():
     item = action_data.get("checkItem", {})
     name = item.get("name", "")
 
-    if "[kupit]" not in name.lower():
+    if "[k]" not in name.lower():
         return jsonify({"ignored": "no tag"})
 
     card = action_data.get("card", {})
@@ -84,7 +84,7 @@ def webhook():
     if card_info.get("idList") != ALLOWED_LIST_ID:
         return jsonify({"ignored": "wrong list"})
 
-    clean_name = name.replace("[kupit]", "").strip()
+    clean_name = name.replace("[k]", "").strip()
     new_item_text = f"{clean_name} - {card_info['name']}"
 
     checklist_id = get_or_create_checklist()
