@@ -22,7 +22,7 @@ BASE = "https://api.trello.com/1"
 def trello_get(path, params=None):
     params = params or {}
     params.update({"key": API_KEY, "token": TOKEN})
-    r = requests.get(f"{BASE}{path}", params=params, timeout=20)
+    r = requests.get(f"{BASE}{path}", params=params, timeout=10)
     r.raise_for_status()
     return r.json()
 
@@ -30,7 +30,7 @@ def trello_get(path, params=None):
 def trello_post(path, params=None):
     params = params or {}
     params.update({"key": API_KEY, "token": TOKEN})
-    r = requests.post(f"{BASE}{path}", params=params, timeout=20)
+    r = requests.post(f"{BASE}{path}", params=params, timeout=10)
     r.raise_for_status()
     return r.json()
 
@@ -80,10 +80,8 @@ def card_exists_in_list(list_id, card_name):
 def clean_item_name(item_name, tag=None):
     cleaned = item_name.strip()
 
-    if tag:
-        cleaned = cleaned.replace(tag, "").strip()
-        cleaned = cleaned.replace(tag.upper(), "").strip()
-        cleaned = cleaned.replace(tag.lower(), "").strip()
+    if "[" in cleaned:
+        cleaned = cleaned.split("[")[0].strip()
 
     return cleaned
     
@@ -97,35 +95,37 @@ def find_cards_with_term_in_checklists(search_term, exclude_card_id=None):
 
     search_term_lower = search_term.strip().lower()
 
-    for card in cards:
+    for i, card in enumerate(cards):
+        if i >= 15:
+            print("STOP: reached search limit")
+            break
+
         if exclude_card_id and card["id"] == exclude_card_id:
             continue
 
         try:
             checklists = get_checklists_on_card(card["id"])
-            found_on_this_card = False
 
             for checklist in checklists:
                 for item in checklist.get("checkItems", []):
                     item_name = item.get("name", "").strip()
 
-                    item_name_clean = clean_item_name(item_name, CHECKLIST_TAG)
+                    if "[" in item_name:
+                        item_name = item_name.split("[")[0].strip()
 
-                    if search_term_lower in item_name_clean.lower():
+                    if search_term_lower in item_name.lower():
                         print("MATCH FOUND IN CARD:", card["name"])
                         matching_cards.append(card["name"])
-                        found_on_this_card = True
                         break
-
-                if found_on_this_card:
-                    break
+                else:
+                    continue
+                break
 
         except Exception as e:
             print(f"ERROR reading card {card.get('name')}: {str(e)}")
 
     print("FINAL MATCHING CARDS:", matching_cards)
     return matching_cards
-    
 @app.route("/", methods=["GET"])
 def home():
     return "Trello webhook server is running", 200
@@ -215,27 +215,17 @@ def trello_webhook():
         try:
             target_checklists = get_checklists_on_card(TARGET_CARD_ID)
             target_checklist = find_checklist_by_name(target_checklists, TARGET_CHECKLIST_NAME)
-
+        
             if not target_checklist:
                 print("ERROR: target checklist not found")
             else:
-                matching_cards = find_cards_with_term_in_checklists(
-                    clean_name,
-                    exclude_card_id=None
-                )
-
-                if matching_cards:
-                    found_text = ", ".join(matching_cards)
-                else:
-                    found_text = "nenájdené"
-
-                new_item_text = f"{clean_name} - {found_text}"
+                new_item_text = f"{clean_name} - {card_info['name']}"
                 add_checkitem_to_checklist(target_checklist["id"], new_item_text)
-
                 print("CHECKLIST CREATED:", new_item_text)
-
+        
         except Exception as e:
             return jsonify({"status": "error", "reason": f"checklist failed: {str(e)}"}), 500
+
         try:
             new_card_name = f"{clean_name} - {card_info['name']}"
             print("NEW CARD NAME:", new_card_name)
