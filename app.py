@@ -22,7 +22,7 @@ BASE = "https://api.trello.com/1"
 def trello_get(path, params=None):
     params = params or {}
     params.update({"key": API_KEY, "token": TOKEN})
-    r = requests.get(f"{BASE}{path}", params=params, timeout=10)
+    r = requests.get(f"{BASE}{path}", params=params, timeout=20)
     r.raise_for_status()
     return r.json()
 
@@ -30,7 +30,7 @@ def trello_get(path, params=None):
 def trello_post(path, params=None):
     params = params or {}
     params.update({"key": API_KEY, "token": TOKEN})
-    r = requests.post(f"{BASE}{path}", params=params, timeout=10)
+    r = requests.post(f"{BASE}{path}", params=params, timeout=20)
     r.raise_for_status()
     return r.json()
 
