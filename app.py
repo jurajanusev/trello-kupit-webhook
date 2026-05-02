@@ -101,17 +101,24 @@ def normalize_item_name(text):
 
 def find_cards_with_exact_item(search_term, exclude_card_id=None):
     print("SEARCH TERM:", search_term)
-
     matching_cards = []
     search_norm = normalize_item_name(search_term)
 
-    cards = trello_get(f"/lists/{ALLOWED_LIST_ID}/cards", {
+    # Optimalizované API volanie: Stiahneme karty AJ s checklistami v jednom balíku
+    params = {
         "fields": "name",
+        "checklists": "all",      # Toto je kľúčová zmena
+        "checklist_fields": "id", # Stačí nám ID checklistu
         "limit": 1000
-    })
+    }
 
-    print("CARDS LOADED:", len(cards))
-    print("NORMALIZED SEARCH:", search_norm)
+    try:
+        # Použijeme cestu pre list, ktorá vráti karty so zanorenými checklistami
+        cards = trello_get(f"/lists/{ALLOWED_LIST_ID}/cards", params)
+        print(f"CARDS LOADED: {len(cards)}")
+    except Exception as e:
+        print(f"ERROR loading cards from list: {str(e)}")
+        return []
 
     for card in cards:
         card_id = card["id"]
@@ -120,33 +127,21 @@ def find_cards_with_exact_item(search_term, exclude_card_id=None):
         if exclude_card_id and card_id == exclude_card_id:
             continue
 
-        try:
-            checklists = get_checklists_on_card(card_id)
-            found_on_this_card = False
-
-            print("READING CARD:", card_name)
-
-            for checklist in checklists:
-                for item in checklist.get("checkItems", []):
-                    item_name = item.get("name", "")
-                    item_norm = normalize_item_name(item_name)
-
-                    print("COMPARE:", search_norm, "VS", item_norm)
-
-                    if item_norm == search_norm:
-                        print("MATCH FOUND IN CARD:", card_name)
-                        matching_cards.append(card_name)
-                        found_on_this_card = True
-                        break
-
-                if found_on_this_card:
-                    break
-
-        except Exception as e:
-            print(f"ERROR reading card {card_name}: {str(e)}")
+        # Dáta checklistov sú už v objekte karty vďaka parametru checklists=all
+        checklists = card.get("checklists", [])
+        
+        for checklist in checklists:
+            # Každý checklist obsahuje pole checkItems
+            for item in checklist.get("checkItems", []):
+                item_name = item.get("name", "")
+                if normalize_item_name(item_name) == search_norm:
+                    print(f"MATCH FOUND IN CARD: {card_name}")
+                    matching_cards.append(card_name)
+                    break 
 
     print("FINAL MATCHING CARDS:", matching_cards)
     return matching_cards
+
 
 
 @app.route("/", methods=["GET"])
