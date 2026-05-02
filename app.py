@@ -276,14 +276,10 @@ def trello_webhook():
 
         exists = card_exists_in_list(TARGET_LIST_ID, new_card_name)
 
-        if exists:
+                if exists:
             print("SKIP existing card:", new_card_name)
         else:
-            created_card = create_card(
-                TARGET_LIST_ID,
-                new_card_name,
-                new_card_desc
-            )
+            created_card = create_card(TARGET_LIST_ID, new_card_name, new_card_desc)
             print("CARD CREATED:", created_card)
 
     except Exception as e:
@@ -292,7 +288,7 @@ def trello_webhook():
 
     return jsonify({"status": "ok", "mode": "both"}), 200
 
-
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
