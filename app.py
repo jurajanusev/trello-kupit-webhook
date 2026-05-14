@@ -12,8 +12,7 @@ TOKEN = os.environ["TRELLO_TOKEN"]
 TARGET_CARD_ID = os.environ["TARGET_CARD_ID"]
 TARGET_CHECKLIST_NAME = os.environ.get("TARGET_CHECKLIST_NAME", "Kupit")
 TARGET_LIST_ID = os.environ["TARGET_LIST_ID"]
-ALLOWED_LIST_IDS = os.getenv("ALLOWED_LIST_IDS", "").split(",")
-
+ALLOWED_LIST_IDS = set(filter(None, os.getenv("ALLOWED_LIST_IDS", "").split(",")))
 CHECKLIST_TAG = os.environ.get("CHECKLIST_TAG", "[Z]")
 
 BASE = "https://api.trello.com/1"
