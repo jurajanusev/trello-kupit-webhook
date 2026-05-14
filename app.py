@@ -9,10 +9,19 @@ app = Flask(__name__)
 API_KEY = os.environ["TRELLO_KEY"]
 TOKEN = os.environ["TRELLO_TOKEN"]
 
-TARGET_CARD_ID = os.environ["TARGET_CARD_ID"]
-TARGET_CHECKLIST_NAME = os.environ.get("TARGET_CHECKLIST_NAME", "Kupit")
-TARGET_LIST_ID = os.environ["TARGET_LIST_ID"]
-ALLOWED_LIST_ID = os.environ["ALLOWED_LIST_ID"]
+BOARD_CONFIG = {
+    "69cd95eed6bf6120fee7dd22": {
+        "target_card_id": "69e5345410c5e305cdb9c22f",
+        "target_list_id": "69e53446a823be00f2e5e837",
+        "checklist_name": "Kupit"
+    },
+
+    "ID_SLEDOVANEHO_LISTU_2": {
+        "target_card_id": "6a0608facad8cbe3997be410",
+        "target_list_id": "6a057f30a60d4ab5aee502b6",
+        "checklist_name": "Kupit"
+    }
+}
 
 CHECKLIST_TAG = os.environ.get("CHECKLIST_TAG", "[Z]")
 
@@ -99,7 +108,7 @@ def normalize_item_name(text):
     return t
 
 
-def find_cards_with_exact_item(search_term, exclude_card_id=None):
+def find_cards_with_exact_item(search_term, allowed_list_id, exclude_card_id=None):
     print("SEARCH TERM:", search_term)
     matching_cards = []
     search_norm = normalize_item_name(search_term)
@@ -114,7 +123,7 @@ def find_cards_with_exact_item(search_term, exclude_card_id=None):
 
     try:
         # Použijeme cestu pre list, ktorá vráti karty so zanorenými checklistami
-        cards = trello_get(f"/lists/{ALLOWED_LIST_ID}/cards", params)
+        cards = trello_get(f"/lists/{allowed_list_id}/cards", params)
         print(f"CARDS LOADED: {len(cards)}")
     except Exception as e:
         print(f"ERROR loading cards from list: {str(e)}")
@@ -204,9 +213,17 @@ def trello_webhook():
     except Exception as e:
         return jsonify({"status": "error", "reason": f"failed to load card: {str(e)}"}), 500
 
-    if card_info["idList"] != ALLOWED_LIST_ID:
+    allowed_list_id = card_info["idList"]
+
+    if allowed_list_id not in BOARD_CONFIG:
         print("IGNORED: wrong list")
-        return jsonify({"status": "ignored", "reason": "card not in allowed list"}), 200
+        return jsonify({"status": "ignored", "reason": "card not in configured list"}), 200
+
+    config = BOARD_CONFIG[allowed_list_id]
+
+    target_card_id = config["target_card_id"]
+    target_list_id = config["target_list_id"]
+    target_checklist_name = config["checklist_name"]
 
     item_lower = checkitem_name.lower()
     tag_lower = CHECKLIST_TAG.lower()
@@ -225,15 +242,16 @@ def trello_webhook():
 
     # 1. Pridanie položky do cieľového checklistu
     try:
-        target_checklists = get_checklists_on_card(TARGET_CARD_ID)
+        target_checklists = get_checklists_on_card(target_card_id)
         target_checklist = find_checklist_by_name(
             target_checklists,
-            TARGET_CHECKLIST_NAME
+            target_checklist_name
         )
 
         if target_checklist:
             matching_cards = find_cards_with_exact_item(
                 clean_name,
+                allowed_list_id,
                 exclude_card_id=None
             )
 
@@ -258,6 +276,7 @@ def trello_webhook():
 
         matching_cards = find_cards_with_exact_item(
             clean_name,
+            allowed_list_id,
             exclude_card_id=card_id
         )
 
@@ -274,12 +293,12 @@ def trello_webhook():
             f"Nájdené v kartách:\n{found_text}"
         )
 
-        exists = card_exists_in_list(TARGET_LIST_ID, new_card_name)
+        exists = card_exists_in_list(target_list_id, new_card_name)
 
         if exists:
             print("SKIP existing card:", new_card_name)
         else:
-            created_card = create_card(TARGET_LIST_ID, new_card_name, new_card_desc)
+            created_card = create_card(target_list_id, new_card_name, new_card_desc)
             print("CARD CREATED:", created_card)
 
     except Exception as e:
