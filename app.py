@@ -12,7 +12,8 @@ TOKEN = os.environ["TRELLO_TOKEN"]
 TARGET_CARD_ID = os.environ["TARGET_CARD_ID"]
 TARGET_CHECKLIST_NAME = os.environ.get("TARGET_CHECKLIST_NAME", "Kupit")
 TARGET_LIST_ID = os.environ["TARGET_LIST_ID"]
-ALLOWED_LIST_IDS = set(filter(None, os.getenv("ALLOWED_LIST_IDS", "").split(",")))
+ALLOWED_LIST_ID = os.environ["ALLOWED_LIST_ID"]
+
 CHECKLIST_TAG = os.environ.get("CHECKLIST_TAG", "[Z]")
 
 BASE = "https://api.trello.com/1"
@@ -112,14 +113,9 @@ def find_cards_with_exact_item(search_term, exclude_card_id=None):
     }
 
     try:
-        cards = []
-
-        for list_id in ALLOWED_LIST_IDS:
-            list_cards = trello_get(f"/lists/{list_id}/cards", params)
-            cards.extend(list_cards)
-
+        # Použijeme cestu pre list, ktorá vráti karty so zanorenými checklistami
+        cards = trello_get(f"/lists/{ALLOWED_LIST_ID}/cards", params)
         print(f"CARDS LOADED: {len(cards)}")
-
     except Exception as e:
         print(f"ERROR loading cards from list: {str(e)}")
         return []
@@ -208,7 +204,7 @@ def trello_webhook():
     except Exception as e:
         return jsonify({"status": "error", "reason": f"failed to load card: {str(e)}"}), 500
 
-    if card_info["idList"] not in ALLOWED_LIST_IDS:
+    if card_info["idList"] != ALLOWED_LIST_ID:
         print("IGNORED: wrong list")
         return jsonify({"status": "ignored", "reason": "card not in allowed list"}), 200
 
@@ -280,7 +276,7 @@ def trello_webhook():
 
         exists = card_exists_in_list(TARGET_LIST_ID, new_card_name)
 
-        if exists:
+                if exists:
             print("SKIP existing card:", new_card_name)
         else:
             created_card = create_card(TARGET_LIST_ID, new_card_name, new_card_desc)
@@ -295,4 +291,3 @@ def trello_webhook():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
-
