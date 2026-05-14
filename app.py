@@ -16,7 +16,7 @@ BOARD_CONFIG = {
         "checklist_name": "Kupit"
     },
 
-    "ID_SLEDOVANEHO_LISTU_2": {
+    "69f74077554ff079f9472308": {
         "target_card_id": "6a0608facad8cbe3997be410",
         "target_list_id": "6a057f30a60d4ab5aee502b6",
         "checklist_name": "Kupit"
