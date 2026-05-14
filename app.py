@@ -276,7 +276,7 @@ def trello_webhook():
 
         exists = card_exists_in_list(TARGET_LIST_ID, new_card_name)
 
-                if exists:
+        if exists:
             print("SKIP existing card:", new_card_name)
         else:
             created_card = create_card(TARGET_LIST_ID, new_card_name, new_card_desc)
