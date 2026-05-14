@@ -108,7 +108,7 @@ def find_cards_with_exact_item(search_term, exclude_card_id=None):
     params = {
         "fields": "name",
         "checklists": "all",      # Toto je kľúčová zmena
-        "checklist_fields": "id", # Stačí nám ID checklistu
+        "checklist_fields": "all", # Stačí nám ID checklistu
         "limit": 1000
     }
 
