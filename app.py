@@ -11,14 +11,11 @@ TOKEN = os.environ["TRELLO_TOKEN"]
 
 BOARD_CONFIG = {
     "69cd95eed6bf6120fee7dd22": {
-        "target_card_id": "69e5345410c5e305cdb9c22f",
-        "target_list_id": "69e53446a823be00f2e5e837",
-        "checklist_name": "Kupit"
+        "target_list_id": "69e53446a823be00f2e5e837"
     },
+
     "69f74077554ff079f9472308": {
-        "target_card_id": "6a0608facad8cbe3997be410",
-        "target_list_id": "6a057f30a60d4ab5aee502b6",
-        "checklist_name": "Kupit"
+        "target_list_id": "6a057f30a60d4ab5aee502b6"
     }
 }
 
@@ -31,6 +28,10 @@ def trello_get(path, params=None):
     params = params or {}
     params.update({"key": API_KEY, "token": TOKEN})
     r = requests.get(f"{BASE}{path}", params=params, timeout=20)
+
+    if not r.ok:
+        print("TRELLO GET ERROR:", r.status_code, r.text)
+
     r.raise_for_status()
     return r.json()
 
@@ -39,6 +40,10 @@ def trello_post(path, params=None):
     params = params or {}
     params.update({"key": API_KEY, "token": TOKEN})
     r = requests.post(f"{BASE}{path}", params=params, timeout=20)
+
+    if not r.ok:
+        print("TRELLO POST ERROR:", r.status_code, r.text)
+
     r.raise_for_status()
     return r.json()
 
@@ -46,25 +51,6 @@ def trello_post(path, params=None):
 def get_card(card_id):
     return trello_get(f"/cards/{card_id}", {
         "fields": "name,idList,shortUrl,desc"
-    })
-
-
-def get_checklists_on_card(card_id):
-    return trello_get(f"/cards/{card_id}/checklists", {
-        "checkItems": "all"
-    })
-
-
-def find_checklist_by_name(checklists, checklist_name):
-    for cl in checklists:
-        if cl["name"].strip().lower() == checklist_name.strip().lower():
-            return cl
-    return None
-
-
-def add_checkitem_to_checklist(checklist_id, item_name):
-    return trello_post(f"/checklists/{checklist_id}/checkItems", {
-        "name": item_name
     })
 
 
@@ -134,7 +120,6 @@ def find_cards_with_exact_item(search_term, allowed_list_id, exclude_card_id=Non
             continue
 
         checklists = card.get("checklists", [])
-
         found_on_card = False
 
         for checklist in checklists:
@@ -219,10 +204,7 @@ def trello_webhook():
         return jsonify({"status": "ignored", "reason": "card not in configured list"}), 200
 
     config = BOARD_CONFIG[allowed_list_id]
-
-    target_card_id = config["target_card_id"]
     target_list_id = config["target_list_id"]
-    target_checklist_name = config["checklist_name"]
 
     item_lower = checkitem_name.lower()
     tag_lower = CHECKLIST_TAG.lower()
@@ -238,35 +220,6 @@ def trello_webhook():
 
     if not clean_name:
         return jsonify({"status": "ignored", "reason": "empty clean name"}), 200
-
-    try:
-        target_checklists = get_checklists_on_card(target_card_id)
-        target_checklist = find_checklist_by_name(
-            target_checklists,
-            target_checklist_name
-        )
-
-        if target_checklist:
-            matching_cards = find_cards_with_exact_item(
-                clean_name,
-                allowed_list_id,
-                exclude_card_id=None
-            )
-
-            if matching_cards:
-                found_text = ", ".join(matching_cards)
-            else:
-                found_text = "nenájdené"
-
-            new_item_text = f"{clean_name} - {found_text}"
-            add_checkitem_to_checklist(target_checklist["id"], new_item_text)
-
-            print("CHECKLIST ITEM CREATED:", new_item_text)
-        else:
-            print("ERROR: target checklist not found")
-
-    except Exception as e:
-        return jsonify({"status": "error", "reason": f"checklist failed: {str(e)}"}), 500
 
     try:
         new_card_name = f"{clean_name} - {card_info['name']}"
@@ -303,7 +256,7 @@ def trello_webhook():
         return jsonify({"status": "error", "reason": f"card failed: {str(e)}"}), 500
 
     processed_actions.add(action_id)
-    return jsonify({"status": "ok", "mode": "both"}), 200
+    return jsonify({"status": "ok", "mode": "card_only"}), 200
 
 
 if __name__ == "__main__":
