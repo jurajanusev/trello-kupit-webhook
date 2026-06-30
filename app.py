@@ -15,7 +15,6 @@ BOARD_CONFIG = {
         "target_list_id": "69e53446a823be00f2e5e837",
         "checklist_name": "Kupit"
     },
-
     "69f74077554ff079f9472308": {
         "target_card_id": "6a0608facad8cbe3997be410",
         "target_list_id": "6a057f30a60d4ab5aee502b6",
@@ -113,16 +112,14 @@ def find_cards_with_exact_item(search_term, allowed_list_id, exclude_card_id=Non
     matching_cards = []
     search_norm = normalize_item_name(search_term)
 
-    # Optimalizované API volanie: Stiahneme karty AJ s checklistami v jednom balíku
     params = {
         "fields": "name",
-        "checklists": "all",      # Toto je kľúčová zmena
-        "checklist_fields": "all", # Stačí nám ID checklistu
+        "checklists": "all",
+        "checklist_fields": "all",
         "limit": 1000
     }
 
     try:
-        # Použijeme cestu pre list, ktorá vráti karty so zanorenými checklistami
         cards = trello_get(f"/lists/{allowed_list_id}/cards", params)
         print(f"CARDS LOADED: {len(cards)}")
     except Exception as e:
@@ -136,21 +133,25 @@ def find_cards_with_exact_item(search_term, allowed_list_id, exclude_card_id=Non
         if exclude_card_id and card_id == exclude_card_id:
             continue
 
-        # Dáta checklistov sú už v objekte karty vďaka parametru checklists=all
         checklists = card.get("checklists", [])
-        
+
+        found_on_card = False
+
         for checklist in checklists:
-            # Každý checklist obsahuje pole checkItems
             for item in checklist.get("checkItems", []):
                 item_name = item.get("name", "")
+
                 if normalize_item_name(item_name) == search_norm:
                     print(f"MATCH FOUND IN CARD: {card_name}")
                     matching_cards.append(card_name)
-                    break 
+                    found_on_card = True
+                    break
+
+            if found_on_card:
+                break
 
     print("FINAL MATCHING CARDS:", matching_cards)
     return matching_cards
-
 
 
 @app.route("/", methods=["GET"])
@@ -238,7 +239,6 @@ def trello_webhook():
     if not clean_name:
         return jsonify({"status": "ignored", "reason": "empty clean name"}), 200
 
-    # 1. Pridanie položky do cieľového checklistu
     try:
         target_checklists = get_checklists_on_card(target_card_id)
         target_checklist = find_checklist_by_name(
@@ -268,7 +268,6 @@ def trello_webhook():
     except Exception as e:
         return jsonify({"status": "error", "reason": f"checklist failed: {str(e)}"}), 500
 
-    # 2. Vytvorenie novej karty
     try:
         new_card_name = f"{clean_name} - {card_info['name']}"
 
@@ -303,10 +302,10 @@ def trello_webhook():
         print("CARD ERROR:", repr(e))
         return jsonify({"status": "error", "reason": f"card failed: {str(e)}"}), 500
 
+    processed_actions.add(action_id)
     return jsonify({"status": "ok", "mode": "both"}), 200
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
-    
-    processed_actions.add(action_id)
