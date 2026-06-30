@@ -185,8 +185,6 @@ def trello_webhook():
         print("SKIP duplicate action:", action_id)
         return jsonify({"status": "ignored", "reason": "duplicate action"}), 200
 
-    processed_actions.add(action_id)
-
     if action_type not in ["createCheckItem", "updateCheckItem"]:
         return jsonify({"status": "ignored", "reason": f"unsupported action {action_type}"}), 200
 
@@ -310,3 +308,5 @@ def trello_webhook():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+    
+    rocessed_actions.add(action_id)
