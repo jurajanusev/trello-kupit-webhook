@@ -489,7 +489,7 @@ def build_trello_description(characters, body):
         f"**PREPIS: {lead}**" if lead else "**PREPIS:**",
     ]
     if rest:
-        parts.extend(["", rest])
+        parts.extend(["", format_scene_body(rest)])
     return "\n".join(parts).strip()
 
 
@@ -506,6 +506,48 @@ def split_lead_sentence(text):
     return normalized[: match.start()].strip(), normalized[match.end() :].strip()
 
 
+def format_scene_body(text):
+    lines = [line.strip() for line in text.split("\n")]
+    lines = [line for line in lines if line and not re.fullmatch(r"\d{1,3}", line)]
+    blocks = []
+    buffer = []
+    i = 0
+
+    while i < len(lines):
+        line = lines[i]
+        if looks_like_character_line(line):
+            flush_text_block(blocks, buffer)
+            speaker = line
+            dialogue = []
+            i += 1
+            while i < len(lines) and not looks_like_character_line(lines[i]):
+                if not re.fullmatch(r"\d{1,3}", lines[i]):
+                    dialogue.append(lines[i])
+                i += 1
+            spoken = join_wrapped_lines(dialogue)
+            blocks.append(f"**{speaker}:** {spoken}".strip())
+            continue
+
+        buffer.append(line)
+        i += 1
+
+    flush_text_block(blocks, buffer)
+    return "\n\n".join(block for block in blocks if block).strip()
+
+
+def flush_text_block(blocks, buffer):
+    if buffer:
+        blocks.append(join_wrapped_lines(buffer))
+        buffer.clear()
+
+
+def join_wrapped_lines(lines):
+    text = " ".join(line.strip() for line in lines if line.strip())
+    text = re.sub(r"\s+", " ", text)
+    text = re.sub(r"\s+([,.!?;:])", r"\1", text)
+    return text.strip()
+
+
 def scene_card_from_id(scene_id, title, body):
     characters = guess_opening_characters(body)
     card_title = build_trello_scene_title(scene_id, title, characters)
@@ -514,9 +556,14 @@ def scene_card_from_id(scene_id, title, body):
     card["name"] = card_title
     card["description"] = build_trello_description(characters, body)
     card["characters"] = characters
-    card["labels"] = ["PREPIS"]
+    card["labels"] = []
     card["checklistName"] = "Rekvizity"
     card["checklist"] = []
+    card["checklists"] = [
+        {"name": "Rekvizity", "items": []},
+        {"name": "Poznamky z porady", "items": []},
+        {"name": "Info z natacania", "items": []},
+    ]
     return card
 
 
@@ -752,11 +799,6 @@ def trello_webhook():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
-
-
-
-
-
 
 
 
