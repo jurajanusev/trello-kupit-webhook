@@ -459,7 +459,7 @@ def looks_like_character_line(line):
 def split_character_line(line):
     cleaned = re.sub(r"\([^)]*\)", "", line)
     names = re.split(r",|\+| A | S ", cleaned)
-    ignored = {"ŽIADNA POSTAVA"}
+    ignored = set()
     return [name.strip().title() for name in names if name.strip().upper() not in ignored]
 
 
@@ -500,7 +500,7 @@ def scene_card_from_id(scene_id, title, body):
     card["number"] = scene_id
     card["name"] = card_title
     card["description"] = build_trello_description(characters, body)
-    card["characters"] = characters or card["characters"]
+    card["characters"] = characters
     card["labels"] = ["PREPIS"]
     card["checklistName"] = "Rekvizity"
     card["checklist"] = []
@@ -739,6 +739,12 @@ def trello_webhook():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
+
+
+
+
+
 
 
 
