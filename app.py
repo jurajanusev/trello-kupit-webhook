@@ -309,6 +309,11 @@ SCENE_HEADING_RE = re.compile(
     re.IGNORECASE,
 )
 
+TV_SCENE_HEADING_RE = re.compile(
+    r"^\s*(?P<scene>\d+/\d+)(?P<tag>[A-Z]{0,12})?\.?\s*(?P<title>(?:INT\.?|EXT\.?).*)$",
+    re.IGNORECASE,
+)
+
 
 @app.route("/screener", methods=["GET"])
 def screener():
@@ -343,6 +348,15 @@ def split_scenes(text):
         ):
             starts.append(idx)
 
+    tv_starts = [
+        (idx, TV_SCENE_HEADING_RE.match(line.strip()))
+        for idx, line in enumerate(lines)
+        if TV_SCENE_HEADING_RE.match(line.strip())
+    ]
+    if tv_starts:
+        starts = select_script_body_starts(tv_starts)
+        return build_tv_scene_cards(lines, starts)
+
     if not starts:
         starts = [idx for idx, line in enumerate(lines) if SCENE_HEADING_RE.match(line.strip())]
 
@@ -364,6 +378,38 @@ def split_scenes(text):
         cards.append(scene_card(number, title, body))
 
     return cards
+
+
+
+def select_script_body_starts(tv_starts):
+    first_scene = tv_starts[0][1].group("scene")
+    body_start_pos = 0
+    for pos, (_, match) in enumerate(tv_starts[1:], start=1):
+        if match.group("scene") == first_scene:
+            body_start_pos = pos
+    return tv_starts[body_start_pos:]
+
+
+def build_tv_scene_cards(lines, starts):
+    cards = []
+    for pos, (start, match) in enumerate(starts):
+        end = starts[pos + 1][0] if pos + 1 < len(starts) else len(lines)
+        block = "\n".join(lines[start:end]).strip()
+        scene_id = match.group("scene")
+        tag = (match.group("tag") or "").strip()
+        title = match.group("title").strip()
+        scene_key = f"{scene_id}{tag}"
+        block_lines = block.split("\n")
+        body = "\n".join(block_lines[1:]).strip() if len(block_lines) > 1 else block
+        cards.append(scene_card_from_id(scene_key, title, body))
+    return cards
+
+
+def scene_card_from_id(scene_id, title, body):
+    card = scene_card(0, title, body)
+    card["number"] = scene_id
+    card["name"] = f"Obraz {scene_id} - {title}"
+    return card
 
 
 def scene_card(number, title, body):
@@ -598,6 +644,12 @@ def trello_webhook():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
+
+
+
+
+
 
 
 
