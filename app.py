@@ -657,6 +657,124 @@ def build_description(location, time_of_day, characters, body):
     ]
     return "\n".join(parts).strip()
 
+
+def normalize_lookup(value):
+    normalized = unicodedata.normalize("NFKD", value or "")
+    ascii_text = "".join(ch for ch in normalized if not unicodedata.combining(ch))
+    return re.sub(r"[^a-z0-9]+", "", ascii_text.lower())
+
+
+def find_trello_board_by_name(board_name):
+    target = normalize_lookup(board_name)
+    boards = trello_get("/members/me/boards", {"fields": "name,closed"})
+    for board in boards:
+        if not board.get("closed") and normalize_lookup(board.get("name")) == target:
+            return board
+    raise RuntimeError(f"Trello board not found: {board_name}")
+
+
+def find_trello_list_by_name(board_id, list_name):
+    target = normalize_lookup(list_name)
+    lists = trello_get(f"/boards/{board_id}/lists", {"fields": "name,closed"})
+    for trello_list in lists:
+        if not trello_list.get("closed") and normalize_lookup(trello_list.get("name")) == target:
+            return trello_list
+    raise RuntimeError(f"Trello list not found: {list_name}")
+
+
+def add_checklist(card_id, name, items):
+    checklist = trello_post_body("/checklists", {"idCard": card_id, "name": name})
+    for item in items or []:
+        if item:
+            trello_post_body(
+                f"/checklists/{checklist['id']}/checkItems",
+                {"name": item, "checked": "false"},
+            )
+    return checklist
+
+
+@app.route("/api/import-screener-cards", methods=["POST"])
+def import_screener_cards():
+    payload = request.get_json(silent=True) or {}
+    board_name = payload.get("board") or "Riverdale"
+    list_name = payload.get("list") or "Scenare"
+    cards = payload.get("cards") or []
+
+    if not cards:
+        return jsonify({"error": "No cards supplied"}), 400
+
+    try:
+        board = find_trello_board_by_name(board_name)
+        target_list = find_trello_list_by_name(board["id"], list_name)
+        existing_cards = trello_get(
+            f"/lists/{target_list['id']}/cards",
+            {"fields": "name", "filter": "open"},
+        )
+        existing_names = {card.get("name") for card in existing_cards}
+
+        created = []
+        skipped = []
+        errors = []
+
+        for card in cards:
+            name = (card.get("name") or "").strip()
+            if not name:
+                errors.append({"name": "", "error": "Missing card name"})
+                continue
+            if name in existing_names:
+                skipped.append(name)
+                continue
+
+            try:
+                created_card = trello_post_body(
+                    "/cards",
+                    {
+                        "idList": target_list["id"],
+                        "name": name,
+                        "desc": card.get("description") or "",
+                        "pos": "bottom",
+                    },
+                )
+                checklists = card.get("checklists") or [
+                    {
+                        "name": card.get("checklistName") or "Rekvizity",
+                        "items": card.get("checklist") or [],
+                    }
+                ]
+                for checklist in checklists:
+                    add_checklist(
+                        created_card["id"],
+                        checklist.get("name") or "Rekvizity",
+                        checklist.get("items") or [],
+                    )
+                created.append(
+                    {
+                        "name": name,
+                        "url": created_card.get("shortUrl") or created_card.get("url"),
+                    }
+                )
+                existing_names.add(name)
+            except Exception as exc:
+                errors.append({"name": name, "error": str(exc)})
+
+        status_code = 207 if errors else 200
+        return jsonify(
+            {
+                "board": board.get("name"),
+                "list": target_list.get("name"),
+                "counts": {
+                    "created": len(created),
+                    "skipped": len(skipped),
+                    "errors": len(errors),
+                },
+                "created": created,
+                "skipped": skipped,
+                "errors": errors,
+            }
+        ), status_code
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 500
+
 @app.route("/", methods=["GET"])
 def home():
     return "Trello webhook server is running", 200
@@ -799,6 +917,8 @@ def trello_webhook():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
+
 
 
 
