@@ -90,6 +90,18 @@ def trello_post(path, params=None):
     return r.json()
 
 
+def trello_post_body(path, data=None):
+    data = data or {}
+    data.update({"key": API_KEY, "token": TOKEN})
+    r = requests.post(f"{BASE}{path}", data=data, timeout=20)
+
+    if not r.ok:
+        print("TRELLO POST BODY ERROR:", r.status_code, r.text)
+
+    r.raise_for_status()
+    return r.json()
+
+
 def microsoft_enabled():
     return all([
         MICROSOFT_CLIENT_ID,
@@ -633,10 +645,10 @@ def get_or_create_label(board_id, name, color="purple"):
 
 
 def add_checklist(card_id, name, items):
-    checklist = trello_post("/checklists", {"idCard": card_id, "name": name})
+    checklist = trello_post_body("/checklists", {"idCard": card_id, "name": name})
     for item in items or []:
         if item:
-            trello_post(f"/checklists/{checklist['id']}/checkItems", {"name": item, "checked": "false"})
+            trello_post_body(f"/checklists/{checklist['id']}/checkItems", {"name": item, "checked": "false"})
     return checklist
 
 
@@ -667,7 +679,7 @@ def import_screener_cards():
             skipped.append(name)
             continue
         try:
-            created_card = trello_post("/cards", {
+            created_card = trello_post_body("/cards", {
                 "idList": target_list["id"],
                 "name": name,
                 "desc": card.get("description") or "",
@@ -833,6 +845,11 @@ def trello_webhook():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
+
+
+
+
 
 
 
