@@ -67,7 +67,7 @@ csvBtn.addEventListener("click", () => {
       card.name,
       card.description,
       (card.labels || []).join(", "),
-      (card.checklist || []).join(" | "),
+      [card.checklistName, ...(card.checklist || [])].filter(Boolean).join(" | "),
     ]);
   });
   download(`${slug(projectName.value)}-trello-cards.csv`, toCsv(rows), "text/csv");
@@ -102,9 +102,10 @@ function renderCards() {
       .filter(Boolean)
       .map((item) => `<span>${escapeHtml(item)}</span>`)
       .join("");
-    node.querySelector(".checklist").innerHTML = (card.checklist || [])
-      .map((item) => `<label><input type="checkbox"><span>${escapeHtml(item)}</span></label>`)
-      .join("");
+    const checklistItems = card.checklist || [];
+    node.querySelector(".checklist").innerHTML = checklistItems.length
+      ? checklistItems.map((item) => `<label><input type="checkbox"><span>${escapeHtml(item)}</span></label>`).join("")
+      : `<label><input type="checkbox"><span>${escapeHtml(card.checklistName || "Rekvizity")}</span></label>`;
 
     title.addEventListener("input", () => {
       card.name = title.value;
