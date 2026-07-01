@@ -398,17 +398,112 @@ def build_tv_scene_cards(lines, starts):
         scene_id = match.group("scene")
         tag = (match.group("tag") or "").strip()
         title = match.group("title").strip()
-        scene_key = f"{scene_id}{tag}"
+        scene_key = format_scene_key(scene_id, tag)
         block_lines = block.split("\n")
         body = "\n".join(block_lines[1:]).strip() if len(block_lines) > 1 else block
         cards.append(scene_card_from_id(scene_key, title, body))
     return cards
 
 
+def format_scene_key(scene_id, tag):
+    episode, scene = scene_id.split("/", 1)
+    return f"{int(episode):02d}/{int(scene):02d}{tag}"
+
+
+def build_trello_scene_title(scene_id, title, characters):
+    normalized = normalize_scene_heading(title)
+    suffix = f" — {', '.join(name.upper() for name in characters)}" if characters else ""
+    return f"{scene_id}. {normalized}{suffix}"
+
+
+def normalize_scene_heading(title):
+    title = re.sub(r"\s+", " ", title.strip())
+    title = title.replace(" – ", " - ")
+    title = re.sub(r"\s+-\s+(DAY|NIGHT|DEŇ|NOC|RÁNO|RANO|VEČER|VECER)\b", r", \1", title, flags=re.IGNORECASE)
+    replacements = {
+        "DAY": "DEŇ",
+        "NIGHT": "NOC",
+        "RANO": "RÁNO",
+        "VECER": "VEČER",
+    }
+    for source, target in replacements.items():
+        title = re.sub(rf"\b{source}\b", target, title, flags=re.IGNORECASE)
+    return title.upper()
+
+
+def guess_opening_characters(body):
+    lines = [line.strip() for line in body.split("\n") if line.strip()]
+    collected = []
+    for line in lines[:8]:
+        if looks_like_character_line(line):
+            collected.extend(split_character_line(line))
+            continue
+        if collected:
+            break
+    seen = []
+    for name in collected:
+        if name and name not in seen:
+            seen.append(name)
+    return seen[:16]
+
+
+def looks_like_character_line(line):
+    if len(line) > 130:
+        return False
+    if any(token in line.upper() for token in ["INT.", "EXT.", "OBRAZ", "SCÉNA", "SCENA"]):
+        return False
+    letters = re.sub(r"[^A-Za-zÁČĎÉÍĽĹŇÓÔŔŠŤÚÝŽÄÖÜáčďéíľĺňóôŕšťúýžäöü]", "", line)
+    return bool(letters) and line == line.upper()
+
+
+def split_character_line(line):
+    cleaned = re.sub(r"\([^)]*\)", "", line)
+    names = re.split(r",|\+| A | S ", cleaned)
+    ignored = {"ŽIADNA POSTAVA"}
+    return [name.strip().title() for name in names if name.strip().upper() not in ignored]
+
+
+def build_trello_description(characters, body):
+    cleaned = body.strip()
+    lines = cleaned.split("\n")
+    while lines and (not lines[0].strip() or looks_like_character_line(lines[0].strip())):
+        lines.pop(0)
+    scene_text = "\n".join(lines).strip()
+    lead, rest = split_lead_sentence(scene_text)
+    parts = [
+        f"POSTAVY: {', '.join(name.upper() for name in characters) if characters else 'DOPLNIŤ'}",
+        "",
+        f"**PREPIS: {lead}**" if lead else "**PREPIS:**",
+    ]
+    if rest:
+        parts.extend(["", rest])
+    return "\n".join(parts).strip()
+
+
+def split_lead_sentence(text):
+    normalized = text.strip()
+    if not normalized:
+        return "", ""
+    first_line, separator, rest = normalized.partition("\n")
+    if separator:
+        return first_line.strip(), rest.strip()
+    match = re.search(r"(?<=[.!?])\s+", normalized)
+    if not match:
+        return normalized, ""
+    return normalized[: match.start()].strip(), normalized[match.end() :].strip()
+
+
 def scene_card_from_id(scene_id, title, body):
+    characters = guess_opening_characters(body)
+    card_title = build_trello_scene_title(scene_id, title, characters)
     card = scene_card(0, title, body)
     card["number"] = scene_id
-    card["name"] = f"Obraz {scene_id} - {title}"
+    card["name"] = card_title
+    card["description"] = build_trello_description(characters, body)
+    card["characters"] = characters or card["characters"]
+    card["labels"] = ["PREPIS"]
+    card["checklistName"] = "Rekvizity"
+    card["checklist"] = []
     return card
 
 
@@ -644,6 +739,9 @@ def trello_webhook():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
+
+
 
 
 
