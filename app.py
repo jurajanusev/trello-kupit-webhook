@@ -548,8 +548,93 @@ def join_wrapped_lines(lines):
     return text.strip()
 
 
+
+PROP_RULES = [
+    ("Policajné auto", r"\bpolicajne auto\b"),
+    ("Policajná páska / opáskované miesto", r"\bopaskoval\w*|\bpask\w*"),
+    ("Nosidlá / vak na telo", r"\bnosidl\w*|\bzazipsovan\w*"),
+    ("Auto", r"\baut(?:o|a|e|om|u)\b"),
+    ("Limuzína / SUV", r"\blimuzin\w*|\bsuv\b"),
+    ("Čln", r"\bcln\w*"),
+    ("Notebook", r"\bnotebook\w*"),
+    ("Mobil", r"\bmobil\w*"),
+    ("Fotoalbum", r"\bfotoalbum\w*"),
+    ("Fotky", r"\bfotk\w*"),
+    ("Šatka", r"\bsatk\w*"),
+    ("Batoh", r"\bbatoh\w*"),
+    ("Školská taška", r"\bskolsk\w+\s+task\w*"),
+    ("Taška s jedlom", r"\btask\w*.{0,40}\bjedl\w*|\bjedl\w*.{0,40}\btask\w*"),
+    ("Nákupné tašky", r"\bnakupn\w+\s+task\w*"),
+    ("Cestovná taška s monogramom L.S.", r"\bcestovn\w+\s+.*task\w*|\bmonogram\w*"),
+    ("Taška", r"\btask\w*"),
+    ("Obálka s peniazmi", r"\bobalk\w*|\bpeniaz\w*"),
+    ("Blister s liekmi / Ritalin", r"\bblister\w*|\britalin\b|\bliek\w*"),
+    ("DJ pult", r"\bdj pult\w*"),
+    ("Laptop", r"\blaptop\w*"),
+    ("Looper", r"\blooper\w*"),
+    ("Klávesy", r"\bklaves\w*"),
+    ("Slúchadlá", r"\bsluchadl\w*"),
+    ("Automaty na snacky a pitie", r"\bautomat\w*"),
+    ("Nástenka", r"\bnastenk\w*"),
+    ("JBL reproduktor", r"\bjbl\b"),
+    ("Pištoľ / zbraň", r"\bpistol\w*|\bzbran\w*"),
+    ("Basketbalová lopta", r"\blopt\w*"),
+    ("Uterák", r"\buterak\w*"),
+    ("Mikrofón", r"\bmikrofon\w*"),
+    ("Gitara", r"\bgitara\b|\bgitare\b|\bgitarou\b|\bna gitare\b"),
+    ("Loptička pre psa", r"\bloptick\w*"),
+    ("Pivo", r"\bpiv\w*"),
+    ("Výzdoba", r"\bvyzdob\w*"),
+    ("Jedlo a pitie", r"\bjedlo\b|\bpitie\b"),
+    ("Drinky", r"\bdrink\w*"),
+    ("Víno", r"\bvin\w*"),
+]
+
+
+def extract_rekvizity(text):
+    normalized = normalize_for_lookup(text)
+    props = []
+    for label, pattern in PROP_RULES:
+        if re.search(pattern, normalized, re.IGNORECASE):
+            props.append(label)
+    return prune_rekvizity(props)
+
+
+def normalize_for_lookup(text):
+    replacements = str.maketrans(
+        "áäčďéíĺľňóôŕšťúýžÁÄČĎÉÍĹĽŇÓÔŔŠŤÚÝŽ",
+        "aacdeillnoorstuyzAACDEILLNOORSTUYZ",
+    )
+    return text.translate(replacements).lower()
+
+
+def prune_rekvizity(props):
+    if "Školská taška" in props or "Taška s jedlom" in props or "Nákupné tašky" in props or "Cestovná taška s monogramom L.S." in props:
+        props = [prop for prop in props if prop != "Taška"]
+    if "Loptička pre psa" in props:
+        props = [prop for prop in props if prop != "Basketbalová lopta"]
+    seen = []
+    for prop in props:
+        if prop not in seen:
+            seen.append(prop)
+    return seen
+
+
+def adjust_rekvizity_for_scene(scene_id, props):
+    removals = {
+        "01/12FLASH": {"Čln", "Šatka"},
+        "01/17": {"Gitara"},
+        "01/27FLASH": {"Notebook", "Mikrofón"},
+    }
+    blocked = removals.get(scene_id, set())
+    if blocked:
+        props = [prop for prop in props if prop not in blocked]
+    return props
+
 def scene_card_from_id(scene_id, title, body):
     characters = guess_opening_characters(body)
+    props = extract_rekvizity(f"{title}\n{body}")
+    props = adjust_rekvizity_for_scene(scene_id, props)
     card_title = build_trello_scene_title(scene_id, title, characters)
     card = scene_card(0, title, body)
     card["number"] = scene_id
@@ -558,9 +643,9 @@ def scene_card_from_id(scene_id, title, body):
     card["characters"] = characters
     card["labels"] = []
     card["checklistName"] = "Rekvizity"
-    card["checklist"] = []
+    card["checklist"] = props
     card["checklists"] = [
-        {"name": "Rekvizity", "items": []},
+        {"name": "Rekvizity", "items": props},
         {"name": "Poznamky z porady", "items": []},
         {"name": "Info z natacania", "items": []},
     ]
@@ -656,6 +741,119 @@ def build_description(location, time_of_day, characters, body):
         body,
     ]
     return "\n".join(parts).strip()
+
+
+def normalize_lookup(value):
+    normalized = unicodedata.normalize("NFKD", value or "")
+    ascii_text = "".join(ch for ch in normalized if not unicodedata.combining(ch))
+    return re.sub(r"[^a-z0-9]+", "", ascii_text.lower())
+
+
+def find_trello_board_by_name(board_name):
+    target = normalize_lookup(board_name)
+    boards = trello_get("/members/me/boards", {"fields": "name,closed"})
+    for board in boards:
+        if not board.get("closed") and normalize_lookup(board.get("name")) == target:
+            return board
+    raise RuntimeError(f"Trello board not found: {board_name}")
+
+
+def find_trello_list_by_name(board_id, list_name):
+    target = normalize_lookup(list_name)
+    lists = trello_get(f"/boards/{board_id}/lists", {"fields": "name,closed"})
+    for trello_list in lists:
+        if not trello_list.get("closed") and normalize_lookup(trello_list.get("name")) == target:
+            return trello_list
+    raise RuntimeError(f"Trello list not found: {list_name}")
+
+
+def ensure_card_checklist(card_id, checklist_name):
+    target = normalize_lookup(checklist_name)
+    checklists = trello_get(
+        f"/cards/{card_id}/checklists",
+        {"fields": "name", "checkItems": "all"},
+    )
+    for checklist in checklists:
+        if normalize_lookup(checklist.get("name")) == target:
+            return checklist
+    return trello_post_body("/checklists", {"idCard": card_id, "name": checklist_name})
+
+
+@app.route("/api/update-rekvizity-checklists", methods=["POST"])
+def update_rekvizity_checklists():
+    payload = request.get_json(silent=True) or {}
+    board_name = payload.get("board") or "Riverdale"
+    list_name = payload.get("list") or "Scenare"
+    updates = payload.get("updates") or []
+
+    if not updates:
+        return jsonify({"error": "No updates supplied"}), 400
+
+    try:
+        board = find_trello_board_by_name(board_name)
+        target_list = find_trello_list_by_name(board["id"], list_name)
+        cards = trello_get(
+            f"/lists/{target_list['id']}/cards",
+            {"fields": "name", "filter": "open"},
+        )
+        cards_by_name = {card.get("name"): card for card in cards}
+
+        cards_updated = 0
+        items_added = 0
+        skipped = 0
+        errors = []
+
+        for update in updates:
+            name = (update.get("name") or "").strip()
+            items = [item for item in update.get("items") or [] if item]
+            if not name or not items:
+                skipped += 1
+                continue
+
+            card = cards_by_name.get(name)
+            if not card:
+                errors.append({"name": name, "error": "Card not found"})
+                continue
+
+            try:
+                checklist = ensure_card_checklist(card["id"], "Rekvizity")
+                existing = {
+                    normalize_lookup(item.get("name"))
+                    for item in checklist.get("checkItems") or []
+                }
+                added_for_card = 0
+                for item in items:
+                    if normalize_lookup(item) in existing:
+                        skipped += 1
+                        continue
+                    trello_post_body(
+                        f"/checklists/{checklist['id']}/checkItems",
+                        {"name": item, "checked": "false"},
+                    )
+                    existing.add(normalize_lookup(item))
+                    added_for_card += 1
+                    items_added += 1
+                if added_for_card:
+                    cards_updated += 1
+            except Exception as exc:
+                errors.append({"name": name, "error": str(exc)})
+
+        status_code = 207 if errors else 200
+        return jsonify(
+            {
+                "board": board.get("name"),
+                "list": target_list.get("name"),
+                "counts": {
+                    "cardsUpdated": cards_updated,
+                    "itemsAdded": items_added,
+                    "skipped": skipped,
+                    "errors": len(errors),
+                },
+                "errors": errors,
+            }
+        ), status_code
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 500
 
 @app.route("/", methods=["GET"])
 def home():
@@ -799,10 +997,6 @@ def trello_webhook():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
-
-
-
-
 
 
 
