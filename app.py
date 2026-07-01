@@ -15,7 +15,7 @@ MICROSOFT_AUTHORITY = os.environ.get("MICROSOFT_AUTHORITY", "consumers")
 TODO_LIST_ID = os.environ.get("TODO_LIST_ID")
 TODO_TASK_TITLE_TEMPLATE = os.environ.get("TODO_TASK_TITLE_TEMPLATE", "{item} - {card}")
 
-BOARD_CONFIG = {
+DEFAULT_BOARD_CONFIG = {
     "69cd95eed6bf6120fee7dd22": {
         "target_list_id": "69e53446a823be00f2e5e837"
     },
@@ -24,6 +24,37 @@ BOARD_CONFIG = {
         "target_list_id": "6a057f30a60d4ab5aee502b6"
     }
 }
+
+
+def load_board_config():
+    """
+    SOURCE_TARGET_LISTS format:
+    source_list_id:target_list_id,source_list_id:target_list_id
+    """
+    raw = os.environ.get("SOURCE_TARGET_LISTS", "").strip()
+    if not raw:
+        return DEFAULT_BOARD_CONFIG
+
+    config = {}
+    for pair in raw.split(","):
+        pair = pair.strip()
+        if not pair:
+            continue
+
+        if ":" not in pair:
+            raise RuntimeError(f"Invalid SOURCE_TARGET_LISTS pair: {pair}")
+
+        source_list_id, target_list_id = pair.split(":", 1)
+        source_list_id = source_list_id.strip()
+        target_list_id = target_list_id.strip()
+
+        if source_list_id and target_list_id:
+            config[source_list_id] = {"target_list_id": target_list_id}
+
+    return config
+
+
+BOARD_CONFIG = load_board_config()
 
 CHECKLIST_TAG = os.environ.get("CHECKLIST_TAG", "[Z]")
 
@@ -327,7 +358,7 @@ def trello_webhook():
     allowed_list_id = card_info["idList"]
 
     if allowed_list_id not in BOARD_CONFIG:
-        print("IGNORED: wrong list")
+        print("IGNORED: wrong list", allowed_list_id, "configured:", list(BOARD_CONFIG.keys()))
         return jsonify({"status": "ignored", "reason": "card not in configured list"}), 200
 
     config = BOARD_CONFIG[allowed_list_id]

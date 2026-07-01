@@ -15,3 +15,13 @@ TODO_TASK_TITLE_TEMPLATE={item} - {card}
 ```
 
 Ak tieto hodnoty nie su nastavene, povodne Trello kopirovanie funguje dalej a To Do cast sa preskoci.
+
+## Trello list mapping
+
+Source listy a ich cielove listy na kopirovanie kariet sa daju nastavit cez env:
+
+```env
+SOURCE_TARGET_LISTS=source_list_id:target_list_id,source_list_id:target_list_id
+```
+
+Ak `SOURCE_TARGET_LISTS` nie je nastavene, pouzije sa povodna konfiguracia v kode.
