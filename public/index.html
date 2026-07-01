@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="sk">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Trello Screener Add</title>
+    <link rel="stylesheet" href="/screener-assets/styles.css">
+  </head>
+  <body>
+    <main class="app">
+      <section class="panel input-panel">
+        <div class="brand">
+          <div>
+            <p class="eyebrow">Trello Screener Add</p>
+            <h1>Scenár na Trello karty</h1>
+          </div>
+          <button id="sampleBtn" class="ghost" type="button">Vložiť ukážku</button>
+        </div>
+
+        <label class="field">
+          <span>Názov projektu</span>
+          <input id="projectName" value="Testovací seriál" autocomplete="off">
+        </label>
+
+        <label class="field">
+          <span>Scenár</span>
+          <textarea id="scriptInput" placeholder="Vlož sem scenár. Ideálne s nadpismi typu OBRAZ 1, SCÉNA 2, INT./EXT. ..."></textarea>
+        </label>
+
+        <div class="actions">
+          <button id="parseBtn" type="button">Spracovať obrazy</button>
+          <button id="jsonBtn" class="secondary" type="button" disabled>Export JSON</button>
+          <button id="csvBtn" class="secondary" type="button" disabled>Export CSV</button>
+        </div>
+      </section>
+
+      <section class="workspace">
+        <div class="toolbar">
+          <div>
+            <p class="eyebrow">Náhľad boardu</p>
+            <h2 id="boardTitle">Karty zatiaľ čakajú na scenár</h2>
+          </div>
+          <div class="stats">
+            <span><strong id="cardCount">0</strong> kariet</span>
+            <span><strong id="characterCount">0</strong> postáv</span>
+          </div>
+        </div>
+
+        <div id="cards" class="cards empty">
+          <p>Po spracovaní sa tu zobrazia karty podľa jednotlivých obrazov.</p>
+        </div>
+      </section>
+    </main>
+
+    <template id="cardTemplate">
+      <article class="trello-card">
+        <div class="card-head">
+          <input class="card-title">
+          <span class="badge"></span>
+        </div>
+        <div class="meta"></div>
+        <textarea class="description"></textarea>
+        <div class="checklist"></div>
+      </article>
+    </template>
+
+    <script src="/screener-assets/app.js"></script>
+  </body>
+</html>
