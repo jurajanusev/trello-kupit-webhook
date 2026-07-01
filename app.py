@@ -631,10 +631,142 @@ def adjust_rekvizity_for_scene(scene_id, props):
         props = [prop for prop in props if prop not in blocked]
     return props
 
+
+SCENE_REKVIZITY_DETAILS = {
+    "01/02LP": {
+        "Auto": "Auto Jakuba a Sáry - cesta k rieke; nadväzuje na 01/03LP a 01/04LP; aj letecký záber na auto",
+    },
+    "01/03LP": {
+        "Auto": "Auto Jakuba a Sáry - pokračuje lesom k rieke; nadväzuje na 01/02LP a pokračuje v 01/04LP",
+    },
+    "01/04LP": {
+        "Auto": "Auto Jakuba a Sáry - zastaví pri rieke, výstup z auta; nadväzuje na 01/02LP-01/03LP",
+        "Čln": "Čln pri rieke - Jakub a Sára sa presúvajú k plavbe; nadväzuje na 01/06LP",
+    },
+    "01/06LP": {
+        "Čln": "Čln na rieke - Jakub vesluje, Sára sedí v člne; nadväzuje na 01/04LP",
+    },
+    "01/08LP": {
+        "Čln": "Policajný čln - policajti z člna koordinujú hľadanie Jakubovho tela",
+    },
+    "01/09": {
+        "Policajné auto": "Policajné auto - blikajúce v pozadí na brehu rieky pri vyšetrovaní Jakuba",
+        "Čln": "Policajný čln / riečny zásah - nadväzuje na hľadanie tela v 01/08LP",
+        "Auto": None,
+    },
+    "01/11FLASH": {
+        "Šatka": "Sárina šatka - pláva vo vode; súčasť Sárinej verzie nehody, nadväzuje na rozprávanie v 01/12FLASH",
+    },
+    "01/12FLASH": {
+        "Notebook": "Dogyho notebook vo Fefe Beef - Dogy píše román/VO, rámuje flashback so Sárou",
+        "Fotoalbum": "Sárin fotoalbum - Sára si v izbe prezerá Jakubove fotky",
+        "Fotky": "Jakubove fotky vo fotoalbume - používa Sára pri spomienke na Jakuba",
+    },
+    "01/13": {
+        "Limuzína / SUV": "Čierna limuzína / SUV vyššej triedy - Veronika a Laura prichádzajú pred vilu",
+    },
+    "01/15": {
+        "Auto": "Kikove auto - Kiko a Bety prichádzajú pred dom Bety; Alex sa objaví pred autom",
+    },
+    "01/16": {
+        "Mobil": "Betin mobil - Bety kontroluje displej, Kiko jej ho berie",
+    },
+    "01/17": {
+        "Taška s jedlom": "Zabalená taška s jedlom pre Veroniku - Fefe ju prinesie a položí na pult",
+    },
+    "01/18": {
+        "Batoh": "Alexov batoh do školy - Alex doň hodí posledné veci a zazipsuje ho",
+        "Obálka s peniazmi": "Obálka s peniazmi od Lukáša - Lukáš ňou máva, rieši prácu v kancli",
+    },
+    "01/19": {
+        "Batoh": "Betin školský batoh/taška - Bety sa chystá do školy a balí si veci",
+        "Taška": "Betina taška do školy - Bety si ju balí pred odchodom",
+        "Blister s liekmi / Ritalin": "Blister s Ritalinom - Alica ho podá Bety, Bety si ho berie",
+    },
+    "01/22": {
+        "DJ pult": "DJ pult v hudobnej miestnosti - obsluhuje ho Mery",
+        "Laptop": "Laptop pri DJ pulte - súčasť Merynej hudobnej zostavy",
+        "Looper": "Looper - súčasť Merynej elektronickej hudobnej zostavy",
+        "Klávesy": "Klávesy / malé klávesy - Lea hrá na klávesoch, Mery ich má pri DJ pulte",
+        "Slúchadlá": "Slúchadlá Mery - Mery ich má na ušiach pri obsluhe DJ pultu",
+    },
+    "01/23": {
+        "Mobil": "Alexov mobil - Alex ťuká do mobilu pri automate/nástenke",
+        "Automaty na snacky a pitie": "Automat na chodbe - Alex si pri ňom vyberá vec alebo sa zastaví pri nástenke",
+        "Nástenka": "Školská nástenka - alternatívna akcia Alexa pri chodbe so skrinkami",
+    },
+    "01/27FLASH": {
+        "Auto": "Auto Olasovej - deň pri stavbe a noc na parkovisku; kontinuita s 01/26FLASH a 01/32FLASH",
+    },
+    "01/30": {
+        "Mobil": "Alexov mobil - Alex púšťa Bety a Kikovi svoju pesničku",
+        "Školská taška": "Alexova školská taška - Alex ju berie pri odchode",
+        "Automaty na snacky a pitie": "Automaty v školskej klubovni - snacky a pitie v pozadí scény",
+        "Jedlo a pitie": "Jedlo a pitie v klubovni - decká sedia, kecajú a jedia",
+    },
+    "01/32FLASH": {
+        "Auto": "Auto Olasovej - odstavené pri rieke počas výstrelu; kontinuita 01/26FLASH-01/27FLASH-01/32FLASH",
+        "Mobil": "Alexov mobil - Alex púšťa Olasovej demo/pesničku",
+        "Pištoľ / zbraň": "Pištoľ / zbraň mimo obrazu - postavy počujú výstrel pri rieke",
+    },
+    "01/33": {
+        "Mobil": "Mobil s hudbou - púšťa sa rovnaká pesnička/demoverzia",
+        "JBL reproduktor": "JBL reproduktor - hudba pustená z mobilu cez JBL, Sára chce hudbu vypnúť",
+    },
+    "01/34": {
+        "Basketbalová lopta": "Basketbalová lopta - tréning v telocvični, Alex dribluje a dáva kôš",
+        "Uterák": "Alexov uterák - Alex sa utiera po tréningu",
+    },
+    "01/38": {
+        "Nákupné tašky": "Nákupné tašky Laury - Gajdoš ich nesie za Laurou a položí ich",
+        "Cestovná taška s monogramom L.S.": "Stratená cestovná príručná taška s monogramom L.S. - priniesol ju taxík, Laura ju otvorí",
+    },
+    "01/39": {
+        "Gitara": "Alexova gitara - Alex na terase hrá/brnká a skladá",
+        "Loptička pre psa": "Loptička pre Bona - voliteľná rekvizita pri psovi, ak ju bude Bono nosiť",
+        "Pivo": "Lukášovo pivo - Lukáš vyjde na terasu s pivom v ruke",
+    },
+    "01/40": {
+        "Výzdoba": "Výzdoba imatrikulačnej párty v telocvični - školská párty, nadväzuje na 01/42-01/43",
+        "Jedlo a pitie": "Jedlo a nealko pitie na imatrikulačnej párty - školská akcia, bez alkoholu",
+    },
+    "01/44": {
+        "Drinky": "Drinky na Sárinej afterke - partia sedí v Sárinej izbe a popíja",
+    },
+    "01/48": {
+        "Víno": "Laurino víno - Laura sedí na gauči v župane a pije víno",
+    },
+    "01/49": {
+        "Notebook": "Dogyho notebook vo Fefe Beef - Dogy sedí a píše svoj román, nadväzuje na 01/52",
+    },
+    "01/52": {
+        "Policajné auto": "Policajné auto - miesto nálezu Jakubovho tela pri rieke; strihák 01/53LP je zatiaľ v karte 01/52",
+        "Policajná páska / opáskované miesto": "Policajná páska / opáskované miesto - pri náleze Jakubovho tela",
+        "Nosidlá / vak na telo": "Nosidlá / vak na telo - policajti odnášajú Jakubovo telo už zazipsované",
+        "Notebook": "Dogyho notebook vo Fefe Beef - Dogy píše o zastrelení Jakuba; nadväzuje na 01/49",
+        "Mobil": "Alicin mobil - Alica si robí zábery z miesta činu, Bety na ňu zazerá",
+        "Auto": None,
+    },
+}
+
+
+def enrich_rekvizity_for_scene(scene_id, props):
+    details = SCENE_REKVIZITY_DETAILS.get(scene_id, {})
+    enriched = []
+    for prop in props:
+        if prop in details:
+            replacement = details[prop]
+            if replacement:
+                enriched.append(replacement)
+            continue
+        enriched.append(prop)
+    return enriched
+
 def scene_card_from_id(scene_id, title, body):
     characters = guess_opening_characters(body)
     props = extract_rekvizity(f"{title}\n{body}")
     props = adjust_rekvizity_for_scene(scene_id, props)
+    props = enrich_rekvizity_for_scene(scene_id, props)
     card_title = build_trello_scene_title(scene_id, title, characters)
     card = scene_card(0, title, body)
     card["number"] = scene_id
@@ -741,6 +873,127 @@ def build_description(location, time_of_day, characters, body):
         body,
     ]
     return "\n".join(parts).strip()
+
+
+def normalize_lookup(value):
+    normalized = unicodedata.normalize("NFKD", value or "")
+    ascii_text = "".join(ch for ch in normalized if not unicodedata.combining(ch))
+    return re.sub(r"[^a-z0-9]+", "", ascii_text.lower())
+
+
+def trello_delete(path, params=None):
+    params = params or {}
+    params.update({"key": API_KEY, "token": TOKEN})
+    r = requests.delete(f"{BASE}{path}", params=params, timeout=20)
+
+    if not r.ok:
+        print("TRELLO DELETE ERROR:", r.status_code, r.text)
+
+    r.raise_for_status()
+    return r.json() if r.text else {}
+
+
+def find_trello_board_by_name(board_name):
+    target = normalize_lookup(board_name)
+    boards = trello_get("/members/me/boards", {"fields": "name,closed"})
+    for board in boards:
+        if not board.get("closed") and normalize_lookup(board.get("name")) == target:
+            return board
+    raise RuntimeError(f"Trello board not found: {board_name}")
+
+
+def find_trello_list_by_name(board_id, list_name):
+    target = normalize_lookup(list_name)
+    lists = trello_get(f"/boards/{board_id}/lists", {"fields": "name,closed"})
+    for trello_list in lists:
+        if not trello_list.get("closed") and normalize_lookup(trello_list.get("name")) == target:
+            return trello_list
+    raise RuntimeError(f"Trello list not found: {list_name}")
+
+
+def ensure_card_checklist(card_id, checklist_name):
+    target = normalize_lookup(checklist_name)
+    checklists = trello_get(
+        f"/cards/{card_id}/checklists",
+        {"fields": "name", "checkItems": "all"},
+    )
+    for checklist in checklists:
+        if normalize_lookup(checklist.get("name")) == target:
+            return checklist
+    return trello_post_body("/checklists", {"idCard": card_id, "name": checklist_name})
+
+
+@app.route("/api/replace-rekvizity-checklists", methods=["POST"])
+def replace_rekvizity_checklists():
+    payload = request.get_json(silent=True) or {}
+    board_name = payload.get("board") or "Riverdale"
+    list_name = payload.get("list") or "Scenare"
+    updates = payload.get("updates") or []
+
+    if not updates:
+        return jsonify({"error": "No updates supplied"}), 400
+
+    try:
+        board = find_trello_board_by_name(board_name)
+        target_list = find_trello_list_by_name(board["id"], list_name)
+        cards = trello_get(
+            f"/lists/{target_list['id']}/cards",
+            {"fields": "name", "filter": "open"},
+        )
+        cards_by_name = {card.get("name"): card for card in cards}
+
+        cards_updated = 0
+        items_deleted = 0
+        items_added = 0
+        skipped = 0
+        errors = []
+
+        for update in updates:
+            name = (update.get("name") or "").strip()
+            items = [item for item in update.get("items") or [] if item]
+            if not name:
+                skipped += 1
+                continue
+
+            card = cards_by_name.get(name)
+            if not card:
+                errors.append({"name": name, "error": "Card not found"})
+                continue
+
+            try:
+                checklist = ensure_card_checklist(card["id"], "Rekvizity")
+                for item in checklist.get("checkItems") or []:
+                    trello_delete(f"/checklists/{checklist['id']}/checkItems/{item['id']}")
+                    items_deleted += 1
+
+                for item in items:
+                    trello_post_body(
+                        f"/checklists/{checklist['id']}/checkItems",
+                        {"name": item, "checked": "false"},
+                    )
+                    items_added += 1
+
+                cards_updated += 1
+            except Exception as exc:
+                errors.append({"name": name, "error": str(exc)})
+
+        status_code = 207 if errors else 200
+        return jsonify(
+            {
+                "board": board.get("name"),
+                "list": target_list.get("name"),
+                "counts": {
+                    "cardsUpdated": cards_updated,
+                    "itemsDeleted": items_deleted,
+                    "itemsAdded": items_added,
+                    "skipped": skipped,
+                    "errors": len(errors),
+                },
+                "errors": errors,
+            }
+        ), status_code
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 500
 
 @app.route("/", methods=["GET"])
 def home():
