@@ -8,6 +8,12 @@ app = Flask(__name__)
 
 API_KEY = os.environ["TRELLO_KEY"]
 TOKEN = os.environ["TRELLO_TOKEN"]
+MICROSOFT_CLIENT_ID = os.environ.get("MICROSOFT_CLIENT_ID")
+MICROSOFT_CLIENT_SECRET = os.environ.get("MICROSOFT_CLIENT_SECRET")
+MICROSOFT_REFRESH_TOKEN = os.environ.get("MICROSOFT_REFRESH_TOKEN")
+MICROSOFT_AUTHORITY = os.environ.get("MICROSOFT_AUTHORITY", "consumers")
+TODO_LIST_ID = os.environ.get("TODO_LIST_ID")
+TODO_TASK_TITLE_TEMPLATE = os.environ.get("TODO_TASK_TITLE_TEMPLATE", "{item} - {card}")
 
 BOARD_CONFIG = {
     "69cd95eed6bf6120fee7dd22": {
@@ -22,6 +28,7 @@ BOARD_CONFIG = {
 CHECKLIST_TAG = os.environ.get("CHECKLIST_TAG", "[Z]")
 
 BASE = "https://api.trello.com/1"
+GRAPH_BASE = "https://graph.microsoft.com/v1.0"
 
 
 def trello_get(path, params=None):
@@ -46,6 +53,126 @@ def trello_post(path, params=None):
 
     r.raise_for_status()
     return r.json()
+
+
+def microsoft_enabled():
+    return all([
+        MICROSOFT_CLIENT_ID,
+        MICROSOFT_CLIENT_SECRET,
+        MICROSOFT_REFRESH_TOKEN,
+        TODO_LIST_ID
+    ])
+
+
+def get_microsoft_access_token():
+    if not microsoft_enabled():
+        raise RuntimeError("Microsoft To Do env variables are not configured")
+
+    r = requests.post(
+        f"https://login.microsoftonline.com/{MICROSOFT_AUTHORITY}/oauth2/v2.0/token",
+        data={
+            "client_id": MICROSOFT_CLIENT_ID,
+            "client_secret": MICROSOFT_CLIENT_SECRET,
+            "refresh_token": MICROSOFT_REFRESH_TOKEN,
+            "grant_type": "refresh_token",
+            "scope": "offline_access User.Read Tasks.ReadWrite",
+        },
+        timeout=20
+    )
+
+    if not r.ok:
+        print("MICROSOFT TOKEN ERROR:", r.status_code, r.text)
+
+    r.raise_for_status()
+    return r.json()["access_token"]
+
+
+def graph_get(path, access_token, params=None):
+    r = requests.get(
+        f"{GRAPH_BASE}{path}",
+        headers={"Authorization": f"Bearer {access_token}"},
+        params=params or {},
+        timeout=20
+    )
+
+    if not r.ok:
+        print("GRAPH GET ERROR:", r.status_code, r.text)
+
+    r.raise_for_status()
+    return r.json()
+
+
+def graph_post(path, access_token, payload):
+    r = requests.post(
+        f"{GRAPH_BASE}{path}",
+        headers={
+            "Authorization": f"Bearer {access_token}",
+            "Content-Type": "application/json",
+        },
+        json=payload,
+        timeout=20
+    )
+
+    if not r.ok:
+        print("GRAPH POST ERROR:", r.status_code, r.text)
+
+    r.raise_for_status()
+    return r.json()
+
+
+def todo_task_exists(access_token, title):
+    data = graph_get(
+        f"/me/todo/lists/{TODO_LIST_ID}/tasks",
+        access_token,
+        params={"$top": 100}
+    )
+
+    for task in data.get("value", []):
+        if task.get("title", "").strip().lower() == title.strip().lower():
+            return True
+
+    return False
+
+
+def create_todo_task(item_name, original_item_name, card_info, matching_cards):
+    if not microsoft_enabled():
+        print("TODO SKIP: Microsoft To Do is not configured")
+        return None
+
+    title = TODO_TASK_TITLE_TEMPLATE.format(
+        item=item_name,
+        card=card_info["name"],
+        original_item=original_item_name
+    )
+
+    found_text = ", ".join(matching_cards) if matching_cards else "nenajdene"
+    body = (
+        "Vytvorene automaticky z Trello checklist polozky.\n\n"
+        f"Povodna karta: {card_info['name']}\n"
+        f"Odkaz na povodnu kartu: {card_info['shortUrl']}\n\n"
+        f"Povodna checklist polozka: {original_item_name}\n\n"
+        f"Najdene v kartach:\n{found_text}"
+    )
+
+    access_token = get_microsoft_access_token()
+
+    if todo_task_exists(access_token, title):
+        print("TODO SKIP existing task:", title)
+        return None
+
+    task = graph_post(
+        f"/me/todo/lists/{TODO_LIST_ID}/tasks",
+        access_token,
+        {
+            "title": title,
+            "body": {
+                "content": body,
+                "contentType": "text"
+            }
+        }
+    )
+    print("TODO TASK CREATED:", task.get("id"), task.get("title"))
+    return task
 
 
 def get_card(card_id):
@@ -255,8 +382,27 @@ def trello_webhook():
         print("CARD ERROR:", repr(e))
         return jsonify({"status": "error", "reason": f"card failed: {str(e)}"}), 500
 
+    todo_status = "skipped"
+    try:
+        todo_task = create_todo_task(
+            clean_name,
+            checkitem_name,
+            card_info,
+            matching_cards
+        )
+        if todo_task:
+            todo_status = "created"
+        elif microsoft_enabled():
+            todo_status = "already_exists_or_skipped"
+        else:
+            todo_status = "not_configured"
+
+    except Exception as e:
+        todo_status = "error"
+        print("TODO ERROR:", repr(e))
+
     processed_actions.add(action_id)
-    return jsonify({"status": "ok", "mode": "card_only"}), 200
+    return jsonify({"status": "ok", "mode": "card_and_todo", "todo": todo_status}), 200
 
 
 if __name__ == "__main__":
