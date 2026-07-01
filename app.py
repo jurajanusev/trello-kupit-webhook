@@ -1,6 +1,9 @@
 processed_actions = set()
 
 from flask import Flask, request, jsonify
+from flask import send_from_directory
+from pathlib import Path
+import re
 import requests
 import os
 
@@ -297,6 +300,162 @@ def find_cards_with_exact_item(search_term, allowed_list_id, exclude_card_id=Non
     return matching_cards
 
 
+
+ROOT = Path(__file__).parent.resolve()
+PUBLIC = ROOT / "public"
+
+SCENE_HEADING_RE = re.compile(
+    r"^\s*(?:(?:OBRAZ|SC[ÉE]NA|SCENE)\s*)?(\d{1,4})[\).:-]?\s*(.*)$",
+    re.IGNORECASE,
+)
+
+
+@app.route("/screener", methods=["GET"])
+def screener():
+    return send_from_directory(PUBLIC, "index.html")
+
+
+@app.route("/screener-assets/<path:filename>", methods=["GET"])
+def screener_assets(filename):
+    return send_from_directory(PUBLIC, filename)
+
+@app.route("/api/parse", methods=["POST"])
+def parse_script():
+    payload = request.get_json(silent=True) or {}
+    cards = split_scenes(payload.get("script", ""))
+    return jsonify({"cards": cards})
+
+
+def split_scenes(text):
+    lines = text.replace("\r\n", "\n").replace("\r", "\n").split("\n")
+    starts = []
+
+    for idx, line in enumerate(lines):
+        stripped = line.strip()
+        upper = stripped.upper()
+        if not stripped:
+            continue
+        if (
+            upper.startswith("OBRAZ ")
+            or upper.startswith("SCÉNA ")
+            or upper.startswith("SCENA ")
+            or upper.startswith("SCENE ")
+        ):
+            starts.append(idx)
+
+    if not starts:
+        starts = [idx for idx, line in enumerate(lines) if SCENE_HEADING_RE.match(line.strip())]
+
+    if not starts:
+        body = "\n".join(lines).strip()
+        return [scene_card(1, "Celý scenár", body)]
+
+    cards = []
+    for pos, start in enumerate(starts):
+        end = starts[pos + 1] if pos + 1 < len(starts) else len(lines)
+        block = "\n".join(lines[start:end]).strip()
+        heading = lines[start].strip()
+        match = SCENE_HEADING_RE.match(heading)
+        number = int(match.group(1)) if match else pos + 1
+        title_tail = match.group(2).strip(" -:") if match else heading
+        title = title_tail or heading
+        block_lines = block.split("\n")
+        body = "\n".join(block_lines[1:]).strip() if len(block_lines) > 1 else block
+        cards.append(scene_card(number, title, body))
+
+    return cards
+
+
+def scene_card(number, title, body):
+    clean_body = body.strip()
+    location = guess_location(title, clean_body)
+    time_of_day = guess_time(title, clean_body)
+    characters = guess_characters(clean_body)
+    labels = [
+        value
+        for value in [
+            time_of_day,
+            "interiér" if "INT" in title.upper() else None,
+            "exteriér" if "EXT" in title.upper() else None,
+        ]
+        if value
+    ]
+
+    return {
+        "number": number,
+        "name": f"Obraz {number:02d} - {title.strip() or 'Bez názvu'}",
+        "description": build_description(location, time_of_day, characters, clean_body),
+        "location": location,
+        "timeOfDay": time_of_day,
+        "characters": characters,
+        "labels": labels,
+        "checklist": [
+            "Overiť postavy v obraze",
+            "Doplniť lokáciu",
+            "Doplniť rekvizity/kostýmy",
+            "Potvrdiť produkčné poznámky",
+        ],
+    }
+
+
+def guess_location(title, body):
+    first = title or body.split("\n", 1)[0]
+    normalized = first.replace("INT.", "").replace("EXT.", "").replace("INT", "").replace("EXT", "")
+    normalized = re.split(
+        r"\s+-\s+|\s+–\s+|\s+/\s*(?:DEŇ|DEN|NOC|RÁNO|RANO|VEČER|VECER)",
+        normalized,
+        maxsplit=1,
+        flags=re.IGNORECASE,
+    )[0]
+    return normalized.strip(" .:-")[:80] or "Neurčená lokácia"
+
+
+def guess_time(title, body):
+    sample = f"{title}\n{body[:500]}".upper()
+    for key, value in [
+        ("NOC", "noc"),
+        ("VEČER", "večer"),
+        ("VECER", "večer"),
+        ("RÁNO", "ráno"),
+        ("RANO", "ráno"),
+        ("DEŇ", "deň"),
+        ("DEN", "deň"),
+    ]:
+        if key in sample:
+            return value
+    return ""
+
+
+def guess_characters(body):
+    names = []
+    for line in body.split("\n"):
+        stripped = line.strip()
+        if (
+            2 <= len(stripped) <= 32
+            and stripped == stripped.upper()
+            and re.search(r"[A-ZÁČĎÉÍĽĹŇÓÔŔŠŤÚÝŽ]", stripped)
+            and not any(token in stripped for token in ["INT", "EXT", "OBRAZ", "SCENA", "SCÉNA"])
+        ):
+            names.append(stripped.title())
+
+    seen = []
+    for name in names:
+        if name not in seen:
+            seen.append(name)
+    return seen[:12]
+
+
+def build_description(location, time_of_day, characters, body):
+    parts = [
+        f"Lokácia: {location}",
+        f"Čas: {time_of_day or 'neurčený'}",
+        f"Postavy: {', '.join(characters) if characters else 'doplniť'}",
+        "",
+        "Scenár / poznámky:",
+        body,
+    ]
+    return "\n".join(parts).strip()
+
 @app.route("/", methods=["GET"])
 def home():
     return "Trello webhook server is running", 200
@@ -439,3 +598,17 @@ def trello_webhook():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
