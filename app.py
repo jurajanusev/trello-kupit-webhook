@@ -888,6 +888,18 @@ def trello_head():
 
 @app.route("/api/import-episodes-3-5", methods=["POST"])
 def import_episodes_3_5():
+    try:
+        return import_episodes_3_5_impl()
+    except requests.HTTPError as error:
+        response = error.response
+        return jsonify({
+            "error": "trello request failed",
+            "status": response.status_code if response is not None else None,
+            "detail": response.text if response is not None else str(error),
+        }), 502
+
+
+def import_episodes_3_5_impl():
     if request.headers.get("X-Import-Key") != "ep3-5-91da67be4c2380f5":
         return jsonify({"error": "forbidden"}), 403
 
