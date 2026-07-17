@@ -7,6 +7,7 @@ import re
 import requests
 import os
 import unicodedata
+import json
 
 app = Flask(__name__)
 
@@ -883,6 +884,45 @@ def home():
 @app.route("/trello-webhook", methods=["HEAD"])
 def trello_head():
     return "", 200
+
+
+@app.route("/api/import-episode-2", methods=["POST"])
+def import_episode_2():
+    if request.headers.get("X-Import-Key") != "ep2-7f3a91c6d85e4b20a4f8":
+        return jsonify({"error": "forbidden"}), 403
+
+    boards = trello_get("/members/me/boards", {"fields": "name,closed"})
+    board = next((item for item in boards if item.get("name") == "Riverdale" and not item.get("closed")), None)
+    if not board:
+        return jsonify({"error": "board Riverdale not found"}), 404
+
+    lists = trello_get(f"/boards/{board['id']}/lists", {"fields": "name,closed"})
+    target = next(
+        (item for item in lists if not item.get("closed") and unicodedata.normalize("NFKD", item.get("name", "")).encode("ascii", "ignore").decode().upper() == "SCENARE"),
+        None,
+    )
+    if not target:
+        return jsonify({"error": "list SCENARE not found"}), 404
+
+    payload = json.loads((ROOT / "cierny_kamen_ep02_cards.json").read_text(encoding="utf-8"))
+    existing = trello_get(f"/lists/{target['id']}/cards", {"fields": "name", "limit": 1000})
+    existing_names = {item["name"].strip().casefold() for item in existing}
+    created = []
+    skipped = []
+
+    for item in payload["cards"]:
+        if item["name"].strip().casefold() in existing_names:
+            skipped.append(item["name"])
+            continue
+        card = create_card(target["id"], item["name"], item["description"])
+        for checklist in item.get("checklists", []):
+            created_checklist = trello_post("/checklists", {"idCard": card["id"], "name": checklist["name"]})
+            for checklist_item in checklist.get("items", []):
+                trello_post(f"/checklists/{created_checklist['id']}/checkItems", {"name": checklist_item})
+        created.append({"id": card["id"], "name": card["name"], "url": card.get("shortUrl")})
+        existing_names.add(item["name"].strip().casefold())
+
+    return jsonify({"created": created, "skipped": skipped, "list": target["name"]})
 
 
 @app.route("/trello-webhook", methods=["POST"])
