@@ -891,13 +891,16 @@ def import_episode_2():
     if request.headers.get("X-Import-Key") != "ep2-7f3a91c6d85e4b20a4f8":
         return jsonify({"error": "forbidden"}), 403
 
-    boards = trello_get("/members/me/boards", {"fields": "name,closed"})
+    boards = trello_get("/members/me/boards", {
+        "fields": "name,closed",
+        "lists": "open",
+        "list_fields": "name,closed",
+    })
     candidates = []
     for board in boards:
         if board.get("closed"):
             continue
-        lists = trello_get(f"/boards/{board['id']}/lists", {"fields": "name,closed"})
-        for list_item in lists:
+        for list_item in board.get("lists", []):
             normalized_name = unicodedata.normalize("NFKD", list_item.get("name", "")).encode("ascii", "ignore").decode().upper()
             if not list_item.get("closed") and normalized_name == "SCENARE":
                 cards = trello_get(f"/lists/{list_item['id']}/cards", {"fields": "name", "limit": 1000})
@@ -914,6 +917,7 @@ def import_episode_2():
     existing_names = {item["name"].strip().casefold() for item in existing}
     created = []
     skipped = []
+    batch_size = 5
 
     for item in payload["cards"]:
         if item["name"].strip().casefold() in existing_names:
@@ -926,8 +930,11 @@ def import_episode_2():
                 trello_post(f"/checklists/{created_checklist['id']}/checkItems", {"name": checklist_item})
         created.append({"id": card["id"], "name": card["name"], "url": card.get("shortUrl")})
         existing_names.add(item["name"].strip().casefold())
+        if len(created) >= batch_size:
+            break
 
-    return jsonify({"created": created, "skipped": skipped, "list": target["name"]})
+    remaining = sum(item["name"].strip().casefold() not in existing_names for item in payload["cards"])
+    return jsonify({"created": created, "skipped": skipped, "remaining": remaining, "list": target["name"]})
 
 
 @app.route("/trello-webhook", methods=["POST"])
