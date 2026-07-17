@@ -892,17 +892,22 @@ def import_episode_2():
         return jsonify({"error": "forbidden"}), 403
 
     boards = trello_get("/members/me/boards", {"fields": "name,closed"})
-    board = next((item for item in boards if item.get("name") == "Riverdale" and not item.get("closed")), None)
-    if not board:
-        return jsonify({"error": "board Riverdale not found"}), 404
+    candidates = []
+    for board in boards:
+        if board.get("closed"):
+            continue
+        lists = trello_get(f"/boards/{board['id']}/lists", {"fields": "name,closed"})
+        for list_item in lists:
+            normalized_name = unicodedata.normalize("NFKD", list_item.get("name", "")).encode("ascii", "ignore").decode().upper()
+            if not list_item.get("closed") and normalized_name == "SCENARE":
+                cards = trello_get(f"/lists/{list_item['id']}/cards", {"fields": "name", "limit": 1000})
+                episode_one_count = sum(card.get("name", "").startswith("01/") for card in cards)
+                candidates.append((episode_one_count, board, list_item))
 
-    lists = trello_get(f"/boards/{board['id']}/lists", {"fields": "name,closed"})
-    target = next(
-        (item for item in lists if not item.get("closed") and unicodedata.normalize("NFKD", item.get("name", "")).encode("ascii", "ignore").decode().upper() == "SCENARE"),
-        None,
-    )
+    candidates.sort(key=lambda item: item[0], reverse=True)
+    target = candidates[0][2] if candidates and candidates[0][0] > 0 else None
     if not target:
-        return jsonify({"error": "list SCENARE not found"}), 404
+        return jsonify({"error": "SCENARE list with episode 1 cards not found"}), 404
 
     payload = json.loads((ROOT / "cierny_kamen_ep02_cards.json").read_text(encoding="utf-8"))
     existing = trello_get(f"/lists/{target['id']}/cards", {"fields": "name", "limit": 1000})
