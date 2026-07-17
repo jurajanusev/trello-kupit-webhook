@@ -1,0 +1,1775 @@
+{
+  "project": "Riverdale - Cierny Kamen 1/3",
+  "cards": [
+    {
+      "number": "03/01LP",
+      "name": "03/01LP. INT. FEFE BEEF, DEŇ 7 — DOGY, DOGY MO",
+      "description": "POSTAVY: DOGY, DOGY MO\n\n**PREPIS: Dogyho úvod k 3.epizóde**\n\nDogy sedí s notebookom za stolom a píše, do toho počuť jeho voiceover.\n\n**FB 2/58. (SPOMALENÝ) KELER A RIADITEĽ SÁRU ODVÁDZAJÚ V PUTÁCH:**\n\n**PO CHODBE:** Pod tým znie Dogyho VO.\n\n**DOGY VO:** Vina a nevina… dobro a zlo… život a smrť. Keď rieka vyplavila tajomstvo v podobe tela poznačeného strašným zaobchádzaním, jasné hranice, ktoré tieto protiklady delili, sa stratili. „Som vinná“, povedala Sára na hodine biológie. Ale z čoho?",
+      "location": "FEFE BEEF",
+      "timeOfDay": "",
+      "characters": [
+        "Dogy",
+        "Dogy Mo"
+      ],
+      "labels": [],
+      "checklist": [
+        "Notebook - dogy sedí s notebookom za stolom a píše, do toho počuť jeho voiceover."
+      ],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": [
+            "Notebook - dogy sedí s notebookom za stolom a píše, do toho počuť jeho voiceover."
+          ]
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/02LP",
+      "name": "03/02LP. INT. ŠKOLA - RIADITEĽŇA, DEŇ 7 — SÁRA, LOLA, POPY, ČMELSKÝ, DOGY MO",
+      "description": "POSTAVY: SÁRA, LOLA, POPY, ČMELSKÝ, DOGY MO\n\n**PREPIS: Sárine kamošky ju sledujú v riaditeľni**\n\nDoznieva Dogyho VO. Sáru privádzajú do kancelárie riaditeľa. Sárine kamošky stoja vo dverách riaditeľne a sledujú, ako si Sára sadá. Niekto (riaditeľ) im zabuchne dvere pred nosom.",
+      "location": "ŠKOLA",
+      "timeOfDay": "",
+      "characters": [
+        "Sára",
+        "Lola",
+        "Popy",
+        "Čmelský",
+        "Dogy Mo"
+      ],
+      "labels": [],
+      "checklist": [],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": []
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/03",
+      "name": "03/03. INT. ŠKOLA - RIADITEĽŇA, DEŇ 7 — SÁRA, KELER, RIADITEĽ, KLAUDIA, OSKAR",
+      "description": "POSTAVY: SÁRA, KELER, RIADITEĽ, KLAUDIA, OSKAR\n\n**PREPIS: Keler vypočúva Sáru**\n\n**(PARALELNE):**",
+      "location": "ŠKOLA",
+      "timeOfDay": "",
+      "characters": [
+        "Sára",
+        "Keler",
+        "Riaditeľ",
+        "Klaudia",
+        "Oskar"
+      ],
+      "labels": [],
+      "checklist": [],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": []
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/04FLASH",
+      "name": "03/04FLASH. EXT. PRI RIEKE, DEŇ X — JAKUB, SÁRA, SÁRA MO",
+      "description": "POSTAVY: JAKUB, SÁRA, SÁRA MO\n\n**PREPIS: Jakub a Sára počujú výstrel**\n\n**(PARALELNE):**",
+      "location": "PRI RIEKE",
+      "timeOfDay": "",
+      "characters": [
+        "Jakub",
+        "Sára",
+        "Sára Mo"
+      ],
+      "labels": [],
+      "checklist": [],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": []
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/05FLASH",
+      "name": "03/05FLASH. EXT. PRI RIEKE (OPAČNÝ BREH), DEŇ X — JAKUB, SÁRA, SÁRA MO",
+      "description": "POSTAVY: JAKUB, SÁRA, SÁRA MO\n\n**PREPIS: Jakub a Sára sa lúčia**\n\nSára sedí skľúčene za stolom. Oproti nej sedia Keler a Čmelský, ktorí s chladným pokojom počúvajú jej priznanie.\n\n**SÁRA:** Som vinná. Nie z vraždy ale z klamstva. Keler sa nervózne zahniezdi na stoličke.\n\n**KELER:** Z akého presne klamstva? Roztrasená Sára prikývne a upokojí sa hlbokým nádychom.\n\n**SÁRA:** Mali sme to v ten deň s Jakubom naplánované. Chceli sme predstierať, že sa utopil, aby mohol utiecť. Čmelský sa na Sáru podozrievavo pozerá. Keler očami skenuje každý jej mikropohyb.\n\n**KELER:** Sára, podľa pitevnej správy to vyzerá tak, že tvoj brat nezomrel v deň, kedy zmizol. Podľa odhadu patológa sa to stalo až v druhej polovici júla. Vieš o tom niečo? Sára nesúhlasne kýve hlavou.\n\n**SÁRA:** Viem len to, čo sa stalo, kým sme sa rozlúčili. Potom som ho už nevidela.\n\n**FB 1/5 JAKUB A SÁRA PRI RIEKE (VYSTUPUJÚ Z AUTA, DRŽIA SA ZA:**\n\n**RUKY):**\n\n**FB 1/6 JAKUB A SÁRA V ČLNE (IDÚ K ČLNU, JAKUB VESLUJE NA:**\n\n**DRUHÚ STRANU,:** (prestrih Flash1) (Flash) Jakub a Sára sa na druhom brehu rieky lúčia, objímajú sa. Keď sa Jakub chce odtrhnúť, Sára ho zostane držať za ruku, a drží ho ešte počas toho, ako sa on otočí a chce odísť. Detail na držiace sa ruky. Nakoniec sa Jakub pustí, pozrie sa na Sáru a odchádza. (prestrih Riaditeľňa) Sára dovysvetľuje Kelerovi dohodu s Jakubom.\n\n**SÁRA:** Mala som všetkým povedať, že sa utopil a on mal zmiznúť. Sľúbil mi, že sa ozve, ale nikdy od neho neprišiel ani mail, ani správa. Keler je podozrievavý, vypytuje sa na detaily.\n\n**KELER:** Prečo chcel Jakub ujsť? Pred čím? Sára mlčí.\n\n**KELER:** Kam mal namierené? Sára stále iba pozerá do zeme.\n\n**KELER:** Sára, pomáhala si mu len ty, alebo o tom vedel aj niekto iný? Sára stále mlčí (vie, že chcel utiecť so Sofiou, ale v tejto chvíli ešte nevie o tehotenstve. Iba sa dopočula oficiálnu verziu, že Sofia je kvôli nejakým zdravotným problémom v nejakom psychiatrickom zariadení, čo pre Sáru znamená, že Sofiu rodičia skrývajú, lebo vie niečo o Jakubovej smrti). Sára v podstate Sofiu už v duchu obviňuje, že to ona ho zabila. Kelerovi sa jej ticho a príbeh o úteku vôbec nepozdávajú.\n\n**KELER:** Nechcem byť zlý, ale nevymýšľaš si tieto tvrdenia, aby si zakryla svoje vlastné stopy? Kelerov útok Sáru bytostne urazí. Vzpriami sa, ako struna.\n\n**SÁRA:** Ja som svojho brata nezabila! Ten výstrel sme počuli obaja! (prestrih Flash2) Jakub a Sára kráčajú od rieky, v pozadí vidieť čln. Zrazu počujú výstrel a pozrú sa na seba. (prestrih Riaditeľňa) Kelera nová dôležitá informácia mierne rozhodí. Nakloní sa na Sáru a nechápavo pokýva hlavou.\n\n**KELER:** Vy ste počuli výstrel? Prečo mi to hovoríš až teraz?\n\n**SÁRA:** Lebo mi zomrel brat a musela som to nejako stráviť.\n\n**KELER:** /náznak sarkazmu/ Ale zato si zvládla tancovať na otvorení basketbalovej sezóny a moderovať imatrikulačky. Kým Sára na poznámku zareaguje, do miestnosti vtrhnú Oskar s Klaudiou a Sárinu výpoveď rázne zastavia.\n\n**OSKAR:** Sára, už im nepovedz ani slovo! Odchádzame! Oskar s Klaudiou k Sáre podídu. Ona sa postaví a odchádza v sprievode nahnevaných rodičov. Oskar tresne dverami. Keler a Čmelský na seba pozrú. Čmelský sa zatvári bezmocne.",
+      "location": "PRI RIEKE (OPAČNÝ BREH)",
+      "timeOfDay": "deň",
+      "characters": [
+        "Jakub",
+        "Sára",
+        "Sára Mo"
+      ],
+      "labels": [],
+      "checklist": [
+        "Auto Jakuba a Sáry pri rieke - flashback na ich príchod a vystúpenie z auta; nadväzuje na obrazy 01/05-01/06",
+        "Čln Jakuba a Sáry - flashback na cestu cez rieku a ich rozlúčku; v závere zostáva v pozadí pri výstrele"
+      ],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": [
+            "Auto Jakuba a Sáry pri rieke - flashback na ich príchod a vystúpenie z auta; nadväzuje na obrazy 01/05-01/06",
+            "Čln Jakuba a Sáry - flashback na cestu cez rieku a ich rozlúčku; v závere zostáva v pozadí pri výstrele"
+          ]
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/06",
+      "name": "03/06. INT. ŠKOLA - CHODBA SO SKRINKAMI, DEŇ 7 — SÁRA, ALEX, KLAUDIA, OSKAR, LOLA, POPI, KOMPARZ",
+      "description": "POSTAVY: SÁRA, ALEX, KLAUDIA, OSKAR, LOLA, POPI, KOMPARZ\n\n**PREPIS: Rodičia odvedú Sáru z riaditeľne**\n\nRodičia nahnevane vedú Sáru po chodbe pomedzi študentov.\n\n**KLAUDIA:** Prečo si nám nezavolala?!\n\n**OSKAR:** Lebo je to klamárka! Sára neodpovedá, buble v nej hnev. Klaudia ju prebodne pohľadom, ktorý vie vystrúhať jedine nahnevaná matka.\n\n**KLAUDIA:** Doma nám povieš všetko! Rozumieš? Medzi študentmi na chodbe je aj Alex, ktorý trojicu sleduje. Sám ešte stále váha, či prezradiť, že počul výstrel.",
+      "location": "ŠKOLA",
+      "timeOfDay": "deň",
+      "characters": [
+        "Sára",
+        "Alex",
+        "Klaudia",
+        "Oskar",
+        "Lola",
+        "Popi",
+        "Komparz"
+      ],
+      "labels": [],
+      "checklist": [],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": []
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/07",
+      "name": "03/07. INT. DOM BETY - IZBA BETY, DEŇ 7 — BETY, ALICA, ALICA MO",
+      "description": "POSTAVY: BETY, ALICA, ALICA MO\n\n**PREPIS: Bety sa nepáči mamin aktuálny podcast**\n\nBety pozerá Alicin podcast na mobile (použije sa obraz 2/55). ALICA MO (Z OBRAZU 2/55) Podľa zaručených informácii z prostredia policajného vyšetrovania sa s telom mladého muža diali hrozné veci. Zdá sa, že si prežil peklo. Toto mesto takúto hrôzu dávno nezažilo. Bola to osobná záležitosť? Alebo musí byť každý v meste v strehu, či naňho nepoľuje vrah? To sú otázky, ktoré si teraz kladú mnohí. A čo Jakubova sestra Sára? Prečo všetkým tvrdila, že sa utopil? Bety to zarazene počúva, ale vyruší ju Alica, ktorá jej do izby priniesla čistú bielizeň. Bety podcast pauzne a namrzene na Alicu zazrie.\n\n**BETY:** Prečo z toho robíš senzáciu, mami?\n\n**ALICA:** No dovoľ? Alica ukladá bielizeň (na poličku, do komody), Bety sa posadí a pokračuje vo výčitkách.\n\n**BETY:** Načo je dobré sa vŕtať v detailoch z pitvy a šíriť hoaxy, že v tom má Sára prsty?\n\n**ALICA:** Ale veď ľudí zaujíma presne toto. A ja mám novinársku povinnosť verejnosť informovať o súčasnom dianí. Vrátane... teórií. Bety dvihne obočie a prebodáva alibistickú Alicu pohľadom. Alica na ňu pozrie.\n\n**ALICA:** No čo?\n\n**BETY:** Čokoľvek urobil Jakub Sofii, je to stále len človek. Prečo si neriešila čo sa mohlo naozaj stať? Kto ho mohol uväzniť? Kto mohol vystreliť? Alica sa prestane venovať bielizni. Dcérine dobiedzanie je jej nepríjemné a tak sa rozhodne dialóg premostiť.\n\n**ALICA:** Keď si taká múdra a chceš klásť iné, podľa teba lepšie otázky, prečo nepracuješ pre náš web? Tu Bety napadne, že by mohla urobiť niečo iné - obnoviť starý školský časopis, ktorý predtým vychádzal na papieri, do modernej podoby online magazínu. Alici to však nepovie. Namiesto toho jej zľahka odpapuľuje.\n\n**BETY:** Nemôžem pre vás robiť, mám iný plán. Alica na ňu podozrievavo pozrie, že čo chce robiť.",
+      "location": "DOM BETY",
+      "timeOfDay": "",
+      "characters": [
+        "Bety",
+        "Alica",
+        "Alica Mo"
+      ],
+      "labels": [],
+      "checklist": [
+        "Mobil - bety pozerá Alicin podcast na mobile (použije sa obraz 2/55)."
+      ],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": [
+            "Mobil - bety pozerá Alicin podcast na mobile (použije sa obraz 2/55)."
+          ]
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/08",
+      "name": "03/08. INT. ŠKOLA - CHODBA S UČEBŇAMI/HUDOBNÁ MIESTNOSŤ, DEŇ 7 — ALEX, OLASOVÁ",
+      "description": "POSTAVY: ALEX, OLASOVÁ\n\n**PREPIS: Alex váha pred Olasovej učebňou**\n\nAlex nakukuje do učebne hudby kde Olasová hrá na violončelo. Váha či má vojsť, chcel by jej povedať čo ide urobiť (ide za Čmelským povedať o výstrele), ale bojí sa že mu to Olasová nakoniec vyhovorí. Chvíľu len pozerá ako hrá, ale neodhodlá sa vojsť a bez slova odíde.",
+      "location": "ŠKOLA",
+      "timeOfDay": "",
+      "characters": [
+        "Alex",
+        "Olasová"
+      ],
+      "labels": [],
+      "checklist": [],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": []
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/09",
+      "name": "03/09. INT. ŠKOLA - RIADITEĽŇA, DEŇ 7 — KELER, ALEX, ČMELSKÝ",
+      "description": "POSTAVY: KELER, ALEX, ČMELSKÝ\n\n**PREPIS: Alex priznáva že bol pri rieke a počul výstrel**\n\nAlex sedí na rovnakom mieste, ako predtým Sára. Keler sa hrá s perom, ale oči má prilepené na Alexovi. Čmelský Alexa upokojuje.\n\n**ČMELSKÝ:** Je správne, že si prišiel, Alex. Nemáš sa čoho báť. Keler gestom ruky naznačí, aby Alex prehovoril.\n\n**KELER:** Pokojne povedz čokoľvek z toho dňa, všetko môže byť dôležité pre vyšetrovanie. Alex zdráhavo prikývne.\n\n**ALEX:** Bol som pri rieke, keď sa to stalo. Počul som tam výstrel. Keler sa prestane hrať s perom.\n\n**KELER:** A prezradíš nám aj, čo si pri tej rieke tak skoro ráno robil? Alex sa zahanbí, ale odpovie.\n\n**ALEX:** Skladal som pesničku.\n\n**KELER:** Bol si tam sám?\n\n**ALEX:** Nie. Keler s Čmelským spozornejú. Alexovi docvakne že sa prekecol, ale Olasovú nebonzne.\n\n**ALEX:** Bol tam som mnou môj pes. /nervózne/ Volá sa Bono.\n\n**FB 1/32 OLASOVÁ SA MUCHLUJE NA DEKE S ALEXOM, POČUJÚ VÝSTREL,:**\n\n**STRHNÚ SA:**",
+      "location": "ŠKOLA",
+      "timeOfDay": "",
+      "characters": [
+        "Keler",
+        "Alex",
+        "Čmelský"
+      ],
+      "labels": [],
+      "checklist": [],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": []
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/10",
+      "name": "03/10. INT. ŠKOLA - KLUBOVŇA, DEŇ 7 — KIKO, ALEX, VERONIKA, FIFO, KOMPARZ ŠTUDENTI",
+      "description": "POSTAVY: KIKO, ALEX, VERONIKA, FIFO, KOMPARZ ŠTUDENTI\n\n**PREPIS: Veronika oznamuje rande s Fifom**\n\nDecká po škole sedia v klubovni a plánujú, čo s načatým dňom. Bety a Veronika niečo riešia na mobiloch. Veronika sa pri tom potmehútsky usmieva. Kiko a Alex sa rozprávajú.\n\n**KIKO:** Čo robíte večer? Mohli by sme pozrieť na nejaký seroš.\n\n**ALEX:** Seroš?\n\n**KIKO:** Nejaký true crime, nech sa trafíme do vajbu posledných dní. Kiko sa na partičku uškrnie, ale oni veľmi nadšene nereagujú.\n\n**BETY:** Ja nemôžem, pracujem na článku.\n\n**KIKO:** Na akom? Mama ťa konečne prinútila písať pre jej gossip plátok? Bety ho úplne chápe a vlastne aj súhlasí, takže sa ani neurazí.\n\n**BETY:** Nepíšem pre ňu. Obnovujem školské noviny. Budú online. A volať sa to budé... Scroll! So širokým úsmevom očakáva reakciu, ale kamaráti mlčia. Trápne ticho prelomí Alex.\n\n**ALEX:** Scroll, hej?\n\n**BETY:** Áno, Scroll. Kiko vedľa Alexa mykne plecami.\n\n**KIKO:** Tak... neviem, asi je to okej názov. Veronika, ktorá doteraz ťukala do mobilu sa konečne zapojí.\n\n**VERONIKA:** Mne sa veľmi páči.\n\n**BETY:** Ó, ďakujem. Aspoň niekto. Veronika pozrie na Kika.\n\n**VERONIKA:** Ale na ten seriál tiež nemôžem prísť. Mám rande.\n\n**ALEX:** Rande?\n\n**VERONIKA:** Áno, rande. Kiko prevráti očami a rýpne do Alexa, ktorý je trochu spomalený, lebo stále premýšľa nad svojím svedectvom pred Kelerom.\n\n**KIKO:** /sarkasticky/ Ty si si ráno nedal kávu, že?\n\n**ALEX:** Tak, je tu chvíľku a už randí, prekvapilo ma to. Veronika sa na Alexa trochu výhražne pozrie, keďže obaja vedia, čo sa medzi nimi stalo už po pár hodinách (pusa v šatníku).\n\n**VERONIKA:** Som tu už dosť dlho na to, aby som sa rozkukala. Diki, že sa tak zaujímaš. Bety sa na pasívne agresívnej poznámke sama pre seba usmeje. Kiko sa so zvedavým výrazom nakloní k Veronike.\n\n**KIKO:** A kto je ten vyvolený?\n\n**VERONIKA:** To nie je dôležité.\n\n**KIKO:** Haló? Je to extrémne dôležité? Come on, povedz. Veroniku jeho zvedavosť baví. Než ale stihne odpovedať, tak do klubovne vstúpi Fifo so spoluhráčmi. Ako okolo našej partie prechádzajú, Fifo sa pri Veronike zastaví.\n\n**FIFO:** Dnes večer to platí?\n\n**VERONIKA:** O šiestej ťa čakám. Fifo sa usmeje a odíde. Kiko s Bety naňho pri odchode prekvapene pozerajú, potom si udivene prezrú usmiatu Veroniku.\n\n**KIKO:** Really? Chodiaci red flag?\n\n**BETY:** Fifo je dosť toxický. Dala by som si pozor.\n\n**KIKO:** Akože áno, určite je taký, ale zase... je to stále Fifo. Kiko je z Fifa paf, páči sa mu. Bety však nie je vôbec presvedčená.\n\n**KIKO:** Čo? Je hot a je to alfa Čierneho kameňa. Možno budem aj trošička žiarliť. Bety nesúhlasne pokýve hlavou. Veronika sa spokojne usmieva, nič však ďalej nevysvetľuje.\n\n**VERONIKA:** Uvidíme.",
+      "location": "ŠKOLA",
+      "timeOfDay": "večer",
+      "characters": [
+        "Kiko",
+        "Alex",
+        "Veronika",
+        "Fifo",
+        "Komparz Študenti"
+      ],
+      "labels": [],
+      "checklist": [
+        "Mobil - bety a Veronika niečo riešia na mobiloch."
+      ],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": [
+            "Mobil - bety a Veronika niečo riešia na mobiloch."
+          ]
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/11",
+      "name": "03/11. INT. ŠKOLA - REDAKCIA, DEŇ 7 — BETY, DOGY",
+      "description": "POSTAVY: BETY, DOGY\n\n**PREPIS: Bety presviedča Dogyho aby pre ňu písal**\n\nMalá miestnosť, ktorá vyzerá, že ju nikto roky nepoužíval. Bety tu už stihla upratať. Dogy stojí pri dverách a trochu neisto si obzerá priestor. Bety si ho všimne, privíta ho.\n\n**BETY:** Som rada, že si prišiel. Dogy si sadne oproti nej ku kancelárskemu stolu (ak bude).\n\n**DOGY:** Tu bývali školské noviny, nie?\n\n**BETY:** Obnovujem ich v online forme a chcem, aby si bol súčasťou redakcie. Dogymu sa to až tak nepozdáva, má svoju tvorbu. Vyhovára sa.\n\n**DOGY:** Ale ja nie som moc novinár. Bety sa ho snaží zlomiť. Ide cez komplimenty.\n\n**BETY:** Viem, že dobre píšeš a nemyslím tým len referáty na slovinu. Potrebujem druhého redaktora, ktorý je dobrý v písaní a je aj dobrý parťák. Dogy si zvnútra hryzie do líca a ošíva sa. Bety pokračuje.\n\n**BETY:** Mám v pláne písať aj o Jakubovom prípade.\n\n**DOGY:** O tom mám svoj vlastný materiál. Niečo ako román. Bety je príjemne prekvapená, nevedela o tom.\n\n**BETY:** Vážne? Tak o to lepšie!\n\n**DOGY:** Ale to nie je to isté. Román je román, nie článok na školský web. Tam sa ti taká téma ani nehodí. Dogymu sa do toho stále veľmi nechce, ale je naštrbený.\n\n**BETY:** Práveže hodí. Nebudem ťa nútiť písať o imatrikulačkách, alebo o baskete. Chcem spojiť sily. Spolu sa vo vyšetrovaní Jakubovej smrti dostaneme ďalej. Dogy mlčí. Bety to vie správne prečítať: Váha, ale nevylúčil to.\n\n**BETY:** Budeš mať voľné ruky. Píšeš si, čo chceš a ja ti do toho nekecám... možno trochu.\n\n**DOGY:** Úplne voľné ruky? Bety prikývne. Dogy si to v hlave prechádza (získa parťáčku pre „vyšetrovanie“, bude mať z prvej ruky viac informácií, ako by mal, keby sa tomu venoval sám). Jemne prikývne.\n\n**DOGY:** No dobre. Ale ak v tom nebudem vidieť zmysel, dávam spiatočku. Bety sa úprimne teší.\n\n**BETY:** Mám pre teba rovno aj prvú úlohu.\n\n**DOGY:** To ma neprekvapuje.\n\n**BETY:** Pri rieke bol v deň zmiznutia ešte niekto, komu sa doteraz nikto nevenoval a nikto sa ho na nič nepýtal. Dogymu to okamžite docvakne.\n\n**DOGY:** Matej so svojimi incelmi zo survival krúžku.\n\n**BETY:** Presne. Dogy sa postaví a prehodí si cez plece batoh.\n\n**DOGY:** Idem na vec.",
+      "location": "ŠKOLA",
+      "timeOfDay": "",
+      "characters": [
+        "Bety",
+        "Dogy"
+      ],
+      "labels": [],
+      "checklist": [
+        "Batoh - dogy sa postaví a prehodí si cez plece batoh."
+      ],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": [
+            "Batoh - dogy sa postaví a prehodí si cez plece batoh."
+          ]
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/12",
+      "name": "03/12. INT. ALEXOV DOM - OBÝVAČKA, NOC 7 — ALEX, LUKÁŠ",
+      "description": "POSTAVY: ALEX, LUKÁŠ\n\n**PREPIS: Alex sa háda s Lukášom kvôli klamstvu**\n\nAlex prichádza domov. Lukáš sedí v obývačke na gauči, zjavne naňho čakal.\n\n**LUKÁŠ:** Kde si bol? Píšem ti už dve hodiny.\n\n**ALEX:** Na tréningu. Potom som tam ešte chvíľu zostal skladať. Mal som nápad na nový song. Lukáš sa naňho nahnevane mračí.\n\n**LUKÁŠ:** Odpísať svojmu otcovi si mohol niekedy medzitým.\n\n**ALEX:** Oci, chcem stíhať oboje. Basketbal aj hudbu. Potrebujem na to priestor. Lukáš akože uznanlivo prikývne a prskne Alexovi do tváre výčitku.\n\n**LUKÁŠ:** Aj 5. júla si potreboval priestor, tak si mi klamal, že ideš na výlet s Dogym? Alex zamrzne, hľadá čo povedať. Lukáš ho začne z gauča karhať.\n\n**LUKÁŠ:** Volal mi Keler. /sklamane/ Ja som si myslel, že si dôverujeme, Alex. Čo také tajné si tam robil, že si mi to nemohol normálne povedať?\n\n**ALEX:** Nič tajné som nerobil. Chcel som tam len skladať. Lukáš sa postaví a zase útočí.\n\n**LUKÁŠ:** Klamal si mi.\n\n**ALEX:** Neklamal som, len som nechcel... (hádku) Lukáš mu skočí do reči.\n\n**LUKÁŠ:** Dobre vieš, že klamstvo je u mňa konečná. Máš zaracha. Rozumieme si? Alex, nervózny zo všemožných tlakov puberťácky vypení na otca.\n\n**ALEX:** Nebav sa so mnou ako s malým deckom.\n\n**LUKÁŠ:** Tak sa prestaň ako decko správať! Lukáš sa snaží byť pokojný, ale má svoje zásady. Alex otcovi vyčítavo vyhodí na oči.\n\n**ALEX:** Róža dnes zvolal mimoriadny tréning a chce tam všetkých.\n\n**LUKÁŠ:** Na školu a basket to samozrejme neplatí… Inak budeš doma. Lukáš pokojne odíde. Nechá Alexa samého v obývačke.",
+      "location": "ALEXOV DOM",
+      "timeOfDay": "",
+      "characters": [
+        "Alex",
+        "Lukáš"
+      ],
+      "labels": [],
+      "checklist": [],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": []
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/13",
+      "name": "03/13. EXT. FEFE BEEF - PARKOVISKO, NOC 7 — VERONIKA, FIFO, KOMPARZ",
+      "description": "POSTAVY: VERONIKA, FIFO, KOMPARZ\n\n**PREPIS: Veronika a Fifo na rande**\n\nVeronika a Fifo sú v aute, majú po rande. Ako správni puberťáci si robia selfíčko na Fifov telefón.\n\n**VERONIKA:** Ukáž, daj mi to.\n\n**FIFO:** Hej. Veronika Fifovi okamžite vytiahne telefón z ruky a skontroluje záber.\n\n**VERONIKA:** Ani náhodou. Znova.\n\n**FIFO:** Veď vyzeráš dobre.\n\n**VERONIKA:** Viem, ako vyzerám. … Znova! Fifo sa pobavene zasmeje a spraví ďalšie selfie, tentoraz viac zhora. Veronika ho opäť skontroluje a prikývne. Vráti mu mobil.\n\n**VERONIKA:** Takto je to fajn. Spoločne sa uchechtnú a pozrú sa cez čelné sklo. Fifo krátke mlčanie preruší.\n\n**FIFO:** Čakal som, že budeš iná.\n\n**VERONIKA:** Aká?\n\n**FIFO:** Neviem. Nová babenka, čo sa bude snažiť nasilu zapôsobiť.\n\n**VERONIKA:** A nezapôsobila som?\n\n**FIFO:** Áno, áno. Len inak.\n\n**VERONIKA:** Možno to bude tým, že už nechcem nič siliť. Fifo si ju zvedavo prezerá.\n\n**FIFO:** Aké to je? Byť tá nová?\n\n**VERONIKA:** Je vtipné, ako ťa ľudia súdia skôr, než niečo vôbec spravíš. Každý má hneď názor. Fifo prikývne. Pozerá na ňu, ako cez okno sleduje ulicu. Priťahuje ho.\n\n**FIFO:** A čo si čakala ty? Myslím, keď si šla so mnou von.\n\n**VERONIKA:** Neviem. Ale preklepla som si ťa.\n\n**FIFO:** Ajajáj... Čo si zistila?\n\n**VERONIKA:** Že to bude ťažké.\n\n**FIFO:** Pre teba, alebo pre mňa? Veronika sa vyzývavo uškrnie.\n\n**VERONIKA:** Pre teba. Fifo sa k nej nakloní.\n\n**FIFO:** To je dobre. Milujem výzvy. Pobozká ju. Ona to opätuje. Nacucnú sa na seba. Fifo zrazu pritlačí na pílu príliš. Začne jej siahať pod sukňu a Veronika ho odstrčí.\n\n**VERONIKA:** Čo to robíš?\n\n**FIFO:** Prijímam výzvu.\n\n**VERONIKA:** Fifo… nie… Veronika ho odstrčí, ale on je neodbytný.\n\n**FIFO:** Neboj, bude to okej, len sa nebráň… Veronika sa však nepodvolí, udrie ho medzi nohy. Fifo od bolesti zakričí.\n\n**FIFO:** Aaaa! Čo robíš, ty krava? Veronika sa naňho suverénne usmeje.\n\n**VERONIKA:** Asi si nerozumel, povedala som „nie“. … Môžeš ma hodiť domov?",
+      "location": "FEFE BEEF",
+      "timeOfDay": "",
+      "characters": [
+        "Veronika",
+        "Fifo",
+        "Komparz"
+      ],
+      "labels": [],
+      "checklist": [
+        "Auto - veronika a Fifo sú v aute, majú po rande.",
+        "Mobil - vráti mu mobil."
+      ],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": [
+            "Auto - veronika a Fifo sú v aute, majú po rande.",
+            "Mobil - vráti mu mobil."
+          ]
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/14",
+      "name": "03/14. INT. ŠKOLA - CHODBA S UČEBŇAMI/HUDOBNÁ MIESTNOSŤ, DEŇ 8 — ALEX, OLASOVÁ",
+      "description": "POSTAVY: ALEX, OLASOVÁ\n\n**PREPIS: Olasová v strese ruší Alexove hodiny**\n\nOlasová za zavretými dverami hudobnej miestnosti vyčíta Alexovi, že povedal polícii o výstrele.\n\n**OLASOVÁ:** Na čo si im o tom výstrele hovoril?\n\n**ALEX:** Musel som. Neverili Sáre. Chcel som jej pomôcť. V Olasovej rastie nervozita a očividne má aj strach.\n\n**OLASOVÁ:** Boli sme mimo podozrenia. A teraz?!\n\n**ALEX:** O tebe som im nepovedal ani slovo. Takže o nič nejde. Olasová neveriacky pokrúti hlavou.\n\n**OLASOVÁ:** O nič nejde?! Práve si sa namočil do vyšetrovania. Keler sa v tom začne vŕtať a privedie ho to k nám... k nášmu vzťahu.\n\n**ALEX:** Urobím to tak, aby sa to nestalo. Olasová to radšej ani nedopovie, vidí, že Alex je v tomto naivný, ale ona musí samú seba ochrániť. Takže mu rázne povie.\n\n**OLASOVÁ:** Ruším naše individuálne hodiny. Alex neveriacky pokýva hlavou a pohodí rukami. Olasová je už na odchode.\n\n**ALEX:** Čože?!",
+      "location": "ŠKOLA",
+      "timeOfDay": "",
+      "characters": [
+        "Alex",
+        "Olasová"
+      ],
+      "labels": [],
+      "checklist": [],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": []
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/15",
+      "name": "03/15. INT. ŠKOLA - CHODBA SO SKRINKAMI, DEŇ 8 — BETY, KIKO, VERONIKA, LOLA, POPY, KOMPARZ ŠTUDENTI",
+      "description": "POSTAVY: BETY, KIKO, VERONIKA, LOLA, POPY, KOMPARZ ŠTUDENTI\n\n**PREPIS: Celá škola dostáva slutshamingovú fotku**\n\nNa chodbe je pár študentov. Niektorí sa hrabú v skrinkách. Veronika si vyberá zošity z batoha a ukladá ich do skrinky. Zrazu sa pri nej zjaví Kiko s Bety. Bety na ňu pozerá s očakávajúcim výrazom.\n\n**BETY:** Tak? … Čo Fifo? Hovor.\n\n**VERONIKA:** No comment.\n\n**KIKO:** Hej! Chceme vedieť, aké bolo rande. Veronika zavrtí hlavou, akoby sa vlastne nič nestalo.\n\n**VERONIKA:** Hral to na chrumkavého, ale ja som mu na to neskočila. Okolo vtedy idú viacerí študenti a pozerajú do mobilov. Medzi nimi aj Lola a Popy. Smejú sa na niečom v Lolinom mobile, so smiechom pri tom pozrú aj na Veroniku. Veronika, Bety aj Kiko ich sledujú. Popy sa zasmeje Veronike do tváre.\n\n**POPY:** Tak čo? Chutilo? Veronika nechápe.\n\n**VERONIKA:** Čo chutilo?\n\n**LOLA:** Každá máme nejakú guilty pleasure… Lola a Popy sa rehnia a idú ďalej.\n\n**VERONIKA:** O čom tie kravy točia? Vidíme, že viacerým prichádzajú správy a pozerajú do mobilov. Kiko, Bety ani Veronika nechápu, čo sa deje. Kikovi vtedy pípne tiež mobil. Šokovane pozrie na displej.\n\n**KIKO:** No way! Veronika mu vytrhne mobil a tiež pozerá na displej. Uvidí svoju fotku s Fifom z večera, ale na jej tvári je prirobená stekajúca biela lepkavá tekutina (nie realisticky, skôr prehnane a symbolicky). K tomu nápis: Blow na prvom rande – odporúčam! A smajlíky.\n\n**BETY:** Bože. Veronika je vytočená.\n\n**VERONIKA:** Prosím?!!\n\n**KIKO:** Oops… Rande zrejme bolo úspešnejšie, ako si tvrdila. Kiko sa najskôr uchechtne. Veronika naňho naštvane štekne.\n\n**VERONIKA:** Vážne si myslíš, že by som to urobila na prvom rande? Kiko sa zarazí, zvážnie.\n\n**KIKO:** Džízs, no!\n\n**VERONIKA:** Chvíľu sme sa bozkávali a potom som mu dosť jasne ukázala, kde sú hranice. A on zo mňa urobí bitch, ktorú môžeš mať na prvý pokus? Bety ju vydesene sleduje, Veronika svoj hnev stupňuje.\n\n**VERONIKA:** On si vážne myslí, že toto mu prejde?! Asi nechápe, s kým má dočinenia! Bety rozhodne vyhlási.\n\n**BETY:** Toto musíme nahlásiť riaditeľovi! Veronika sa nesúhlasne naštvane ohradí.\n\n**VERONIKA:** Čo? Že synáčik trénera je slutshamer?\n\n**BETY:** Alebo o tom napíšem článok do Scrollu!\n\n**VERONIKA:** Nie, Bety… teraz hovoríš ako dievčatko, ktoré dodržiava pravidlá. Ja pravidlá nedodržujem, ja ich určujem! A keď treba, aj porušujem!!! Veronika rázne vykročí smerom po chodbe a Bety ide za ňou.",
+      "location": "ŠKOLA",
+      "timeOfDay": "deň",
+      "characters": [
+        "Bety",
+        "Kiko",
+        "Veronika",
+        "Lola",
+        "Popy",
+        "Komparz Študenti"
+      ],
+      "labels": [],
+      "checklist": [
+        "Mobil - okolo vtedy idú viacerí študenti a pozerajú do mobilov.",
+        "Fotky - uvidí svoju fotku s Fifom z večera, ale na jej tvári je prirobená stekajúca biela lepkavá tekutina (nie realisticky, skôr prehnane a symbolicky).",
+        "Batoh - veronika si vyberá zošity z batoha a ukladá ich do skrinky."
+      ],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": [
+            "Mobil - okolo vtedy idú viacerí študenti a pozerajú do mobilov.",
+            "Fotky - uvidí svoju fotku s Fifom z večera, ale na jej tvári je prirobená stekajúca biela lepkavá tekutina (nie realisticky, skôr prehnane a symbolicky).",
+            "Batoh - veronika si vyberá zošity z batoha a ukladá ich do skrinky."
+          ]
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/16",
+      "name": "03/16. INT. ŠKOLA - ŠATŇA, DEŇ 8 — BETY, VERONIKA, PATRIK, FIFO, TOMI, SEBO, KOMPARZ, BASKETBALISTI",
+      "description": "POSTAVY: BETY, VERONIKA, PATRIK, FIFO, TOMI, SEBO, KOMPARZ, BASKETBALISTI\n\n**PREPIS: Veronika konfrontuje Fifa**\n\nUpotená a dusná chlapčenská šatňa. Polonahí basketbalisti sa prezliekajú po tréningu. Dvere sa zrazu prudko otvoria — Zúrivá Veronika nakráča dnu s telefónom v ruke, za ňou cupitá zahanbená Bety. Veronika jedného z basketbalistov rázne odsotí, aby sa hneď dostala blízko k Fifovi, ktorý tam práve niečo rozoberá s Patrikom.\n\n**VERONIKA:** Čo si o sebe myslíš, ty kretén?! Fifo do pol pása holý a s uterákom okolo bedier sa usmeje, keď ju vidí prichádzať s Bety.\n\n**FIFO:** Ale čo? Priviedla si Bety? Dáme troječku? Veronika mu otrčí displej Kikovho mobilu.\n\n**VERONIKA:** Okamžite. To. Vymaž!! Fifo sa sebavedomo usmeje.\n\n**FIFO:** Neviem, či vieš, ale urobiť Fifkovi dobre je na tejto škole česť. Mala by si si to vážiť… Ostatní chalani sa zasmejú. (Okrem Seba, ten je už tu na Fifa nasratý, že zverejnil na svojom public instagrame obrázok z privátnej DC skupiny.)\n\n**VERONIKA:** Je to tvoje zbožné želanie, chápem. Ale medzi nami nič nebolo, ty idiot.\n\n**FIFO:** Ale no tak. Nerob tu zo seba neviniatko, bejbe. Veď okrem mňa si ťa už vyskúšal aj Alexko… v šatníku u Sáry, nie? Zasmejú sa aj ostatní basketbalisti.\n\n**VERONIKA:** Drž hubu! Tesne pred Fifa sa postaví na obranu kamarátky Bety.\n\n**BETY:** Čo si to vlastne dovoľuješ, ty idiot?! Nemáš právo takto ponižovať žiadne dievča! Rozumieš. Fifo využíva telesnú prevahu a presilu chlapov v šatni, nestráca sebavedomie.\n\n**FIFO:** Ty jej tuším závidíš, že? Ak chceš, dnes môžeš ochutnať ty… Fifo ukáže svojimi ukazovákmi medzi svoje nohy. Chalani znova zborovo ocenia. Veronika však sebavedomie nestráca, opäť sa pred neho postaví s mobilom.\n\n**VERONIKA:** Poviem to jednoducho… tak, aby to pochopil aj tvoj zaostalý basketbalový mozoček… Ak to nevymažeš, oľutuješ! Fifo sa drzo usmeje.\n\n**FIFO:** Niky, Niky… z toho tvojho piskľavého hlásku sa asi v Bratislave všetci išli posrať… ale tu si na našom území, rozumieš? Fifo sa k nej tesne priblíži, ona však neustúpi, nenávistne mu pozerá do očí. Fifo sa ešte pousmeje.\n\n**FIFO:** By the way… odkiaľ to mám vymazať? Z dvesto telefónov, do ktorých som to preposlal?\n\n**VERONIKA:** Zničím ťa, ty prasa! Veronika odchádza a za ňou aj Bety. Fifo za nimi zakričí.\n\n**FIFO:** Okej… len si pri tom neublíž, pussy…\n\n**PATRIK:** Yes, bro!!! Keď sú baby preč, všetci pochvalne tľapkajú Fifa. Fifovi dobrú náladu skazí až Sebo, ktorému sa toto divadlo nepáčilo. Nikto tomu však už nevenuje pozornosť (ostatní pokračujú v prezliekaní sa).\n\n**SEBO:** Tebe úplne hrabe?\n\n**FIFO:** Čo je? Problém, bráško?\n\n**SEBO:** Povedali sme si, že toto zostáva iba v skupine! Fifo hrá formu.\n\n**FIFO:** Sorry, tentokrát som sa musel pochváliť. (V skutočnosti zverejnil slutshamingovú fotku Veroniky preto, lebo ho odmietla a udrela do rozkroku).",
+      "location": "ŠKOLA",
+      "timeOfDay": "",
+      "characters": [
+        "Bety",
+        "Veronika",
+        "Patrik",
+        "Fifo",
+        "Tomi",
+        "Sebo",
+        "Komparz",
+        "Basketbalisti"
+      ],
+      "labels": [],
+      "checklist": [
+        "Mobil - veronika mu otrčí displej Kikovho mobilu.",
+        "Fotky - (V skutočnosti zverejnil slutshamingovú fotku Veroniky preto, lebo ho odmietla a udrela do rozkroku).",
+        "Uterák - fifo do pol pása holý a s uterákom okolo bedier sa usmeje, keď ju vidí prichádzať s Bety."
+      ],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": [
+            "Mobil - veronika mu otrčí displej Kikovho mobilu.",
+            "Fotky - (V skutočnosti zverejnil slutshamingovú fotku Veroniky preto, lebo ho odmietla a udrela do rozkroku).",
+            "Uterák - fifo do pol pása holý a s uterákom okolo bedier sa usmeje, keď ju vidí prichádzať s Bety."
+          ]
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/17",
+      "name": "03/17. EXT. ŠKOLA - DVOR, DEŇ 8 — DOGY, MATEJ, MICHAL, KOMPARZ CHALANI V MASKÁČOCH",
+      "description": "POSTAVY: DOGY, MATEJ, MICHAL, KOMPARZ CHALANI V MASKÁČOCH\n\n**PREPIS: Dogy ťahá info od Mateja**\n\nDogy príde za Matejom na ihrisko, kde majú práve zraz členovia miestneho survival klubu (čiže klubu, v ktorom sa združujú chlapci v maskáčoch s balíčkami prežitia v ruksakoch, a ukazujú si stratégie zakladania ohňa a získavania pitnej vody v divočine). Ukazujú si na dvore na lankách viazanie nejakých uzlov, nevyhnutných pri zlaňovaní v nebezpečenstve a podobných aktivitách.\n\n**DOGY:** Pekné makramé. Matej sa naňho otočí.\n\n**MATEJ:** Čo tu chceš?\n\n**DOGY:** Chcem ťa viac spoznať. Máš minútku, dve? Matej si ho premeria, potom kývne na chalanov, aby pokračovali, a odíde s Dogym bokom.\n\n**DOGY:** Piateho júla si bol pri rieke, áno?\n\n**MATEJ:** Chodíme tam pravidelne na tréningy v teréne.\n\n**DOGY:** A v ten deň si videl Sáru Révayovú. Matej prikyvuje, akoby presviedčal sám seba, že videl len to.\n\n**MATEJ:** Sedela na brehu, celá mokrá. Kričala Jakubovo meno. To všetko som už hovoril polícii.\n\n**DOGY:** A predtým, kým si narazil na Sáru? Nepočuli ste niečo? Výstrel, hlasy, čokoľvek? Matej sa vyhovára.\n\n**MATEJ:** V lese sú vždy zvuky. Vtáky, konáre... Dogy sa zatvári netrpezlivo.\n\n**DOGY:** Lesné víly… k veci!\n\n**MATEJ:** Okrem Sáry som naozaj nevidel nič neobvyklé.\n\n**DOGY:** Vôbec nič?\n\n**MATEJ:** Nič také, čo by v lese nebolo aj inokedy. Dogy sa naňho chvíľku zadumane pozerá. Cíti, že niečo nie je košér, ale nemôže to napadnúť.\n\n**DOGY:** Rozumiem. Klasický deň v prírode. Mal by som asi častejšie chodiť do lesa, je to inšpiratívne. Matej neisto prikývne. Potom sa otočí a vráti k svojim chlapcom. Dogy ho sleduje od chrbta. Debatu Mateja s Dogym celý čas sledoval jeden z členov klubu, Michal. Na sekundu sa im s Dogym stretnú pohľady, na čo Michal rýchlo sklopí zrak späť ku špagátu.",
+      "location": "ŠKOLA",
+      "timeOfDay": "",
+      "characters": [
+        "Dogy",
+        "Matej",
+        "Michal",
+        "Komparz Chalani V Maskáčoch"
+      ],
+      "labels": [],
+      "checklist": [],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": []
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/18",
+      "name": "03/18. INT. ŠKOLA - TRIEDA, DEŇ 8 — SÁRA, ALEX, KOMPARZ",
+      "description": "POSTAVY: SÁRA, ALEX, KOMPARZ\n\n**PREPIS: Sára sľubuje Alexovi odmenu**\n\nAlex sedí v lavici a číta si poznámky, čo naškrabal, ako kocúr. Pred ním sedí Sára. Obráti sa naňho (je menej afektovaná ako zvyčajne, je Alexovi naozaj vďačná).\n\n**SÁRA:** Hej. Alex.\n\n**ALEX:** Čo je?\n\n**SÁRA:** Počula som, že si povedal policajtom o tom výstrele.\n\n**ALEX:** Povedal, no. Sára sa usmeje ešte širšie (touto informáciou ju Alex akoby vyvinil zo streľby – potvrdil, že tiež počul výstrel, a keďže ho počula aj ona v Jakubovej prítomnosti, tak tento výstrel nemohol byť ten, ktorý zabil Jakuba).\n\n**SÁRA:** Vďaka, naozaj. Zaslúžiš si nejakú odmenu.\n\n**ALEX:** Nerobil som to kvôli odmene. Sára sa k nemu nakloní ešte bližšie. Alexa to znervózni.\n\n**SÁRA:** Viem že nie, ale máš u mňa jedno želanie.\n\n**ALEX:** Sára, ja fakt nič nechcem.\n\n**SÁRA:** Môžeš si želať čokoľvek. Okrem môjho tela of course. Ale inak? /zašepká/ One wish. Alex na ňu pozrie a trochu neisto pokýve hlavou. Chce odmietnuť, no potom si uvedomí, že by tu jedna vec bola.\n\n**ALEX:** Vlastne...\n\n**SÁRA:** Ja som to vedela!",
+      "location": "ŠKOLA",
+      "timeOfDay": "",
+      "characters": [
+        "Sára",
+        "Alex",
+        "Komparz"
+      ],
+      "labels": [],
+      "checklist": [],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": []
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/19",
+      "name": "03/19. INT. ŠKOLA - KLUBOVŇA, DEŇ 8 — ALEX, BEKA",
+      "description": "POSTAVY: ALEX, BEKA\n\n**PREPIS: Beka dovolí Alexovi chodiť na jej skúšky**\n\nAlex je sám v klubovni, brnká si na svojej starej gitare. Prichádza Beka, ktorú poslala Sára, aby Alexovi pomohla s hudbou - to je tá sľúbená láskavosť (Sára často sama robí drobnosti pre iných ľudí, aby jej boli potom zaviazaní a mala na nich páku).\n\n**BEKA:** Sára ťa pozdravuje. Alex zdvihne hlavu. Beka neochotne spustí.\n\n**BEKA:** Poslala ma, aby som ti pomohla s hudbou. Takže... Môžeš chodiť na naše skúšky a pozerať sa. Ale potichu.\n\n**ALEX:** Okej…\n\n**BEKA:** Nebudeš sa zapájať, nebudeš nás rušiť, len tam budeš sedieť a počúvať, to jediné strpím. Rozumieme si? Alexovi sa dominancia Beky nepáči, ale slušne to oceňuje.\n\n**ALEX:** V pohode… Beka trochu nevrlo pokračuje.\n\n**BEKA:** Skúšame každý deň, teraz intenzívnejšie, lebo zajtra vystupujeme na vinobraní. Bývame v skúšobni od štvrtej.\n\n**ALEX:** Takže aj dnes od štvrtej?\n\n**BEKA:** /sarkasticky/ Áno, Alex, pochopil si to správne. Alex sa zháči. Niečo si uvedomil (má zaracha a dovolenú má len školu a basket).\n\n**ALEX:** Ale dnes to je trochu problém… Beka sa zatvári nonšalantne.\n\n**BEKA:** Take it or leave it. Inú možnosť ti nedám. Alex si to prechádza v hlave.\n\n**ALEX:** Nejak si to zariadim. Beka sa otočí na odchod.\n\n**BEKA:** Tak od siedmej.",
+      "location": "ŠKOLA",
+      "timeOfDay": "",
+      "characters": [
+        "Alex",
+        "Beka"
+      ],
+      "labels": [],
+      "checklist": [
+        "Gitara - alex je sám v klubovni, brnká si na svojej starej gitare."
+      ],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": [
+            "Gitara - alex je sám v klubovni, brnká si na svojej starej gitare."
+          ]
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/20",
+      "name": "03/20. INT. FEFE BEEF, DEŇ 8 — VERONIKA, LAURA",
+      "description": "POSTAVY: VERONIKA, LAURA\n\n**PREPIS: Veronika tají pred Laurou, čo sa jej stalo**\n\nVeronika sedí za stolom s knihami, ale nedokáže sa učiť, stále sa vracia k tomu screenshotu, ktorý dostala. Je z toho nesústredená, rozrušená. Je nešťastná, očividne ju to rozhodilo viac, ako dala pred kamarátmi najavo a dosť prežíva aj to, že Fifo ju ešte raz zosmiešnil, keď ho konfrontovala. Ešte raz rozklikáva profil, z ktorého tú fotku dostala, ale tam je prázdno, bol vytvorený len dnes. Prichádza Laura a prisadne si.\n\n**LAURA:** Konečne mám pauzu. Dnes som tu nabehala maratón. Veronika neodpovie. Laura pozrie na knihy, čo má dcéra pred sebou.\n\n**LAURA:** Čo sa tak drvíš? Veronika odloží telefón.\n\n**VERONIKA:** Biológiu.\n\n**LAURA:** A to včerajšie rande? Ani slovko si mi nepovedala. Veronika prehĺta slzičku a zatĺka.\n\n**VERONIKA:** Normálne rande. V rámci tohto mesta asi nad očakávania, ale Fifo nie je môj typ. Nič z toho nebude.\n\n**LAURA:** Naozaj? Vyzerala si, že sa naňho tešíš.\n\n**VERONIKA:** Ani nie. Veronike zrazu zavolá Bety a vlastne ju tým zachráni od Laurinho nevedomého jatrenia rany.\n\n**VERONIKA:** Prepáč mami, volá mi Bety.",
+      "location": "FEFE BEEF",
+      "timeOfDay": "deň",
+      "characters": [
+        "Veronika",
+        "Laura"
+      ],
+      "labels": [],
+      "checklist": [
+        "Fotky - ešte raz rozklikáva profil, z ktorého tú fotku dostala, ale tam je prázdno, bol vytvorený len dnes."
+      ],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": [
+            "Fotky - ešte raz rozklikáva profil, z ktorého tú fotku dostala, ale tam je prázdno, bol vytvorený len dnes."
+          ]
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/21",
+      "name": "03/21. INT. ŠKOLA - CHODBA S UČEBŇAMI, DEŇ 8 — VERONIKA",
+      "description": "POSTAVY: VERONIKA\n\n**PREPIS: Veronika ide do Scrollu**\n\nVeronika rýchlo kráča po chodbe do redakcie Scrollu.",
+      "location": "ŠKOLA",
+      "timeOfDay": "",
+      "characters": [
+        "Veronika"
+      ],
+      "labels": [],
+      "checklist": [],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": []
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/22",
+      "name": "03/22. INT. ŠKOLA - REDAKCIA, DEŇ 8 — SÁRA, BETY, VERONIKA, EVA, KIKO, KOMPARZ",
+      "description": "POSTAVY: SÁRA, BETY, VERONIKA, EVA, KIKO, KOMPARZ\n\n**PREPIS: Bety odhaľuje slutshamingový kanál**\n\nVeronika vchádza do redakcie, a je prekvapená, keď tam s Bety vidí sedieť ešte ďalších 6 dievčat, vrátane Evy (Eva je spolužiačka, nie je zrovna modelkovský typ, skôr taká intelektuálka, mierne pri sebe, žiadny veľký sociálny okruh, skôr bifľoška, introvertka).\n\n**BETY:** Radšej si sadni. Veronika nevie, čo sa deje, ale usadí sa. Pozerá po prítomných dievčatách, niektoré pozná viac, iné menej.\n\n**BETY:** Niečo veľmi podobné ako tebe sa stalo aj Eve a ostatným babám, ktoré tu sedia. Veronika sa pozrie na Evu, ktorá sedí s rukami v lone a pozerá pred seba.\n\n**VERONIKA:** Čo ti urobil?\n\n**EVA:** Raz po škole som Fifovi pomohla s úlohou z matiky. Normálne, zostali sme v triede, nič sa nedialo. Keď sme skončili, chcel si dať selfíčko. Nevedela som načo, ale prišlo mi blbé odmietnuť. Tak sme sa odfotili. Eva sa nachvíľu odmlčí, ale naberie odvahu a pokračuje.\n\n**EVA:** O pár dní sa ku mne začalo dostávať, čo o mne hovorí. Čo sme vraj spolu robili aj so šťavnatými detailmi. Jeho kamoši z tímu to po mne pokrikovali, cez prestávky, na chodbe aj v jedálni. Zosypala som sa.\n\n**VERONIKA:** Takže aj tvoju fotku poslal všetkým v škole?\n\n**EVA:** Zrejme iba niektorým basketbalistom. V miestnosti je chvíľku nepríjemné ticho. Preruší ho Bety.\n\n**BETY:** Eva nie je sama. Každé z týchto dievčat má svoju verziu rovnakého príbehu.\n\n**VERONIKA:** Robí to len Fifo? Bety sklamane pokýve hlavou.\n\n**BETY:** Fifo, Patrik, Sebo... dokonca aj Jakub keď ešte žil. Vyzerá to tak, že skoro všetci z tímu. Alex ani Tomi v tom zrejme nejdú. Pýtala som sa ich a o ničom netušia. Veronika prikývne a pomaly spracúva informácie. Bety ukáže na svojom mobile onú fotku, má ju aj ona. Okrem slutshamingového obrázku je tam aj niečo iné.\n\n**BETY:** Keď sa na ten obrázok pozrieš lepšie, pochopíš, že je to screenshot… pod fotkou sú komenty a hodnotenia. Žiadne mená, iba nicky (prezývky)… Veronika si fotku rozklikne a naozaj tam uvidí nicknejmy a komenty. Patricko: „exkluzívny materiál – 6/10“, fejf: „odporúčam“, Pip: Congrats, AnotherOneDown 7/10 a podobne.\n\n**BETY:** Je to jedna úchylná narušená hra. Spravia si s tebou selfíčko. Buď zverejnia, čo sa stalo, alebo ak sa nezadarilo, niečo perverzné si vymyslia. Obodujú to a vedú si rebríček. Navzájom sa v tom hecujú. Bety dievčatá vypočúvala dlhú dobu a vidno na nej únavu a znechutenie. Po krátkej pauze však pokračuje.\n\n**BETY:** Ten screenshot je pravdepodobne z utajenej discordovej skupiny.\n\n**VERONIKA:** Myslela som, že Discord používajú len gejmeri… Máme k tej skupine prístup? Bety pokrúti hlavou. Niektoré dievčatá sediace po miestnosti tiež pokrútia hlavami.\n\n**VERONIKA:** Takže nemáme žiadne konkrétne dôkazy.\n\n**BETY:** Zatiaľ nie. Veronika sa pozrie na Evu, ktorá na Betine slová súhlasne prikývne. Vtom sa rozrazia dvere a vpadne Sára.\n\n**SÁRA:** Okay, bitches, sorry, že prerušujem vašu sebaľútostnú session, ale máme tréning! Niekoľko dievčat sa začne dvíhať, ale Veronika sedí na mieste.\n\n**VERONIKA:** Sára, riešime niečo dôležité.\n\n**SÁRA:** Stále ten tajný server? Džízs, aj tebe tvrdili, že v tom bol aj Jakub? … Nikdy v živote by sa na niečom takom nezúčastnil. Veronika sa postaví a pozrie priamo na Sáru.\n\n**VERONIKA:** To, čo sa stalo mne, Eve a ostatným je reálne. A tí zakomplexovaní hajzlíci za to dostanú po hube. Sára mykne ramenami.\n\n**SÁRA:** I guess?\n\n**VERONIKA:** Takže sa nám nikto nebude stavať do cesty. Ani ty. Veronika sa na ňu zamračí a dodáva.\n\n**VERONIKA:** A ešte jedna vec. Už nikdy viac tieto dievčatá nenazývaj bitches.",
+      "location": "ŠKOLA",
+      "timeOfDay": "",
+      "characters": [
+        "Sára",
+        "Bety",
+        "Veronika",
+        "Eva",
+        "Kiko",
+        "Komparz"
+      ],
+      "labels": [],
+      "checklist": [
+        "Mobil - bety ukáže na svojom mobile onú fotku, má ju aj ona.",
+        "Fotky - vERONIKA: Takže aj tvoju fotku poslal všetkým v škole?"
+      ],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": [
+            "Mobil - bety ukáže na svojom mobile onú fotku, má ju aj ona.",
+            "Fotky - vERONIKA: Takže aj tvoju fotku poslal všetkým v škole?"
+          ]
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/23",
+      "name": "03/23. INT. FEFE BEEF, DEŇ 8 — DOGY, MICHAL, KOMPARZ",
+      "description": "POSTAVY: DOGY, MICHAL, KOMPARZ\n\n**PREPIS: Michal prezradí, kto strieľal**\n\n**(PARALELNE):**",
+      "location": "FEFE BEEF",
+      "timeOfDay": "",
+      "characters": [
+        "Dogy",
+        "Michal",
+        "Komparz"
+      ],
+      "labels": [],
+      "checklist": [],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": []
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/24FLASH",
+      "name": "03/24FLASH. EXT. PRI RIEKE, DEŇ X — MATEJ, MICHAL, KOMPARZ",
+      "description": "POSTAVY: MATEJ, MICHAL, KOMPARZ\n\n**PREPIS: Matej strieľa**\n\nMichal, ktorý nervózne pozeral na Dogyho a Matejov rozhovor na školskom dvore počas stretka survivalistov, sedí u Fefeho a chystá sa pochutiť si na hambáči. Dogy si k nemu nečakane prisadne v momente, keď akurát ide hryznúť do burgra.\n\n**DOGY:** Dnes na dvore si na mňa celý čas nervózne čumel. Michal pokýve hlavou.\n\n**MICHAL:** Nečumel som.\n\n**DOGY:** Čo skrývaš? Michal položí burger na tácku a povzdychne si.\n\n**MICHAL:** Ja neskrývam nič. To Matej ti klame.\n\n**DOGY:** O čom? No pokračuj! Michal vie, že už nie je cesty späť a navyše mu chladne burger.\n\n**MICHAL:** O tom výstrele. Strieľal on. Doniesol fotrov revolver a ukazoval nám streľbu na terč. (Prestrih Flash) Matej mieri revolverom na terč umiestnený na strome a vystrelí. Hrdo sa otáča na skupinku chlapcov, tí naňho obdivne pozerajú. (Prestrih Fefe Beef) Dogy neveriacky opakuje, čo práve počul od Michala.\n\n**DOGY:** On strieľal z revolveru pri rieke. Mhm. Predpokladám, že zbrojný pas nemá.\n\n**MICHAL:** Nemá. On je trochu taký prepnutý. Hovorí, že musíme byť pripravení. Že keď príde rozhodujúca chvíľa, nikto iný nás neubráni, len my sami. Dogy neveriacky krúti hlavou.\n\n**DOGY:** Jasné. /sarkasticky/ Django z Čierneho kameňa...",
+      "location": "PRI RIEKE",
+      "timeOfDay": "",
+      "characters": [
+        "Matej",
+        "Michal",
+        "Komparz"
+      ],
+      "labels": [],
+      "checklist": [],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": []
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/25",
+      "name": "03/25. INT. ALEXOV DOM - ALEXOVA IZBA, DEŇ 8 — ALEX",
+      "description": "POSTAVY: ALEX\n\n**PREPIS: Alex zdrhá z domu na skúšku**\n\nAlex sa potrebuje dostať nepozorovane z domu a prepašovať so sebou gitaru. Otcovi povedal, že má tréning, ale v skutočnosti ide na skúšku s Bekou a jej kapelou, ktorý začína o štvrtej. Snaží sa vyjsť potichu cez halu až ku vchodovým dverám, opatrne nakúka, či ho nemôže otec vidieť, ako nesie gitaru. Preplíži sa ku dverám a chytí kľučku. Čo najpokojnejšie zahlási smerom do bytu:\n\n**ALEX:** Oci, idem na ten tréning! A ide von.",
+      "location": "ALEXOV DOM",
+      "timeOfDay": "",
+      "characters": [
+        "Alex"
+      ],
+      "labels": [],
+      "checklist": [],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": []
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/26",
+      "name": "03/26. INT. ŠKOLA - HUDOBNÁ MIESTNOSŤ, DEŇ 8 — ALEX, BEKA, MERY, LEA",
+      "description": "POSTAVY: ALEX, BEKA, MERY, LEA\n\n**PREPIS: Beke sa nepáčia Alexove zásahy do jej hudby**\n\nHudobná miestnosť. Sú štyri hodiny a Mery a Lea si polohlasne skúšajú text. Alex sedí vedľa nich, počúva, niečo mu napadne.\n\n**ALEX:** Táto časť, kde hovoríš „nechaj ma ísť“, čo keby tam bolo niečo konkrétne? Niečo, čo si vie každý predstaviť… Mery sa zamyslí.\n\n**MERY:** Čo napríklad?\n\n**ALEX:** Neviem, nejaký detail, miesto, pocit. Niečo čo si zapamätáš. Teraz to trošku splýva. Dvere skúšobne sa otvoria. Vojde Beka a hneď spozornie, keďže vidí, ako sa Alex baví s babami.\n\n**BEKA:** Čo sa tu deje?\n\n**ALEX:** Len sme sa bavili o textoch. Beka je extrémne citlivá na svoju kapelu, je to jej srdcovka, považuje sa za šéfku a hlavný hlas, je to celé jej projekt od A po Z, preto zle znáša akékoľvek pokusy montovať sa jej do toho.\n\n**BEKA:** Dohoda bola, že budeš potichu sedieť. O čo ti ide?\n\n**ALEX:** Len aby si dala šancu mojím návrhom. Mohlo by to znieť o dosť modernejšie. Beku Alexove mudrovanie rozhodí, ale nezúri. Neverí mu. Je skôr pohŕdavá a ironická.\n\n**BEKA:** Prosím ťa a ty čo vieš o hudbe? My tri spolu skladáme dva roky. Máme svoj štýl, máme svoj sound a je dostatočne súčasný. Alex ju nechcel rozrušiť, snaží sa to zahasiť.\n\n**ALEX:** Ide len o pár detailov… Beka sa nenechá.\n\n**BEKA:** Ja odmietam, aby mi do hudby mudroval basketbalista. Priama urážka sa Alexa celkom dotkne.\n\n**ALEX:** Čo to s tým má spoločné?! Veď ani nepoznáš moje pesničky.\n\n**BEKA:** Alex, si chlap. Nikdy sa na nás nedokážeš napojiť. Beka ho nechce úplne verbálne zlikvidovať, spomalí a snaží sa dohovoriť v rámci logiky.\n\n**BEKA:** Žiješ iný svet, máš iné problémy a pohľad na veci. Nemáš ženský cit a vnímanie. Bez urážky, ale ako by si to mohol pochopiť? Alex je porazený, prehltne urazenie sa a pozrie na Beku.\n\n**ALEX:** Okej… som ticho… iba počúvam vašu skúšku. Alex si sám sadne na stoličku v rohu miestnosti a čaká, ako začnú spievať a hrať.",
+      "location": "ŠKOLA",
+      "timeOfDay": "",
+      "characters": [
+        "Alex",
+        "Beka",
+        "Mery",
+        "Lea"
+      ],
+      "labels": [],
+      "checklist": [],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": []
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/27",
+      "name": "03/27. INT. ŠKOLA - REDAKCIA, DEŇ 8 — BETY, EVA, VERONIKA, PETER, KIKO",
+      "description": "POSTAVY: BETY, EVA, VERONIKA, PETER, KIKO\n\n**PREPIS: Peter potvrdzuje existenciu kanála**\n\nBety (už po tanečnom tréningu) sedí s notebookom za stolom v redakcii a usilovne sa snaží nejak porozumieť systému DCčka (Discord, skrátene DCčko). Sťažuje sa Veronike a Kikovi, že hocijako ten kanál hľadá, furt nič nemá.\n\n**BETY:** Toto je hrozne neprehľadné. Kde je vyhľadávanie? Ako tu vôbec niečo nájdeš? Kiko vedľa nej ťuká do mobilu a nahlas žasne.\n\n**KIKO:** Skús googliť, ja tu vidím o DC-čku toľko spicy gay materiálov, že sa na pár serverov asi zaregistrujem.\n\n**BETY:** Mal si hľadať basketbalový kanál. Kiko ho vôbec nehľadá, ale zahovorí to a ďalej scrolluje.\n\n**KIKO:** Veď hľadám, hľadám. Veronika neodpovedá, je tiež zaujatá ťukaním do notebooku, striedavo stále pozerá na mobile na tú fotku, pokúša sa ju zväčšiť a nájsť nejakú stopu, ale krúti hlavou, evidentne sa jej nedarí. Do redakcie odrazu vojde Eva, ťahá za sebou Petra a víťazoslávne ho predstaví.\n\n**EVA:** Našla som vám svedka.\n\n**PETER:** Čaute. Peter sa tvári trochu neisto, ale odhodlane. Eva sa naňho obráti.\n\n**EVA:** Povedz im, čo si povedal mne. Peter prikývne a spustí.\n\n**PETER:** Ten Discord kanál existuje. Videl som ho na vlastné oči. Volá sa Blackstone&sluts a majú ho na jednom basketbalovom serveri. Všetci naňho zvedavo pozerajú. Bety naňho otočí notebook s otvoreným Discordom.\n\n**BETY:** Ako sa tam dostaneme? Peter sa zháči.\n\n**PETER:** Nedostanete. Ako, na ten server možno hej, tam je polka školy, ale konkrétny kanál vnútri majú schovaný a vie o ňom málokto. Neuvidíš ho bez povolenia od admina. Bety sa nervózne pozrie na obrazovku, potom na Petra a Evu.\n\n**BETY:** Takže bez pozvánky sme zaseknuté? Peter prikývne.\n\n**PETER:** Presne. Ja som sa s nimi kvôli tomu prestal baviť. Nechcel som to robiť a už vôbec tráviť čas s týpkami, ktorým to príde vtipné. Peter sa otočí na odchod ale ešte dodáva poslednú vec.\n\n**PETER:** Robte si s tou informáciou čo chcete. Ja som rád, že som to niekomu povedal, ale tam to končí. Peter odíde. Eva za ním zatvorí dvere a sadá si k Bety. Veronika sa kanál stále snaží nájsť, ale márne. Peter im neklamal.\n\n**VERONIKA:** Nič s tým názvom tu nie je. Skúšajú na Betinom notebooku ešte nejaké iné varianty, ale stále nič. Eva pozerá na Bety a čaká, čo na to ako vedúca detektívka povie. Bety chvíľu mlčí, rozmýšľa.\n\n**BETY:** Nie je náhodou basketbalový tréning niekedy teraz, po našom tanečnom? Veronika sa spiklenecky usmeje. Bety spokojne dvihne obočie, má plán.",
+      "location": "ŠKOLA",
+      "timeOfDay": "",
+      "characters": [
+        "Bety",
+        "Eva",
+        "Veronika",
+        "Peter",
+        "Kiko"
+      ],
+      "labels": [],
+      "checklist": [
+        "Notebook - bety (už po tanečnom tréningu) sedí s notebookom za stolom v redakcii a usilovne sa snaží nejak porozumieť systému DCčka (Discord, skrátene DCčko).",
+        "Mobil - kiko vedľa nej ťuká do mobilu a nahlas žasne.",
+        "Fotky - veronika neodpovedá, je tiež zaujatá ťukaním do notebooku, striedavo stále pozerá na mobile na tú fotku, pokúša sa ju zväčšiť a nájsť nejakú stopu, ale krúti hlavou, evidentne sa jej nedarí."
+      ],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": [
+            "Notebook - bety (už po tanečnom tréningu) sedí s notebookom za stolom v redakcii a usilovne sa snaží nejak porozumieť systému DCčka (Discord, skrátene DCčko).",
+            "Mobil - kiko vedľa nej ťuká do mobilu a nahlas žasne.",
+            "Fotky - veronika neodpovedá, je tiež zaujatá ťukaním do notebooku, striedavo stále pozerá na mobile na tú fotku, pokúša sa ju zväčšiť a nájsť nejakú stopu, ale krúti hlavou, evidentne sa jej nedarí."
+          ]
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/28",
+      "name": "03/28. INT. ŠKOLA - ŠATŇA, DEŇ 8 — BETY, VERONIKA, EVA, SÁRA, KIKO, TRÉNER MO, KOMPARZ MO",
+      "description": "POSTAVY: BETY, VERONIKA, EVA, SÁRA, KIKO, TRÉNER MO, KOMPARZ MO\n\n**PREPIS: Odhalenie tajného kanála**\n\nBety, Veronika, Eva a Kiko sa potichu pohybujú po chlapčenskej šatni. Kiko stojí pri dverách a dáva pozor. Nazerá smerom do telocvične, aby dal signál, keby sa niekto chcel vrátiť do šatne. Z telocvične počuť piskot tenisiek, výkriky hráčov a trénera.\n\n**KIKO:** Okay, teraz nacvičujú slalom s loptou. Marek si vyhŕňa tričko... pekáč buchiet, nice... Bety, Veronika a Eva lašujú po skrinkách.\n\n**BETY:** Máte niečo? Akýkoľvek mobil. Zrazu sa otvoria šatňové dvere a vojde do nich Sára. Bety, Veronika, Eva aj Kiko sú prekvapení, že ju tam vidia. Sára sebavedomo pohodí hlavou.\n\n**SÁRA:** Čo čumíte? Nie ste jediné koho zaujíma pravda a prišla som vám dokázať, že ju nemáte. Sára podíde ku jednej zo skriniek a znechutene k nej pričuchne.\n\n**SÁRA:** Aj keď sa kvôli tomu budem musieť hrabať v cudzích smradľavých handrách.\n\n**VERONIKA:** Tak si švihni. A buď potichu. Sára znechutene otvorí prvú skrinku a začne sa v nej hrabať. Medzitým však Eva ohlási úspech a vyberie mobil.\n\n**EVA:** Bingo! Podá mobil Bety. Tá ho vezme, snaží sa ho zapnúť, ale nedarí sa jej.\n\n**BETY:** Vyzerá byť vybitý.\n\n**VERONIKA:** Nemáme čas, skúsme niekoho iného. Bety zo Sebovej skrinky vyberie mobil. Tento sa hneď zapne, ale pýta PIN kód. Bety vyťuká štyri nuly, ale neodomkne sa. Potom skúsi štyri deviatky. Nič.\n\n**BETY:** Netušíte, aký môže mať Sebo PIN? Veronika sa pohŕdavo pozrie na teamovú selfie fotku nalepenú na stene vedľa dverí. Bety sa usmeje, niečo jej napadlo. Zadá dvakrát číslo Sebiho dresu: 5656. Telefón sa odokmne.\n\n**BETY:** /hrdo/ Jednoduchý chlapec. Baby sa zhŕknu pred Sebiho skrinkou, aj Kiko pribehne a hľadajú v telefóne DC-čko. Bety drží telefón a hľadá, Kiko sa obzerá, stráži popritom dvere do telocvične, všetci sú v napätí.\n\n**BETY:** Dc-čko, aha, má ho tu.\n\n**VERONIKA:** Dúfam, že má zapamätané heslo.\n\n**BETY:** Má. Sme tam, aha. Kanál Blackstone&sluts. Obrazovka telefónu blikne. Sára zažmurká, akoby neverila vlastným očiam a Bety sa pozrie na Veroniku. V tajnom kanáli (mal by vyzerať ako whatsap, čiže fotky s lajkami a komentármi, vystriedané so správami) medzi fotkami je aj tá s Evou, a samozrejme aj fotka s Veronikou, pri ktorej je komentár „nová baba“ a priradených osem bodov a rôzne emotikony vyjadrujúce obdiv a pobavenie.\n\n**EVA:** Nechuťáci. Bety ďalej scrolluje. Sú tam aj mená a fotky ďalších dievčat s basketbalistami. Ako sa Bety posúva prstom na staršie záznamy, nájde fotku svojej sestry Sofie s Jakubom a pritom tri body.(O tejto fotke doteraz nikto nevedel.) Sára je v šoku, nechápe to, nechce tomu uveriť.\n\n**SÁRA:** Wtf? To nie. Jakub by toto nikdy neurobil. Sára od nich ustúpi a kýve hlavou, nechce informáciu prijať. V Bety to vrie, má čo robiť, aby nevybuchla. Čím dlhšie sa na tie záznamy pozerá, tým viac v nej stúpa hnev.\n\n**BETY:** /nahlas/ Hajzli! Podá telefón Veronike a od nervov zatína zuby.\n\n**BETY:** Ako môže byť niekto takýto nechutný perverzák? Veronika okamžite vyberie svoj telefón a robí si fotky celého kanálu, aby mali dôkaz.\n\n**VERONIKA:** Teraz máme s čím pracovať.",
+      "location": "ŠKOLA",
+      "timeOfDay": "",
+      "characters": [
+        "Bety",
+        "Veronika",
+        "Eva",
+        "Sára",
+        "Kiko",
+        "Tréner Mo",
+        "Komparz Mo"
+      ],
+      "labels": [],
+      "checklist": [
+        "Mobily basketbalistov zo skriniek - Eva a Bety ich hľadajú a skúšajú odomknúť; Sebov mobil sprístupní tajný kanál Blackstone&sluts",
+        "Tímová selfie basketbalistov na stene - Veronike a Bety napovie Sebov PIN 5656",
+        "Basketbalová lopta mimo šatne - hráči s ňou trénujú slalom v telocvični, počuť ich cez dvere"
+      ],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": [
+            "Mobily basketbalistov zo skriniek - Eva a Bety ich hľadajú a skúšajú odomknúť; Sebov mobil sprístupní tajný kanál Blackstone&sluts",
+            "Tímová selfie basketbalistov na stene - Veronike a Bety napovie Sebov PIN 5656",
+            "Basketbalová lopta mimo šatne - hráči s ňou trénujú slalom v telocvični, počuť ich cez dvere"
+          ]
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/29",
+      "name": "03/29. INT. ŠKOLA - HUDOBNÁ MIESTNOSŤ, DEŇ 8 — ALEX, BEKA, MERY, LEA",
+      "description": "POSTAVY: ALEX, BEKA, MERY, LEA\n\n**PREPIS: Alex pomáha s textom**\n\nBaby pokračujú v skúške, ale na jednej skladbe sa trochu zasekli. (Text piesne doplníme do scenára, keď bude vybratá konkrétna skladba.) Mery skúsi text znova, v polke prestane.\n\n**MERY:** Toto tam nepasuje. Rytmicky to sedí, ale necítim to.\n\n**LEA:** Znie to, akoby sme vypĺňali prázdne miesto.\n\n**BEKA:** Ja viem. Zamyslí sa a potichu text znova prespieva. Potom vystrúha nespokojnú grimasu.\n\n**BEKA:** Viem že to nefunguje, ale neviem, čo tam dať namiesto toho. Dievčatá potichu premýšľajú. Alex sedí a pozerá na nich. Zjavne niečo vie, hýbe ústami, akoby si ich text opakoval. Niečo mu cvaklo. Dvihne ruku, ako na hodine.\n\n**ALEX:** Môžem? Beka pochybovačne zdvihne obočie.\n\n**ALEX:** Len jeden návrh. Čo keby ste to skúsili takto... (Text piesne doplníme do scenára, keď bude vybratá konkrétna skladba.) Alex potichu navrhne zmenu textu. Baby na seba pozrú. Beka má stále pochybovačný výraz, ale Lea si Alexov návrh zahmká a prikývne.\n\n**LEA:** Mne sa to páči. Skúsme to zaspievať.\n\n**BEKA:** Dobre. Aspoň uvidí, že to nebude fungovať. Beka, Mery a Lea zaspievajú Alexovu verziu textu. Sedí tam, ako riť na šerbeľ, a to musí uznať aj Beka.\n\n**BEKA:** Dobre, uznávam, je to celkom fajn. Pozrie sa na Alexa a zase má svoju povýšeneckú grimasu.\n\n**BEKA:** Ale jeden dobrý nápad ti nedáva právo sa nám motať do hudby. Kapito? Alex prikývne.\n\n**ALEX:** Kapito. Už som ticho. Beka sa otočí späť k mikrofónu. Alex sa usmeje popod fúz. Už mu v hlave šrotuje, čo ďalšie vymyslí. (Texty piesní sa doriešia neskôr, dohodli sme sa na tom so Stanom.)",
+      "location": "ŠKOLA",
+      "timeOfDay": "",
+      "characters": [
+        "Alex",
+        "Beka",
+        "Mery",
+        "Lea"
+      ],
+      "labels": [],
+      "checklist": [
+        "Mikrofón - beka sa otočí späť k mikrofónu."
+      ],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": [
+            "Mikrofón - beka sa otočí späť k mikrofónu."
+          ]
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/30",
+      "name": "03/30. INT. DOM BETY - IZBA BETY, NOC 8 — BETY, ALICA",
+      "description": "POSTAVY: BETY, ALICA\n\n**PREPIS: Narúžovaná Bety klame a nedá si tabletku**\n\nBety si v izbe zamyslene skúša výrazný červený rúž a pozoruje sa v zrkadle. Vchádza Alica a pohŕdavo si dcéru premeria.\n\n**ALICA:** Ten otrasný rúž máš od Veroniky, že? To je farba presne pre ňu. Bety na provokáciu nereaguje. Ďalej pozerá do zrkadla. Alica teda spustí prednášku.\n\n**ALICA:** Nepáči sa mi, ako ťa tá farba robí staršou. Sofia mala podobný. Hrala sa na dospelú a aha kam ju to dostalo. Podíde k Bety a napol matersky a napol autoritatívne jej sama zotrie vreckovkou rúž z pier. Potom ukáže na tubičku so spomínaným rúžom.\n\n**ALICA:** Nech si ho Veronika nosí sama, keď chce vyzerať jak... Nedopovie. Bety na Alicu spýtavo pozrie, ale stále jej nedáva vytúženú reakciu. Alicu to jeduje.\n\n**ALICA:** Má na teba očividne zlý vplyv. Ste stále spolu a ja to rozhodne neschvaľujem. Dcéra kriminálnika pre teba nie je dobrá spoločnosť. Bety sa s mamou neháda, neoponuje, už v hlave rieši pomstu Fifovi a ovplyvňuje to aj jej správanie.\n\n**BETY:** Sme kamošky. Zvykni si. Alica sa ironicky uchechtne a krúti hlavou.\n\n**ALICA:** Zajtra poobede je na vinobraní koncert. Pôjdeš so mnou? Bety vinobranie nezaujíma (je to tradičný spoločenský event v mestečku, kde sa predstavujú aj miestni podnikatelia formou stánkov s výrobkami, gastroproduktami a službami). Vyhovára sa z nich.\n\n**BETY:** /klame/ Nemôžem. Po škole sa idem k Veronike učiť na test a asi tam aj prespím. Vlastne aj dnes sa u nej musím zastaviť pre poznámky.\n\n**ALICA:** Tak neskoro? Alica si povzdychne v duchu „čo už s tebou“. Zo stolíka vezme blister liekov a podá ho Bety.\n\n**ALICA:** Nezabudni si dať lieky. Je osem hodín. Alica odíde. Bety pozerá na blister, jednu tabletku vyberie a hodí ju do koša. Blister vráti na miesto.",
+      "location": "DOM BETY",
+      "timeOfDay": "",
+      "characters": [
+        "Bety",
+        "Alica"
+      ],
+      "labels": [],
+      "checklist": [
+        "Blister s liekmi / Ritalin - zo stolíka vezme blister liekov a podá ho Bety."
+      ],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": [
+            "Blister s liekmi / Ritalin - zo stolíka vezme blister liekov a podá ho Bety."
+          ]
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/31",
+      "name": "03/31. INT. FEFE BEEF, NOC 8 — BETY, FIFO, KOMPARZ",
+      "description": "POSTAVY: BETY, FIFO, KOMPARZ\n\n**PREPIS: Bety zvádza Fifa**\n\nBety s červeným rúžom na perách a zvodne previazanou blúzkou nájde Fifa sedieť u Fefeho na burgri. Napriek ich predchádzajúcemu konfliktu si k nemu prisadne. Fifo sa zháči.\n\n**FIFO:** Ak mi ideš znova vynadať kvôli Veronike, tak nemám záujem.\n\n**BETY:** Nejdem. Bety sa tvári milo a nahodí udičku.\n\n**BETY:** Rozmýšľala som o tom dnešku, ako som na teba vybehla. Vlastne som zistila, že už nechcem byť to trápne milučké dievča. Fifo sa trochu pobaví.\n\n**FIFO:** Ale ty si trápne milučké dievča. Bety naňho hodí zvodný pohľad a je v ňom nečakane veľa dominancie.\n\n**BETY:** Myslíš? Fifo zvraští obočie a prikývne.\n\n**FIFO:** No úprimne si mi vždy prišla taká suchárka. Fifo nahlas premýšľa. Nápad sa mu začína páčiť.\n\n**FIFO:** Ale asi to máte v rodine. Aj tvoja segra sa tvárila ako poctivka a podľa Jakuba bola v skutočnosti dračica. Bety slová o Sofii trošičku vyhodia z konceptu, ale rýchlo sa napojí naspäť do flirtovacieho módu.\n\n**BETY:** Tak čo myslíš? Mohol by si ma naučiť, aké je to byť trochu... neposlušná. Fifo tú návnadu teraz prehltol aj s háčikom a nadšene sa uškrnie.\n\n**FIFO:** A kde si to predstavuješ?\n\n**BETY:** U Evy.\n\n**FIFO:** Prečo tam?\n\n**BETY:** Eva bude s rodičmi mimo mesto a dala mi strážiť dom. Budeme to mať celé len pre seba. Mrkne naňho.\n\n**BETY:** Je tam aj vírivka. Fifo si utrie obrúskom sliny, ktoré nie sú len z burgra a prikývne. Už sa nevie dočkať.",
+      "location": "FEFE BEEF",
+      "timeOfDay": "",
+      "characters": [
+        "Bety",
+        "Fifo",
+        "Komparz"
+      ],
+      "labels": [],
+      "checklist": [],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": []
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/32",
+      "name": "03/32. INT. ALEXOV DOM - VSTUP, NOC 8 — ALEX, LUKÁŠ",
+      "description": "POSTAVY: ALEX, LUKÁŠ\n\n**PREPIS: Lukáš pristihne Alexa**\n\nAlex sa zakráda potichu domov zo skúšky. Lukáš ho čaká na schodisku, hneď si všimne, že nesie gitaru. Je mu jasné, kde Alex v skutočnosti bol.\n\n**LUKÁŠ:** S gitarou si asi nebol na basketbale, že? Alex vidí, že nemôže otca klamať, tak sa prizná.\n\n**ALEX:** Dostal som šancu byť na skúške Bekinej kapely. Musel som si vybrať. Lukáš si skríži ruky na prsiach.\n\n**LUKÁŠ:** A vybral si si. Alex má naliehavý tón. Ide mu o veľa a musí Lukáša obmäkčiť.\n\n**ALEX:** Dokonca som im vylepšil jeden song, na zajtrajší koncert. Prvýkrát budem počuť niečo, na čom som robil. Aj keď má Lukáš Alexa nadovšetko rád, teraz bude tvrdý.\n\n**LUKÁŠ:** To teda nebudeš. Máš predsa na dva týždne zaracha. Alex začína panikáriť, Lukáš je takýto nekompromisný málokedy (alebo taký nebol ešte nikdy).\n\n**ALEX:** Oci… prosím… Daj mi zaracha aj na mesiac, ale zajtra ma tam fakt musíš pustiť…\n\n**LUKÁŠ:** Ja musím, hej?\n\n**ALEX:** Prosím. Nechápeš, aké je to pre mňa dôležité? Alexove prosíkanie nepadá na úrodnú pôdu. Lukáš je skrátka naštvaný.\n\n**LUKÁŠ:** Ja s tebou nediskutujem. Dvakrát po sebe si mi klamal. Alex naštvane odíde hore schodmi a úplne nedospelo tresne dverami.",
+      "location": "ALEXOV DOM",
+      "timeOfDay": "",
+      "characters": [
+        "Alex",
+        "Lukáš"
+      ],
+      "labels": [],
+      "checklist": [
+        "Gitara - lUKÁŠ: S gitarou si asi nebol na basketbale, že?"
+      ],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": [
+            "Gitara - lUKÁŠ: S gitarou si asi nebol na basketbale, že?"
+          ]
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/33",
+      "name": "03/33. EXT. PRED RADNICOU, DEŇ 9 — KAMENICKÁ, OSKAR, KLAUDIA, ALICA, LAURA, KELER, LUKÁŠ, OLASOVÁ, KOMPARZ",
+      "description": "POSTAVY: KAMENICKÁ, OSKAR, KLAUDIA, ALICA, LAURA, KELER, LUKÁŠ, OLASOVÁ, KOMPARZ\n\n**PREPIS: Príhovor primátorky na vinobraní**\n\nMestský event pri príležitosti hodov na námestíčku pred radnicou. Ľudia sa motajú okolo stánkov, kde ponúkajú miestne výrobky – kváskové chleby, sladkosti, syry, víno resp. Prosecco atď. Primátorka Kamenická má na pódiu uvítací príhovor.\n\n**KAMENICKÁ:** Vážení spoluobčania, milí priatelia. Vitajte na našom tradičnom vinobraní. Teší ma, že vás tu dnes vidím toľko, aj napriek tragickým udalostiam, ktorými sme si tento rok prešli. Čierny Kameň je malé mesto, ale v ťažkých časoch sme vždy dokázali, že sme súdržní. Ľudia zatlieskajú. Kamenická pokračuje.\n\n**KAMENICKÁ:** Prajem vám príjemnú zábavu, navštívte naše stánky, ochutnávajte, čo hrdlo ráči a užite si tento vzácny deň.",
+      "location": "PRED RADNICOU",
+      "timeOfDay": "",
+      "characters": [
+        "Kamenická",
+        "Oskar",
+        "Klaudia",
+        "Alica",
+        "Laura",
+        "Keler",
+        "Lukáš",
+        "Olasová",
+        "Komparz"
+      ],
+      "labels": [],
+      "checklist": [
+        "Víno - ľudia sa motajú okolo stánkov, kde ponúkajú miestne výrobky – kváskové chleby, sladkosti, syry, víno resp."
+      ],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": [
+            "Víno - ľudia sa motajú okolo stánkov, kde ponúkajú miestne výrobky – kváskové chleby, sladkosti, syry, víno resp."
+          ]
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/34",
+      "name": "03/34. EXT. PRED RADNICOU, DEŇ 9 — ALICA, LAURA, FEFE, KOMPARZ",
+      "description": "POSTAVY: ALICA, LAURA, FEFE, KOMPARZ\n\n**PREPIS: Alica provokuje Lauru**\n\nLaura stojí v zástere za pultom stánku, kde predávajú limonády a burgery. Keďže je vinobranie, majú aj víno. Pristúpi sem Alica (už vyzerá, že predtým obehla aj viacero stánkov s vínom, keďže mierne popíjanie k jej postave patrí). Sú s Laurou spolužiačky zo strednej, ale nikdy sa nemali veľmi rady.\n\n**ALICA:** Laura! No kto by to bol povedal, že práve ty skončíš za barovým pultom v zamastenej zástere a závislá na tringeltoch?\n\n**LAURA:** Ty si vždy vedela potešiť. Čo ti donesiem? Nejakú dobrú limonádu? Alica si prezerá ponuku. Uškŕňa sa na Lauru.\n\n**ALICA:** Víno. Laura jej ide vytiahnuť pohár na víno. Alica prikývne a prejde prstom po ošpliechanom barovom pultíku. Usmieva sa, ako mesiačik na hnoji. (Má ohromné Vianoce z toho, že sa Laura so stiahnutým chvostom a v podstate holým zadkom vrátila do mestečka, kde vyrástla, a o ktorom sa vždy vyjadrovala s pohŕdaním.)\n\n**ALICA:** Pekné, naozaj pekné. Pamätám si, ako si nám vždy vravela, že sa nevieš dočkať dňa, keď z týchto lazov zmizneš. Aj to, ako si odkopla dobrého, ale chudobného chlapca a zdrhla si so zbohatlíkom. Laura sa nenechá vyprovokovať. Pokojne postaví vínový pohár na pult.\n\n**LAURA:** Ružové, biele, červené?\n\n**ALICA:** Hlavne nech to má bubliny. Alica sa oprie o pultík. Ďalej vyrýva, užíva si to.\n\n**ALICA:** Ale aspoň si sa nám vrátila. Je tu lepší vzduch, že? Laura je otrlá. Pokojne pred Alicu položí pohár so šumivým vínom.\n\n**LAURA:** Nech sa ti páči.\n\n**ALICA:** Vďaka. Ako sa má Veronika? Zvyká si?\n\n**LAURA:** Zvyká. Ďakujem za opýtanie. Alica nemá o Veronike príliš vysokú mienku a nepovažuje ju za hodnú kamarátiť sa s jej dcérou, je to dcéra kriminálnika.\n\n**ALICA:** Vkus má po tebe, čo? Čudujem sa, že jej riaditeľ dovolí takto oblečenej chodiť do školy. Laura vidí na Alici, že je pod parou, tak to nekomentuje. Alica pokračuje.\n\n**ALICA:** Bety mala na sebe včera tak otrasný rúž... to musel byť jedine Veronikin. Má na ňu zlý vplyv, ešte jej pokazí vkus a bohvie na čo ďalšie ju nahovorí. Alica očakáva reakciu, ale tá stále neprichádza. Už je v bode, kedy tlačí na pílu.\n\n**ALICA:** Počula som, že chodí s trénerovým synom. Videli ich spolu. To je tiež pekný kvietok. Ale asi si majú čo povedať... ak sa vôbec k nejakému rozprávaniu dostali. Nezaprela, po kom je, čo? Laura sa nenechá vyprovokovať, vidí že s Alicou sa v tomto stave neoplatí debatovať.\n\n**LAURA:** Nedáš si kávičku? Na môj účet. Alebo ti zavolám taxík domov, nech si trochu odpočinieš. Alica vidí, že tu nepochodí, (Laura je pokojná, pozná svoju dcéru), tak mávne rukou a odchádza. Laura ju sleduje s pohoršeným výrazom ale trochu ju aj ľutuje.",
+      "location": "PRED RADNICOU",
+      "timeOfDay": "",
+      "characters": [
+        "Alica",
+        "Laura",
+        "Fefe",
+        "Komparz"
+      ],
+      "labels": [],
+      "checklist": [
+        "Víno - keďže je vinobranie, majú aj víno."
+      ],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": [
+            "Víno - keďže je vinobranie, majú aj víno."
+          ]
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/35",
+      "name": "03/35. EXT. EVINA VILA - VCHOD, NOC 9 — VERONIKA, FIFO",
+      "description": "POSTAVY: VERONIKA, FIFO\n\n**PREPIS: Fifovo rande bude v trojici**\n\nFifo prichádza do Evinho domu. Po zazvonení očakáva Bety, a prekvapí ho, keď mu otvorí Veronika v sexi odeve.\n\n**FIFO:** Ou...kej? Veronika sa šarmantne usmeje.\n\n**VERONIKA:** Prekvapkó! Fifo sa pozrie do domu, potom na Veroniku, ktorá sa zvodne opiera o dvere. Je zaskočený.\n\n**FIFO:** Čo sa deje? Kde je Bety? Veronika hrá prekvapené tupelko.\n\n**VERONIKA:** Ona ti nepovedala, že budeme traja? Nechcela si ťa nechať len pre seba. Veronika naňho mrkne. Fifo sa snaží tváriť sebaisto, ale veľmi mu to nejde. Čumí Veronike do výstrihu.\n\n**VEORNIKA:** Alebo sa na nás necítiš? Fifo pokýve hlavou a pozrie na ňu, ledva dokáže skryť nadšenie.\n\n**FIFO:** Tomu ver, že sa cítim, v živote som sa viac necítil. Veronika sa s flirtovným úsmevom otočí a vchádza dnu.\n\n**VERONIKA:** No tak tam nestoj a poď.",
+      "location": "EVINA VILA",
+      "timeOfDay": "",
+      "characters": [
+        "Veronika",
+        "Fifo"
+      ],
+      "labels": [],
+      "checklist": [],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": []
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/36",
+      "name": "03/36. EXT. EVINA VILA - TERASA PRI VÍRIVKE, NOC 9 — VERONIKA, FIFO, BETY",
+      "description": "POSTAVY: VERONIKA, FIFO, BETY\n\n**PREPIS: Bety sa mení**\n\n**(PARALELNE):**",
+      "location": "EVINA VILA",
+      "timeOfDay": "",
+      "characters": [
+        "Veronika",
+        "Fifo",
+        "Bety"
+      ],
+      "labels": [],
+      "checklist": [],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": []
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/37",
+      "name": "03/37. INT. EVINA VILA, NOC 9 — BETY, EVA",
+      "description": "POSTAVY: BETY, EVA\n\n**PREPIS: Eva povzbudzuje Bety**\n\nVeronika si zvodne sadá na okraj vírivky, namáča nôžku do vody a pozrie na Fifa.\n\n**VERONIKA:** Na čo čakáš? Chceš sa len pozerať, ako sa kúpem ja? Fifo si okamžite začne vyzliekať zvršky. (prestrih) V dome vidíme Evu, ktorá stojí oproti niekomu, koho nevidno do tváre (len obrys postavy). Spiklenecky sa škerí.\n\n**EVA:** Ideš na to. Nalož mu aj za mňa. Prezrie si postavu pred sebou a pochváli ju. (v skutočnosti je to Bety, ale v parochni a zvodne oblečená)\n\n**EVA:** A úprimne, vyzeráš extrémne sexi. Eva sa potom pozerá, ako osoba odchádza von na terasu (počujeme otváranie dverí). (prestrih) Fifo je už na polceste do vody, keď sa otvoria dvere a z domu k vírivke príde aj Bety. Má na sebe zvodné odhaľujúce oblečenie a na hlave čiernu parochňu. Veroniku to nešokuje, Fifa áno, parochňa je súčasť hry, vedela o nej dopredu (základné body mali dohodnuté vopred). Veronika sa usmeje.\n\n**VERONIKA:** Tak toto už je iná liga. Fifo len tak pozerá. Bety sa k nemu priblíži. Príliš sa vžije do novej identity a správa sa nečakane sebavedomo a vyzývavo.\n\n**BETY:** Čo je? Nečakal si ma takto?\n\n**FIFO:** Ja... nie.\n\n**BETY:** To je škoda. Ja som ťa čakala presne takto. Bety mu siahne na tričko a kusne si do spodnej pery.\n\n**BETY:** Iba toto by sme mohli dať dole. Bety vyzlieka Fifovi tričko a dáva si záležať, aby sa ho pritom dostatočne dotýkala na ramenách a rukách. Veronika pri bazéne ich sleduje a spozornie, lebo takúto Bety nepozná, ale stále je s tým ešte ako tak ok, je to v rámci dohody). Bety sa na ňu flirtovne pozrie.\n\n**BETY:** Čo s načatým večerom? Začneme vírivkou? Bety v tejto hre jednoznačne preberá iniciatívu a je dominantná aj voči Veronike. (Neskôr sa to bude stupňovať.)",
+      "location": "EVINA VILA",
+      "timeOfDay": "",
+      "characters": [
+        "Bety",
+        "Eva"
+      ],
+      "labels": [],
+      "checklist": [],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": []
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/38",
+      "name": "03/38. EXT. PRED RADNICOU, NOC 9 — ALICA, IVAN, KLAUDIA, OSKAR, KAMENICKÁ, KELER, KOMPARZ",
+      "description": "POSTAVY: ALICA, IVAN, KLAUDIA, OSKAR, KAMENICKÁ, KELER, KOMPARZ\n\n**PREPIS: Alica dostáva po hube**\n\nVinobranie je v plnom prúde, primátorka Kamenická debatuje so spoluobčanmi s Kelerom po boku. Uvidí Révayovcov a spolu s Kelerom k nim pristúpia. Kamenická ich súcitne osloví.\n\n**KAMENICKÁ:** Klaudia, Oskar... som rada, že ste prišli. /opatrne/ Ako to zvládate? Klaudia reaguje vyčítavo, ako matka, ktorej zabili syna a nikto sa zjavne neponáhľa chytiť páchateľa.\n\n**KLAUDIA:** Môj syn je mŕtvy a jeho vrah sa stále potuluje po meste. Ako si myslíš, že to zvládame? Starostke je to nepríjemné, ale snaží sa Klaudiu, spoločne s Kelerom, aspoň verbálne uistiť, že robia, čo môžu.\n\n**KAMENICKÁ:** Verím, že sa to v najbližšej dobe uzavrie a polícia páchateľa chytí.\n\n**KELER:** Ubezpečujem vás, že robíme všetko, čo je v našich silách. Vyšetrovanie prebieha, ale potrebujeme čas.\n\n**KLAUDIA:** To počúvam už dva mesiace. Nervozitu ešte vyhrotí príchod podnapitej Alice, ktorá sa do debaty z fleku a sebavedomo zapojí.\n\n**ALICA:** Klaudia! Som rada, že ťa vidím. Počúvaj, čo keby sme si dohodli rozhovor do novín? Alebo rovno návštevu v podcaste, ľudia by... Klaudia ju nenechá dopovedať, okamžite jej strelí facku. Alica sa zapotáca (sčasti aj kvôli vypitému alkoholu).\n\n**KLAUDIA:** Ty nemáš ani kúsok hanby, že na mňa vôbec pozrieš, po tom, čo si vykričala do sveta? Detaily z pitvy? A ako Jakuba mučili a hodili do mrazáku, ako nejaký kus mäsa? Alica toto nečakala, ale je jej jasné, že si to zaslúžila, tak radšej nevracia úder a ustupuje. Počujeme, že Bekina kapela začína hrať.",
+      "location": "PRED RADNICOU",
+      "timeOfDay": "",
+      "characters": [
+        "Alica",
+        "Ivan",
+        "Klaudia",
+        "Oskar",
+        "Kamenická",
+        "Keler",
+        "Komparz"
+      ],
+      "labels": [],
+      "checklist": [],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": []
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/39",
+      "name": "03/39. EXT. PRED RADNICOU, NOC 9 — LUKÁŠ, LAURA, OLASOVÁ, ALEX, KOMPARZ, BEKA, MERY, LEA",
+      "description": "POSTAVY: LUKÁŠ, LAURA, OLASOVÁ, ALEX, KOMPARZ, BEKA, MERY, LEA\n\n**PREPIS: Lukáš osloví Olasovú**\n\nDievčatá z Bekinej kapely na pódiu vidia blížiacu sa katastrofu (Klaudiinu facku Alici) a tak v snahe zabrániť jej rýchlo začnú hrať. Laura obsluhuje pri stánku Fefeho bistra, kde sú ponalievané Fefeho legendárne limonády a nejaké hranolky a miniburgre. V ponuke je aj pivo, víno. Primotá sa tam Lukáš.\n\n**LUKÁŠ:** Ahoj. Vidím, že si si niečo predsa len našla. Laura prikývne.\n\n**LAURA:** Áno, ja som to s prácou myslela vážne. Čo ty? Pivo, víno, limonáda?\n\n**LUKÁŠ:** Máš nejaké odporúčanie?\n\n**LAURA:** Máme novinky, ak nechceš klasiku. Marakuja a mango, potom liči a dračie ovocie. Lukáš na tropické mixy dvihne obočie a mávne rukou.\n\n**LUKÁŠ:** Kolu? Ideálne s citrónom. Laura prikývne. K stánku si príde kúpiť drink aj Olasová.\n\n**OLASOVÁ:** Zdravím. Môžem poprosiť levanduľovú limonádu?\n\n**LAURA:** Samozrejme, hneď to bude. Lukáš Olasovú spozná.\n\n**LUKÁŠ:** Vy ste slečna Olasová, však? Učiteľka hudobnej? Olasová prikývne.\n\n**OLASOVÁ:** Áno. Lukáš jej podá ruku a vystrúha zdvorilý úsmev. Zoznamujú sa.\n\n**LUKÁŠ:** Ja som Lukáš Adamovič.\n\n**OLASOVÁ:** Teší ma. Lukáš zrazu trochu zvážnie.\n\n**LUKÁŠ:** Vy učíte môjho syna, Alexa. Môžeme sa o ňom na chvíľku porozprávať? Olasová trochu znervóznie, netuší, čo chce Lukáš preberať, ale nechce sa prezradiť.\n\n**OLASOVÁ:** Samozrejme. O čo ide?",
+      "location": "PRED RADNICOU",
+      "timeOfDay": "ráno",
+      "characters": [
+        "Lukáš",
+        "Laura",
+        "Olasová",
+        "Alex",
+        "Komparz",
+        "Beka",
+        "Mery",
+        "Lea"
+      ],
+      "labels": [],
+      "checklist": [
+        "Pivo - v ponuke je aj pivo, víno.",
+        "Drinky - k stánku si príde kúpiť drink aj Olasová.",
+        "Víno - v ponuke je aj pivo, víno."
+      ],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": [
+            "Pivo - v ponuke je aj pivo, víno.",
+            "Drinky - k stánku si príde kúpiť drink aj Olasová.",
+            "Víno - v ponuke je aj pivo, víno."
+          ]
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/40",
+      "name": "03/40. EXT. PRED RADNICOU, NOC 9 — ALEX, DOGY, OLASOVÁ, LUKÁŠ, KOMPARZ",
+      "description": "POSTAVY: ALEX, DOGY, OLASOVÁ, LUKÁŠ, KOMPARZ\n\n**PREPIS: Alex a Dogy na vinobraní**\n\nAlex sleduje koncert spoza nejakého nenápadného rohu, aby nebol na očiach a tam ho prekvapí Dogy.\n\n**DOGY:** Čo ty tu? Nemáš náhodou zaracha? Alex sa nervózne obzrie, ale potom sa usmeje.\n\n**ALEX:** Mám, ale baby práve hrajú skladbu, s ktorou som im trochu pomohol. Zdrhol som, aby som to počul. Dogy prikývne.\n\n**DOGY:** Nie je to zlé, text je fajn. Aj by som zostal dlhšie, ale musím si posvietiť na jedného zlého nerda. Alex ho až tak nevníma.\n\n**ALEX:** Ako povieš.\n\n**DOGY:** Tak zatiaľ čau. Dogy odchádza, Alex zostáva pozerať na pódium. Neďaleko od neho zbadá Lukáša v debate s Olasovou.",
+      "location": "PRED RADNICOU",
+      "timeOfDay": "",
+      "characters": [
+        "Alex",
+        "Dogy",
+        "Olasová",
+        "Lukáš",
+        "Komparz"
+      ],
+      "labels": [],
+      "checklist": [],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": []
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/41",
+      "name": "03/41. EXT. PRED RADNICOU, NOC 9 — ALEX, OLASOVÁ, LUKÁŠ, KOMPARZ",
+      "description": "POSTAVY: ALEX, OLASOVÁ, LUKÁŠ, KOMPARZ\n\n**PREPIS: Lukáš debatuje s Olasovou**\n\nLukáš stojí s Olasovou neďaleko pódia (dosť ďaleko na debatu bez nutnosti kričať, ale dosť blízko na to, aby ich tam uvidel Alex). On má v ruke kolu s citrónom a ona levanduľovú limonádu.\n\n**LUKÁŠ:** Alex si vás váži, lebo ho podporujete. Ale ja chcem vedieť skutočnú pravdu. Olasová sa zľakne pri slove pravda, ale Lukáš ešte nedohovoril.\n\n**LUKÁŠ:** Má talent a budúcnosť v hudbe? Je do nej zažratý. Nerád by som, aby strácal čas so snom, na ktorý nemá. Olasovej odľahne.\n\n**OLASOVÁ:** Alex je veľmi talentovaný. Mal by sa hudbe určite venovať viac, ako doteraz. Začal pomerne neskoro a potrebuje veľa dohnať. Lukáš sa na ňu skúmavo zahľadí.\n\n**LUKÁŠ:** Čím vás môj syn tak zaujal? Prečo mu venujete toľko času? Olasová sa vynájde neutrálnou odpoveďou.\n\n**OLASOVÁ:** Je to výnimočný mladý muž. Od ďalších debát ju zachráni potlesk po skončení vystúpenia. V druhom pláne sa Alex pokúša nenápadne opustiť miesto, z ktorého doteraz sledoval vystúpenie a debatu otca s Olasovou.",
+      "location": "PRED RADNICOU",
+      "timeOfDay": "",
+      "characters": [
+        "Alex",
+        "Olasová",
+        "Lukáš",
+        "Komparz"
+      ],
+      "labels": [],
+      "checklist": [],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": []
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/42",
+      "name": "03/42. EXT. EVINA VILA - PRI VÍRIVKE, NOC 9 — BETY, VERONIKA, FIFO",
+      "description": "POSTAVY: BETY, VERONIKA, FIFO\n\n**PREPIS: Bety sype Fifovi do drinku uvoľňovač**\n\nBety a Veronika stoja pri barovom vozíku neďaleko vírivky a spokojne sledujú Fifa, ako sa rochní vo vode.\n\n**VERONIKA:** Bavíš sa zatiaľ dobre, Fifo? Fifo sa usmieva, ako prasa v žite.\n\n**FIFO:** Náramne, baby. Toto by sme mali podnikať častejšie. Ste obe fakt sexi.\n\n**BETY:** /sebavedomo/ Ale nepreháňaj... Zasmejú sa spolu. Bety a Veronika sa potom otočia chrbtom k Fifovi a začnú miešať drinky. Bety zrazu vytiahne ampulku, a nasype z nej do jedného z pohárov. Veronika sa zháči, keď vidí, že Bety sa to snaží bez stopy rozmiešať.\n\n**VERONIKA:** Čo to je? Prečo mu to tam dávaš?\n\n**BETY:** /chladne/ Neboj, je to len uvoľňovač svalov. V kombinácii s alkoholom sa z neho stane také malé šikovné sérum pravdy. Veronika v tom okamihu začne pochybovať o celej tejto akcii.\n\n**VERONIKA:** O žiadnych drogách nebola reč. Čo keď mu to ublíži? Nedávaj mu to.\n\n**BETY:** Nie sú to drogy. Všetko mám pod kontrolou, ideme presne podľa plánu.\n\n**VERONIKA:** Bety, toto v žiadnom pláne nebolo. Bety ju ignoruje, ešte sa aj koketne usmeje na Fifa a ukáže mu drinčík. Fifo jej z bazéna ukáže palec hore. Veronika je dosť nervózna.\n\n**VERONIKA:** Fakt spomaľ. Bety je však už na temnej strane (prebudila sa v nej agresivita ako dôsledok chemických výkyvov po schválnom vynechaní tabletky na ADHD) a o žiadnom spomaľovaní nechce počuť.\n\n**BETY:** A on spomalil? Chlapec dostane len to, čo si zaslúži.\n\n**VERONIKA:** O čom trepeš? Čo si má zaslúžiť, čo mu chceš urobiť? Bety nevníma jej protesty, sústreďuje sa na poháre, berie dva do rúk a podáva ich Veronike.\n\n**BETY:** Tieto dva sú pre nás, nepopleť to. Veronika si ich od nej zoberie a naštvane odchádza k vírivke, Bety nahodí zvodný úsmev a vyberie sa s Fifovým pohárom za ňou.",
+      "location": "EVINA VILA",
+      "timeOfDay": "",
+      "characters": [
+        "Bety",
+        "Veronika",
+        "Fifo"
+      ],
+      "labels": [],
+      "checklist": [
+        "Drinky - bety a Veronika sa potom otočia chrbtom k Fifovi a začnú miešať drinky."
+      ],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": [
+            "Drinky - bety a Veronika sa potom otočia chrbtom k Fifovi a začnú miešať drinky."
+          ]
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/43",
+      "name": "03/43. EXT. PRED RADNICOU, NOC 9 — DOGY, MATEJ, KOMPARZ",
+      "description": "POSTAVY: DOGY, MATEJ, KOMPARZ\n\n**PREPIS: Dogy konfrontuje Mateja**\n\nVinobranie je stále v plnom prúde. Dogy si vyhľadá Mateja v dave a prikradne sa k nemu. Bez okolkov ho konfrontuje.\n\n**DOGY:** Jeden z tvojich nerdov mi povedal zaujímavú vec. Chceš počuť? Matej sa ho takmer zľakne. Prekvapene naňho pozerá.\n\n**DOGY:** Ty si ten výstrel 5. júla nie len že počul... ty si aj vystrelil. Tým pádom nie si len klamár, ale aj verejná hrozba. Matej sa to najprv pokúša zľahčovať.\n\n**MATEJ:** Bolo to len na ukážku.\n\n**DOGY:** Priniesol si ockov revolver a strieľal si bez zbrojáku v deň, čo Jakub zmizol... a zhodou okolností ho potom nájdu s deravou hlavou? Matej si spojí dve a dve a začína panikáriť.\n\n**MATEJ:** Ale to bolo úplne niekde inde! Ja s tým nič nemám! Dogymu potemnie pohľad. Má nad Matejom jasne navrch.\n\n**DOGY:** Namiesto výhovoriek by si si mal pripraviť buď výpoveď pre Kelera, alebo kompletné info o celom dni pre mňa. Vyber si, ale odporúčam druhú možnosť. Matej nevie reagovať, je na prášky.\n\n**DOGY:** Zajtra po škole budem čakať v redakcii. Uži si ešte akciu. Dogy spokojne odchádza. Matej za ním rezignovane pozerá.",
+      "location": "PRED RADNICOU",
+      "timeOfDay": "deň",
+      "characters": [
+        "Dogy",
+        "Matej",
+        "Komparz"
+      ],
+      "labels": [],
+      "checklist": [],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": []
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/44",
+      "name": "03/44. EXT. EVINA VILA - PRI VÍRIVKE, NOC 9 — BETY, VERONIKA, FIFO",
+      "description": "POSTAVY: BETY, VERONIKA, FIFO\n\n**PREPIS: Bety týra Fifa**\n\nFifo sa malátne prevaľuje na kraji vírivky, pomaly sa preberá a zisťuje, že je pripútaný k držiakom na vírivke (alebo k niečomu blízko vírivky – podľa možností lokácie). Nad ním stojí Bety, a už očividne nervózna a mierne vyplašená Veronika, stojí meter od nich s telefónom v ruke.\n\n**FIFO:** Wtf? Prečo mám putá? Vám drbe? Bety mu neodpovie. Otočí sa na Veroniku s chladným výrazom.\n\n**BETY:** Začni nahrávať. Otočí sa späť na Fifa.\n\n**BETY:** Povedz nám pravdu. Čo sa skutočne stalo na rande s Veronikou? Fifovi dopne, že sranda skončila.\n\n**FIFO:** Dali sme si u Fefeho koláč a limonádu. Potom sme sa muchlovali v aute.\n\n**BETY:** Celú pravdu.\n\n**FIFO:** /rýchlo/ Ježiš, veď nič iné nebolo. Odviezol som ju potom domov. To je celé, prisahám. Veronika je už spokojná (oddýchne si, že to už majú všetci za sebou, predpokladá, že je hotovo).\n\n**VERONIKA:** /ironicky/ No vidíš, zas také ťažké to nebolo. Teraz sa aspoň všetci dozvedia, čo sa naozaj stalo. Veronika vypne nahrávanie, ale ešte s vyrývačným úsmevom dodá:\n\n**VERONIKA:** Máš to za sebou. Kým si kontroluje záznam v mobile, Bety zaváha. Pozrie sa na svoje dlane, v ktorých drží ovládač od vírivky. Detail – má na nich veľké krvavé stopy od zaťatých nechtov (to robí aj v ďalších situáciách v iných epizódach, keď je vo vysokom leveli stresu). Fifo si vydýchne, že je už koniec, lenže Bety už úplne ovládla jej temná stránka – pod vplyvom nervového vypätia (plus nevzala si dnešnú tabletku) sa dostala akoby do tranzu. Položí mu nohu v lodičke na hlavu.\n\n**BETY:** Baví ťa ponižovať iných? Vymýšľať si o nich svinstvá? Robí ti to dobre? Fifo sa vydesí, výrivka nepríjemne buble.\n\n**FIFO:** Všetko som povedal. Nechaj ma vyliezť, tá voda je vriaca. Lenže Bety mu pomaly ukáže ovládač, pozerá naňho a bez slova pridá stupne. Veronika nechápavo pozerá na Bety a snaží sa pochopiť, čo sa deje.\n\n**VERONIKA:** /opatrne/ Bety? Bez reakcie, fokusuje sa len na Fifa.\n\n**BETY:** No tak čo Fifo? Páči sa ti, keď ťa ponižujem ja?\n\n**VEORNIKA:** Bety! Bety stále nereaguje, je už mimo, uprene sleduje Fifa, ako sa trápi v horúcej vode.\n\n**FIFO:** Prosím, je mi horúco... Vypni to! Veronika už je dosť výrazne vyplašená.\n\n**VERONIKA:** Bety, daj mi ovládač aj kľúče od pút! Máme, čo sme chceli! Ublížiš mu!\n\n**FIFO:** /zaskučí/Jej úplne preplo! Bety sa na Veronikin aj Fifov krik spamätá. Veronika jej vytrhne ovládač od vírivky. Bety je už späť v realite, no vyzerá mierne zmätene.",
+      "location": "EVINA VILA",
+      "timeOfDay": "",
+      "characters": [
+        "Bety",
+        "Veronika",
+        "Fifo"
+      ],
+      "labels": [],
+      "checklist": [
+        "Mobil - kým si kontroluje záznam v mobile, Bety zaváha."
+      ],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": [
+            "Mobil - kým si kontroluje záznam v mobile, Bety zaváha."
+          ]
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/45",
+      "name": "03/45. INT. ALEXOV DOM - KUCHYŇA, DEŇ 10 — ALEX, LUKÁŠ",
+      "description": "POSTAVY: ALEX, LUKÁŠ\n\n**PREPIS: Alex dostane od otca gitaru**\n\nAlex ráno zíde do kuchyne, aby si dal pred odchodom do školy raňajky.\n\n**ALEX:** Dobré ráno…\n\n**LUKÁŠ:** Dobré ráno. Alex si vezme chlieb so šunkou a odhryzne si z neho. Všimne si, že Lukáš sa naňho popri natieraní chleba maslom pozerá s miernym úsmevom. Stále platí domáce väzenie a tak je medzi nimi trochu napätie.\n\n**ALEX:** Po škole mám basket. A neboj sa, po tréningu rovno domov. Lukáš pokračuje so spokojným úsmevom.\n\n**LUKÁŠ:** Včera som stretol tvoju učiteľku hudby. Alex stuhne.\n\n**ALEX:** Olasovú?\n\n**LUKÁŠ:** /obdivne/ Áno. Za našich čias tie učiteľky vyzerali úplne inak...\n\n**ALEX:** /neisto/ O čom ste sa bavili?\n\n**LUKÁŠ:** No o tebe. To Alexa vyvedie z rovnováhy ešte viac.\n\n**LUKÁŠ:** Keď ti verí učiteľka, tak ti budem veriť aj ja. Alex nechápe. Lukáš vtedy spoza stola vytiahne gitaru v puzdre. Podá ju Alexovi.\n\n**LUKÁŠ:** Predavač hovoril, že to už je taká lepšia… vraj sa dá aj pripojiť káblom na reprák či čo… vieš, na koncerte alebo tak…\n\n**ALEX:** To je pre mňa?\n\n**LUKÁŠ:** Očividne… Alex rozzipsuje gitaru a vytiahne ju. Je to krásna nová španielka vyššej kvality aj s pripojením na kombo. Alex zažiari.\n\n**ALEX:** Waw!!! Ďakujem, oci… je krásna! Alex objíme otca. Lukáš pátos trochu odľahčí naoko prísnym tónom.\n\n**LUKÁŠ:** To len aby si toho dvojtýždňového zaracha strávil užitočne… Obaja sú spokojní, ich sporu je zrejme koniec.",
+      "location": "ALEXOV DOM",
+      "timeOfDay": "ráno",
+      "characters": [
+        "Alex",
+        "Lukáš"
+      ],
+      "labels": [],
+      "checklist": [],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": []
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/46",
+      "name": "03/46. INT. ŠKOLA - CHODBA SO SKRINKAMI, DEŇ 10 — BETY, VERONIKA, DOGY MO",
+      "description": "POSTAVY: BETY, VERONIKA, DOGY MO\n\n**PREPIS: Bety popiera svoje včerajšie správanie**\n\nUnavená Bety sa opiera o svoju skrinku, vyberá si učebnice, a nenápadne si pritom obzerá ranky na dlaniach, ktoré si spôsobila včera (sú podstatne väčšie ako jej obvyklé škrabance). Prichádza Veronika s mobilom v ruke (má v ňom otvorený Scroll).\n\n**VERONIKA:** Tak a o „kanáli hanby“ vie za doobedie celý internet. Krásne si im to vytmavila. Kedy si to vôbec stihla napísať? Bety schováva dlane.\n\n**BETY:** Bola som po tom včerajšku dlho hore.\n\n**VERONIKA:** Chápem. Ja som tiež nemohla spať. Veronike to nedá, chce včerajšiu situáciu riešiť.\n\n**VERONIKA:** Čo to včera bolo? Prečo si to pri tej vírivke tak vyhrotila? Bety sa vyhýba odpovedi.\n\n**BETY:** Fifo si to zaslúžil. A dopadlo to tak, ako sme chceli. Veronike to nestačí, skúša znova.\n\n**VERONIKA:** To nie je odpoveď. Nespoznávala som ťa. Ten výraz... normálne som sa ťa bála. Bety to zľahčuje.\n\n**BETY:** Veď som iba hrala svoju úlohu. Je to za nami a môžeme to pustiť z hlavy. Je z toho rozhovoru nesvoja, tuší, že to prehnala, ale nepamätá si presne, čo hovorila alebo robila. Zatvára skrinku.\n\n**BETY:** Prepáč, mám hodinu. Musím utekať. Do záberu na nechápajúcu Veroniku začína znieť Dogyho VO.\n\n**DOGY VO:** Dobro a zlo… svetlo a tma… Bety a Veronika… Dve tváre túžby po spravodlivosti.",
+      "location": "ŠKOLA",
+      "timeOfDay": "",
+      "characters": [
+        "Bety",
+        "Veronika",
+        "Dogy Mo"
+      ],
+      "labels": [],
+      "checklist": [
+        "Mobil - prichádza Veronika s mobilom v ruke (má v ňom otvorený Scroll)."
+      ],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": [
+            "Mobil - prichádza Veronika s mobilom v ruke (má v ňom otvorený Scroll)."
+          ]
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/47LP",
+      "name": "03/47LP. INT. ŠKOLA - CHODBA SO SKRINKAMI (SKRINKA BETY), DEŇ — DOGY MO",
+      "description": "POSTAVY: DOGY MO\n\n**PREPIS: 10**\n\n**DOGY MO:** Parochňa v Betinej skrinke LP: Kamera vojde do skrinky Bety cez zatvorené dvierka, kde je fotka Bety a Alexa, usmievajú sa. Švenk na čiernu parochňu pohodenú v skrinke. Na poličke nad ňou je krabička liekov (Ritalin), navrchu poloprázdny blister. Do toho znie pokračovanie Dogyho VO.\n\n**DOGY VO:** Tá mierna a tá krutá.",
+      "location": "ŠKOLA",
+      "timeOfDay": "deň",
+      "characters": [
+        "Dogy Mo"
+      ],
+      "labels": [],
+      "checklist": [
+        "Fotky - dOGY MO: Parochňa v Betinej skrinke LP: Kamera vojde do skrinky Bety cez zatvorené dvierka, kde je fotka Bety a Alexa, usmievajú sa.",
+        "Blister s liekmi / Ritalin - na poličke nad ňou je krabička liekov (Ritalin), navrchu poloprázdny blister."
+      ],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": [
+            "Fotky - dOGY MO: Parochňa v Betinej skrinke LP: Kamera vojde do skrinky Bety cez zatvorené dvierka, kde je fotka Bety a Alexa, usmievajú sa.",
+            "Blister s liekmi / Ritalin - na poličke nad ňou je krabička liekov (Ritalin), navrchu poloprázdny blister."
+          ]
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/48LP",
+      "name": "03/48LP. INT. ŠKOLA - RIADITEĽŇA, DEŇ 10 — ČMELSKÝ, TRÉNER RÓŽA, FIFO, SEBO, KOMPARZ, DOGY MO",
+      "description": "POSTAVY: ČMELSKÝ, TRÉNER RÓŽA, FIFO, SEBO, KOMPARZ, DOGY MO\n\n**PREPIS: Čmelský prinúti páchateľov zmazať kanál**\n\n**DOGY VO:** Keď Bety na študentskom webe zverejnila článok o tom, čo na škole páchala svorka basketbalistov s dievčatami, riaditeľ musel nájsť obetného baránka. Oproti Čmelskému a trénerovi sedí Fifo, Sebo a ďalší chalani z tímu, majú sklonené hlavy, hanbia sa, nevedia sa pozrieť priamo na Čmelského. Čmelský je mimoriadne vytočený, v rukách drží telefón a pozerá striedavo doňho a na chalanov. Tréner sa drží jednou rukou za hlavu, v tvári má sklamanie. Chalani sú ticho, nemajú na to čo povedať. Čmelský podá telefón Fifovi, ten si ho vezme a vidíme, že po drobnom váhaní a pohľade na otca(trénera) vymazáva celý DC kanál Blackstone&sluts. Čmelský ho po celý čas sleduje.",
+      "location": "ŠKOLA",
+      "timeOfDay": "deň",
+      "characters": [
+        "Čmelský",
+        "Tréner Róža",
+        "Fifo",
+        "Sebo",
+        "Komparz",
+        "Dogy Mo"
+      ],
+      "labels": [],
+      "checklist": [],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": []
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/49LP",
+      "name": "03/49LP. INT. ŠKOLA - CHODBA SO SKRINKAMI, DEŇ 10 — SÁRA, KIKO, VERONIKA, TRÉNER RÓŽA, FIFO, SEBO, EVA, POČETNÝ",
+      "description": "POSTAVY: SÁRA, KIKO, VERONIKA, TRÉNER RÓŽA, FIFO, SEBO, EVA, POČETNÝ\n\n**PREPIS: KOMPARZ ŠTUDENTI A DIEVČATÁ Z OBRAZU 21, DOGY MO**\n\nFifo s hanbou opúšťa školu (spomalene) Fifo so štyrmi spoluhráčmi,(Sebo plus dvaja basketbalisti z predch. Obrazu 48 z riaditeľne), s trénerom a Čmelským v pätách kráčajú pokorne po chodbe školy. Všetci sa na nich pozerajú s posmechom. Tesne pred východom zo školy ich čaká stena pozostávajúca z ublížených dievčat na čele s Bety, Veronikou, Sárou a Evou. Majú bojovne založené ruky a spokojne sledujú „pochod hanby“. Niektorí si to celé fotia, tlieskajú... Fifo zazerá na baby, a nakoniec s chalanmi vychádzajú dvermi von.\n\n**DOGY MO:** Filip Róža bol vylúčený zo školy. Aby si jeho otec, hlavný tréner, ochránil reputáciu, musel vlastného syna vyhodiť aj z basketbalového tímu.",
+      "location": "ŠKOLA",
+      "timeOfDay": "deň",
+      "characters": [
+        "Sára",
+        "Kiko",
+        "Veronika",
+        "Tréner Róža",
+        "Fifo",
+        "Sebo",
+        "Eva",
+        "Početný"
+      ],
+      "labels": [],
+      "checklist": [],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": []
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/50",
+      "name": "03/50. INT. ŠKOLA - CHODBA SO SKRINKAMI, DEŇ 10 — SÁRA, KIKO, VERONIKA, EVA, POČETNÝ KOMPARZ ŠTUDENTI",
+      "description": "POSTAVY: SÁRA, KIKO, VERONIKA, EVA, POČETNÝ KOMPARZ ŠTUDENTI\n\n**PREPIS: A DIEVČATÁ Z OBRAZU 21, DOGY MO**\n\nEva ďakuje Bety a Nike Eva sa spokojne pozerá za odchádzajúcim Fifom a otočí sa na Bety a Veroniku. Postáva tu aj Sára a čumí do mobilu.\n\n**EVA:** Ďakujem vám. Neviete si predstaviť, ako mi odľahlo.\n\n**BETY:** My ďakujeme tebe. To, že si bola ochotná vypovedať u riaditeľa zavážilo rovnako, ako to video.\n\n**VERONIKA:** Si z nás najodvážnejšia. Sára sa vyšklebí. (robiť dobro len tak bez toho, aby niečo z toho mala, nie je pre Sáru úplne typické, ale na tomto ju bavila tá babská súdržnosť).\n\n**SÁRA:** Hashtag Spravodlivosť pre Evu!\n\n**DOGY MO:** Jedno však bolo isté. Nech bola cesta k pomste akokoľvek za hranicou, Bety a Veronika sa nespálili. Cieľ posvätil prostriedky a stala sa z nich nerozlučná dvojica. Bety a Veronika sa na seba spiklenecky usmejú.",
+      "location": "ŠKOLA",
+      "timeOfDay": "deň",
+      "characters": [
+        "Sára",
+        "Kiko",
+        "Veronika",
+        "Eva",
+        "Početný Komparz Študenti"
+      ],
+      "labels": [],
+      "checklist": [
+        "Mobil - postáva tu aj Sára a čumí do mobilu."
+      ],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": [
+            "Mobil - postáva tu aj Sára a čumí do mobilu."
+          ]
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/51",
+      "name": "03/51. INT. ŠKOLA - CHODBA SO SKRINKAMI, DEŇ 10 — SÁRA, BETY",
+      "description": "POSTAVY: SÁRA, BETY\n\n**PREPIS: Bety a Sára epilóg**\n\nBety zatvára svoju skrinku, niečo si prezerá v mobile. Prichádza k nej Sára, oprie sa o skrinky a chvíľu hľadá slová. (Práve sa so svojou, v podstate nepriateľkou, podieľala na verejnej náprave zla, ktoré spoluspôsobil aj jej brat. Ona ho doteraz považovala za dokonalého a toto je moment, kedy jej spadli ružové okuliare a v podstate, priamo pred jej očami, sa z dobrého stal zlý a naopak.)\n\n**SÁRA:** Pomsta je dokonaná. Zločin odhalený... A ja vôbec nič necítim. Ani spokojnosť, ani zadosťučinenie. Bety ju mlčky počúva. Sára sa rozcíti.\n\n**SÁRA:** Ako sa na tom mohol podieľať Jakub? Takto som ho nepoznala, takýto nikdy nebol. Snažím sa na to nájsť nejaké ospravedlnenie, nejaký dôvod, ale aj keby bol... dá sa toto vôbec ospravedlniť? Bety prekvapí táto Sárina rozcítenosť, neprejavuje sa obvykle takto pred ľuďmi. Sára sa ešte viac otvorí a zaslzí.\n\n**SÁRA:** Čo keď som ho vlastne vôbec nepoznala? Bol zlý človek? ubližoval ľuďom a niekto mu to vrátil? Vieš, ako ma tá predstava desí?\n\n**BETY:** Keď polícia zistí, kto ho zabil, objasnia sa aj takéto veci. Možno aj také, o ktorých my dve ani netušíme. Dievčatá spolu zdieľajú chvíľku ticha. Sára ho prelomí.\n\n**SÁRA:** Myslela som si, že Sofia ublížila Jakubovi. Že ona bola tá zlá. Prepáč mi to. Bety stisne Sáre ruku, prijíma ospravedlnenie.\n\n**BETY:** Ďakujem. Mňa by to tiež upokojilo. Vedieť, čo sa medzi nimi dvoma stalo. Stoja chvíľu vedľa seba pri skrinkách. Prvýkrát nie ako nepriateľky.",
+      "location": "ŠKOLA",
+      "timeOfDay": "",
+      "characters": [
+        "Sára",
+        "Bety"
+      ],
+      "labels": [],
+      "checklist": [
+        "Mobil - bety zatvára svoju skrinku, niečo si prezerá v mobile."
+      ],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": [
+            "Mobil - bety zatvára svoju skrinku, niečo si prezerá v mobile."
+          ]
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/52",
+      "name": "03/52. INT. ŠKOLA - HUDOBNÁ MIESTNOSŤ, DEŇ 10 — ALEX, OLASOVÁ, DOGY MO",
+      "description": "POSTAVY: ALEX, OLASOVÁ, DOGY MO\n\n**PREPIS: Olasová obnovuje Alexove hudobné hodiny**\n\nOlasová sedí v hudobnej triede a niečo si sústredene zapisuje. Alexov nečakaný príchod ju prekvapí, trochu sa zľakne.\n\n**ALEX:** Prišiel som ti poďakovať. Za to, že si sa prihovorila u otca.\n\n**OLASOVÁ:** Myslela som to vážne, Alex. Máš v hudbe budúcnosť. Alex to okamžite pochopí ako výzvu, pristúpi k Olasovej.\n\n**ALEX:** To znamená, že by sme mali obnoviť spoločné hodiny, nemyslíš? Olasová je z jeho blízkosti namäkko... do toho znie Dogyho\n\n**VO.:**\n\n**DOGY VO:** Všetci niekde vo vnútri túžime po tom zachovať sa správne. Tak, aby sme si za všetkým stáli, keď príde deň zúčtovania. Lenže život je oveľa zložitejší.",
+      "location": "ŠKOLA",
+      "timeOfDay": "deň",
+      "characters": [
+        "Alex",
+        "Olasová",
+        "Dogy Mo"
+      ],
+      "labels": [],
+      "checklist": [],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": []
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/53",
+      "name": "03/53. INT. ŠKOLA - REDAKCIA, DEŇ 10 — BETY, DOGY, MATEJ, DOGY MO",
+      "description": "POSTAVY: BETY, DOGY, MATEJ, DOGY MO\n\n**PREPIS: Matej vyjednáva s Bety a Dogym, aby neprezradili streľbu**\n\n**PARALELNE:**",
+      "location": "ŠKOLA",
+      "timeOfDay": "",
+      "characters": [
+        "Bety",
+        "Dogy",
+        "Matej",
+        "Dogy Mo"
+      ],
+      "labels": [],
+      "checklist": [],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": []
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/54FLASH",
+      "name": "03/54FLASH. EXT. PRI RIEKE, DEŇ X — BEZ POSTÁV",
+      "description": "POSTAVY: BEZ POSTÁV\n\n**PREPIS: Auto pri rieke**\n\n**PARALELNE:**",
+      "location": "PRI RIEKE",
+      "timeOfDay": "",
+      "characters": [
+        "Bez Postáv"
+      ],
+      "labels": [],
+      "checklist": [
+        "Olasovej auto pri rieke - samostatný paralelný flash/insert, kontinuita s 03/55LP"
+      ],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": [
+            "Olasovej auto pri rieke - samostatný paralelný flash/insert, kontinuita s 03/55LP"
+          ]
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    },
+    {
+      "number": "03/55LP",
+      "name": "03/55LP. INT. ŠKOLA - HUDOBNÁ MIESTNOSŤ, DEŇ 10 — ALEX, OLASOVÁ, DOGY MO",
+      "description": "POSTAVY: ALEX, OLASOVÁ, DOGY MO\n\n**PREPIS: Alex a Olasová sa muchlujú v triede**\n\nBety a Dogy sedia za kancelárskym stolom v redakcii, tentoraz sú vedľa seba. Matej je oproti nim, je extrémne nervózny.\n\n**MATEJ:** Viete, čo z toho budem mať, keď vydáte článok, že som tam v ten deň strieľal? Vyrazia ma zo školy.\n\n**BETY:** Nad tým si sa mohol zamyslieť trochu skôr, nie? Matej si to dobre uvedomuje. Niečo mu ale napadne.\n\n**MATEJ:** Môžeme sa aspoň skúsiť dohodnúť? Mám o 5. júli jednu informáciu, ktorá vás určite bude zaujímať. Dogy s Bety sa zvedavo naklonia nad stôl.\n\n**DOGY:** /sucho/ Snáď sa nám trafíš do vkusu. Matej sa naňho za ironickú poznámku zamračí a potom pokýve hlavou.\n\n**MATEJ:** Najprv chcem sľub, že keď vám to poviem, zabudnete na celý príbeh o revolveri.\n\n**BETY:** Dávam ti čestné slovo šéfredaktorky Scrollu. Matej prikývne a s vážnym výrazom položí ruky na stôl.\n\n**MATEJ:** Videl som pri rieke niečo, čo nevidel nikto iný a nikde sa to nespomínalo. Stálo tam Olasovej auto. (prestrih Flash) Prázdne auto slečny Olasovej stojace pri rieke, na mieste kde ležala s Alexom na deke (prestrih Redakcia) Matej má stále vážny výraz.\n\n**MATEJ:** Olasová tam bola. Do toho znie Dogyho VO.\n\n**DOGY VO:** S Alexom sme si prešli zlým obdobím. A zvládli sme to. Najlepší kamoši. Lenže Pandorina skrinka sa otvorila. (prestrih LP) Olasová a Alex sa muchlujú v triede. Pokračuje Dogyho VO.\n\n**DOGY VO:** A ja som nemohol urobiť nič, aby som ho zachránil. (prestrih Redakcia) Bety sa v redakcii znepokojene pozerá na Dogyho. Dogy sa tvári zachmúrene. Dogyho VO doznieva.\n\n**KONIEC:**",
+      "location": "ŠKOLA",
+      "timeOfDay": "deň",
+      "characters": [
+        "Alex",
+        "Olasová",
+        "Dogy Mo"
+      ],
+      "labels": [],
+      "checklist": [
+        "Olasovej auto pri rieke - stojí na mieste udalosti; nadväzuje na paralelný záber 03/54FLASH"
+      ],
+      "checklistName": "Rekvizity",
+      "checklists": [
+        {
+          "name": "Rekvizity",
+          "items": [
+            "Olasovej auto pri rieke - stojí na mieste udalosti; nadväzuje na paralelný záber 03/54FLASH"
+          ]
+        },
+        {
+          "name": "Poznamky z porady",
+          "items": []
+        },
+        {
+          "name": "Info z natacania",
+          "items": []
+        }
+      ]
+    }
+  ]
+}

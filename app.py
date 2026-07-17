@@ -7,6 +7,7 @@ import re
 import requests
 import os
 import unicodedata
+import json
 
 app = Flask(__name__)
 
@@ -100,6 +101,16 @@ def trello_post_body(path, data=None):
 
     r.raise_for_status()
     return r.json()
+
+
+def trello_delete(path, params=None):
+    params = params or {}
+    params.update({"key": API_KEY, "token": TOKEN})
+    r = requests.delete(f"{BASE}{path}", params=params, timeout=20)
+    if not r.ok:
+        print("TRELLO DELETE ERROR:", r.status_code, r.text)
+    r.raise_for_status()
+    return r.json() if r.text else None
 
 
 def microsoft_enabled():
@@ -883,6 +894,66 @@ def home():
 @app.route("/trello-webhook", methods=["HEAD"])
 def trello_head():
     return "", 200
+
+
+@app.route("/api/replace-props-episodes-3-5", methods=["POST"])
+def replace_props_episodes_3_5():
+    if request.headers.get("X-Import-Key") != "props-3-5-6e1b84c920f7":
+        return jsonify({"error": "forbidden"}), 403
+    start = max(0, int(request.args.get("start", 0)))
+    batch_size = 5
+
+    payload_cards = []
+    for episode in (3, 4, 5):
+        payload = json.loads((ROOT / f"cierny_kamen_ep{episode:02d}_cards.json").read_text(encoding="utf-8"))
+        payload_cards.extend(payload["cards"])
+
+    boards = trello_get("/members/me/boards", {
+        "fields": "name,closed",
+        "lists": "open",
+        "list_fields": "name,closed",
+    })
+    candidates = []
+    for board in boards:
+        if board.get("closed"):
+            continue
+        for list_item in board.get("lists", []):
+            normalized_name = unicodedata.normalize("NFKD", list_item.get("name", "")).encode("ascii", "ignore").decode().upper()
+            if not list_item.get("closed") and normalized_name == "SCENARE":
+                cards = trello_get(f"/lists/{list_item['id']}/cards", {"fields": "name", "limit": 1000})
+                matches = sum(card.get("name", "").startswith(("03/", "04/", "05/")) for card in cards)
+                candidates.append((matches, list_item, cards))
+    candidates.sort(key=lambda item: item[0], reverse=True)
+    if not candidates or candidates[0][0] == 0:
+        return jsonify({"error": "target SCENARE list not found"}), 404
+
+    _, target, trello_cards = candidates[0]
+    cards_by_name = {card["name"].strip().casefold(): card for card in trello_cards}
+    selected = payload_cards[start:start + batch_size]
+    updated = []
+    missing = []
+    for desired in selected:
+        card = cards_by_name.get(desired["name"].strip().casefold())
+        if not card:
+            missing.append(desired["name"])
+            continue
+        checklists = trello_get(f"/cards/{card['id']}/checklists", {"fields": "name", "checkItems": "all"})
+        for checklist in checklists:
+            if checklist.get("name", "").strip().casefold() == "rekvizity":
+                trello_delete(f"/checklists/{checklist['id']}")
+        new_checklist = trello_post("/checklists", {"idCard": card["id"], "name": "Rekvizity"})
+        for item in desired.get("checklist", []):
+            trello_post_body(f"/checklists/{new_checklist['id']}/checkItems", {"name": item})
+        updated.append({"name": desired["name"], "items": len(desired.get("checklist", []))})
+
+    next_start = start + len(selected)
+    return jsonify({
+        "updated": updated,
+        "missing": missing,
+        "next": next_start,
+        "remaining": max(0, len(payload_cards) - next_start),
+        "list": target["name"],
+    })
 
 
 @app.route("/trello-webhook", methods=["POST"])
