@@ -897,6 +897,13 @@ def import_episodes_3_5():
             "status": response.status_code if response is not None else None,
             "detail": response.text if response is not None else str(error),
         }), 502
+    except Exception as error:
+        detail = re.sub(r"(?i)(key|token)=[^&\s]+", r"\1=[redacted]", str(error))
+        return jsonify({
+            "error": "internal import failure",
+            "type": type(error).__name__,
+            "detail": detail[:1000],
+        }), 500
 
 
 def import_episodes_3_5_impl():
