@@ -7,7 +7,6 @@ import re
 import requests
 import os
 import unicodedata
-import json
 
 app = Flask(__name__)
 
@@ -884,79 +883,6 @@ def home():
 @app.route("/trello-webhook", methods=["HEAD"])
 def trello_head():
     return "", 200
-
-
-@app.route("/api/import-episodes-3-5", methods=["POST"])
-def import_episodes_3_5():
-    try:
-        return import_episodes_3_5_impl()
-    except requests.HTTPError as error:
-        response = error.response
-        return jsonify({
-            "error": "trello request failed",
-            "status": response.status_code if response is not None else None,
-            "detail": response.text if response is not None else str(error),
-        }), 502
-    except Exception as error:
-        detail = re.sub(r"(?i)(key|token)=[^&\s]+", r"\1=[redacted]", str(error))
-        return jsonify({
-            "error": "internal import failure",
-            "type": type(error).__name__,
-            "detail": detail[:1000],
-        }), 500
-
-
-def import_episodes_3_5_impl():
-    if request.headers.get("X-Import-Key") != "ep3-5-91da67be4c2380f5":
-        return jsonify({"error": "forbidden"}), 403
-
-    boards = trello_get("/members/me/boards", {
-        "fields": "name,closed",
-        "lists": "open",
-        "list_fields": "name,closed",
-    })
-    candidates = []
-    for board in boards:
-        if board.get("closed"):
-            continue
-        for list_item in board.get("lists", []):
-            normalized_name = unicodedata.normalize("NFKD", list_item.get("name", "")).encode("ascii", "ignore").decode().upper()
-            if not list_item.get("closed") and normalized_name == "SCENARE":
-                cards = trello_get(f"/lists/{list_item['id']}/cards", {"fields": "name", "limit": 1000})
-                prior_episode_count = sum(card.get("name", "").startswith(("01/", "02/")) for card in cards)
-                candidates.append((prior_episode_count, list_item))
-
-    candidates.sort(key=lambda item: item[0], reverse=True)
-    target = candidates[0][1] if candidates and candidates[0][0] > 0 else None
-    if not target:
-        return jsonify({"error": "SCENARE list with prior episode cards not found"}), 404
-
-    cards_to_import = []
-    for episode in (3, 4, 5):
-        payload = json.loads((ROOT / f"cierny_kamen_ep{episode:02d}_cards.json").read_text(encoding="utf-8"))
-        cards_to_import.extend(payload["cards"])
-
-    existing = trello_get(f"/lists/{target['id']}/cards", {"fields": "name", "limit": 1000})
-    existing_names = {item["name"].strip().casefold() for item in existing}
-    created = []
-    skipped = []
-    for item in cards_to_import:
-        normalized_card_name = item["name"].strip().casefold()
-        if normalized_card_name in existing_names:
-            skipped.append(item["name"])
-            continue
-        card = create_card(target["id"], item["name"], item["description"])
-        for checklist in item.get("checklists", []):
-            created_checklist = trello_post("/checklists", {"idCard": card["id"], "name": checklist["name"]})
-            for checklist_item in checklist.get("items", []):
-                trello_post(f"/checklists/{created_checklist['id']}/checkItems", {"name": checklist_item})
-        created.append({"id": card["id"], "name": card["name"], "url": card.get("shortUrl")})
-        existing_names.add(normalized_card_name)
-        if len(created) >= 5:
-            break
-
-    remaining = sum(item["name"].strip().casefold() not in existing_names for item in cards_to_import)
-    return jsonify({"created": created, "skipped": skipped, "remaining": remaining, "list": target["name"]})
 
 
 @app.route("/trello-webhook", methods=["POST"])
