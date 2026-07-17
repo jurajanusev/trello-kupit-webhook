@@ -230,7 +230,7 @@ def get_card(card_id):
 
 
 def create_card(list_id, name, desc=""):
-    return trello_post("/cards", {
+    return trello_post_body("/cards", {
         "idList": list_id,
         "name": name,
         "desc": desc,
