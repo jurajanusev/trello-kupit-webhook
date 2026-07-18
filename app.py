@@ -902,6 +902,8 @@ def trello_head():
 
 @app.route("/api/create-riverdale-workflow-test-v2", methods=["POST"])
 def create_riverdale_workflow_test_v2():
+    return jsonify({"error": "test endpoint disabled"}), 410
+
     if request.headers.get("X-Test-Key") != "riverdale-workflow-v2-8c31e74a":
         return jsonify({"error": "forbidden"}), 403
 
