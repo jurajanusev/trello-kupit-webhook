@@ -2165,6 +2165,16 @@ def split_dok4_scene_07_39():
 
     mode = request.args.get("mode", "dry-run")
     if mode != "apply":
+        existing_details = None
+        if existing:
+            checklists = trello_get(f"/cards/{existing['id']}/checklists", {"fields": "name"})
+            existing_details = {
+                "name": existing["name"], "url": existing["shortUrl"],
+                "due": existing.get("due"), "description_length": len(existing.get("desc", "")),
+                "has_metadata": "<!-- DOK4-SCHEDULE-METADATA:START -->" in existing.get("desc", ""),
+                "contains_dialogue_end": "Katarína si vydýchne" in existing.get("desc", ""),
+                "checklists": [item["name"] for item in checklists],
+            }
         return jsonify({
             "status": "dry-run", "source": {"name": source["name"], "url": source["shortUrl"]},
             "boundary_found": bool(boundary),
@@ -2173,7 +2183,7 @@ def split_dok4_scene_07_39():
             "scene_text_length": len(scene_text or ""),
             "scene_text_start": (scene_text or "")[:500],
             "scene_text_end": (scene_text or "")[-500:],
-            "existing_target_card": ({"name": existing["name"], "url": existing["shortUrl"]} if existing else None),
+            "existing_target_card": existing_details,
             "target_list": target["name"],
         })
 
