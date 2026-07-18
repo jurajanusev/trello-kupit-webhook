@@ -1965,6 +1965,111 @@ def repair_dok4_zero_padded_scenes():
     })
 
 
+@app.route("/api/repair-dok4-retake-base-scenes", methods=["POST"])
+def repair_dok4_retake_base_scenes():
+    if request.headers.get("X-Sync-Key") != "dok4-retakes-43b-16a-61e8c20f":
+        return jsonify({"error": "forbidden"}), 403
+
+    fallback_map = {"04/43B": "04/43", "09/16A": "09/16"}
+    schedule_path = os.path.join(os.path.dirname(__file__), "dok4_schedule_2026-07-18.json")
+    with open(schedule_path, "r", encoding="utf-8") as handle:
+        schedule_rows = json.load(handle)["rows"]
+    rows = {row["scene_id"]: row for row in schedule_rows if row["scene_id"] in fallback_map}
+
+    board = trello_get("/boards/lzNy4AtY", {"fields": "id,name"})
+    board_lists = trello_get(f"/boards/{board['id']}/lists", {"fields": "id,name,closed"})
+    open_lists = {item["id"]: item for item in board_lists if not item.get("closed")}
+    lists_by_name = {item["name"]: item for item in open_lists.values()}
+    cards_by_id = {}
+    for list_id in open_lists:
+        cards = trello_get(f"/lists/{list_id}/cards", {
+            "fields": "id,name,desc,idList,shortUrl,due,dueComplete,pos", "filter": "open", "limit": 1000
+        })
+        for card in cards:
+            match = re.match(r"^\s*([0-9]{1,2})\s*/\s*([0-9]+[A-Z]*)(?:\.|\s|$)", card.get("name", ""), re.I)
+            if match:
+                scene_id = normalize_scene_id(match.group(1), match.group(2))
+                cards_by_id.setdefault(scene_id, []).append(card)
+
+    matches = []
+    missing = []
+    for planned_id, base_id in fallback_map.items():
+        candidates = cards_by_id.get(base_id, [])
+        if not candidates:
+            missing.append({"planned_id": planned_id, "base_id": base_id})
+            continue
+        for card in candidates:
+            row = rows[planned_id]
+            _, month, day = (int(value) for value in row["shooting_date"].split("-"))
+            matches.append({
+                "planned_id": planned_id, "base_id": base_id, "row": row, "card": card,
+                "current_list": open_lists.get(card["idList"], {}).get("name"),
+                "target_list": f"{day}.{month}.",
+            })
+
+    mode = request.args.get("mode", "dry-run")
+    if mode != "apply":
+        return jsonify({
+            "status": "dry-run", "board": board["name"], "matches_count": len(matches),
+            "missing": missing,
+            "matches": [{
+                "planned_id": item["planned_id"], "base_id": item["base_id"],
+                "name": item["card"]["name"], "from": item["current_list"],
+                "to": item["target_list"], "date": item["row"]["shooting_date"],
+                "order": item["row"]["order"], "due": item["card"].get("due"),
+                "due_complete": item["card"].get("dueComplete"), "url": item["card"]["shortUrl"],
+            } for item in matches],
+        })
+
+    start_marker = "<!-- DOK4-SCHEDULE-METADATA:START -->"
+    end_marker = "<!-- DOK4-SCHEDULE-METADATA:END -->"
+    updated = []
+    errors = []
+    for item in matches:
+        row = item["row"]
+        card = item["card"]
+        target = lists_by_name.get(item["target_list"])
+        if not target:
+            errors.append({"planned_id": item["planned_id"], "error": f"missing list {item['target_list']}"})
+            continue
+        metadata = (
+            f"{start_marker}\n"
+            f"**ČÍSLO OBRAZU:** {item['planned_id']}\n"
+            f"**ZDROJ:** predbežné dispo DOK 4 z 18. 7. 2026\n"
+            f"**NATÁČACÍ DEŇ:** {row['shooting_day']}\n"
+            f"**DÁTUM NATÁČANIA:** {row['shooting_date']}\n"
+            f"**PORADIE DŇA:** {row['order']}\n"
+            f"**UNIT:** {row['unit']}\n"
+            f"**LOKÁCIA:** {row['location']}\n"
+            f"**POSTAVY:** {row['characters']}\n"
+            f"{end_marker}"
+        )
+        old_desc = card.get("desc", "")
+        if start_marker in old_desc and end_marker in old_desc:
+            pattern = re.escape(start_marker) + r".*?" + re.escape(end_marker)
+            new_desc = re.sub(pattern, lambda _: metadata, old_desc, count=1, flags=re.S)
+        else:
+            new_desc = metadata + ("\n\n" + old_desc if old_desc else "")
+        try:
+            result = trello_put_body(f"/cards/{card['id']}", {
+                "desc": new_desc, "due": f"{row['shooting_date']}T10:00:00.000Z",
+                "dueComplete": "false", "idList": target["id"], "pos": row["order"] * 16384,
+            })
+            updated.append({
+                "planned_id": item["planned_id"], "base_id": item["base_id"],
+                "date": row["shooting_date"], "order": row["order"],
+                "list": item["target_list"], "due_complete": result.get("dueComplete"),
+                "url": result["shortUrl"],
+            })
+        except Exception as exc:
+            errors.append({"planned_id": item["planned_id"], "error": str(exc)})
+
+    return jsonify({
+        "status": "applied", "updated_count": len(updated), "updated": updated,
+        "errors_count": len(errors), "errors": errors, "missing": missing,
+    })
+
+
 @app.route("/trello-webhook", methods=["POST"])
 def trello_webhook():
     data = request.json
