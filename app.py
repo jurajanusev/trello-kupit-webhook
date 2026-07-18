@@ -1693,6 +1693,146 @@ def sync_dok4_due_dates():
     })
 
 
+@app.route("/api/prepare-dok4-next-7-days", methods=["POST"])
+def prepare_dok4_next_7_days():
+    if request.headers.get("X-Sync-Key") != "dok4-next7-20260719-25-f5a2c813":
+        return jsonify({"error": "forbidden"}), 403
+
+    window_start = "2026-07-19"
+    window_end = "2026-07-25"
+    schedule_path = os.path.join(os.path.dirname(__file__), "dok4_schedule_2026-07-18.json")
+    with open(schedule_path, "r", encoding="utf-8") as handle:
+        all_rows = json.load(handle)["rows"]
+    rows = [row for row in all_rows if window_start <= row["shooting_date"] <= window_end]
+    row_by_scene = {row["scene_id"]: row for row in rows}
+
+    board = trello_get("/boards/lzNy4AtY", {"fields": "id,name"})
+    board_lists = trello_get(f"/boards/{board['id']}/lists", {"fields": "id,name,closed"})
+    open_lists = {item["id"]: item for item in board_lists if not item.get("closed")}
+    lists_by_name = {item["name"]: item for item in open_lists.values()}
+
+    def target_name(date_text):
+        year, month, day = (int(part) for part in date_text.split("-"))
+        return f"{day}.{month}."
+
+    shooting_dates = sorted({row["shooting_date"] for row in rows})
+    target_names = {date_text: target_name(date_text) for date_text in shooting_dates}
+    missing_lists = [name for name in target_names.values() if name not in lists_by_name]
+
+    cards = []
+    for list_id in open_lists:
+        cards.extend(trello_get(f"/lists/{list_id}/cards", {
+            "fields": "id,name,idList,shortUrl,due,dueComplete,pos", "filter": "open", "limit": 1000
+        }))
+    cards_by_scene = {}
+    for card in cards:
+        match = re.match(r"^\s*([0-9]{1,2})\s*/\s*([0-9]+[A-Z]*)(?:\.|\s|$)", card.get("name", ""), re.I)
+        if match:
+            scene_id = f"{int(match.group(1)):02d}/{match.group(2).upper()}"
+            if scene_id in row_by_scene:
+                cards_by_scene.setdefault(scene_id, []).append(card)
+
+    missing_cards = []
+    planned = []
+    protected_shot = []
+    duplicates = []
+    for row in rows:
+        candidates = cards_by_scene.get(row["scene_id"], [])
+        if not candidates:
+            missing_cards.append(row["scene_id"])
+            continue
+        if len(candidates) > 1:
+            duplicates.append({
+                "scene_id": row["scene_id"],
+                "cards": [{"url": c["shortUrl"], "list": open_lists.get(c["idList"], {}).get("name")} for c in candidates],
+            })
+        for card in candidates:
+            current_list = open_lists.get(card["idList"], {}).get("name")
+            item = {
+                "row": row, "card": card, "current_list": current_list,
+                "target_list": target_names[row["shooting_date"]],
+            }
+            if current_list == "NATOČENÉ OBRAZY":
+                protected_shot.append({
+                    "scene_id": row["scene_id"], "date": row["shooting_date"],
+                    "url": card["shortUrl"], "list": current_list,
+                })
+            else:
+                planned.append(item)
+
+    already_correct = [item for item in planned if item["current_list"] == item["target_list"]]
+    to_move = [item for item in planned if item["current_list"] != item["target_list"]]
+    mode = request.args.get("mode", "dry-run")
+    if mode != "apply":
+        by_date = {}
+        for row in rows:
+            info = by_date.setdefault(row["shooting_date"], {
+                "target_list": target_names[row["shooting_date"]], "schedule_rows": 0,
+                "cards_found": 0, "already_correct": 0, "to_move": 0, "protected_shot": 0,
+            })
+            info["schedule_rows"] += 1
+        for item in planned:
+            info = by_date[item["row"]["shooting_date"]]
+            info["cards_found"] += 1
+            info["already_correct" if item["current_list"] == item["target_list"] else "to_move"] += 1
+        for item in protected_shot:
+            by_date[item["date"]]["protected_shot"] += 1
+        return jsonify({
+            "status": "dry-run", "board": board["name"],
+            "window_start": window_start, "window_end": window_end,
+            "shooting_dates": shooting_dates, "days_without_shooting": 7 - len(shooting_dates),
+            "schedule_rows": len(rows), "cards_plannable": len(planned),
+            "already_correct": len(already_correct), "to_move": len(to_move),
+            "protected_shot_count": len(protected_shot), "protected_shot": protected_shot[:30],
+            "missing_cards_count": len(missing_cards), "missing_cards": missing_cards,
+            "duplicate_scene_ids_count": len(duplicates), "duplicates": duplicates[:20],
+            "missing_lists": missing_lists, "by_date": by_date,
+            "move_sample": [{
+                "scene_id": item["row"]["scene_id"], "date": item["row"]["shooting_date"],
+                "order": item["row"]["order"], "from": item["current_list"],
+                "to": item["target_list"], "url": item["card"]["shortUrl"],
+            } for item in to_move[:30]],
+        })
+
+    for date_text, name in target_names.items():
+        if name not in lists_by_name:
+            created = trello_post_body("/lists", {"idBoard": board["id"], "name": name, "pos": "bottom"})
+            lists_by_name[name] = created
+
+    moved = []
+    reordered = []
+    errors = []
+    for item in sorted(planned, key=lambda value: (value["row"]["shooting_date"], value["row"]["order"])):
+        row = item["row"]
+        card = item["card"]
+        target = lists_by_name[item["target_list"]]
+        update = {"pos": row["order"] * 16384}
+        if card["idList"] != target["id"]:
+            update["idList"] = target["id"]
+        try:
+            result = trello_put_body(f"/cards/{card['id']}", update)
+            entry = {
+                "scene_id": row["scene_id"], "date": row["shooting_date"],
+                "order": row["order"], "url": result["shortUrl"],
+                "list": lists_by_name[item["target_list"]]["name"],
+            }
+            if "idList" in update:
+                moved.append(entry)
+            else:
+                reordered.append(entry)
+        except Exception as exc:
+            errors.append({"scene_id": row["scene_id"], "error": str(exc)})
+
+    return jsonify({
+        "status": "applied", "window_start": window_start, "window_end": window_end,
+        "shooting_dates": shooting_dates, "lists_created": missing_lists,
+        "moved_count": len(moved), "reordered_count": len(reordered),
+        "protected_shot_count": len(protected_shot), "missing_cards_count": len(missing_cards),
+        "errors_count": len(errors), "errors": errors[:30],
+        "moved": moved, "reordered": reordered,
+    })
+
+
 @app.route("/trello-webhook", methods=["POST"])
 def trello_webhook():
     data = request.json
