@@ -3,6 +3,7 @@
 Schvalene nastavenie pre dalsi vyvoj:
 
 - Zo scenara sa vytvori presne jedna karta na obraz so stabilnym ID `diel/obraz`.
+- Pri parovani sa cisla obrazov normalizuju: `08/05`, `8/5` a `08 / 005` znamenaju rovnaky obraz `08/5`; pismena sa zachovavaju, napriklad `09/016A` sa paruje ako `09/16A`.
 - Popis karty obsahuje metadata, dej, rekvizity v kontexte, kontinuitu a hned pod nou sekciu `ORIGINALNY SCENAR` s kompletnym textom obrazu vratane dialogov.
 - Checklisty obrazu: `REKVIZITY`, `Poznamky z porady`, `Info z natacania`.
 - Samostatne ToDo karty sa vytvaraju iba pre rekvizity, ktore treba zohnat, kupit, pozicat, vyrobit, vytlacit, upravit alebo schvalit.

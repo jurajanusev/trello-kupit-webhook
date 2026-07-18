@@ -1459,7 +1459,7 @@ def sync_dok4_schedule_metadata():
     for card in cards:
         match = re.match(r"^\s*([0-9]{1,2})\s*/\s*([0-9]+[A-Z]*)(?:\.|\s|$)", card.get("name", ""), re.I)
         if match:
-            scene_id = f"{int(match.group(1)):02d}/{match.group(2).upper()}"
+            scene_id = normalize_scene_id(match.group(1), match.group(2))
             cards_by_scene.setdefault(scene_id, []).append(card)
 
     row_by_scene = {row["scene_id"]: row for row in schedule_rows}
@@ -1619,7 +1619,7 @@ def sync_dok4_due_dates():
         match = re.match(r"^\s*([0-9]{1,2})\s*/\s*([0-9]+[A-Z]*)(?:\.|\s|$)", card.get("name", ""), re.I)
         if not match:
             continue
-        scene_id = f"{int(match.group(1)):02d}/{match.group(2).upper()}"
+        scene_id = normalize_scene_id(match.group(1), match.group(2))
         row = row_by_scene.get(scene_id)
         if row:
             matched.append({"scene_id": scene_id, "row": row, "card": card})
@@ -1738,7 +1738,7 @@ def prepare_dok4_next_7_days():
     for card in cards:
         match = re.match(r"^\s*([0-9]{1,2})\s*/\s*([0-9]+[A-Z]*)(?:\.|\s|$)", card.get("name", ""), re.I)
         if match:
-            scene_id = f"{int(match.group(1)):02d}/{match.group(2).upper()}"
+            scene_id = normalize_scene_id(match.group(1), match.group(2))
             if scene_id in row_by_scene:
                 cards_by_scene.setdefault(scene_id, []).append(card)
 
@@ -1845,6 +1845,8 @@ def prepare_dok4_next_7_days():
 
 @app.route("/api/repair-dok4-zero-padded-scenes", methods=["POST"])
 def repair_dok4_zero_padded_scenes():
+    return jsonify({"error": "zero-padding repair endpoint disabled"}), 410
+
     if request.headers.get("X-Sync-Key") != "dok4-zero-padding-7d9a4f21":
         return jsonify({"error": "forbidden"}), 403
 
