@@ -6,6 +6,7 @@ from pathlib import Path
 import re
 import requests
 import os
+import json
 import unicodedata
 
 app = Flask(__name__)
@@ -1422,6 +1423,132 @@ def test_dok4_schedule_on_riverdale():
     return jsonify({
         "status": "tested", "source_board_modified": False,
         "target_board": "RIVERDALE", "matched": len(results), "cards": results,
+    })
+
+
+@app.route("/api/sync-dok4-schedule-metadata", methods=["POST"])
+def sync_dok4_schedule_metadata():
+    if request.headers.get("X-Sync-Key") != "dok4-metadata-20260718-a7c53e91":
+        return jsonify({"error": "forbidden"}), 403
+
+    schedule_path = os.path.join(os.path.dirname(__file__), "dok4_schedule_2026-07-18.json")
+    with open(schedule_path, "r", encoding="utf-8") as handle:
+        schedule_data = json.load(handle)
+    schedule_rows = schedule_data["rows"]
+
+    board = trello_get("/boards/lzNy4AtY", {"fields": "id,name,url"})
+    board_lists = trello_get(f"/boards/{board['id']}/lists", {"fields": "id,name,closed"})
+    open_lists = {item["id"]: item["name"] for item in board_lists if not item.get("closed")}
+    cards = trello_get(f"/boards/{board['id']}/cards", {
+        "fields": "id,name,desc,idList,closed,shortUrl", "filter": "open", "limit": 1000
+    })
+
+    cards_by_scene = {}
+    for card in cards:
+        matches = re.findall(r"(?<![0-9])([0-9]{1,2})\s*/\s*([0-9]+[A-Z]*)(?![A-Z0-9])", card.get("name", ""), re.I)
+        normalized = {f"{int(ep):02d}/{scene.upper()}" for ep, scene in matches}
+        if len(normalized) == 1:
+            scene_id = next(iter(normalized))
+            cards_by_scene.setdefault(scene_id, []).append(card)
+
+    row_by_scene = {row["scene_id"]: row for row in schedule_rows}
+    matched = []
+    missing = []
+    ambiguous = []
+    for scene_id, row in row_by_scene.items():
+        candidates = cards_by_scene.get(scene_id, [])
+        if not candidates:
+            missing.append(scene_id)
+        elif len(candidates) > 1:
+            ambiguous.append({
+                "scene_id": scene_id,
+                "cards": [{"name": c["name"], "list": open_lists.get(c["idList"]), "url": c["shortUrl"]} for c in candidates],
+            })
+        else:
+            card = candidates[0]
+            matched.append({"row": row, "card": card})
+
+    mode = request.args.get("mode", "dry-run")
+    if mode != "apply":
+        list_counts = {}
+        for item in matched:
+            list_name = open_lists.get(item["card"]["idList"], "UNKNOWN")
+            list_counts[list_name] = list_counts.get(list_name, 0) + 1
+        return jsonify({
+            "status": "dry-run",
+            "board": board["name"],
+            "schedule_rows": len(schedule_rows),
+            "board_open_cards": len(cards),
+            "matched_unique": len(matched),
+            "missing_count": len(missing),
+            "missing_sample": missing[:40],
+            "ambiguous_count": len(ambiguous),
+            "ambiguous_sample": ambiguous[:15],
+            "matched_by_list": list_counts,
+            "sample": [{
+                "scene_id": item["row"]["scene_id"],
+                "card": item["card"]["name"],
+                "list": open_lists.get(item["card"]["idList"]),
+                "date": item["row"]["shooting_date"],
+                "day": item["row"]["shooting_day"],
+                "order": item["row"]["order"],
+            } for item in matched[:20]],
+        })
+
+    start_marker = "<!-- DOK4-SCHEDULE-METADATA:START -->"
+    end_marker = "<!-- DOK4-SCHEDULE-METADATA:END -->"
+    updated = []
+    unchanged = 0
+    moved = []
+    errors = []
+    for item in matched:
+        row = item["row"]
+        card = item["card"]
+        metadata = (
+            f"{start_marker}\n"
+            f"**ČÍSLO OBRAZU:** {row['scene_id']}\n"
+            f"**ZDROJ:** predbežné dispo DOK 4 z 18. 7. 2026\n"
+            f"**NATÁČACÍ DEŇ:** {row['shooting_day']}\n"
+            f"**DÁTUM NATÁČANIA:** {row['shooting_date']}\n"
+            f"**PORADIE DŇA:** {row['order']}\n"
+            f"**UNIT:** {row['unit']}\n"
+            f"**LOKÁCIA:** {row['location']}\n"
+            f"**POSTAVY:** {row['characters']}\n"
+            f"{end_marker}"
+        )
+        old_desc = card.get("desc", "")
+        if start_marker in old_desc and end_marker in old_desc:
+            pattern = re.escape(start_marker) + r".*?" + re.escape(end_marker)
+            new_desc = re.sub(pattern, lambda _: metadata, old_desc, count=1, flags=re.S)
+        else:
+            new_desc = metadata + ("\n\n" + old_desc if old_desc else "")
+        if new_desc == old_desc:
+            unchanged += 1
+            continue
+        try:
+            result = trello_put_body(f"/cards/{card['id']}", {"desc": new_desc})
+            if result.get("idList") != card.get("idList"):
+                moved.append({"scene_id": row["scene_id"], "card": card["shortUrl"]})
+            updated.append({
+                "scene_id": row["scene_id"], "url": result["shortUrl"],
+                "list": open_lists.get(result.get("idList")),
+            })
+        except Exception as exc:
+            errors.append({"scene_id": row["scene_id"], "error": str(exc)})
+
+    return jsonify({
+        "status": "applied",
+        "board": board["name"],
+        "matched_unique": len(matched),
+        "updated": len(updated),
+        "unchanged": unchanged,
+        "missing_count": len(missing),
+        "ambiguous_count": len(ambiguous),
+        "moved_count": len(moved),
+        "moved": moved[:20],
+        "errors_count": len(errors),
+        "errors": errors[:30],
+        "updated_sample": updated[:20],
     })
 
 
