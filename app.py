@@ -117,6 +117,18 @@ def trello_post_body(path, data=None):
     return r.json()
 
 
+def trello_put_body(path, data=None):
+    data = data or {}
+    data.update({"key": API_KEY, "token": TOKEN})
+    r = requests.put(f"{BASE}{path}", data=data, timeout=20)
+
+    if not r.ok:
+        print("TRELLO PUT BODY ERROR:", r.status_code, r.text)
+
+    r.raise_for_status()
+    return r.json()
+
+
 def microsoft_enabled():
     return all([
         MICROSOFT_CLIENT_ID,
@@ -1190,6 +1202,100 @@ def create_riverdale_simple_workflow_test():
     return jsonify({"status": "created", "cards": [
         {"name": card["name"], "url": card["shortUrl"]} for card in (scene, phone, photo)
     ]})
+
+
+@app.route("/api/update-riverdale-test-with-original-script", methods=["POST"])
+def update_riverdale_test_with_original_script():
+    if request.headers.get("X-Test-Key") != "riverdale-original-03-28-5c8a41d2":
+        return jsonify({"error": "forbidden"}), 403
+
+    scene = trello_get("/cards/p1WdZ1MD", {"fields": "name,desc,shortUrl"})
+    original_script = """### ORIGINÁLNY SCENÁR — KOMPLETNÝ PREPIS
+
+Bety, Veronika, Eva a Kiko sa potichu pohybujú po chlapčenskej šatni. Kiko stojí pri dverách a dáva pozor. Nazerá smerom do telocvične, aby dal signál, keby sa niekto chcel vrátiť do šatne. Z telocvične počuť piskot tenisiek, výkriky hráčov a trénera.
+
+**KIKO:** Okay, teraz nacvičujú slalom s loptou. Marek si vyhŕňa tričko... pekáč buchiet, nice...
+
+Bety, Veronika a Eva lašujú po skrinkách.
+
+**BETY:** Máte niečo? Akýkoľvek mobil.
+
+Zrazu sa otvoria šatňové dvere a vojde do nich Sára. Bety, Veronika, Eva aj Kiko sú prekvapení, že ju tam vidia. Sára sebavedomo pohodí hlavou.
+
+**SÁRA:** Čo čumíte? Nie ste jediné koho zaujíma pravda a prišla som vám dokázať, že ju nemáte.
+
+Sára podíde ku jednej zo skriniek a znechutene k nej pričuchne.
+
+**SÁRA:** Aj keď sa kvôli tomu budem musieť hrabať v cudzích smradľavých handrách.
+
+**VERONIKA:** Tak si švihni. A buď potichu.
+
+Sára znechutene otvorí prvú skrinku a začne sa v nej hrabať. Medzitým však Eva ohlási úspech a vyberie mobil.
+
+**EVA:** Bingo!
+
+Podá mobil Bety. Tá ho vezme, snaží sa ho zapnúť, ale nedarí sa jej.
+
+**BETY:** Vyzerá byť vybitý.
+
+**VERONIKA:** Nemáme čas, skúsme niekoho iného.
+
+Bety zo Sebovej skrinky vyberie mobil. Tento sa hneď zapne, ale pýta PIN kód. Bety vyťuká štyri nuly, ale neodomkne sa. Potom skúsi štyri deviatky. Nič.
+
+**BETY:** Netušíte, aký môže mať Sebo PIN?
+
+Veronika sa pohŕdavo pozrie na teamovú selfie fotku nalepenú na stene vedľa dverí. Bety sa usmeje, niečo jej napadlo. Zadá dvakrát číslo Sebiho dresu: 5656. Telefón sa odokmne.
+
+**BETY:** /hrdo/ Jednoduchý chlapec.
+
+Baby sa zhŕknu pred Sebiho skrinkou, aj Kiko pribehne a hľadajú v telefóne DC-čko. Bety drží telefón a hľadá, Kiko sa obzerá, stráži popritom dvere do telocvične, všetci sú v napätí.
+
+**BETY:** Dc-čko, aha, má ho tu.
+
+**VERONIKA:** Dúfam, že má zapamätané heslo.
+
+**BETY:** Má. Sme tam, aha. Kanál Blackstone&sluts.
+
+Obrazovka telefónu blikne. Sára zažmurká, akoby neverila vlastným očiam a Bety sa pozrie na Veroniku. V tajnom kanáli (mal by vyzerať ako whatsap, čiže fotky s lajkami a komentármi, vystriedané so správami) medzi fotkami je aj tá s Evou, a samozrejme aj fotka s Veronikou, pri ktorej je komentár „nová baba“ a priradených osem bodov a rôzne emotikony vyjadrujúce obdiv a pobavenie.
+
+**EVA:** Nechuťáci.
+
+Bety ďalej scrolluje. Sú tam aj mená a fotky ďalších dievčat s basketbalistami. Ako sa Bety posúva prstom na staršie záznamy, nájde fotku svojej sestry Sofie s Jakubom a pritom tri body. (O tejto fotke doteraz nikto nevedel.) Sára je v šoku, nechápe to, nechce tomu uveriť.
+
+**SÁRA:** Wtf? To nie. Jakub by toto nikdy neurobil.
+
+Sára od nich ustúpi a kýve hlavou, nechce informáciu prijať. V Bety to vrie, má čo robiť, aby nevybuchla. Čím dlhšie sa na tie záznamy pozerá, tým viac v nej stúpa hnev.
+
+**BETY:** /nahlas/ Hajzli!
+
+Podá telefón Veronike a od nervov zatína zuby.
+
+**BETY:** Ako môže byť niekto takýto nechutný perverzák?
+
+Veronika okamžite vyberie svoj telefón a robí si fotky celého kanálu, aby mali dôkaz.
+
+**VERONIKA:** Teraz máme s čím pracovať."""
+
+    desc = scene.get("desc", "")
+    if "### ORIGINÁLNY SCENÁR" not in desc:
+        desc = desc.rstrip() + "\n\n" + original_script
+    desc = desc.replace("**DIEL:** 01  |  **OBRAZ:** 28", "**DIEL:** 03  |  **OBRAZ:** 28")
+    updated_scene = trello_put_body("/cards/p1WdZ1MD", {
+        "name": "[TEST 2] 03/28. INT. ŠKOLA — CHLAPČENSKÁ ŠATŇA, DEŇ",
+        "desc": desc,
+    })
+
+    updated_todos = []
+    for card_id in ("7FfRrfYt", "VKhWF92J"):
+        card = trello_get(f"/cards/{card_id}", {"fields": "desc,shortUrl,name"})
+        todo_desc = card.get("desc", "").replace("**SÚVISIACI OBRAZ:** 01/28", "**SÚVISIACI OBRAZ:** 03/28")
+        updated_todos.append(trello_put_body(f"/cards/{card_id}", {"desc": todo_desc}))
+
+    return jsonify({
+        "status": "updated",
+        "scene": {"name": updated_scene["name"], "url": updated_scene["shortUrl"]},
+        "todos_updated": len(updated_todos),
+    })
 
 
 @app.route("/trello-webhook", methods=["POST"])
