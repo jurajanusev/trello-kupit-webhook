@@ -1062,6 +1062,8 @@ def create_riverdale_workflow_test_v2():
 
 @app.route("/api/create-riverdale-simple-workflow-test", methods=["POST"])
 def create_riverdale_simple_workflow_test():
+    return jsonify({"error": "test endpoint disabled"}), 410
+
     if request.headers.get("X-Test-Key") != "riverdale-simple-v1-72d941ac":
         return jsonify({"error": "forbidden"}), 403
 
