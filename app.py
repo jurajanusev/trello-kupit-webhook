@@ -1300,6 +1300,129 @@ Veronika okamžite vyberie svoj telefón a robí si fotky celého kanálu, aby m
     })
 
 
+@app.route("/api/test-dok4-schedule-on-riverdale", methods=["POST"])
+def test_dok4_schedule_on_riverdale():
+    if request.headers.get("X-Test-Key") != "dok4-schedule-riverdale-93b6d120":
+        return jsonify({"error": "forbidden"}), 403
+
+    board_id = trello_get("/boards/CzuD55PR", {"fields": "id,name"})["id"]
+    schedule = [
+        {
+            "scene_id": "02/35", "date": "2026-05-27", "day": 1, "order": 1,
+            "location": "NEMOCNICA - KANCELÁRIA RIADITEĽA", "setting": "INT/DEŇ",
+            "story": "Júlia má návrh, ako nastaviť prijímanie pacientov lepšie.",
+            "characters": "Júlia, Tibor",
+        },
+        {
+            "scene_id": "03/41", "date": "2026-05-27", "day": 1, "order": 2,
+            "location": "NEMOCNICA - KANCELÁRIA RIADITEĽA", "setting": "INT/DEŇ",
+            "story": "Júlia obhajuje Andreja pred riaditeľom; prestriháva sa s ďalším obrazom.",
+            "characters": "Júlia, Tibor",
+        },
+        {
+            "scene_id": "01/55L", "date": "2026-05-27", "day": 1, "order": 3,
+            "location": "NEMOCNICA - KANCELÁRIA PRIMÁRA", "setting": "INT/DEŇ",
+            "story": "Júlia presviedča Martinu.", "characters": "Júlia",
+        },
+        {
+            "scene_id": "02/12", "date": "2026-05-29", "day": 2, "order": 1,
+            "location": "NEMOCNICA - LEKÁRSKA MIESTNOSŤ", "setting": "INT/DEŇ",
+            "story": "Martina a Matej prichádzajú postupne k spolupráci.",
+            "characters": "Matej, Martina, Oliver",
+        },
+        {
+            "scene_id": "04/20", "date": "2026-05-30", "day": 3, "order": 1,
+            "location": "NEMOCNICA - LEKÁRSKA MIESTNOSŤ", "setting": "INT/DEŇ",
+            "story": "Linda zisťuje, prečo chce Matej robiť obvodného lekára.",
+            "characters": "Matej, Linda",
+        },
+    ]
+
+    board_lists = trello_get(f"/boards/{board_id}/lists", {"fields": "name,closed"})
+    lists_by_name = {item["name"]: item for item in board_lists if not item.get("closed")}
+
+    def ensure_list(name):
+        if name not in lists_by_name:
+            lists_by_name[name] = trello_post_body("/lists", {
+                "idBoard": board_id, "name": name, "pos": "bottom"
+            })
+        return lists_by_name[name]
+
+    unscheduled = ensure_list("TEST DÁTUMY — NEZARADENÉ")
+    target_lists = {
+        "2026-05-27": ensure_list("TEST DÁTUMY — DEŇ 01 — 27. 5. 2026"),
+        "2026-05-29": ensure_list("TEST DÁTUMY — DEŇ 02 — 29. 5. 2026"),
+        "2026-05-30": ensure_list("TEST DÁTUMY — DEŇ 03 — 30. 5. 2026"),
+    }
+
+    board_labels = trello_get(f"/boards/{board_id}/labels", {"fields": "name,color", "limit": 1000})
+    test_label = next((x for x in board_labels if x.get("name", "").casefold() == "test dátumy".casefold()), None)
+    if not test_label:
+        test_label = trello_post_body("/labels", {
+            "idBoard": board_id, "name": "TEST DÁTUMY", "color": "sky"
+        })
+
+    all_existing = []
+    for item in (unscheduled, *target_lists.values()):
+        all_existing.extend(trello_get(f"/lists/{item['id']}/cards", {
+            "fields": "name,desc,shortUrl,idList,due,pos", "limit": 100
+        }))
+    existing_by_id = {}
+    for card in all_existing:
+        match = re.search(r"\[TEST DÁTUMY\]\s+([0-9]{2}/[0-9]+[A-Z]*)", card.get("name", ""))
+        if match:
+            existing_by_id[match.group(1)] = card
+
+    results = []
+    for row in schedule:
+        scene_id = row["scene_id"]
+        name = f"[TEST DÁTUMY] {scene_id} — {row['location']} — {row['setting']}"
+        desc = (
+            f"**STABILNÉ ID:** {scene_id}\n"
+            f"**ZDROJ:** predbežné dispo DOK 4 z 18. 7. 2026\n"
+            f"**NATÁČACÍ DEŇ:** {row['day']}\n"
+            f"**DÁTUM NATÁČANIA:** {row['date']}\n"
+            f"**PORADIE DŇA:** {row['order']}\n"
+            f"**UNIT:** 1st unit\n"
+            f"**LOKÁCIA:** {row['location']}\n"
+            f"**POSTAVY:** {row['characters']}\n\n"
+            f"### DEJ\n{row['story']}\n\n"
+            "### TEST SYNCHRONIZÁCIE\n"
+            "Karta bola najprv vytvorená ako nezaradená a následne spárovaná podľa stabilného ID, "
+            "nadátovaná a presunutá do zoznamu natáčacieho dňa. Nástenka DOK 4 nebola zmenená."
+        )
+        created = False
+        card = existing_by_id.get(scene_id)
+        if not card:
+            card = trello_post_body("/cards", {
+                "idList": unscheduled["id"], "name": name, "desc": desc,
+                "idLabels": test_label["id"], "pos": "bottom",
+            })
+            created = True
+        due = f"{row['date']}T06:00:00.000Z"
+        target = target_lists[row["date"]]
+        card = trello_put_body(f"/cards/{card['id']}", {
+            "name": name, "desc": desc, "due": due, "idList": target["id"],
+            "pos": row["order"] * 16384,
+        })
+        trello_post_body(f"/cards/{card['id']}/actions/comments", {
+            "text": (
+                f"[TEST IMPORTU] Spárované podľa ID {scene_id}. Dátum: {row['date']}, "
+                f"natáčací deň: {row['day']}, poradie: {row['order']}. DOK 4 bez zásahu."
+            )
+        })
+        results.append({
+            "scene_id": scene_id, "created": created, "date": row["date"],
+            "day": row["day"], "order": row["order"], "list": target["name"],
+            "url": card["shortUrl"],
+        })
+
+    return jsonify({
+        "status": "tested", "source_board_modified": False,
+        "target_board": "RIVERDALE", "matched": len(results), "cards": results,
+    })
+
+
 @app.route("/trello-webhook", methods=["POST"])
 def trello_webhook():
     data = request.json
