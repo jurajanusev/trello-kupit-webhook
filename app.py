@@ -1439,34 +1439,35 @@ def sync_dok4_schedule_metadata():
     board = trello_get("/boards/lzNy4AtY", {"fields": "id,name,url"})
     board_lists = trello_get(f"/boards/{board['id']}/lists", {"fields": "id,name,closed"})
     open_lists = {item["id"]: item["name"] for item in board_lists if not item.get("closed")}
-    cards = trello_get(f"/boards/{board['id']}/cards", {
-        "fields": "id,name,desc,idList,closed,shortUrl", "filter": "open", "limit": 1000
-    })
+    cards = []
+    for list_id in open_lists:
+        cards.extend(trello_get(f"/lists/{list_id}/cards", {
+            "fields": "id,name,desc,idList,closed,shortUrl", "filter": "open", "limit": 1000
+        }))
 
     cards_by_scene = {}
     for card in cards:
-        matches = re.findall(r"(?<![0-9])([0-9]{1,2})\s*/\s*([0-9]+[A-Z]*)(?![A-Z0-9])", card.get("name", ""), re.I)
-        normalized = {f"{int(ep):02d}/{scene.upper()}" for ep, scene in matches}
-        if len(normalized) == 1:
-            scene_id = next(iter(normalized))
+        match = re.match(r"^\s*([0-9]{1,2})\s*/\s*([0-9]+[A-Z]*)(?:\.|\s|$)", card.get("name", ""), re.I)
+        if match:
+            scene_id = f"{int(match.group(1)):02d}/{match.group(2).upper()}"
             cards_by_scene.setdefault(scene_id, []).append(card)
 
     row_by_scene = {row["scene_id"]: row for row in schedule_rows}
     matched = []
     missing = []
-    ambiguous = []
+    duplicate_scene_ids = []
     for scene_id, row in row_by_scene.items():
         candidates = cards_by_scene.get(scene_id, [])
         if not candidates:
             missing.append(scene_id)
-        elif len(candidates) > 1:
-            ambiguous.append({
+        else:
+            if len(candidates) > 1:
+                duplicate_scene_ids.append({
                 "scene_id": scene_id,
                 "cards": [{"name": c["name"], "list": open_lists.get(c["idList"]), "url": c["shortUrl"]} for c in candidates],
             })
-        else:
-            card = candidates[0]
-            matched.append({"row": row, "card": card})
+            for card in candidates:
+                matched.append({"row": row, "card": card})
 
     mode = request.args.get("mode", "dry-run")
     if mode != "apply":
@@ -1482,8 +1483,9 @@ def sync_dok4_schedule_metadata():
             "matched_unique": len(matched),
             "missing_count": len(missing),
             "missing_sample": missing[:40],
-            "ambiguous_count": len(ambiguous),
-            "ambiguous_sample": ambiguous[:15],
+            "matched_scene_ids": len(schedule_rows) - len(missing),
+            "duplicate_scene_ids_count": len(duplicate_scene_ids),
+            "duplicate_scene_ids_sample": duplicate_scene_ids[:15],
             "matched_by_list": list_counts,
             "sample": [{
                 "scene_id": item["row"]["scene_id"],
@@ -1543,7 +1545,8 @@ def sync_dok4_schedule_metadata():
         "updated": len(updated),
         "unchanged": unchanged,
         "missing_count": len(missing),
-        "ambiguous_count": len(ambiguous),
+        "matched_scene_ids": len(schedule_rows) - len(missing),
+        "duplicate_scene_ids_count": len(duplicate_scene_ids),
         "moved_count": len(moved),
         "moved": moved[:20],
         "errors_count": len(errors),
