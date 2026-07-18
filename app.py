@@ -2133,6 +2133,8 @@ def find_dok4_scene_07_39():
 
 @app.route("/api/split-dok4-scene-07-39", methods=["POST"])
 def split_dok4_scene_07_39():
+    return jsonify({"error": "scene split endpoint disabled"}), 410
+
     if request.headers.get("X-Sync-Key") != "dok4-split-07-39-84c6d2f1":
         return jsonify({"error": "forbidden"}), 403
 
