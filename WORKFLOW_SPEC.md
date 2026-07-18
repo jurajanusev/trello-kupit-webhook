@@ -9,6 +9,8 @@ Schvalene nastavenie pre dalsi vyvoj:
 - Jedna rekvizita ma jednu ToDo kartu so vsetkymi suvisiacimi obrazmi; ToDo karta a obrazy maju vzajomne odkazy.
 - Synchronizacia po porade aktualizuje obraz aj ToDo kartu bez straty rucnych poznamok.
 - Import natacacieho planu podla `diel/obraz` doplni datum, den, unit a poradie a presunie povodnu kartu do zoznamu daneho natacacieho dna.
+- Datum natacania sa zaroven nastavi do Trello `due date` funkcionality. Technicky cas terminu je 12:00 v casovej zone Europe/Bratislava, aby sa datum pri zobrazeni neposunul.
+- Synchronizacia due date nemeni `dueComplete`; stav dokoncenia sa riadi samostatne podla skutocneho natocenia obrazu.
 - Zoznamy jednotlivych natacacich dni a presuny kariet sa vytvaraju najviac 7 kalendarnych dni dopredu, aby na nastenke nevznikalo prilis vela buducich zoznamov.
 - Obrazy naplanovane dalej ako 7 dni maju datum a metadata v popise, ale zostavaju vo svojom aktualnom zozname.
 - Po potvrdeni natocenia sa tato ista karta presunie do `NATOCENE OBRAZY`; nevytvara sa kopia.

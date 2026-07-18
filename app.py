@@ -1587,6 +1587,8 @@ def sync_dok4_schedule_metadata():
 
 @app.route("/api/sync-dok4-due-dates", methods=["POST"])
 def sync_dok4_due_dates():
+    return jsonify({"error": "due date endpoint disabled"}), 410
+
     if request.headers.get("X-Sync-Key") != "dok4-due-20260718-43f98b2e":
         return jsonify({"error": "forbidden"}), 403
 
