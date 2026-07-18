@@ -1695,6 +1695,8 @@ def sync_dok4_due_dates():
 
 @app.route("/api/prepare-dok4-next-7-days", methods=["POST"])
 def prepare_dok4_next_7_days():
+    return jsonify({"error": "next-seven-days endpoint disabled"}), 410
+
     if request.headers.get("X-Sync-Key") != "dok4-next7-20260719-25-f5a2c813":
         return jsonify({"error": "forbidden"}), 403
 
