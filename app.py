@@ -2131,6 +2131,98 @@ def find_dok4_scene_07_39():
     })
 
 
+@app.route("/api/split-dok4-scene-07-39", methods=["POST"])
+def split_dok4_scene_07_39():
+    if request.headers.get("X-Sync-Key") != "dok4-split-07-39-84c6d2f1":
+        return jsonify({"error": "forbidden"}), 403
+
+    source = trello_get("/cards/HVWHmy1U", {
+        "fields": "id,name,desc,idList,shortUrl,closed"
+    })
+    board = trello_get("/boards/lzNy4AtY", {"fields": "id,name"})
+    board_lists = trello_get(f"/boards/{board['id']}/lists", {"fields": "id,name,closed"})
+    lists_by_name = {item["name"]: item for item in board_lists if not item.get("closed")}
+    target = lists_by_name.get("23.7.")
+    if not target:
+        return jsonify({"error": "target list 23.7. missing"}), 409
+
+    boundary = re.search(r"(?mi)^\*0?7/39\.[^\r\n]*\*\s*$", source.get("desc", ""))
+    source_desc_after_split = source.get("desc", "")
+    scene_text = None
+    if boundary:
+        source_desc_after_split = source["desc"][:boundary.start()].rstrip()
+        scene_text = source["desc"][boundary.start():].strip()
+
+    target_cards = trello_get(f"/lists/{target['id']}/cards", {
+        "fields": "id,name,desc,idList,shortUrl,due,closed", "filter": "all", "limit": 1000
+    })
+    existing = None
+    for card in target_cards:
+        match = re.match(r"^\s*([0-9]{1,2})\s*/\s*([0-9]+[A-Z]*)(?:\.|\s|$)", card.get("name", ""), re.I)
+        if match and normalize_scene_id(match.group(1), match.group(2)) == "07/39":
+            existing = card
+            break
+
+    mode = request.args.get("mode", "dry-run")
+    if mode != "apply":
+        return jsonify({
+            "status": "dry-run", "source": {"name": source["name"], "url": source["shortUrl"]},
+            "boundary_found": bool(boundary),
+            "source_length_before": len(source.get("desc", "")),
+            "source_length_after": len(source_desc_after_split),
+            "scene_text_length": len(scene_text or ""),
+            "scene_text_start": (scene_text or "")[:500],
+            "scene_text_end": (scene_text or "")[-500:],
+            "existing_target_card": ({"name": existing["name"], "url": existing["shortUrl"]} if existing else None),
+            "target_list": target["name"],
+        })
+
+    if not scene_text and not existing:
+        return jsonify({"error": "07/39 boundary not found and target card does not exist"}), 409
+
+    metadata = (
+        "<!-- DOK4-SCHEDULE-METADATA:START -->\n"
+        "**ČÍSLO OBRAZU:** 07/39\n"
+        "**ZDROJ:** predbežné dispo DOK 4 z 18. 7. 2026\n"
+        "**NATÁČACÍ DEŇ:** 32\n"
+        "**DÁTUM NATÁČANIA:** 2026-07-23\n"
+        "**PORADIE DŇA:** 1\n"
+        "**UNIT:** 1st unit\n"
+        "**LOKÁCIA:** NEMOCNICA – KANCELÁRIA RICHARDA\n"
+        "**POSTAVY:** Richard, Katarína\n"
+        "<!-- DOK4-SCHEDULE-METADATA:END -->"
+    )
+    new_desc = metadata + "\n\n" + (scene_text or existing.get("desc", ""))
+    card_name = "07/39. INT. NEMOCNICA - RECEPCIA, DEŇ 3 — KATARÍNA, RICHARD, KOMPARZ"
+
+    created = False
+    if existing:
+        new_card = trello_put_body(f"/cards/{existing['id']}", {
+            "name": card_name, "desc": new_desc, "due": "2026-07-23T10:00:00.000Z",
+            "dueComplete": "false", "idList": target["id"], "pos": 16384,
+        })
+    else:
+        new_card = trello_post_body("/cards", {
+            "idList": target["id"], "name": card_name, "desc": new_desc,
+            "due": "2026-07-23T10:00:00.000Z", "pos": 16384,
+        })
+        created = True
+        for checklist_name in ("REKVIZITY", "Poznámky z porady", "Info z natáčania"):
+            trello_post_body("/checklists", {"idCard": new_card["id"], "name": checklist_name})
+
+    source_updated = False
+    if boundary:
+        trello_put_body(f"/cards/{source['id']}", {"desc": source_desc_after_split})
+        source_updated = True
+
+    return jsonify({
+        "status": "applied", "created": created, "source_updated": source_updated,
+        "source": {"name": source["name"], "url": source["shortUrl"]},
+        "new_card": {"name": new_card["name"], "url": new_card["shortUrl"], "list": target["name"]},
+        "scene_text_length": len(scene_text or ""),
+    })
+
+
 @app.route("/trello-webhook", methods=["POST"])
 def trello_webhook():
     data = request.json
