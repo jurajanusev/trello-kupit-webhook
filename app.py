@@ -900,6 +900,164 @@ def trello_head():
     return "", 200
 
 
+@app.route("/api/create-riverdale-workflow-test-v2", methods=["POST"])
+def create_riverdale_workflow_test_v2():
+    if request.headers.get("X-Test-Key") != "riverdale-workflow-v2-8c31e74a":
+        return jsonify({"error": "forbidden"}), 403
+
+    board_id = trello_get("/boards/CzuD55PR", {"fields": "id"})["id"]
+    existing_lists = trello_get(f"/boards/{board_id}/lists", {"fields": "name,closed"})
+    lists_by_name = {item["name"]: item for item in existing_lists if not item.get("closed")}
+
+    def ensure_list(name):
+        if name not in lists_by_name:
+            lists_by_name[name] = trello_post_body("/lists", {
+                "idBoard": board_id, "name": name, "pos": "bottom"
+            })
+        return lists_by_name[name]
+
+    inbox = ensure_list("TEST — SPRACOVANÉ OBRAZY")
+    sourcing = ensure_list("TEST — TREBA ZOHNAŤ / VYROBIŤ")
+    shoot_day = ensure_list("TEST — NATÁČANIE 31. 7. 2026")
+    shot = ensure_list("TEST — NATOČENÉ")
+
+    all_test_cards = []
+    for target_list in (inbox, sourcing, shoot_day, shot):
+        all_test_cards.extend(trello_get(
+            f"/lists/{target_list['id']}/cards", {"fields": "name,shortUrl", "limit": 100}
+        ))
+    if all_test_cards:
+        return jsonify({"status": "exists", "cards": [
+            {"name": card["name"], "url": card.get("shortUrl")} for card in all_test_cards
+        ]})
+
+    board_labels = trello_get(f"/boards/{board_id}/labels", {"fields": "name,color", "limit": 1000})
+    labels = {item.get("name", "").casefold(): item for item in board_labels}
+
+    def ensure_label(name, color):
+        if name.casefold() not in labels:
+            labels[name.casefold()] = trello_post_body("/labels", {
+                "idBoard": board_id, "name": name, "color": color
+            })
+        return labels[name.casefold()]["id"]
+
+    label_test = ensure_label("TEST WORKFLOW", "sky")
+    label_source = ensure_label("TREBA ZOHNAŤ", "orange")
+    label_ready = ensure_label("PRIPRAVENÉ", "green")
+    label_shot = ensure_label("NATOČENÉ", "blue")
+    label_continuity = ensure_label("KONTINUITA", "red")
+
+    def add_checklist(card_id, name, items):
+        checklist = trello_post_body("/checklists", {"idCard": card_id, "name": name})
+        for item in items:
+            trello_post_body(f"/checklists/{checklist['id']}/checkItems", {"name": item})
+
+    imported = trello_post_body("/cards", {
+        "idList": inbox["id"],
+        "name": "[TEST][SPRACOVANÉ] 01/06 — INT. ŠKOLA, CHODBA — DEŇ",
+        "desc": (
+            "**DIEL:** 1  |  **OBRAZ:** 01/06\n\n"
+            "**LOKÁCIA:** Škola — chodba\n"
+            "**ČAS:** Deň\n"
+            "**POSTAVY:** Bety, Veronika, Sebo\n"
+            "**STAV:** čaká na zaradenie do natáčacieho plánu\n\n"
+            "### DEJ A AKCIA\n"
+            "Bety zastaví Seba na chodbe a ukáže mu vytlačenú fotografiu. Sebo si ju vezme, "
+            "prehne ju a vloží do zadného vrecka.\n\n"
+            "### REKVIZITY V KONTEXTE\n"
+            "- **Vytlačená fotografia Bety a Seba** — Bety ju podá Sebovi; Sebo ju prehne a odloží do vrecka. "
+            "Treba pripraviť identické kusy pred prehnutím aj po prehnutí.\n"
+            "- **Sebov mobil** — drží ho v pravej ruke pri príchode; rovnaký čierny obal ako v predchádzajúcich obrazoch.\n\n"
+            "### KONTINUITA\n"
+            "Fotografia prechádza zo stavu NEPREHNUTÁ na PREHNUTÁ. Evidovať variant a miesto uloženia."
+        ),
+        "idLabels": f"{label_test},{label_continuity}",
+        "pos": "bottom",
+    })
+    add_checklist(imported["id"], "AUTOMATICKÁ KONTROLA", [
+        "Dej a postavy vypísané", "Rekvizity vypísané v kontexte", "Nadväznosť označená",
+        "Čaká na dátum natáčania",
+    ])
+
+    acquisition = trello_post_body("/cards", {
+        "idList": sourcing["id"],
+        "name": "[TEST][ZOHNAŤ] Fotografia Bety a Seba — 6 identických kusov",
+        "desc": (
+            "**VZNIKLO AUTOMATICKY Z OBRAZU:** 01/06\n"
+            "**SPÔSOB:** vyrobiť / vytlačiť\n"
+            "**MNOŽSTVO:** 3× neprehnutá + 3× prehnutá\n"
+            "**INTERNÝ DEADLINE:** 29. 7. 2026\n"
+            "**PRVÉ NATÁČANIE:** 31. 7. 2026\n\n"
+            "Fotografia musí byť rovnakého formátu, orezu a papiera. Jeden čistý kus odložiť ako kontinuitný master."
+        ),
+        "idLabels": f"{label_test},{label_source},{label_continuity}",
+        "due": "2026-07-29T12:00:00.000Z",
+        "pos": "bottom",
+    })
+    add_checklist(acquisition["id"], "ZABEZPEČENIE", [
+        "Vybrať a schváliť fotografiu", "Pripraviť tlačové dáta", "Vytlačiť 6 kusov",
+        "Pripraviť tri prehnuté varianty", "Označiť kontinuitný master", "Odovzdať na pľac",
+    ])
+
+    scheduled = trello_post_body("/cards", {
+        "idList": shoot_day["id"],
+        "name": "[TEST][PLÁN 04] 01/06 — INT. ŠKOLA, CHODBA — DEŇ",
+        "desc": (
+            "**NATÁČANIE:** 31. 7. 2026  |  **PORADIE DŇA:** 4\n"
+            "**CALL:** 10:40  |  **LOKÁCIA:** Škola — chodba\n\n"
+            "Táto karta demonštruje automatické zaradenie spracovaného obrazu podľa natáčacieho plánu.\n\n"
+            "### PRÍPRAVA NA DEŇ\n"
+            "Fotografia: 1× neprehnutá v ruke Bety, náhradné kusy pri rekvizitárovi. "
+            "Sebov mobil: čierny obal, nabitý, bez viditeľných notifikácií."
+        ),
+        "idLabels": f"{label_test},{label_ready},{label_continuity}",
+        "due": "2026-07-31T08:40:00.000Z",
+        "pos": "bottom",
+    })
+    add_checklist(scheduled["id"], "REKVIZITY NA PĽAC", [
+        "Fotografia — hero kus neprehnutý", "Fotografia — 5 náhradných variantov",
+        "Sebov mobil — čierny obal", "Kontinuitná fotografia pred prvou klapkou",
+    ])
+    add_checklist(scheduled["id"], "PO OBRAZE", [
+        "Označiť použitý variant", "Nahrať fotografiu kontinuity", "Zapísať poškodenie / zmenu",
+        "Označiť obraz ako natočený",
+    ])
+
+    completed = trello_post_body("/cards", {
+        "idList": shot["id"],
+        "name": "[TEST][NATOČENÉ] 01/05 — EXT. PRED ŠKOLOU — DEŇ",
+        "desc": (
+            "**NATOČENÉ:** 30. 7. 2026  |  **POSLEDNÁ KLAPKA:** 16:25\n"
+            "**STAV:** natočené — automaticky presunuté po potvrdení rekvizitárom\n\n"
+            "### SKUTOČNÝ STAV PO NATÁČANÍ\n"
+            "Sebov mobil bez poškodenia, čierny obal zostáva nasadený. Kontinuitná fotografia priložená/doplní sa. "
+            "Mobil pokračuje do obrazu 01/06."
+        ),
+        "idLabels": f"{label_test},{label_shot},{label_continuity}",
+        "dueComplete": "true",
+        "pos": "bottom",
+    })
+    add_checklist(completed["id"], "UZAVRETIE OBRAZU", [
+        "Rekvizity spočítané", "Stav nadväzných rekvizít zapísaný", "Kontinuita zdokumentovaná",
+        "Rekvizity vrátené / presunuté k ďalšiemu obrazu",
+    ])
+
+    for source, target, name in (
+        (imported, acquisition, "Zabezpečenie — fotografia"),
+        (acquisition, imported, "Zdrojový obraz 01/06"),
+        (scheduled, acquisition, "Úloha — fotografia"),
+        (completed, scheduled, "Nasledujúci obraz 01/06"),
+    ):
+        trello_post_body(f"/cards/{source['id']}/attachments", {
+            "url": target["shortUrl"], "name": name
+        })
+
+    cards = (imported, acquisition, scheduled, completed)
+    return jsonify({"status": "created", "cards": [
+        {"name": card["name"], "url": card["shortUrl"]} for card in cards
+    ]})
+
+
 @app.route("/trello-webhook", methods=["POST"])
 def trello_webhook():
     data = request.json
