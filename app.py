@@ -1060,6 +1060,136 @@ def create_riverdale_workflow_test_v2():
     ]})
 
 
+@app.route("/api/create-riverdale-simple-workflow-test", methods=["POST"])
+def create_riverdale_simple_workflow_test():
+    if request.headers.get("X-Test-Key") != "riverdale-simple-v1-72d941ac":
+        return jsonify({"error": "forbidden"}), 403
+
+    board_id = trello_get("/boards/CzuD55PR", {"fields": "id"})["id"]
+    board_lists = trello_get(f"/boards/{board_id}/lists", {"fields": "name,closed"})
+    lists_by_name = {item["name"]: item for item in board_lists if not item.get("closed")}
+
+    def ensure_list(name):
+        if name not in lists_by_name:
+            lists_by_name[name] = trello_post_body("/lists", {
+                "idBoard": board_id, "name": name, "pos": "bottom"
+            })
+        return lists_by_name[name]
+
+    scenes_list = ensure_list("TEST 2 — OBRAZY")
+    todo_list = ensure_list("TEST 2 — ToDo REKVIZITY")
+    existing = trello_get(f"/lists/{scenes_list['id']}/cards", {
+        "fields": "name,shortUrl", "limit": 100
+    }) + trello_get(f"/lists/{todo_list['id']}/cards", {
+        "fields": "name,shortUrl", "limit": 100
+    })
+    if existing:
+        return jsonify({"status": "exists", "cards": [
+            {"name": card["name"], "url": card.get("shortUrl")} for card in existing
+        ]})
+
+    labels = {item.get("name", "").casefold(): item for item in trello_get(
+        f"/boards/{board_id}/labels", {"fields": "name,color", "limit": 1000}
+    )}
+
+    def ensure_label(name, color):
+        if name.casefold() not in labels:
+            labels[name.casefold()] = trello_post_body("/labels", {
+                "idBoard": board_id, "name": name, "color": color
+            })
+        return labels[name.casefold()]["id"]
+
+    test_label = ensure_label("TEST 2", "sky")
+    continuity_label = ensure_label("NADVÄZNÁ REKVIZITA", "red")
+    source_label = ensure_label("ZOHNAŤ / VYROBIŤ", "orange")
+    screen_label = ensure_label("SCREEN", "purple")
+
+    def add_checklist(card_id, name, items):
+        checklist = trello_post_body("/checklists", {"idCard": card_id, "name": name})
+        for item in items:
+            trello_post_body(f"/checklists/{checklist['id']}/checkItems", {"name": item})
+
+    scene = trello_post_body("/cards", {
+        "idList": scenes_list["id"],
+        "name": "[TEST 2] 01/28. INT. ŠKOLA — CHLAPČENSKÁ ŠATŇA, DEŇ",
+        "desc": (
+            "**DIEL:** 01  |  **OBRAZ:** 28\n"
+            "**LOKÁCIA:** Škola — chlapčenská šatňa\n"
+            "**ČAS:** DEŇ  |  **INT/EXT:** INT\n"
+            "**POSTAVY:** Bety, Veronika, Kiko, Eva, Sára\n"
+            "**NATÁČANIE:** zatiaľ nenaplánované\n\n"
+            "### DEJ OBRAZU\n"
+            "Dievčatá prehľadávajú skrinky basketbalistov. Podľa tímovej fotografie Bety odhalí "
+            "Sebov PIN 5656, odomkne jeho mobil a nájde tajný kanál Blackstone&sluts.\n\n"
+            "### REKVIZITY V KONTEXTE\n"
+            "Podrobný výpis je v checkliste REKVIZITY. Každá položka obsahuje vlastníka, akciu, "
+            "požadovaný stav a kontinuitu.\n\n"
+            "### KONTINUITA\n"
+            "Sebov mobil musí mať vo všetkých nadväzných obrazoch rovnaký čierny obal. "
+            "Po odomknutí musí byť pripravený rovnaký obsah kanála a PIN 5656."
+        ),
+        "idLabels": f"{test_label},{continuity_label},{screen_label}",
+        "pos": "bottom",
+    })
+    add_checklist(scene["id"], "REKVIZITY", [
+        "Sebov mobil — Bety ho vyberie zo skrinky, zadá PIN 5656 a otvorí kanál Blackstone&sluts; čierny obal, nabitý, obsah dostupný offline",
+        "Tímová fotografia basketbalistov — visí pri skrinkách; Bety podľa čísel hráčov odhalí Sebov PIN; pripraviť tlač a identický náhradný kus",
+        "Školské skrinky — dievčatá ich postupne otvárajú a prehľadávajú; určiť presné skrinky a zachovať rozmiestnenie obsahu",
+    ])
+    add_checklist(scene["id"], "Poznámky z porady", [
+        "Doplniť sem zmeny schválené na porade — synchronizácia následne upraví REKVIZITY a ToDo karty",
+    ])
+    add_checklist(scene["id"], "Info z natáčania", [
+        "Po natočení zapísať použitý mobil, stav obalu, použitú fotografiu a priložiť kontinuitné fotky",
+    ])
+
+    phone = trello_post_body("/cards", {
+        "idList": todo_list["id"],
+        "name": "[TEST 2][ToDo] SEBOV MOBIL — pripraviť screen Blackstone&sluts",
+        "desc": (
+            "**REKVIZITA:** Sebov mobil\n**SPÔSOB:** pripraviť / otestovať\n"
+            "**SÚVISIACI OBRAZ:** 01/28\n**TERMÍN:** vypočíta sa po importe natáčacieho plánu\n\n"
+            "Bety mobil vyberie zo skrinky, odomkne PIN-om 5656 a otvorí tajný kanál. "
+            "Pripraviť čierny obal, konkrétny obsah obrazovky a offline zálohu."
+        ),
+        "idLabels": f"{test_label},{source_label},{screen_label},{continuity_label}",
+        "pos": "bottom",
+    })
+    add_checklist(phone["id"], "ZABEZPEČENIE", [
+        "Vybrať fyzický mobil a čierny obal", "Pripraviť obsah kanála", "Nastaviť PIN 5656",
+        "Otestovať offline režim", "Pripraviť záložný mobil alebo video", "Schváliť po porade",
+    ])
+
+    photo = trello_post_body("/cards", {
+        "idList": todo_list["id"],
+        "name": "[TEST 2][ToDo] TÍMOVÁ FOTOGRAFIA BASKETBALISTOV — vyrobiť 2 kusy",
+        "desc": (
+            "**REKVIZITA:** tímová fotografia\n**SPÔSOB:** grafika + tlač\n"
+            "**SÚVISIACI OBRAZ:** 01/28\n**TERMÍN:** vypočíta sa po importe natáčacieho plánu\n\n"
+            "Fotografia visí pri skrinkách a pomôže Bety odvodiť Sebov PIN. Musia byť čitateľné "
+            "čísla hráčov; pripraviť hero kus a identickú náhradu."
+        ),
+        "idLabels": f"{test_label},{source_label},{continuity_label}",
+        "pos": "bottom",
+    })
+    add_checklist(photo["id"], "ZABEZPEČENIE", [
+        "Vybrať hráčov a čísla dresov", "Schváliť kompozíciu", "Pripraviť grafiku",
+        "Vytlačiť hero kus", "Vytlačiť identickú náhradu", "Zdokumentovať umiestnenie pri skrinkách",
+    ])
+
+    for source, target, name in (
+        (scene, phone, "ToDo — Sebov mobil"), (scene, photo, "ToDo — tímová fotografia"),
+        (phone, scene, "Zdrojový obraz 01/28"), (photo, scene, "Zdrojový obraz 01/28"),
+    ):
+        trello_post_body(f"/cards/{source['id']}/attachments", {
+            "url": target["shortUrl"], "name": name
+        })
+
+    return jsonify({"status": "created", "cards": [
+        {"name": card["name"], "url": card["shortUrl"]} for card in (scene, phone, photo)
+    ]})
+
+
 @app.route("/trello-webhook", methods=["POST"])
 def trello_webhook():
     data = request.json
