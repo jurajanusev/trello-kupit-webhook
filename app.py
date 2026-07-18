@@ -1585,6 +1585,112 @@ def sync_dok4_schedule_metadata():
     })
 
 
+@app.route("/api/sync-dok4-due-dates", methods=["POST"])
+def sync_dok4_due_dates():
+    if request.headers.get("X-Sync-Key") != "dok4-due-20260718-43f98b2e":
+        return jsonify({"error": "forbidden"}), 403
+
+    schedule_path = os.path.join(os.path.dirname(__file__), "dok4_schedule_2026-07-18.json")
+    with open(schedule_path, "r", encoding="utf-8") as handle:
+        schedule_rows = json.load(handle)["rows"]
+    row_by_scene = {row["scene_id"]: row for row in schedule_rows}
+
+    board = trello_get("/boards/lzNy4AtY", {"fields": "id,name"})
+    board_lists = trello_get(f"/boards/{board['id']}/lists", {"fields": "id,name,closed"})
+    open_lists = {item["id"]: item["name"] for item in board_lists if not item.get("closed")}
+    cards = []
+    for list_id in open_lists:
+        cards.extend(trello_get(f"/lists/{list_id}/cards", {
+            "fields": "id,name,idList,shortUrl,due,dueComplete", "filter": "open", "limit": 1000
+        }))
+
+    matched = []
+    for card in cards:
+        match = re.match(r"^\s*([0-9]{1,2})\s*/\s*([0-9]+[A-Z]*)(?:\.|\s|$)", card.get("name", ""), re.I)
+        if not match:
+            continue
+        scene_id = f"{int(match.group(1)):02d}/{match.group(2).upper()}"
+        row = row_by_scene.get(scene_id)
+        if row:
+            matched.append({"scene_id": scene_id, "row": row, "card": card})
+
+    no_due = []
+    same_due = []
+    different_due = []
+    for item in matched:
+        current = item["card"].get("due")
+        expected = item["row"]["shooting_date"]
+        summary = {
+            "scene_id": item["scene_id"], "name": item["card"]["name"],
+            "list": open_lists.get(item["card"]["idList"]),
+            "url": item["card"]["shortUrl"], "current_due": current,
+            "expected_date": expected, "due_complete": item["card"].get("dueComplete"),
+        }
+        if not current:
+            no_due.append(summary)
+        elif current[:10] == expected:
+            same_due.append(summary)
+        else:
+            different_due.append(summary)
+
+    mode = request.args.get("mode", "dry-run")
+    if mode != "apply":
+        return jsonify({
+            "status": "dry-run", "board": board["name"],
+            "matched_cards": len(matched), "without_due": len(no_due),
+            "same_due": len(same_due), "different_due": len(different_due),
+            "different_due_sample": different_due[:30],
+            "without_due_sample": no_due[:20],
+        })
+
+    batch_start = max(0, int(request.args.get("start", "0")))
+    batch_limit = min(75, max(1, int(request.args.get("limit", "40"))))
+    overwrite = request.args.get("overwrite", "0") == "1"
+    batch = matched[batch_start:batch_start + batch_limit]
+    updated = []
+    unchanged = 0
+    conflicts_skipped = []
+    moved = []
+    errors = []
+    for item in batch:
+        card = item["card"]
+        expected_date = item["row"]["shooting_date"]
+        current_due = card.get("due")
+        if current_due and current_due[:10] == expected_date:
+            unchanged += 1
+            continue
+        if current_due and not overwrite:
+            conflicts_skipped.append({
+                "scene_id": item["scene_id"], "url": card["shortUrl"],
+                "current_due": current_due, "expected_date": expected_date,
+            })
+            continue
+        try:
+            result = trello_put_body(f"/cards/{card['id']}", {
+                "due": f"{expected_date}T10:00:00.000Z"
+            })
+            if result.get("idList") != card.get("idList"):
+                moved.append({"scene_id": item["scene_id"], "url": card["shortUrl"]})
+            updated.append({
+                "scene_id": item["scene_id"], "date": expected_date,
+                "url": result["shortUrl"], "list": open_lists.get(result.get("idList")),
+            })
+        except Exception as exc:
+            errors.append({"scene_id": item["scene_id"], "error": str(exc)})
+
+    return jsonify({
+        "status": "applied", "matched_cards": len(matched),
+        "batch_start": batch_start, "batch_size": len(batch),
+        "remaining": max(0, len(matched) - batch_start - len(batch)),
+        "updated": len(updated), "unchanged": unchanged,
+        "conflicts_skipped_count": len(conflicts_skipped),
+        "conflicts_skipped": conflicts_skipped[:20],
+        "errors_count": len(errors), "errors": errors[:20],
+        "moved_count": len(moved), "moved": moved[:20],
+        "updated_sample": updated[:20],
+    })
+
+
 @app.route("/trello-webhook", methods=["POST"])
 def trello_webhook():
     data = request.json
