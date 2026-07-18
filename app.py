@@ -900,59 +900,6 @@ def trello_head():
     return "", 200
 
 
-@app.route("/api/inspect-dok4", methods=["GET"])
-def inspect_dok4():
-    if request.headers.get("X-Inspect-Key") != "dok4-read-8d12f64a3c90":
-        return jsonify({"error": "forbidden"}), 403
-
-    board = trello_get("/boards/lzNy4AtY", {"fields": "name,desc,url"})
-    lists = trello_get(f"/boards/{board['id']}/lists", {"fields": "name,pos,closed"})
-    labels = trello_get(f"/boards/{board['id']}/labels", {"fields": "name,color", "limit": 1000})
-    members = trello_get(f"/boards/{board['id']}/members", {"fields": "fullName,username"})
-    cards = trello_get(f"/boards/{board['id']}/cards", {
-        "filter": "open",
-        "fields": "name,idList,pos,desc,due,idMembers,idLabels",
-        "checklists": "all",
-        "checklist_fields": "name,pos",
-        "checkItem_fields": "name,state,pos",
-        "customFieldItems": "true",
-        "limit": 1000,
-    })
-
-    label_map = {item["id"]: {"name": item.get("name", ""), "color": item.get("color")} for item in labels}
-    member_map = {item["id"]: {"name": item.get("fullName", ""), "username": item.get("username", "")} for item in members}
-    list_data = []
-    for list_item in sorted((item for item in lists if not item.get("closed")), key=lambda item: item.get("pos", 0)):
-        list_cards = []
-        for card in sorted((item for item in cards if item.get("idList") == list_item["id"]), key=lambda item: item.get("pos", 0)):
-            list_cards.append({
-                "name": card.get("name", ""),
-                "description": card.get("desc", ""),
-                "due": card.get("due"),
-                "labels": [label_map[label_id] for label_id in card.get("idLabels", []) if label_id in label_map],
-                "members": [member_map[member_id] for member_id in card.get("idMembers", []) if member_id in member_map],
-                "checklists": [
-                    {
-                        "name": checklist.get("name", ""),
-                        "items": [
-                            {"name": check_item.get("name", ""), "state": check_item.get("state")}
-                            for check_item in checklist.get("checkItems", [])
-                        ],
-                    }
-                    for checklist in card.get("checklists", [])
-                ],
-                "customFieldItems": card.get("customFieldItems", []),
-            })
-        list_data.append({"name": list_item.get("name", ""), "cards": list_cards})
-
-    return jsonify({
-        "board": {"name": board.get("name"), "description": board.get("desc", ""), "url": board.get("url")},
-        "labels": labels,
-        "members": members,
-        "lists": list_data,
-    })
-
-
 @app.route("/trello-webhook", methods=["POST"])
 def trello_webhook():
     data = request.json
