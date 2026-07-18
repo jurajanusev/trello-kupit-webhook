@@ -1472,9 +1472,27 @@ def sync_dok4_schedule_metadata():
     mode = request.args.get("mode", "dry-run")
     if mode != "apply":
         list_counts = {}
+        metadata_present = 0
+        metadata_correct = 0
         for item in matched:
             list_name = open_lists.get(item["card"]["idList"], "UNKNOWN")
             list_counts[list_name] = list_counts.get(list_name, 0) + 1
+            desc = item["card"].get("desc", "")
+            row = item["row"]
+            if "<!-- DOK4-SCHEDULE-METADATA:START -->" in desc and "<!-- DOK4-SCHEDULE-METADATA:END -->" in desc:
+                metadata_present += 1
+                required = (
+                    f"**ČÍSLO OBRAZU:** {row['scene_id']}",
+                    "**ZDROJ:** predbežné dispo DOK 4 z 18. 7. 2026",
+                    f"**NATÁČACÍ DEŇ:** {row['shooting_day']}",
+                    f"**DÁTUM NATÁČANIA:** {row['shooting_date']}",
+                    f"**PORADIE DŇA:** {row['order']}",
+                    f"**UNIT:** {row['unit']}",
+                    f"**LOKÁCIA:** {row['location']}",
+                    f"**POSTAVY:** {row['characters']}",
+                )
+                if all(value in desc for value in required):
+                    metadata_correct += 1
         return jsonify({
             "status": "dry-run",
             "board": board["name"],
@@ -1486,6 +1504,9 @@ def sync_dok4_schedule_metadata():
             "matched_scene_ids": len(schedule_rows) - len(missing),
             "duplicate_scene_ids_count": len(duplicate_scene_ids),
             "duplicate_scene_ids_sample": duplicate_scene_ids[:15],
+            "metadata_present": metadata_present,
+            "metadata_correct": metadata_correct,
+            "metadata_incorrect_or_missing": len(matched) - metadata_correct,
             "matched_by_list": list_counts,
             "sample": [{
                 "scene_id": item["row"]["scene_id"],
