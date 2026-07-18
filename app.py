@@ -130,6 +130,14 @@ def trello_put_body(path, data=None):
     return r.json()
 
 
+def normalize_scene_id(episode, scene):
+    """Normalize 8/05, 08 / 5 and 08/005A to the same stable ID 08/5 or 08/5A."""
+    match = re.fullmatch(r"0*([0-9]+)([A-Z]*)", str(scene).strip(), re.I)
+    if not match:
+        return None
+    return f"{int(episode):02d}/{int(match.group(1))}{match.group(2).upper()}"
+
+
 def microsoft_enabled():
     return all([
         MICROSOFT_CLIENT_ID,
@@ -1832,6 +1840,126 @@ def prepare_dok4_next_7_days():
         "protected_shot_count": len(protected_shot), "missing_cards_count": len(missing_cards),
         "errors_count": len(errors), "errors": errors[:30],
         "moved": moved, "reordered": reordered,
+    })
+
+
+@app.route("/api/repair-dok4-zero-padded-scenes", methods=["POST"])
+def repair_dok4_zero_padded_scenes():
+    if request.headers.get("X-Sync-Key") != "dok4-zero-padding-7d9a4f21":
+        return jsonify({"error": "forbidden"}), 403
+
+    missing_ids = {
+        "08/8", "08/5", "08/3", "08/4", "05/1", "05/4", "08/6",
+        "08/2", "07/39", "04/43B", "05/5", "09/7", "09/3", "09/16A",
+    }
+    schedule_path = os.path.join(os.path.dirname(__file__), "dok4_schedule_2026-07-18.json")
+    with open(schedule_path, "r", encoding="utf-8") as handle:
+        schedule_rows = json.load(handle)["rows"]
+    rows = {row["scene_id"]: row for row in schedule_rows if row["scene_id"] in missing_ids}
+
+    board = trello_get("/boards/lzNy4AtY", {"fields": "id,name"})
+    board_lists = trello_get(f"/boards/{board['id']}/lists", {"fields": "id,name,closed"})
+    open_lists = {item["id"]: item for item in board_lists if not item.get("closed")}
+    lists_by_name = {item["name"]: item for item in open_lists.values()}
+    cards = []
+    for list_id in open_lists:
+        cards.extend(trello_get(f"/lists/{list_id}/cards", {
+            "fields": "id,name,desc,idList,shortUrl,due,dueComplete,pos", "filter": "open", "limit": 1000
+        }))
+
+    found = []
+    for card in cards:
+        match = re.match(r"^\s*([0-9]{1,2})\s*/\s*([0-9]+[A-Z]*)(?:\.|\s|$)", card.get("name", ""), re.I)
+        if not match:
+            continue
+        scene_id = normalize_scene_id(match.group(1), match.group(2))
+        if scene_id in rows:
+            found.append({
+                "scene_id": scene_id, "raw_id": f"{match.group(1)}/{match.group(2)}",
+                "row": rows[scene_id], "card": card,
+                "current_list": open_lists.get(card["idList"], {}).get("name"),
+            })
+
+    found_ids = {item["scene_id"] for item in found}
+    still_missing = sorted(missing_ids - found_ids)
+    duplicates = {}
+    for item in found:
+        duplicates.setdefault(item["scene_id"], []).append(item)
+    duplicates = {key: value for key, value in duplicates.items() if len(value) > 1}
+
+    def target_list_name(date_text):
+        _, month, day = (int(value) for value in date_text.split("-"))
+        return f"{day}.{month}."
+
+    mode = request.args.get("mode", "dry-run")
+    if mode != "apply":
+        return jsonify({
+            "status": "dry-run", "board": board["name"],
+            "requested_ids": len(missing_ids), "found_cards": len(found),
+            "found_scene_ids": len(found_ids), "still_missing": still_missing,
+            "duplicate_scene_ids": sorted(duplicates),
+            "matches": [{
+                "scene_id": item["scene_id"], "raw_id": item["raw_id"],
+                "date": item["row"]["shooting_date"], "order": item["row"]["order"],
+                "from": item["current_list"],
+                "to": target_list_name(item["row"]["shooting_date"]),
+                "current_due": item["card"].get("due"), "url": item["card"]["shortUrl"],
+            } for item in sorted(found, key=lambda value: (value["row"]["shooting_date"], value["row"]["order"]))],
+        })
+
+    start_marker = "<!-- DOK4-SCHEDULE-METADATA:START -->"
+    end_marker = "<!-- DOK4-SCHEDULE-METADATA:END -->"
+    updated = []
+    protected_shot = []
+    errors = []
+    for item in sorted(found, key=lambda value: (value["row"]["shooting_date"], value["row"]["order"])):
+        row = item["row"]
+        card = item["card"]
+        if item["current_list"] == "NATOČENÉ OBRAZY":
+            protected_shot.append({"scene_id": item["scene_id"], "url": card["shortUrl"]})
+            continue
+        target_name = target_list_name(row["shooting_date"])
+        target = lists_by_name.get(target_name)
+        if not target:
+            errors.append({"scene_id": item["scene_id"], "error": f"missing target list {target_name}"})
+            continue
+        metadata = (
+            f"{start_marker}\n"
+            f"**ČÍSLO OBRAZU:** {row['scene_id']}\n"
+            f"**ZDROJ:** predbežné dispo DOK 4 z 18. 7. 2026\n"
+            f"**NATÁČACÍ DEŇ:** {row['shooting_day']}\n"
+            f"**DÁTUM NATÁČANIA:** {row['shooting_date']}\n"
+            f"**PORADIE DŇA:** {row['order']}\n"
+            f"**UNIT:** {row['unit']}\n"
+            f"**LOKÁCIA:** {row['location']}\n"
+            f"**POSTAVY:** {row['characters']}\n"
+            f"{end_marker}"
+        )
+        old_desc = card.get("desc", "")
+        if start_marker in old_desc and end_marker in old_desc:
+            pattern = re.escape(start_marker) + r".*?" + re.escape(end_marker)
+            new_desc = re.sub(pattern, lambda _: metadata, old_desc, count=1, flags=re.S)
+        else:
+            new_desc = metadata + ("\n\n" + old_desc if old_desc else "")
+        update = {
+            "desc": new_desc, "due": f"{row['shooting_date']}T10:00:00.000Z",
+            "idList": target["id"], "pos": row["order"] * 16384,
+        }
+        try:
+            result = trello_put_body(f"/cards/{card['id']}", update)
+            updated.append({
+                "scene_id": item["scene_id"], "raw_id": item["raw_id"],
+                "date": row["shooting_date"], "order": row["order"],
+                "list": target_name, "url": result["shortUrl"],
+            })
+        except Exception as exc:
+            errors.append({"scene_id": item["scene_id"], "error": str(exc)})
+
+    return jsonify({
+        "status": "applied", "found_cards": len(found), "updated_count": len(updated),
+        "protected_shot_count": len(protected_shot), "protected_shot": protected_shot,
+        "still_missing": still_missing, "errors_count": len(errors), "errors": errors,
+        "updated": updated,
     })
 
 
