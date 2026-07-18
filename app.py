@@ -1428,6 +1428,8 @@ def test_dok4_schedule_on_riverdale():
 
 @app.route("/api/sync-dok4-schedule-metadata", methods=["POST"])
 def sync_dok4_schedule_metadata():
+    return jsonify({"error": "schedule metadata endpoint disabled"}), 410
+
     if request.headers.get("X-Sync-Key") != "dok4-metadata-20260718-a7c53e91":
         return jsonify({"error": "forbidden"}), 403
 
