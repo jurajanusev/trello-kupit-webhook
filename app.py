@@ -2072,6 +2072,63 @@ def repair_dok4_retake_base_scenes():
     })
 
 
+@app.route("/api/find-dok4-scene-07-39", methods=["GET"])
+def find_dok4_scene_07_39():
+    if request.headers.get("X-Inspect-Key") != "dok4-find-07-39-31b7e5a4":
+        return jsonify({"error": "forbidden"}), 403
+
+    board = trello_get("/boards/lzNy4AtY", {"fields": "id,name"})
+    lists = trello_get(f"/boards/{board['id']}/lists", {"fields": "id,name,closed", "filter": "all"})
+    list_by_id = {item["id"]: item for item in lists}
+    matches = []
+    total_cards = 0
+    pattern = re.compile(r"(?<![0-9])0?7\s*/\s*0*39(?![A-Z0-9])", re.I)
+    for board_list in lists:
+        cards = trello_get(f"/lists/{board_list['id']}/cards", {
+            "fields": "id,name,desc,idList,closed,shortUrl,dateLastActivity", "filter": "all", "limit": 1000
+        })
+        total_cards += len(cards)
+        for card in cards:
+            if pattern.search(card.get("name", "")) or pattern.search(card.get("desc", "")):
+                matches.append({
+                    "id": card["id"], "name": card["name"], "url": card["shortUrl"],
+                    "card_closed": card.get("closed"), "list": board_list["name"],
+                    "list_closed": board_list.get("closed"),
+                    "date_last_activity": card.get("dateLastActivity"),
+                    "matched_name": bool(pattern.search(card.get("name", ""))),
+                    "matched_desc": bool(pattern.search(card.get("desc", ""))),
+                })
+
+    search_result = trello_get("/search", {
+        "query": "07/39", "idBoards": board["id"], "modelTypes": "cards",
+        "cards_limit": 100, "card_fields": "name,closed,idList,shortUrl,dateLastActivity",
+    })
+    search_cards = []
+    for card in search_result.get("cards", []):
+        list_info = list_by_id.get(card.get("idList"), {})
+        search_cards.append({
+            "name": card.get("name"), "url": card.get("shortUrl"),
+            "card_closed": card.get("closed"), "list": list_info.get("name"),
+            "list_closed": list_info.get("closed"), "date_last_activity": card.get("dateLastActivity"),
+        })
+
+    actions = trello_get(f"/boards/{board['id']}/actions", {
+        "filter": "all", "limit": 1000, "fields": "type,date,data"
+    })
+    matching_actions = []
+    for action in actions:
+        if pattern.search(json.dumps(action.get("data", {}), ensure_ascii=False)):
+            matching_actions.append({
+                "type": action.get("type"), "date": action.get("date"), "data": action.get("data"),
+            })
+
+    return jsonify({
+        "board": board["name"], "lists_checked": len(lists), "cards_checked": total_cards,
+        "matches": matches, "search_cards": search_cards,
+        "matching_recent_actions": matching_actions[:100],
+    })
+
+
 @app.route("/trello-webhook", methods=["POST"])
 def trello_webhook():
     data = request.json
