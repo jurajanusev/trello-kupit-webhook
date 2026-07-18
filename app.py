@@ -31,6 +31,11 @@ DEFAULT_BOARD_CONFIG = {
     # DOK4: VSETKY EPIZODY -> ToDo
     "6a3d776cbd0488b47076d8e6": {
         "target_list_id": "6a4776f530468dee7ea5fbfc"
+    },
+
+    # DOK4: SCENARE -> ToDo
+    "6a4524898cb771a99433699b": {
+        "target_list_id": "6a4776f530468dee7ea5fbfc"
     }
 }
 
