@@ -2074,6 +2074,8 @@ def repair_dok4_retake_base_scenes():
 
 @app.route("/api/find-dok4-scene-07-39", methods=["GET"])
 def find_dok4_scene_07_39():
+    return jsonify({"error": "scene locator endpoint disabled"}), 410
+
     if request.headers.get("X-Inspect-Key") != "dok4-find-07-39-31b7e5a4":
         return jsonify({"error": "forbidden"}), 403
 
