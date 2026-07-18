@@ -1302,6 +1302,8 @@ Veronika okamžite vyberie svoj telefón a robí si fotky celého kanálu, aby m
 
 @app.route("/api/test-dok4-schedule-on-riverdale", methods=["POST"])
 def test_dok4_schedule_on_riverdale():
+    return jsonify({"error": "schedule test endpoint disabled"}), 410
+
     if request.headers.get("X-Test-Key") != "dok4-schedule-riverdale-93b6d120":
         return jsonify({"error": "forbidden"}), 403
 
