@@ -1967,6 +1967,8 @@ def repair_dok4_zero_padded_scenes():
 
 @app.route("/api/repair-dok4-retake-base-scenes", methods=["POST"])
 def repair_dok4_retake_base_scenes():
+    return jsonify({"error": "retake fallback endpoint disabled"}), 410
+
     if request.headers.get("X-Sync-Key") != "dok4-retakes-43b-16a-61e8c20f":
         return jsonify({"error": "forbidden"}), 403
 

@@ -15,6 +15,8 @@ Schvalene nastavenie pre dalsi vyvoj:
 - Zoznamy jednotlivych natacacich dni a presuny kariet sa vytvaraju najviac 7 kalendarnych dni dopredu, aby na nastenke nevznikalo prilis vela buducich zoznamov.
 - Obrazy naplanovane dalej ako 7 dni maju datum a metadata v popise, ale zostavaju vo svojom aktualnom zozname.
 - Po potvrdeni natocenia sa tato ista karta presunie do `NATOCENE OBRAZY`; nevytvara sa kopia.
+- Ak novy plan obsahuje variant obrazu s pismenom, ale existuje iba zakladna karta bez pismena, system moze pouzit fallback, napriklad `04/43B -> 04/43` alebo `09/16A -> 09/16`; taketo parovanie musi byt viditelne v dry-rune.
+- Obraz v `NATOCENE OBRAZY` nie je definitivne zamknuty. Ak sa v novom plane objavi na prekrucanie, povodna karta sa presunie spat do prislusneho natacacieho dna, dostane novy due date a `dueComplete` sa nastavi na `false`.
 
 ## Labely a kategoricke zoznamy podla DOK 4
 
