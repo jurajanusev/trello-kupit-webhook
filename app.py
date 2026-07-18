@@ -26,6 +26,11 @@ DEFAULT_BOARD_CONFIG = {
 
     "69f74077554ff079f9472308": {
         "target_list_id": "6a057f30a60d4ab5aee502b6"
+    },
+
+    # DOK4: VSETKY EPIZODY -> ToDo
+    "6a3d776cbd0488b47076d8e6": {
+        "target_list_id": "6a4776f530468dee7ea5fbfc"
     }
 }
 
@@ -39,7 +44,12 @@ def load_board_config():
     if not raw:
         return DEFAULT_BOARD_CONFIG
 
-    config = {}
+    # Environment mappings override defaults, but do not accidentally remove
+    # another board that was added to the built-in configuration later.
+    config = {
+        source_list_id: values.copy()
+        for source_list_id, values in DEFAULT_BOARD_CONFIG.items()
+    }
     for pair in raw.split(","):
         pair = pair.strip()
         if not pair:
