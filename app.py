@@ -1206,6 +1206,8 @@ def create_riverdale_simple_workflow_test():
 
 @app.route("/api/update-riverdale-test-with-original-script", methods=["POST"])
 def update_riverdale_test_with_original_script():
+    return jsonify({"error": "update endpoint disabled"}), 410
+
     if request.headers.get("X-Test-Key") != "riverdale-original-03-28-5c8a41d2":
         return jsonify({"error": "forbidden"}), 403
 
