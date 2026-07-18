@@ -1499,11 +1499,14 @@ def sync_dok4_schedule_metadata():
 
     start_marker = "<!-- DOK4-SCHEDULE-METADATA:START -->"
     end_marker = "<!-- DOK4-SCHEDULE-METADATA:END -->"
+    batch_start = max(0, int(request.args.get("start", "0")))
+    batch_limit = min(75, max(1, int(request.args.get("limit", "40"))))
+    batch = matched[batch_start:batch_start + batch_limit]
     updated = []
     unchanged = 0
     moved = []
     errors = []
-    for item in matched:
+    for item in batch:
         row = item["row"]
         card = item["card"]
         metadata = (
@@ -1542,6 +1545,10 @@ def sync_dok4_schedule_metadata():
         "status": "applied",
         "board": board["name"],
         "matched_unique": len(matched),
+        "batch_start": batch_start,
+        "batch_size": len(batch),
+        "batch_limit": batch_limit,
+        "remaining": max(0, len(matched) - batch_start - len(batch)),
         "updated": len(updated),
         "unchanged": unchanged,
         "missing_count": len(missing),
