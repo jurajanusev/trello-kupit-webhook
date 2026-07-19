@@ -260,7 +260,7 @@ def create_todo_task(item_name, original_item_name, card_info, matching_cards):
 
 def get_card(card_id):
     return trello_get(f"/cards/{card_id}", {
-        "fields": "name,idList,shortUrl,desc"
+        "fields": "name,idList,idBoard,shortUrl,desc,due"
     })
 
 
@@ -284,6 +284,26 @@ def card_exists_in_list(list_id, card_name):
             return True
 
     return False
+
+
+def find_todo_cards_by_prop(list_id, prop_key):
+    cards = trello_get(f"/lists/{list_id}/cards", {
+        "fields": "id,name,desc,due,shortUrl,pos", "filter": "open", "limit": 1000
+    })
+    matches = []
+    for card in cards:
+        desc = card.get("desc", "")
+        source = None
+        marker_match = re.search(r"\*\*REKVIZITA:\*\*\s*(.+)", desc, flags=re.I)
+        if marker_match:
+            source = marker_match.group(1).strip()
+        if not source:
+            old_match = re.search(r"Pôvodná checklist položka:\s*(.*?)(?:\n\n|$)", desc, flags=re.S | re.I)
+            source = old_match.group(1).strip() if old_match else re.split(r"\s+-\s+(?=\d{1,2}/)", card["name"], maxsplit=1)[0]
+        key, _ = canonical_prop(source)
+        if key == prop_key:
+            matches.append(card)
+    return sorted(matches, key=lambda card: card.get("pos", 0))
 
 
 def normalize_item_name(text):
@@ -2596,6 +2616,7 @@ def reorder_dunaj_date_lists():
 
 @app.route("/api/dunaj-props-inventory", methods=["GET"])
 def dunaj_props_inventory():
+    return jsonify({"error": "endpoint disabled"}), 410
     if request.headers.get("X-Inventory-Key") != "dunaj-props-inventory-2bc741e9":
         return jsonify({"error": "forbidden"}), 403
     board = trello_get("/boards/qCPeWA3e", {"fields": "id,name,url"})
@@ -2635,6 +2656,7 @@ def dunaj_props_inventory():
 
 @app.route("/api/dunaj-z-items", methods=["GET"])
 def dunaj_z_items():
+    return jsonify({"error": "endpoint disabled"}), 410
     if request.headers.get("X-Inventory-Key") != "dunaj-props-inventory-2bc741e9":
         return jsonify({"error": "forbidden"}), 403
     list_id = request.args.get("idList", "").strip()
@@ -2674,6 +2696,7 @@ def dunaj_z_items():
 
 @app.route("/api/sync-dunaj-prop-cards", methods=["POST"])
 def sync_dunaj_prop_cards():
+    return jsonify({"error": "endpoint disabled"}), 410
     if request.headers.get("X-Prop-Sync-Key") != "dunaj-props-sync-7f32b861":
         return jsonify({"error": "forbidden"}), 403
 
@@ -2919,12 +2942,18 @@ def trello_webhook():
 
     allowed_list_id = card_info["idList"]
 
-    if allowed_list_id not in BOARD_CONFIG:
-        print("IGNORED: wrong list", allowed_list_id, "configured:", list(BOARD_CONFIG.keys()))
-        return jsonify({"status": "ignored", "reason": "card not in configured list"}), 200
-
-    config = BOARD_CONFIG[allowed_list_id]
-    target_list_id = config["target_list_id"]
+    if allowed_list_id in BOARD_CONFIG:
+        target_list_id = BOARD_CONFIG[allowed_list_id]["target_list_id"]
+    else:
+        board_info = trello_get(f"/boards/{card_info['idBoard']}", {"fields": "shortLink"})
+        is_dunaj_scene = (
+            board_info.get("shortLink") == "qCPeWA3e" and
+            re.match(r"^\s*[0-9]{1,2}\s*/\s*[0-9]+[A-Z]*(?:\.|\s|$)", card_info.get("name", ""), re.I)
+        )
+        if not is_dunaj_scene:
+            print("IGNORED: wrong list", allowed_list_id, "configured:", list(BOARD_CONFIG.keys()))
+            return jsonify({"status": "ignored", "reason": "card not in configured list"}), 200
+        target_list_id = "69e53446a823be00f2e5e837"
 
     item_lower = checkitem_name.lower()
     tag_lower = CHECKLIST_TAG.lower()
@@ -2942,7 +2971,8 @@ def trello_webhook():
         return jsonify({"status": "ignored", "reason": "empty clean name"}), 200
 
     try:
-        new_card_name = f"{clean_name} - {card_info['name']}"
+        prop_key, prop_display = canonical_prop(checkitem_name)
+        new_card_name = f"{prop_display} - {card_info['name']}"
 
         matching_cards = find_cards_with_exact_item(
             clean_name,
@@ -2957,18 +2987,38 @@ def trello_webhook():
 
         new_card_desc = (
             f"Vytvorené automaticky z checklist položky.\n\n"
+            f"**REKVIZITA:** {prop_display}\n\n"
             f"Pôvodná karta: {card_info['name']}\n"
             f"Odkaz na pôvodnú kartu: {card_info['shortUrl']}\n\n"
             f"Pôvodná checklist položka: {checkitem_name}\n\n"
             f"Nájdené v kartách:\n{found_text}"
         )
 
-        exists = card_exists_in_list(target_list_id, new_card_name)
-
-        if exists:
-            print("SKIP existing card:", new_card_name)
+        existing_props = find_todo_cards_by_prop(target_list_id, prop_key)
+        if existing_props:
+            primary = existing_props[0]
+            old_desc = primary.get("desc", "")
+            payload = {}
+            if card_info["shortUrl"] not in old_desc:
+                payload["desc"] = (
+                    old_desc + "\n\n---\n\n"
+                    f"**ĎALŠÍ OBRAZ Z WEBHOOKU:** [{card_info['name']}]({card_info['shortUrl']})\n"
+                    f"**AKCIA/KONTEXT:** {tagged_prop_text(checkitem_name)}"
+                )
+            current_due = card_info.get("due")
+            if current_due and (not primary.get("due") or current_due < primary["due"]):
+                payload["due"] = current_due
+            if payload:
+                trello_put_body(f"/cards/{primary['id']}", payload)
+            for duplicate in existing_props[1:]:
+                trello_put_body(f"/cards/{duplicate['id']}", {"closed": "true"})
+            print("UPDATED existing prop card:", primary["name"])
         else:
-            created_card = create_card(target_list_id, new_card_name, new_card_desc)
+            create_payload = {"idList": target_list_id, "name": new_card_name,
+                              "desc": new_card_desc, "pos": "bottom"}
+            if card_info.get("due"):
+                create_payload["due"] = card_info["due"]
+            created_card = trello_post_body("/cards", create_payload)
             print("CARD CREATED:", created_card)
 
     except Exception as e:
