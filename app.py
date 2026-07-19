@@ -944,6 +944,8 @@ def remove_dok4_meeting_placeholders():
     })
     matches = []
     for board_list in lists:
+        if "NATOC" in folded(board_list["name"]):
+            continue
         cards = trello_get(f"/lists/{board_list['id']}/cards", {
             "fields": "id,name,shortUrl,closed", "filter": "open", "limit": 1000,
             "checklists": "all", "checklist_fields": "name",
