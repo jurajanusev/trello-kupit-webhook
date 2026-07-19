@@ -764,6 +764,50 @@ def add_dok4_set_checklists():
                     "errors": errors, "remaining": max(0, len(missing) - len(batch))})
 
 
+@app.route("/api/inspect-dok4-checklist-text", methods=["GET"])
+def inspect_dok4_checklist_text():
+    if request.headers.get("X-Inspect-Key") != "dok4-checklist-inspect-19jul-2fa9c431":
+        return jsonify({"error": "forbidden"}), 403
+
+    def folded(text):
+        value = unicodedata.normalize("NFKD", text or "")
+        return "".join(ch for ch in value if not unicodedata.combining(ch)).casefold()
+
+    terms = [folded(term) for term in request.args.get("terms", "straznik,vysacka,visacka").split(",")
+             if term.strip()]
+    board = trello_get("/boards/lzNy4AtY", {"fields": "id,name,url"})
+    lists = trello_get(f"/boards/{board['id']}/lists", {
+        "fields": "id,name,closed", "filter": "open"
+    })
+    matches = []
+    for board_list in lists:
+        if folded(board_list["name"]).strip() != folded("VŠETKY EPIZÓDY").strip():
+            continue
+        cards = trello_get(f"/lists/{board_list['id']}/cards", {
+            "fields": "id,name,shortUrl,closed", "filter": "open", "limit": 1000,
+            "checklists": "all", "checklist_fields": "name",
+        })
+        for card in cards:
+            for checklist in card.get("checklists", []):
+                for item in checklist.get("checkItems", []):
+                    text = item.get("name", "").strip()
+                    normalized = folded(text)
+                    if all(term in normalized for term in terms):
+                        matches.append({"card": card["name"], "url": card["shortUrl"],
+                                        "list": board_list["name"],
+                                        "checklist": checklist.get("name"), "item": text,
+                                        "state": item.get("state")})
+    counts = {}
+    for match in matches:
+        counts[match["item"]] = counts.get(match["item"], 0) + 1
+    return jsonify({"board": board["name"], "matches": len(matches),
+                    "cards": len({match['url'] for match in matches}),
+                    "exact_text_counts": sorted(
+                        [{"text": text, "count": count} for text, count in counts.items()],
+                        key=lambda item: (-item["count"], item["text"]))[:100],
+                    "items": matches[:500]})
+
+
 def get_card(card_id):
     return trello_get(f"/cards/{card_id}", {
         "fields": "name,idList,idBoard,shortUrl,desc,due"
