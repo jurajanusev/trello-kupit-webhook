@@ -444,6 +444,196 @@ def sync_project_microsoft_todo(project):
                     "errors": errors, "remaining": max(0, len(actionable) - start - len(batch))})
 
 
+@app.route("/api/sync-<project>-continuity-registry", methods=["POST"])
+def sync_project_continuity_registry(project):
+    if request.headers.get("X-Continuity-Sync-Key") != "continuity-registry-19jul-51ea730c":
+        return jsonify({"error": "forbidden"}), 403
+    projects = {
+        "dunaj": {"board": "qCPeWA3e", "name": "Dunaj"},
+        "riverdale": {"board": "CzuD55PR", "name": "Riverdale"},
+        "dok4": {"board": "lzNy4AtY", "name": "DOK4"},
+    }
+    config = projects.get(project.casefold())
+    if not config:
+        return jsonify({"error": "unknown project"}), 404
+
+    board = trello_get(f"/boards/{config['board']}", {"fields": "id,name,url"})
+    lists = trello_get(f"/boards/{board['id']}/lists", {
+        "fields": "id,name,pos,closed", "filter": "open"
+    })
+    registry_list = next((item for item in lists
+                          if item["name"].strip().casefold() == "register rekvizít".casefold()), None)
+    ignored_list_ids = {item["id"] for item in lists
+                        if item["name"].strip().casefold() in {"todo", "register rekvizít".casefold()}}
+
+    scene_cards = []
+    prop_groups = {}
+    for board_list in lists:
+        if board_list["id"] in ignored_list_ids:
+            continue
+        cards = trello_get(f"/lists/{board_list['id']}/cards", {
+            "fields": "id,name,desc,due,shortUrl,closed,idList", "filter": "open", "limit": 1000,
+            "checklists": "all", "checklist_fields": "name",
+        })
+        for card in cards:
+            scene_id = scene_id_from_card_name(card.get("name"))
+            if not scene_id:
+                continue
+            props = []
+            for checklist in card.get("checklists", []):
+                folded = unicodedata.normalize("NFKD", checklist.get("name", ""))
+                folded = "".join(ch for ch in folded if not unicodedata.combining(ch)).upper()
+                if folded != "REKVIZITY":
+                    continue
+                for item in checklist.get("checkItems", []):
+                    raw = item.get("name", "").strip()
+                    key, display = canonical_prop(raw)
+                    if not key or key in {"test", "x"}:
+                        continue
+                    occurrence = {"scene_id": scene_id, "card": card, "context": tagged_prop_text(raw)}
+                    group = prop_groups.setdefault(key, {"display": display, "occurrences": []})
+                    group["occurrences"].append(occurrence)
+                    props.append({"key": key, "context": tagged_prop_text(raw)})
+            if props:
+                scene_cards.append({"card": card, "scene_id": scene_id, "props": props})
+
+    registry_cards = trello_get(f"/lists/{registry_list['id']}/cards", {
+        "fields": "id,name,desc,due,shortUrl,closed,pos", "filter": "open", "limit": 1000
+    }) if registry_list else []
+    registry_by_key = {}
+    for card in registry_cards:
+        match = re.search(r"\*\*IDENTITA:\*\*\s*`([^`]+)`", card.get("desc", ""), flags=re.I)
+        key = match.group(1).strip() if match else canonical_prop(card.get("name", ""))[0]
+        if key:
+            registry_by_key.setdefault(key, []).append(card)
+
+    plans = []
+    for key, group in prop_groups.items():
+        unique = {}
+        for occurrence in group["occurrences"]:
+            unique.setdefault(occurrence["card"]["id"], occurrence)
+        occurrences = sorted(unique.values(), key=lambda item: (
+            item["card"].get("due") or "9999-12-31", item["scene_id"]
+        ))
+        plans.append({"key": key, "display": group["display"], "occurrences": occurrences,
+                      "existing": registry_by_key.get(key, [])})
+    plans.sort(key=lambda item: item["display"].casefold())
+
+    mode = request.args.get("mode", "dry-run")
+    summary = {
+        "project": config["name"], "board": board["name"],
+        "registry_list_exists": bool(registry_list), "scene_cards": len(scene_cards),
+        "unique_props": len(plans), "registry_cards": len(registry_cards),
+        "repeated_props": sum(1 for plan in plans if len(plan["occurrences"]) > 1),
+        "registry_to_create": sum(1 for plan in plans if not plan["existing"]),
+        "registry_to_update": sum(1 for plan in plans if plan["existing"]),
+        "registry_duplicates": sum(max(0, len(plan["existing"]) - 1) for plan in plans),
+        "scene_cards_to_update": len(scene_cards),
+    }
+    if mode == "dry-run":
+        return jsonify({"status": "dry-run", **summary, "repeated_sample": [{
+            "prop": plan["display"],
+            "scenes": [occ["scene_id"] for occ in plan["occurrences"]],
+        } for plan in plans if len(plan["occurrences"]) > 1][:40]})
+
+    if not registry_list:
+        registry_list = trello_post_body("/lists", {
+            "name": "REGISTER REKVIZÍT", "idBoard": board["id"], "pos": "bottom"
+        })
+    start = max(0, int(request.args.get("start", "0")))
+    limit = min(30, max(1, int(request.args.get("limit", "20"))))
+    registry_marker_start = "<!-- PROP-REGISTRY:START -->"
+    registry_marker_end = "<!-- PROP-REGISTRY:END -->"
+    scene_marker_start = "<!-- PROP-CONTINUITY:START -->"
+    scene_marker_end = "<!-- PROP-CONTINUITY:END -->"
+
+    if mode == "apply-registry":
+        batch = plans[start:start + limit]
+        created = []; updated = []; archived = []; errors = []
+        for plan in batch:
+            lines = [registry_marker_start,
+                     "Automatický register všetkých výskytov rekvizity.", "",
+                     f"**REKVIZITA:** {plan['display']}", f"**IDENTITA:** `{plan['key']}`", "",
+                     "**VÝSKYTY, ODKAZY A KONTEXT:**"]
+            for occ in plan["occurrences"]:
+                date = (occ["card"].get("due") or "")[:10] or "bez dátumu"
+                lines.extend([f"- [{occ['scene_id']} — {occ['card']['name']}]({occ['card']['shortUrl']}) — {date}",
+                              f"  - Akcia/kontext: {occ['context']}"])
+            lines.extend(["", "**REŤAZ KONTINUITY:**",
+                          " → ".join(occ["scene_id"] for occ in plan["occurrences"]), registry_marker_end])
+            synced = "\n".join(lines)
+            primary = plan["existing"][0] if plan["existing"] else None
+            try:
+                if primary:
+                    old = primary.get("desc", "")
+                    if registry_marker_start in old and registry_marker_end in old:
+                        new = re.sub(re.escape(registry_marker_start) + r".*?" + re.escape(registry_marker_end),
+                                     lambda _: synced, old, count=1, flags=re.S)
+                    else:
+                        new = synced + ("\n\n---\n\n**RUČNÉ POZNÁMKY:**\n\n" + old if old else "")
+                    trello_put_body(f"/cards/{primary['id']}", {"desc": new})
+                    updated.append(primary["id"])
+                    for duplicate in plan["existing"][1:]:
+                        trello_put_body(f"/cards/{duplicate['id']}", {"closed": "true"})
+                        archived.append(duplicate["id"])
+                else:
+                    card = trello_post_body("/cards", {"idList": registry_list["id"],
+                                            "name": plan["display"], "desc": synced, "pos": "bottom"})
+                    created.append(card["id"])
+            except Exception as exc:
+                errors.append({"prop": plan["display"], "error": str(exc)})
+        return jsonify({"status": "registry-applied", **summary, "processed": len(batch),
+                        "created": created, "updated": updated, "archived": archived,
+                        "errors": errors, "remaining": max(0, len(plans) - start - len(batch))})
+
+    if mode == "apply-scenes":
+        refreshed = trello_get(f"/lists/{registry_list['id']}/cards", {
+            "fields": "id,name,desc,shortUrl", "filter": "open", "limit": 1000
+        })
+        registry_lookup = {}
+        for reg in refreshed:
+            match = re.search(r"\*\*IDENTITA:\*\*\s*`([^`]+)`", reg.get("desc", ""), flags=re.I)
+            if match:
+                registry_lookup[match.group(1).strip()] = reg
+        plan_lookup = {plan["key"]: plan for plan in plans}
+        batch = scene_cards[start:start + limit]
+        updated = []; errors = []
+        for scene in batch:
+            lines = [scene_marker_start, "### KONTINUITA REKVIZÍT — AUTOMATICKY", ""]
+            seen = set()
+            for prop in scene["props"]:
+                if prop["key"] in seen:
+                    continue
+                seen.add(prop["key"])
+                plan = plan_lookup[prop["key"]]
+                reg = registry_lookup.get(prop["key"])
+                others = [occ for occ in plan["occurrences"] if occ["card"]["id"] != scene["card"]["id"]]
+                lines.append(f"**{plan['display']}**")
+                lines.append(f"Akcia v tomto obraze: {prop['context']}")
+                lines.append("Ďalšie výskyty: " + (", ".join(
+                    f"[{occ['scene_id']}]({occ['card']['shortUrl']})" for occ in others) or "žiadne nájdené"))
+                if reg:
+                    lines.append(f"Register: [{reg['name']}]({reg['shortUrl']})")
+                lines.append("")
+            lines.append(scene_marker_end)
+            synced = "\n".join(lines)
+            old = scene["card"].get("desc", "")
+            if scene_marker_start in old and scene_marker_end in old:
+                new = re.sub(re.escape(scene_marker_start) + r".*?" + re.escape(scene_marker_end),
+                             lambda _: synced, old, count=1, flags=re.S)
+            else:
+                new = old.rstrip() + ("\n\n" if old.strip() else "") + synced
+            try:
+                trello_put_body(f"/cards/{scene['card']['id']}", {"desc": new})
+                updated.append(scene["card"]["id"])
+            except Exception as exc:
+                errors.append({"scene": scene["scene_id"], "error": str(exc)})
+        return jsonify({"status": "scenes-applied", **summary, "processed": len(batch),
+                        "updated": updated, "errors": errors,
+                        "remaining": max(0, len(scene_cards) - start - len(batch))})
+    return jsonify({"error": "invalid mode"}), 400
+
+
 def get_card(card_id):
     return trello_get(f"/cards/{card_id}", {
         "fields": "name,idList,idBoard,shortUrl,desc,due"
