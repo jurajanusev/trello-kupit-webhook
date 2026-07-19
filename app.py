@@ -314,19 +314,28 @@ def create_todo_task(item_name, original_item_name, card_info, matching_cards):
     return task
 
 
-@app.route("/api/sync-dunaj-microsoft-todo", methods=["POST"])
-def sync_dunaj_microsoft_todo():
+@app.route("/api/sync-<project>-microsoft-todo", methods=["POST"])
+def sync_project_microsoft_todo(project):
     if request.headers.get("X-Microsoft-Sync-Key") != "dunaj-ms-todo-sync-19jul-84c2f1a7":
         return jsonify({"error": "forbidden"}), 403
     if not microsoft_enabled():
         return jsonify({"error": "Microsoft To Do is not configured"}), 503
 
-    lists = trello_get("/boards/qCPeWA3e/lists", {
+    projects = {
+        "dunaj": {"board": "qCPeWA3e", "name": "Dunaj"},
+        "riverdale": {"board": "CzuD55PR", "name": "Riverdale"},
+        "dok4": {"board": "lzNy4AtY", "name": "DOK4"},
+    }
+    config = projects.get(project.casefold())
+    if not config:
+        return jsonify({"error": "unknown project"}), 404
+
+    lists = trello_get(f"/boards/{config['board']}/lists", {
         "fields": "id,name,closed", "filter": "open"
     })
     todo_list = next((item for item in lists if item.get("name", "").strip().casefold() == "todo"), None)
     if not todo_list:
-        return jsonify({"error": "Dunaj ToDo list not found"}), 404
+        return jsonify({"error": f"{config['name']} ToDo list not found"}), 404
     cards = trello_get(f"/lists/{todo_list['id']}/cards", {
         "fields": "id,name,desc,due,shortUrl,closed,pos", "filter": "open", "limit": 1000
     })
@@ -348,7 +357,10 @@ def sync_dunaj_microsoft_todo():
 
     plans = []
     for card in cards:
-        matches = tasks_by_title.get(card["name"].strip().casefold(), [])
+        title_matches = tasks_by_title.get(card["name"].strip().casefold(), [])
+        url_matches = [task for task in tasks
+                       if card["shortUrl"] in (task.get("body") or {}).get("content", "")]
+        matches = url_matches or title_matches
         desired_due = todo_due_payload(card.get("due"))
         desired_body = (
             "Synchronizované automaticky z Trello karty rekvizity.\n\n"
@@ -374,6 +386,7 @@ def sync_dunaj_microsoft_todo():
         })
 
     summary = {
+        "project": config["name"],
         "trello_cards": len(cards), "microsoft_tasks": len(tasks),
         "matched": sum(1 for plan in plans if plan["task"]),
         "to_create": sum(1 for plan in plans if not plan["task"]),
