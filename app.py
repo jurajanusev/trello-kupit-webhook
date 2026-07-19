@@ -715,6 +715,55 @@ def move_dok4_medical_prep():
                     "errors": errors, "remaining": max(0, len(moves) - len(batch))})
 
 
+@app.route("/api/add-dok4-set-checklists", methods=["POST"])
+def add_dok4_set_checklists():
+    if request.headers.get("X-Set-Checklist-Key") != "dok4-set-checklist-19jul-3c82b75e":
+        return jsonify({"error": "forbidden"}), 403
+    board = trello_get("/boards/lzNy4AtY", {"fields": "id,name,url"})
+    lists = trello_get(f"/boards/{board['id']}/lists", {
+        "fields": "id,name,closed", "filter": "open"
+    })
+    missing = []; present = 0; scene_count = 0
+    for board_list in lists:
+        cards = trello_get(f"/lists/{board_list['id']}/cards", {
+            "fields": "id,name,shortUrl,closed", "filter": "open", "limit": 1000,
+            "checklists": "all", "checklist_fields": "name",
+        })
+        for card in cards:
+            if not scene_id_from_card_name(card.get("name")):
+                continue
+            scene_count += 1
+            has_set = any(checklist.get("name", "").strip().casefold() == "set"
+                          for checklist in card.get("checklists", []))
+            if has_set:
+                present += 1
+            else:
+                missing.append({"card": card, "list": board_list["name"]})
+    mode = request.args.get("mode", "dry-run")
+    if mode == "dry-run":
+        return jsonify({"status": "dry-run", "board": board["name"],
+                        "scene_cards": scene_count, "set_present": present,
+                        "set_missing": len(missing), "sample": [{
+                            "card": item["card"]["name"], "list": item["list"],
+                            "url": item["card"]["shortUrl"]
+                        } for item in missing[:40]]})
+    if mode != "apply":
+        return jsonify({"error": "invalid mode"}), 400
+    limit = min(40, max(1, int(request.args.get("limit", "20"))))
+    batch = missing[:limit]
+    created = []; errors = []
+    for item in batch:
+        try:
+            checklist = trello_post_body("/checklists", {
+                "idCard": item["card"]["id"], "name": "SET", "pos": "bottom"
+            })
+            created.append({"card": item["card"]["name"], "checklist": checklist.get("id")})
+        except Exception as exc:
+            errors.append({"card": item["card"]["name"], "error": str(exc)})
+    return jsonify({"status": "applied", "processed": len(batch), "created": created,
+                    "errors": errors, "remaining": max(0, len(missing) - len(batch))})
+
+
 def get_card(card_id):
     return trello_get(f"/cards/{card_id}", {
         "fields": "name,idList,idBoard,shortUrl,desc,due"
