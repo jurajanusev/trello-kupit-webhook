@@ -357,13 +357,16 @@ def sync_dunaj_microsoft_todo():
         primary = matches[0] if matches else None
         changes = {}
         if primary:
+            current_body = (primary.get("body") or {}).get("content", "")
+            desired_date = card.get("due", "")[:10] if card.get("due") else ""
+            due_marker_present = bool(desired_date and re.search(
+                r"\*\*DUE DATE:\*\*\s*" + re.escape(desired_date), current_body, flags=re.I
+            ))
             # Graph may normalize text bodies on write. The Trello URL is the
             # stable sync identity, so do not rewrite an already linked body.
-            if card["shortUrl"] not in (primary.get("body") or {}).get("content", ""):
+            if card["shortUrl"] not in current_body or (desired_date and not due_marker_present):
                 changes["body"] = {"content": desired_body, "contentType": "text"}
-            current_due = (primary.get("dueDateTime") or {}).get("dateTime", "")[:10]
-            desired_date = card.get("due", "")[:10] if card.get("due") else ""
-            if desired_date and current_due != desired_date:
+            if desired_date and not due_marker_present:
                 changes["dueDateTime"] = desired_due
         plans.append({
             "card": card, "task": primary, "changes": changes,
