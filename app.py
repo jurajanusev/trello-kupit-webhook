@@ -550,7 +550,9 @@ def sync_project_continuity_registry(project):
     scene_marker_end = "<!-- PROP-CONTINUITY:END -->"
 
     if mode == "apply-registry":
-        batch = plans[start:start + limit]
+        apply_plans = ([plan for plan in plans if not plan["existing"]]
+                       if request.args.get("only_missing") == "1" else plans)
+        batch = apply_plans[start:start + limit]
         created = []; updated = []; archived = []; errors = []
         for plan in batch:
             lines = [registry_marker_start,
@@ -586,7 +588,7 @@ def sync_project_continuity_registry(project):
                 errors.append({"prop": plan["display"], "error": str(exc)})
         return jsonify({"status": "registry-applied", **summary, "processed": len(batch),
                         "created": created, "updated": updated, "archived": archived,
-                        "errors": errors, "remaining": max(0, len(plans) - start - len(batch))})
+                        "errors": errors, "remaining": max(0, len(apply_plans) - start - len(batch))})
 
     if mode == "apply-scenes":
         refreshed = trello_get(f"/lists/{registry_list['id']}/cards", {
