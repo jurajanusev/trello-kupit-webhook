@@ -2959,12 +2959,18 @@ def setup_dunaj_meeting_workflow():
         return jsonify({"error": "forbidden"}), 403
     board = trello_get("/boards/qCPeWA3e", {"fields": "id,name,url"})
     lists = trello_get(f"/boards/{board['id']}/lists", {"fields": "id,name,closed", "filter": "open"})
+    requested_list_id = request.args.get("idList", "").strip()
+    scan_lists = lists
+    if requested_list_id:
+        scan_lists = [item for item in lists if item["id"] == requested_list_id]
+        if not scan_lists:
+            return jsonify({"error": "idList not found on board"}), 404
     checklist_items = ["PRIDAŤ", "UPRAVIŤ", "ZRUŠIŤ", "KONTINUITA", "ZABEZPEČIŤ",
                        "NETREBA ZABEZPEČIŤ", "SCHVÁLENÉ", "OTÁZKA"]
     expected_names = {name.upper() for name in checklist_items}
     scene_cards = []
     meeting_checklist = None
-    for board_list in lists:
+    for board_list in scan_lists:
         cards = trello_get(f"/lists/{board_list['id']}/cards", {
             "fields": "id,name,shortUrl", "filter": "open", "limit": 1000,
             "checklists": "all", "checklist_fields": "name",
