@@ -2475,6 +2475,40 @@ def sync_dunaj_schedule():
             "errors_count": len(errors), "errors": errors[:30], "moved": moved,
         })
 
+    if mode == "create-missing-base":
+        created = []
+        for scene_id in window_missing:
+            row = row_by_scene[scene_id]
+            base_scene_id = re.sub(r"[A-Z]+$", "", scene_id, flags=re.I)
+            if base_scene_id == scene_id or cards_by_scene.get(base_scene_id):
+                continue
+            target_name = target_names[row["shooting_date"]]
+            target = lists_by_name.get(target_name)
+            if not target:
+                target = trello_post_body("/lists", {
+                    "idBoard": board["id"], "name": target_name, "pos": "bottom"
+                })
+                lists_by_name[target_name] = target
+            metadata = (
+                "<!-- DUNAJ-SCHEDULE-METADATA:START -->\n"
+                f"**ČÍSLO OBRAZU:** {scene_id}\n"
+                f"**ZDROJ:** predbežná dispo DUNAJ 16 z 19. 7. 2026\n"
+                f"**NATÁČACÍ DEŇ:** {row['shooting_day']}\n"
+                f"**DÁTUM NATÁČANIA:** {row['shooting_date']}\n"
+                f"**PORADIE DŇA:** {row['order']}\n"
+                f"**UNIT:** {row['unit']}\n"
+                f"**LOKÁCIA:** {row['location']}\n"
+                f"**POSTAVY:** {row['characters']}\n"
+                "<!-- DUNAJ-SCHEDULE-METADATA:END -->"
+            )
+            result = trello_post_body("/cards", {
+                "idList": target["id"], "name": base_scene_id,
+                "desc": metadata, "due": f"{row['shooting_date']}T10:00:00.000Z",
+                "pos": row["order"] * 16384,
+            })
+            created.append({"scene_id": scene_id, "card_name": base_scene_id, "url": result["shortUrl"]})
+        return jsonify({"status": "missing-base-created", "created": created, "created_count": len(created)})
+
     return jsonify({"error": "invalid mode"}), 400
 
 
