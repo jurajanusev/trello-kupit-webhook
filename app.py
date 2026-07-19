@@ -497,7 +497,40 @@ def sync_project_continuity_registry(project):
 
     scene_cards = []
     prop_groups = {}
-    for board_list in lists:
+    # Fetch all open board cards in one request. The earlier per-list scan
+    # exceeded Trello's request limit on large productions such as DOK4.
+    board_cards = trello_get(f"/boards/{board['id']}/cards", {
+        "fields": "id,name,desc,due,shortUrl,closed,idList", "filter": "open", "limit": 1000,
+        "checklists": "all", "checklist_fields": "name",
+    })
+    for card in board_cards:
+        if card.get("idList") in ignored_list_ids:
+            continue
+        scene_id = scene_id_from_card_name(card.get("name"))
+        if not scene_id:
+            continue
+        props = []
+        for checklist in card.get("checklists", []):
+            folded = unicodedata.normalize("NFKD", checklist.get("name", ""))
+            folded = "".join(ch for ch in folded if not unicodedata.combining(ch)).upper()
+            if folded != "REKVIZITY":
+                continue
+            for item in checklist.get("checkItems", []):
+                raw = item.get("name", "").strip()
+                full_context = tagged_prop_text(raw)
+                identity_source = re.split(r"\s+[–—-]\s+", full_context, maxsplit=1)[0].strip()
+                key, display = canonical_prop(identity_source)
+                if not key or key in {"test", "x"}:
+                    continue
+                occurrence = {"scene_id": scene_id, "card": card, "context": full_context}
+                group = prop_groups.setdefault(key, {"display": display, "occurrences": []})
+                group["occurrences"].append(occurrence)
+                props.append({"key": key, "context": full_context})
+        if props:
+            scene_cards.append({"card": card, "scene_id": scene_id, "props": props})
+
+    # Kept structurally for compatibility; all cards were handled above.
+    for board_list in []:
         if board_list["id"] in ignored_list_ids:
             continue
         cards = trello_get(f"/lists/{board_list['id']}/cards", {
