@@ -2965,12 +2965,15 @@ def setup_dunaj_meeting_workflow():
         scan_lists = [item for item in lists if item["id"] == requested_list_id]
         if not scan_lists:
             return jsonify({"error": "idList not found on board"}), 404
-    checklist_items = ["PRIDAŤ", "UPRAVIŤ", "ZRUŠIŤ", "KONTINUITA", "ZABEZPEČIŤ",
-                       "NETREBA ZABEZPEČIŤ", "SCHVÁLENÉ", "OTÁZKA"]
+    checklist_items = ["[ZMENA]", "[ZRUŠENÉ]", "[PRIDANÉ]", "[POŽIADAVKY]", "[PODĽA LOKÁCIE]"]
     expected_names = {name.upper() for name in checklist_items}
+    old_template_names = {"PRIDAŤ", "UPRAVIŤ", "ZRUŠIŤ", "KONTINUITA", "ZABEZPEČIŤ",
+                          "NETREBA ZABEZPEČIŤ", "SCHVÁLENÉ", "OTÁZKA"}
     scene_cards = []
     meeting_checklist = None
     for board_list in scan_lists:
+        if board_list["name"].strip().upper().startswith("NATOCENE"):
+            continue
         cards = trello_get(f"/lists/{board_list['id']}/cards", {
             "fields": "id,name,shortUrl", "filter": "open", "limit": 1000,
             "checklists": "all", "checklist_fields": "name",
@@ -2981,10 +2984,14 @@ def setup_dunaj_meeting_workflow():
             checklists = card.get("checklists", [])
             existing = next((item for item in checklists if item.get("name", "").strip().upper() == "POZNÁMKY Z PORADY"), None)
             existing_names = {item.get("name", "").strip().upper() for item in (existing or {}).get("checkItems", [])}
-            is_complete = expected_names.issubset(existing_names)
+            obsolete_items = [item for item in (existing or {}).get("checkItems", [])
+                              if item.get("name", "").strip().upper() in old_template_names]
+            is_complete = expected_names.issubset(existing_names) and not obsolete_items
             if existing and is_complete and not meeting_checklist:
                 meeting_checklist = existing
             scene_cards.append({"card": card, "checklist": existing, "item_names": existing_names,
+                                "obsolete_items": obsolete_items,
+                                "only_obsolete": bool(existing_names and existing_names.issubset(old_template_names)),
                                 "complete": bool(existing and is_complete)})
 
     todo_list = next(item for item in lists if item["name"].strip().lower() == "todo")
@@ -3042,6 +3049,8 @@ def setup_dunaj_meeting_workflow():
                 meeting_checklist = trello_post_body("/checklists", {
                     "idCard": created_template_card["id"], "name": "POZNÁMKY Z PORADY", "pos": "bottom"
                 })
+            for obsolete in template_item["obsolete_items"]:
+                trello_delete(f"/checklists/{meeting_checklist['id']}/checkItems/{obsolete['id']}")
             for item_name in checklist_items:
                 if item_name.upper() not in template_item["item_names"]:
                     trello_post_body(f"/checklists/{meeting_checklist['id']}/checkItems", {"name": item_name})
@@ -3050,13 +3059,15 @@ def setup_dunaj_meeting_workflow():
         errors = []
         for item in batch:
             try:
-                if item["checklist"] and not item["item_names"]:
+                if item["checklist"] and (not item["item_names"] or item["only_obsolete"]):
                     trello_delete(f"/checklists/{item['checklist']['id']}")
                     trello_post_body("/checklists", {
                         "idCard": item["card"]["id"], "name": "POZNÁMKY Z PORADY",
                         "pos": "bottom", "idChecklistSource": meeting_checklist["id"],
                     })
                 elif item["checklist"]:
+                    for obsolete in item["obsolete_items"]:
+                        trello_delete(f"/checklists/{item['checklist']['id']}/checkItems/{obsolete['id']}")
                     for item_name in checklist_items:
                         if item_name.upper() not in item["item_names"]:
                             trello_post_body(f"/checklists/{item['checklist']['id']}/checkItems", {"name": item_name})
