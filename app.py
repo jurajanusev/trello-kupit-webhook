@@ -2235,6 +2235,17 @@ def split_dok4_scene_07_39():
     })
 
 
+@app.route("/api/find-dunaj-board", methods=["GET"])
+def find_dunaj_board():
+    if request.headers.get("X-Inspect-Key") != "find-dunaj-board-6e20a4f9":
+        return jsonify({"error": "forbidden"}), 403
+    boards = trello_get("/members/me/boards", {
+        "fields": "id,name,url,shortLink,closed", "filter": "open", "limit": 1000
+    })
+    matches = [board for board in boards if "dunaj" in board.get("name", "").casefold()]
+    return jsonify({"matches": matches, "boards_checked": len(boards)})
+
+
 @app.route("/trello-webhook", methods=["POST"])
 def trello_webhook():
     data = request.json
