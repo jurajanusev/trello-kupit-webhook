@@ -355,6 +355,57 @@ def canonical_prop(item_name):
     return key, text
 
 
+def scene_id_from_card_name(card_name):
+    match = re.match(r"^\s*([0-9]{1,2})\s*/\s*([0-9]+[A-Z]*)(?:\.|\s|$)", card_name or "", re.I)
+    return normalize_scene_id(match.group(1), match.group(2)) if match else None
+
+
+def build_prop_sync_marker(prop_display, card_info, checklist_item):
+    scene_id = scene_id_from_card_name(card_info.get("name")) or "neznámy obraz"
+    date_text = (card_info.get("due") or "")[:10] or "bez dátumu"
+    return (
+        "<!-- DUNAJ-PROP-SYNC:START -->\n"
+        "Vytvorené a synchronizované automaticky z obrazových kariet.\n\n"
+        f"**REKVIZITA:** {prop_display}\n"
+        f"**NAJSKORŠÍ OBRAZ:** {scene_id}\n"
+        f"**DUE DATE:** {date_text}\n\n"
+        "**OBRAZY, ODKAZY A KONTEXT:**\n\n"
+        f"[{scene_id} — {card_info['name']}]({card_info['shortUrl']}) — {date_text}\n\n"
+        f"Akcia/kontext: {tagged_prop_text(checklist_item)}\n\n"
+        "**NÁJDENÁ KONTINUITA V ĎALŠÍCH OBRAZOCH:**\n"
+        f"{scene_id}\n"
+        "<!-- DUNAJ-PROP-SYNC:END -->"
+    )
+
+
+def add_scene_to_prop_marker(desc, prop_display, card_info, checklist_item, current_prop_due=None):
+    start = "<!-- DUNAJ-PROP-SYNC:START -->"
+    end = "<!-- DUNAJ-PROP-SYNC:END -->"
+    if start not in desc or end not in desc:
+        return build_prop_sync_marker(prop_display, card_info, checklist_item)
+    marker = desc[desc.index(start):desc.index(end) + len(end)]
+    scene_id = scene_id_from_card_name(card_info.get("name"))
+    if not scene_id or card_info["shortUrl"] in marker:
+        return marker
+    date_text = (card_info.get("due") or "")[:10] or "bez dátumu"
+    occurrence = (
+        f"[{scene_id} — {card_info['name']}]({card_info['shortUrl']}) — {date_text}\n\n"
+        f"Akcia/kontext: {tagged_prop_text(checklist_item)}\n\n"
+    )
+    marker = marker.replace("**NÁJDENÁ KONTINUITA V ĎALŠÍCH OBRAZOCH:**", occurrence + "**NÁJDENÁ KONTINUITA V ĎALŠÍCH OBRAZOCH:**", 1)
+    continuity_match = re.search(r"(\*\*NÁJDENÁ KONTINUITA V ĎALŠÍCH OBRAZOCH:\*\*\n)(.*?)(\n<!-- DUNAJ-PROP-SYNC:END -->)", marker, flags=re.S)
+    if continuity_match:
+        ids = re.findall(r"\b\d{2}/\d+[A-Z]*\b", continuity_match.group(2), flags=re.I)
+        ids.append(scene_id)
+        unique_ids = list(dict.fromkeys(value.upper() for value in ids))
+        marker = marker[:continuity_match.start(2)] + ", ".join(unique_ids) + marker[continuity_match.end(2):]
+    new_due = card_info.get("due")
+    if new_due and (not current_prop_due or new_due < current_prop_due):
+        marker = re.sub(r"\*\*NAJSKORŠÍ OBRAZ:\*\*.*", f"**NAJSKORŠÍ OBRAZ:** {scene_id}", marker, count=1)
+        marker = re.sub(r"\*\*DUE DATE:\*\*.*", f"**DUE DATE:** {new_due[:10]}", marker, count=1)
+    return marker
+
+
 def find_cards_with_exact_item(search_term, allowed_list_id, exclude_card_id=None):
     print("SEARCH TERM:", search_term)
     matching_cards = []
@@ -2892,6 +2943,95 @@ def sync_dunaj_prop_cards():
                     "errors_count": len(errors), "errors": errors[:20]})
 
 
+@app.route("/api/setup-dunaj-meeting-workflow", methods=["POST"])
+def setup_dunaj_meeting_workflow():
+    if request.headers.get("X-Meeting-Setup-Key") != "dunaj-meeting-setup-4a91c7de":
+        return jsonify({"error": "forbidden"}), 403
+    board = trello_get("/boards/qCPeWA3e", {"fields": "id,name,url"})
+    lists = trello_get(f"/boards/{board['id']}/lists", {"fields": "id,name,closed", "filter": "open"})
+    scene_cards = []
+    meeting_checklist = None
+    for board_list in lists:
+        cards = trello_get(f"/lists/{board_list['id']}/cards", {
+            "fields": "id,name,shortUrl", "filter": "open", "limit": 1000,
+            "checklists": "all", "checklist_fields": "name",
+        })
+        for card in cards:
+            if not scene_id_from_card_name(card.get("name")):
+                continue
+            checklists = card.get("checklists", [])
+            existing = next((item for item in checklists if item.get("name", "").strip().upper() == "POZNÁMKY Z PORADY"), None)
+            if existing and not meeting_checklist:
+                meeting_checklist = existing
+            scene_cards.append({"card": card, "has_meeting": bool(existing)})
+
+    todo_list = next(item for item in lists if item["name"].strip().lower() == "todo")
+    todo_cards = trello_get(f"/lists/{todo_list['id']}/cards", {
+        "fields": "id,name,desc,due,shortUrl", "filter": "open", "limit": 1000
+    })
+    marker_start = "<!-- DUNAJ-PROP-SYNC:START -->"
+    marker_end = "<!-- DUNAJ-PROP-SYNC:END -->"
+    props_to_clean = []
+    for card in todo_cards:
+        desc = card.get("desc", "")
+        if marker_start in desc and marker_end in desc:
+            marker = desc[desc.index(marker_start):desc.index(marker_end) + len(marker_end)]
+            if desc.strip() != marker.strip():
+                props_to_clean.append({"card": card, "marker": marker})
+
+    mode = request.args.get("mode", "dry-run")
+    missing_checklists = [item for item in scene_cards if not item["has_meeting"]]
+    if mode == "dry-run":
+        return jsonify({
+            "status": "dry-run", "board": board["name"],
+            "scene_cards": len(scene_cards), "checklists_present": len(scene_cards) - len(missing_checklists),
+            "checklists_missing": len(missing_checklists), "todo_cards": len(todo_cards),
+            "prop_descriptions_to_clean": len(props_to_clean),
+        })
+
+    limit = min(50, max(1, int(request.args.get("limit", "25"))))
+    if mode == "clean-props":
+        batch = props_to_clean[:limit]
+        errors = []
+        for item in batch:
+            try:
+                trello_put_body(f"/cards/{item['card']['id']}", {"desc": item["marker"]})
+            except Exception as exc:
+                errors.append({"card": item["card"]["name"], "error": str(exc)})
+        return jsonify({"status": "props-cleaned", "updated": len(batch) - len(errors),
+                        "remaining": max(0, len(props_to_clean) - len(batch)),
+                        "errors_count": len(errors), "errors": errors})
+
+    if mode == "add-checklists":
+        checklist_items = ["PRIDAŤ", "UPRAVIŤ", "ZRUŠIŤ", "KONTINUITA", "ZABEZPEČIŤ",
+                           "NETREBA ZABEZPEČIŤ", "SCHVÁLENÉ", "OTÁZKA"]
+        created_template_card = None
+        if not meeting_checklist and missing_checklists:
+            created_template_card = missing_checklists[0]["card"]
+            meeting_checklist = trello_post_body("/checklists", {
+                "idCard": created_template_card["id"], "name": "POZNÁMKY Z PORADY", "pos": "bottom"
+            })
+            for item_name in checklist_items:
+                trello_post_body(f"/checklists/{meeting_checklist['id']}/checkItems", {"name": item_name})
+        batch = [item for item in missing_checklists if not created_template_card or item["card"]["id"] != created_template_card["id"]][:limit]
+        created = 1 if created_template_card else 0
+        errors = []
+        for item in batch:
+            try:
+                trello_post_body("/checklists", {
+                    "idCard": item["card"]["id"], "name": "POZNÁMKY Z PORADY",
+                    "pos": "bottom", "idChecklistSource": meeting_checklist["id"],
+                })
+                created += 1
+            except Exception as exc:
+                errors.append({"card": item["card"]["name"], "error": str(exc)})
+        return jsonify({"status": "checklists-added", "created": created,
+                        "remaining": max(0, len(missing_checklists) - created),
+                        "errors_count": len(errors), "errors": errors[:20]})
+
+    return jsonify({"error": "invalid mode"}), 400
+
+
 @app.route("/trello-webhook", methods=["POST"])
 def trello_webhook():
     data = request.json
@@ -2985,26 +3125,15 @@ def trello_webhook():
         else:
             found_text = "nenájdené"
 
-        new_card_desc = (
-            f"Vytvorené automaticky z checklist položky.\n\n"
-            f"**REKVIZITA:** {prop_display}\n\n"
-            f"Pôvodná karta: {card_info['name']}\n"
-            f"Odkaz na pôvodnú kartu: {card_info['shortUrl']}\n\n"
-            f"Pôvodná checklist položka: {checkitem_name}\n\n"
-            f"Nájdené v kartách:\n{found_text}"
-        )
+        new_card_desc = build_prop_sync_marker(prop_display, card_info, checkitem_name)
 
         existing_props = find_todo_cards_by_prop(target_list_id, prop_key)
         if existing_props:
             primary = existing_props[0]
             old_desc = primary.get("desc", "")
-            payload = {}
-            if card_info["shortUrl"] not in old_desc:
-                payload["desc"] = (
-                    old_desc + "\n\n---\n\n"
-                    f"**ĎALŠÍ OBRAZ Z WEBHOOKU:** [{card_info['name']}]({card_info['shortUrl']})\n"
-                    f"**AKCIA/KONTEXT:** {tagged_prop_text(checkitem_name)}"
-                )
+            payload = {"desc": add_scene_to_prop_marker(
+                old_desc, prop_display, card_info, checkitem_name, primary.get("due")
+            )}
             current_due = card_info.get("due")
             if current_due and (not primary.get("due") or current_due < primary["due"]):
                 payload["due"] = current_due
