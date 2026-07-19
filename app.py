@@ -2258,7 +2258,7 @@ def sync_dunaj_schedule():
         schedule_rows = json.load(handle)["rows"]
     row_by_scene = {row["scene_id"]: row for row in schedule_rows}
 
-    board = trello_get("/boards/Kd1WK2R0", {"fields": "id,name,url"})
+    board = trello_get("/boards/qCPeWA3e", {"fields": "id,name,url"})
     board_lists = trello_get(f"/boards/{board['id']}/lists", {"fields": "id,name,closed"})
     open_lists = {item["id"]: item for item in board_lists if not item.get("closed")}
     lists_by_name = {item["name"]: item for item in open_lists.values()}
