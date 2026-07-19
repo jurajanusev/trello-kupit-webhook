@@ -2974,6 +2974,7 @@ def setup_dunaj_meeting_workflow():
     old_template_names = {"PRIDAŤ", "UPRAVIŤ", "ZRUŠIŤ", "KONTINUITA", "ZABEZPEČIŤ",
                           "NETREBA ZABEZPEČIŤ", "SCHVÁLENÉ", "OTÁZKA"}
     scene_cards = []
+    list_stats = []
     meeting_checklist = None
     for board_list in scan_lists:
         folded_list_name = unicodedata.normalize("NFKD", board_list["name"])
@@ -2984,9 +2985,12 @@ def setup_dunaj_meeting_workflow():
             "fields": "id,name,shortUrl", "filter": "open", "limit": 1000,
             "checklists": "all", "checklist_fields": "name",
         })
+        list_scene_count = 0
+        list_complete_count = 0
         for card in cards:
             if not scene_id_from_card_name(card.get("name")):
                 continue
+            list_scene_count += 1
             checklists = card.get("checklists", [])
             existing = next((item for item in checklists if item.get("name", "").strip().upper() == "POZNÁMKY Z PORADY"), None)
             existing_names = {item.get("name", "").strip().upper() for item in (existing or {}).get("checkItems", [])}
@@ -2999,6 +3003,12 @@ def setup_dunaj_meeting_workflow():
                                 "obsolete_items": obsolete_items,
                                 "only_obsolete": bool(existing_names and existing_names.issubset(old_template_names)),
                                 "complete": bool(existing and is_complete)})
+            if existing and is_complete:
+                list_complete_count += 1
+        if list_scene_count:
+            list_stats.append({"id": board_list["id"], "name": board_list["name"],
+                               "scenes": list_scene_count, "complete": list_complete_count,
+                               "incomplete": list_scene_count - list_complete_count})
 
     todo_list = next((item for item in lists if item["name"].strip().lower() == "todo"), None)
     todo_cards = trello_get(f"/lists/{todo_list['id']}/cards", {
@@ -3026,6 +3036,7 @@ def setup_dunaj_meeting_workflow():
             "checklists_incomplete": len(incomplete_checklists), "checklists_empty": len(empty_checklists),
             "checklists_missing": len(missing_checklists), "todo_cards": len(todo_cards),
             "prop_descriptions_to_clean": len(props_to_clean),
+            "list_stats": list_stats,
             "meeting_checklist_sample": {
                 "name": meeting_checklist.get("name"),
                 "items": [item.get("name") for item in meeting_checklist.get("checkItems", [])],
