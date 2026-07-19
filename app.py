@@ -2515,6 +2515,7 @@ def sync_dunaj_schedule():
 
 @app.route("/api/reorder-dunaj-date-lists", methods=["POST"])
 def reorder_dunaj_date_lists():
+    return jsonify({"error": "endpoint disabled"}), 410
     if request.headers.get("X-Reorder-Key") != "dunaj-date-lists-19jul-8d3f01a7":
         return jsonify({"error": "forbidden"}), 403
 
