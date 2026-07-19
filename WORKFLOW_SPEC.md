@@ -56,7 +56,7 @@ Tento postup sa pouziva pre projekty Dunaj, DOK 4 a Riverdale:
 
 ### Poznamky z porady
 
-- Checklist `POZNÁMKY Z PORADY` sa pripravuje iba na aktivnych obrazovych kartach; karty v zozname `NATOCENE 15/16` sa vynechavaju.
+- Checklist `POZNÁMKY Z PORADY` sa pripravuje iba na aktivnych obrazovych kartach projektov Dunaj, DOK 4 a Riverdale; karty v zoznamoch natocenych sa vynechavaju.
 - Predpripravene polozky su `[ZMENA]`, `[ZRUŠENÉ]`, `[PRIDANÉ]`, `[POŽIADAVKY]` a `[PODĽA LOKÁCIE]`.
 - Pouzivatel pocas porady dopise text za prislusnu znacku. Synchronizacia po porade interpretuje iba tieto strukturovane polozky a pred zapisom ukaze dry-run.
 

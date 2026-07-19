@@ -2955,6 +2955,7 @@ def sync_dunaj_prop_cards():
 
 @app.route("/api/setup-dunaj-meeting-workflow", methods=["POST"])
 def setup_dunaj_meeting_workflow():
+    return jsonify({"error": "endpoint disabled"}), 410
     if request.headers.get("X-Meeting-Setup-Key") != "meeting-setup-riverdale-dok4-b618e2c4":
         return jsonify({"error": "forbidden"}), 403
     project = request.args.get("project", "").strip().lower()
