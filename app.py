@@ -2955,6 +2955,7 @@ def sync_dunaj_prop_cards():
 
 @app.route("/api/setup-dunaj-meeting-workflow", methods=["POST"])
 def setup_dunaj_meeting_workflow():
+    return jsonify({"error": "endpoint disabled"}), 410
     if request.headers.get("X-Meeting-Setup-Key") != "dunaj-meeting-setup-4a91c7de":
         return jsonify({"error": "forbidden"}), 403
     board = trello_get("/boards/qCPeWA3e", {"fields": "id,name,url"})

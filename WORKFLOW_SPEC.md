@@ -54,6 +54,12 @@ Tento postup sa pouziva pre projekty Dunaj, DOK 4 a Riverdale:
 - Webhook pri novom `[z]` najprv hlada existujucu kartu podla normalizovaneho nazvu. Ak ju najde, doplni obraz a podla potreby posunie due date na skorsi termin; nevytvori novu kartu.
 - Pri cisteni sa archivuju iba overene automaticke duplicity. Rucne karty a rucne poznamky sa zachovavaju.
 
+### Poznamky z porady
+
+- Checklist `POZNÁMKY Z PORADY` sa pripravuje iba na aktivnych obrazovych kartach; karty v zozname `NATOCENE 15/16` sa vynechavaju.
+- Predpripravene polozky su `[ZMENA]`, `[ZRUŠENÉ]`, `[PRIDANÉ]`, `[POŽIADAVKY]` a `[PODĽA LOKÁCIE]`.
+- Pouzivatel pocas porady dopise text za prislusnu znacku. Synchronizacia po porade interpretuje iba tieto strukturovane polozky a pred zapisom ukaze dry-run.
+
 Nastenky:
 
 - Dunaj: `Dunaj - Rekvizity` - `https://trello.com/b/qCPeWA3e/dunaj-rekvizity`
