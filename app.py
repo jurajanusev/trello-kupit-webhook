@@ -312,13 +312,26 @@ def tagged_prop_text(item_name):
 def canonical_prop(item_name):
     """Normalize a sourcing item while keeping action/context outside the matching key."""
     text = normalize_item_name(tagged_prop_text(item_name))
-    text = re.sub(r"\[(?:h|s)\]", " ", text, flags=re.I)
+    text = re.split(r"\[(?:h|s)\]", text, maxsplit=1, flags=re.I)[0]
     text = re.split(r"\bnadv\.?\s*", text, maxsplit=1, flags=re.I)[0]
-    text = re.sub(r"\b\d{1,2}\s*/\s*\d+[A-Z]*\b", " ", text, flags=re.I)
+    text = re.split(r"\b\d{1,2}\s*/\s*\d+[A-Z]*\b", text, maxsplit=1, flags=re.I)[0]
     text = re.sub(r"\s+", " ", text).strip(" -—,.;:")
     folded = unicodedata.normalize("NFKD", text)
     key = "".join(char for char in folded if not unicodedata.combining(char)).lower()
     key = re.sub(r"[^a-z0-9]+", " ", key).strip()
+    aliases = (
+        (r"^acylpyrin(?: aspirin)?\b", "acylpyrin", "acylpyrin / aspirin"),
+        (r"^auto obojzivelnik\b", "auto obojzivelnik", "auto obojživelník"),
+        (r"^cigarety(?: pre komparz)?$", "cigarety", "cigarety"),
+        (r"^trombon\b", "trombon", "trombón"),
+        (r"^cestovne doklady.*astrid|^cestovne doklady vydala americka ambasada", "cestovne doklady pre astrid", "cestovné doklady pre Astrid"),
+        (r"^(?:helgine|helgino) auto\b", "helgino auto", "Helgino auto"),
+        (r".*(?:walter.*helma|helma.*walter).*", "walterova helma", "Walterova helma"),
+        (r".*(?:fotky? richarda a elizy|koptik ma fotky helginych deti).*", "fotky richarda a elizy", "fotky Richarda a Elizy"),
+    )
+    for pattern, alias_key, alias_display in aliases:
+        if re.match(pattern, key):
+            return alias_key, alias_display
     return key, text
 
 
