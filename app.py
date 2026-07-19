@@ -336,7 +336,7 @@ def sync_dunaj_microsoft_todo():
         access_token = get_microsoft_access_token()
         tasks = graph_get_all(
             f"/me/todo/lists/{TODO_LIST_ID}/tasks", access_token,
-            params={"$top": 100, "$select": "id,title,body,dueDateTime,status"}
+            params={"$top": 100}
         )
     except requests.HTTPError as exc:
         response = exc.response
