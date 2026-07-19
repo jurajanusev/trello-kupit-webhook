@@ -2987,6 +2987,10 @@ def setup_dunaj_meeting_workflow():
             "scene_cards": len(scene_cards), "checklists_present": len(scene_cards) - len(missing_checklists),
             "checklists_missing": len(missing_checklists), "todo_cards": len(todo_cards),
             "prop_descriptions_to_clean": len(props_to_clean),
+            "meeting_checklist_sample": {
+                "name": meeting_checklist.get("name"),
+                "items": [item.get("name") for item in meeting_checklist.get("checkItems", [])],
+            } if meeting_checklist else None,
         })
 
     limit = min(50, max(1, int(request.args.get("limit", "25"))))
