@@ -43,6 +43,7 @@ Tento postup sa pouziva pre projekty Dunaj, DOK 4 a Riverdale:
 - Karty sa presunu do datovych zoznamov a zoradia podla poradia dna. Retake sa moze vratit aj zo zoznamu natocenych a vtedy sa `dueComplete` nastavi na `false`.
 - Datove zoznamy sa zoradia chronologicky hned za hlavnym zoznamom serialu.
 - Zaverecna kontrola musi potvrdit pocet najdenych kariet, nulove duplicity a nulovy pocet zostavajucich presunov; vsetky jednorazove endpointy sa potom vypnu.
+- Po kazdej uspesnej aktualizacii planu sa rekvizitove karty povinne synchronizuju do Microsoft To Do podla pravidiel v casti `Microsoft To Do`.
 
 ### ToDo rekvizity oznacene `[z]`
 
@@ -59,6 +60,16 @@ Tento postup sa pouziva pre projekty Dunaj, DOK 4 a Riverdale:
 - Checklist `POZNÁMKY Z PORADY` sa pripravuje iba na aktivnych obrazovych kartach projektov Dunaj, DOK 4 a Riverdale; karty v zoznamoch natocenych sa vynechavaju.
 - Predpripravene polozky su `[ZMENA]`, `[ZRUŠENÉ]`, `[PRIDANÉ]`, `[POŽIADAVKY]` a `[PODĽA LOKÁCIE]`.
 - Pouzivatel pocas porady dopise text za prislusnu znacku. Synchronizacia po porade interpretuje iba tieto strukturovane polozky a pred zapisom ukaze dry-run.
+- Po zapracovani porady sa najprv aktualizuju zlucene Trello ToDo karty a potom Microsoft To Do.
+
+### Microsoft To Do
+
+- Dunaj, DOK 4 a Riverdale pouzivaju jeden existujuci spolocny Microsoft To Do zoznam. Synchronizacia nesmie vytvarat dalsie Microsoft zoznamy.
+- Jedna aktivna Trello karta rekvizity zodpoveda jednej Microsoft ulohe; stabilna identita je odkaz na Trello kartu, nie iba nazov.
+- Synchronizuje sa nazov, kontextovy popis, Trello odkaz a due date podla najskorsieho naplanovaneho obrazu.
+- Ak Trello karta ani napojeny obraz nema datum, Microsoft termin sa nevymysla.
+- Synchronizacia sa spusta na konci aktualizacie planu aj aktualizacie po porade.
+- Zaverecny dry-run musi pre prislusny projekt potvrdit `to_create=0`, `to_update=0` a `duplicate_exact_titles=0`.
 
 Nastenky:
 
