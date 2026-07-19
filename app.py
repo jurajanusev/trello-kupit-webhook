@@ -357,7 +357,9 @@ def sync_dunaj_microsoft_todo():
         primary = matches[0] if matches else None
         changes = {}
         if primary:
-            if (primary.get("body") or {}).get("content", "") != desired_body:
+            # Graph may normalize text bodies on write. The Trello URL is the
+            # stable sync identity, so do not rewrite an already linked body.
+            if card["shortUrl"] not in (primary.get("body") or {}).get("content", ""):
                 changes["body"] = {"content": desired_body, "contentType": "text"}
             current_due = (primary.get("dueDateTime") or {}).get("dateTime", "")[:10]
             desired_date = card.get("due", "")[:10] if card.get("due") else ""
