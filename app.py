@@ -2931,13 +2931,16 @@ def dunaj_z_items():
                     "occurrences_count": len(occurrences)})
 
 
-@app.route("/api/sync-dunaj-prop-cards", methods=["POST"])
-def sync_dunaj_prop_cards():
-    return jsonify({"error": "endpoint disabled"}), 410
+@app.route("/api/sync-<project>-prop-cards", methods=["POST"])
+def sync_project_prop_cards(project):
     if request.headers.get("X-Prop-Sync-Key") != "dunaj-props-sync-7f32b861":
         return jsonify({"error": "forbidden"}), 403
 
-    board = trello_get("/boards/qCPeWA3e", {"fields": "id,name,url"})
+    board_refs = {"dunaj": "qCPeWA3e", "riverdale": "CzuD55PR", "dok4": "lzNy4AtY"}
+    board_ref = board_refs.get(project.casefold())
+    if not board_ref:
+        return jsonify({"error": "unknown project"}), 404
+    board = trello_get(f"/boards/{board_ref}", {"fields": "id,name,url"})
     lists = trello_get(f"/boards/{board['id']}/lists", {"fields": "id,name,pos,closed", "filter": "open"})
     todo_list = next((item for item in lists if item["name"].strip().lower() == "todo"), None)
     if not todo_list:
@@ -2948,6 +2951,11 @@ def sync_dunaj_prop_cards():
     scanned_scene_cards = 0
     tagged_occurrences = 0
     for board_list in lists:
+        folded_list_name = unicodedata.normalize("NFKD", board_list["name"])
+        folded_list_name = "".join(char for char in folded_list_name
+                                   if not unicodedata.combining(char)).upper()
+        if "NATOC" in folded_list_name or board_list["id"] == todo_list["id"]:
+            continue
         cards = trello_get(f"/lists/{board_list['id']}/cards", {
             "fields": "id,name,desc,due,dueComplete,shortUrl,closed,idList", "filter": "open", "limit": 1000,
             "checklists": "all", "checklist_fields": "name",
