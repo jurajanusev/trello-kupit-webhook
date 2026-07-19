@@ -303,6 +303,25 @@ def normalize_item_name(text):
     return t
 
 
+def tagged_prop_text(item_name):
+    """Return the tagged line when a multiline checklist item contains one [z] line."""
+    lines = [line.strip() for line in str(item_name or "").splitlines() if CHECKLIST_TAG.lower() in line.lower()]
+    return " ".join(lines) if lines else str(item_name or "").strip()
+
+
+def canonical_prop(item_name):
+    """Normalize a sourcing item while keeping action/context outside the matching key."""
+    text = normalize_item_name(tagged_prop_text(item_name))
+    text = re.sub(r"\[(?:h|s)\]", " ", text, flags=re.I)
+    text = re.split(r"\bnadv\.?\s*", text, maxsplit=1, flags=re.I)[0]
+    text = re.sub(r"\b\d{1,2}\s*/\s*\d+[A-Z]*\b", " ", text, flags=re.I)
+    text = re.sub(r"\s+", " ", text).strip(" -—,.;:")
+    folded = unicodedata.normalize("NFKD", text)
+    key = "".join(char for char in folded if not unicodedata.combining(char)).lower()
+    key = re.sub(r"[^a-z0-9]+", " ", key).strip()
+    return key, text
+
+
 def find_cards_with_exact_item(search_term, allowed_list_id, exclude_card_id=None):
     print("SEARCH TERM:", search_term)
     matching_cards = []
@@ -2638,6 +2657,181 @@ def dunaj_z_items():
     return jsonify({"list": board_list["name"], "cards": len(cards),
                     "scene_cards": scene_cards, "occurrences": occurrences,
                     "occurrences_count": len(occurrences)})
+
+
+@app.route("/api/sync-dunaj-prop-cards", methods=["POST"])
+def sync_dunaj_prop_cards():
+    if request.headers.get("X-Prop-Sync-Key") != "dunaj-props-sync-7f32b861":
+        return jsonify({"error": "forbidden"}), 403
+
+    board = trello_get("/boards/qCPeWA3e", {"fields": "id,name,url"})
+    lists = trello_get(f"/boards/{board['id']}/lists", {"fields": "id,name,pos,closed", "filter": "open"})
+    todo_list = next((item for item in lists if item["name"].strip().lower() == "todo"), None)
+    if not todo_list:
+        return jsonify({"error": "ToDo list not found"}), 404
+
+    scene_cards_by_id = {}
+    prop_groups = {}
+    scanned_scene_cards = 0
+    tagged_occurrences = 0
+    for board_list in lists:
+        cards = trello_get(f"/lists/{board_list['id']}/cards", {
+            "fields": "id,name,desc,due,dueComplete,shortUrl,closed,idList", "filter": "open", "limit": 1000,
+            "checklists": "all", "checklist_fields": "name",
+        })
+        for card in cards:
+            match = re.match(r"^\s*([0-9]{1,2})\s*/\s*([0-9]+[A-Z]*)(?:\.|\s|$)", card.get("name", ""), re.I)
+            if not match:
+                continue
+            scene_id = normalize_scene_id(match.group(1), match.group(2))
+            scanned_scene_cards += 1
+            current = scene_cards_by_id.get(scene_id)
+            if not current or (not current.get("due") and card.get("due")):
+                scene_cards_by_id[scene_id] = card
+            for checklist in card.get("checklists", []):
+                for item in checklist.get("checkItems", []):
+                    raw_item = item.get("name", "").strip()
+                    if CHECKLIST_TAG.lower() not in raw_item.lower():
+                        continue
+                    key, display = canonical_prop(raw_item)
+                    if not key or key in {"test", "x"}:
+                        continue
+                    tagged_occurrences += 1
+                    group = prop_groups.setdefault(key, {"display": display, "occurrences": [], "refs": set()})
+                    if len(display) < len(group["display"]):
+                        group["display"] = display
+                    group["occurrences"].append({
+                        "scene_id": scene_id, "card": card, "item": tagged_prop_text(raw_item),
+                    })
+                    for episode, scene in re.findall(r"\b(\d{1,2})\s*/\s*(\d+[A-Z]*)\b", raw_item, flags=re.I):
+                        ref = normalize_scene_id(episode, scene)
+                        if ref:
+                            group["refs"].add(ref)
+
+    todo_cards = trello_get(f"/lists/{todo_list['id']}/cards", {
+        "fields": "id,name,desc,due,shortUrl,closed,pos", "filter": "open", "limit": 1000
+    })
+    todo_by_key = {}
+    for card in todo_cards:
+        desc = card.get("desc", "")
+        match = re.search(r"Pôvodná checklist položka:\s*(.*?)(?:\n\n|$)", desc, flags=re.S | re.I)
+        source_text = match.group(1).strip() if match else re.split(r"\s+-\s+(?=\d{1,2}/)", card["name"], maxsplit=1)[0]
+        key, _ = canonical_prop(source_text)
+        if key:
+            todo_by_key.setdefault(key, []).append(card)
+
+    plans = []
+    for key, group in prop_groups.items():
+        linked = {}
+        contexts = {}
+        for occurrence in group["occurrences"]:
+            linked[occurrence["scene_id"]] = occurrence["card"]
+            contexts.setdefault(occurrence["scene_id"], set()).add(occurrence["item"])
+        for ref in group["refs"]:
+            if ref in scene_cards_by_id:
+                linked.setdefault(ref, scene_cards_by_id[ref])
+        ordered_scenes = sorted(linked.items(), key=lambda pair: (
+            pair[1].get("due") or "9999-12-31", pair[0]
+        ))
+        earliest = next(((scene_id, card) for scene_id, card in ordered_scenes if card.get("due")),
+                        ordered_scenes[0] if ordered_scenes else (None, None))
+        existing = sorted(todo_by_key.get(key, []), key=lambda card: card.get("pos", 0))
+        plans.append({
+            "key": key, "display": group["display"], "linked": ordered_scenes,
+            "contexts": contexts, "earliest_scene": earliest[0], "earliest_card": earliest[1],
+            "existing": existing,
+        })
+    plans.sort(key=lambda item: item["display"].lower())
+
+    summary = {
+        "board": board["name"], "scene_cards_scanned": scanned_scene_cards,
+        "tagged_occurrences": tagged_occurrences, "unique_props": len(plans),
+        "todo_cards_before": len(todo_cards),
+        "to_create": sum(1 for item in plans if not item["existing"]),
+        "to_update": sum(1 for item in plans if item["existing"]),
+        "duplicates_to_archive": sum(max(0, len(item["existing"]) - 1) for item in plans),
+        "without_due": sum(1 for item in plans if not item["earliest_card"] or not item["earliest_card"].get("due")),
+    }
+    mode = request.args.get("mode", "dry-run")
+    if mode == "dry-run":
+        return jsonify({"status": "dry-run", **summary, "sample": [{
+            "prop": item["display"], "scenes": [scene_id for scene_id, _ in item["linked"]],
+            "earliest_scene": item["earliest_scene"],
+            "due": item["earliest_card"].get("due") if item["earliest_card"] else None,
+            "existing_cards": [card["name"] for card in item["existing"]],
+        } for item in plans[:40]]}), 200
+
+    if mode != "apply":
+        return jsonify({"error": "invalid mode"}), 400
+    start = max(0, int(request.args.get("start", "0")))
+    limit = min(25, max(1, int(request.args.get("limit", "15"))))
+    batch = plans[start:start + limit]
+    marker_start = "<!-- DUNAJ-PROP-SYNC:START -->"
+    marker_end = "<!-- DUNAJ-PROP-SYNC:END -->"
+    created = []; updated = []; archived = []; errors = []
+    for plan in batch:
+        earliest_scene = plan["earliest_scene"] or "bez dátumu"
+        earliest_card = plan["earliest_card"]
+        lines = [
+            marker_start,
+            "Vytvorené a synchronizované automaticky z obrazových kariet.", "",
+            f"**REKVIZITA:** {plan['display']}",
+            f"**NAJSKORŠÍ OBRAZ:** {earliest_scene}",
+            f"**DUE DATE:** {(earliest_card.get('due') or 'nenastavený')[:10] if earliest_card else 'nenastavený'}", "",
+            "**OBRAZY, ODKAZY A KONTEXT:**",
+        ]
+        for scene_id, scene_card in plan["linked"]:
+            date_text = (scene_card.get("due") or "")[:10] or "bez dátumu"
+            lines.append(f"- [{scene_id} — {scene_card['name']}]({scene_card['shortUrl']}) — {date_text}")
+            for context in sorted(plan["contexts"].get(scene_id, set())):
+                lines.append(f"  - Akcia/kontext: {context}")
+        lines.extend(["", "**NÁJDENÁ KONTINUITA V ĎALŠÍCH OBRAZOCH:**",
+                      ", ".join(scene_id for scene_id, _ in plan["linked"]) or "nenájdená", marker_end])
+        synced = "\n".join(lines)
+        primary = plan["existing"][0] if plan["existing"] else None
+        if primary:
+            old_desc = primary.get("desc", "")
+            if marker_start in old_desc and marker_end in old_desc:
+                pattern = re.escape(marker_start) + r".*?" + re.escape(marker_end)
+                new_desc = re.sub(pattern, lambda _: synced, old_desc, count=1, flags=re.S)
+            else:
+                new_desc = synced + ("\n\n---\n\n**PÔVODNÝ ZÁZNAM / RUČNÉ POZNÁMKY:**\n\n" + old_desc if old_desc else "")
+            payload = {"desc": new_desc}
+            if earliest_card and earliest_card.get("due"):
+                payload["due"] = earliest_card["due"]
+            try:
+                trello_put_body(f"/cards/{primary['id']}", payload)
+                updated.append(primary["id"])
+            except Exception as exc:
+                errors.append({"prop": plan["display"], "error": str(exc)})
+                continue
+        else:
+            if not earliest_card:
+                errors.append({"prop": plan["display"], "error": "no linked scene card"})
+                continue
+            payload = {
+                "idList": todo_list["id"],
+                "name": f"{plan['display']} - {earliest_card['name']}",
+                "desc": synced, "pos": "bottom",
+            }
+            if earliest_card.get("due"):
+                payload["due"] = earliest_card["due"]
+            try:
+                result = trello_post_body("/cards", payload)
+                created.append(result["id"])
+            except Exception as exc:
+                errors.append({"prop": plan["display"], "error": str(exc)})
+                continue
+        for duplicate in plan["existing"][1:]:
+            try:
+                trello_put_body(f"/cards/{duplicate['id']}", {"closed": "true"})
+                archived.append(duplicate["id"])
+            except Exception as exc:
+                errors.append({"prop": plan["display"], "error": f"archive duplicate: {exc}"})
+    return jsonify({"status": "applied", **summary, "start": start, "batch": len(batch),
+                    "remaining": max(0, len(plans) - start - len(batch)),
+                    "created": len(created), "updated": len(updated), "archived": len(archived),
+                    "errors_count": len(errors), "errors": errors[:20]})
 
 
 @app.route("/trello-webhook", methods=["POST"])
