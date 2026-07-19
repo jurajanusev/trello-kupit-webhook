@@ -362,17 +362,22 @@ def sync_project_microsoft_todo(project):
                        if card["shortUrl"] in (task.get("body") or {}).get("content", "")]
         matches = url_matches or title_matches
         desired_due = todo_due_payload(card.get("due"))
+        desired_date = card.get("due", "")[:10] if card.get("due") else ""
         desired_body = (
             "Synchronizované automaticky z Trello karty rekvizity.\n\n"
             f"Trello: {card['shortUrl']}\n\n{card.get('desc', '')}"
+        )[:24000]
+        desired_body = (
+            f"SYNC PROJECT: {config['name']}\n"
+            f"SYNC DUE DATE: {desired_date or 'NONE'}\n\n"
+            + desired_body
         )[:24000]
         primary = matches[0] if matches else None
         changes = {}
         if primary:
             current_body = (primary.get("body") or {}).get("content", "")
-            desired_date = card.get("due", "")[:10] if card.get("due") else ""
             due_marker_present = bool(desired_date and re.search(
-                r"\*\*DUE DATE:\*\*\s*" + re.escape(desired_date), current_body, flags=re.I
+                r"(?:\*\*DUE DATE:\*\*|SYNC DUE DATE:)\s*" + re.escape(desired_date), current_body, flags=re.I
             ))
             # Graph may normalize text bodies on write. The Trello URL is the
             # stable sync identity, so do not rewrite an already linked body.
@@ -383,6 +388,7 @@ def sync_project_microsoft_todo(project):
         plans.append({
             "card": card, "task": primary, "changes": changes,
             "duplicate_tasks": matches[1:], "desired_due": desired_due,
+            "desired_body": desired_body,
         })
 
     summary = {
