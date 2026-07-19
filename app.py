@@ -8,6 +8,7 @@ import requests
 import os
 import json
 import unicodedata
+import time
 
 app = Flask(__name__)
 
@@ -19,7 +20,7 @@ def handle_requests_http_error(exc):
         "error": "upstream request failed",
         "status_code": response.status_code if response is not None else None,
         "details": response.text[:3000] if response is not None else str(exc),
-        "url": response.url if response is not None else None,
+        "url": response.url.split("?", 1)[0] if response is not None else None,
     }), 502
 
 API_KEY = os.environ["TRELLO_KEY"]
@@ -93,10 +94,24 @@ BASE = "https://api.trello.com/1"
 GRAPH_BASE = "https://graph.microsoft.com/v1.0"
 
 
+def trello_request(method, url, **kwargs):
+    response = requests.request(method, url, **kwargs)
+    if response.status_code == 429:
+        retry_after = response.headers.get("Retry-After", "10")
+        try:
+            wait_seconds = max(1, min(30, int(float(retry_after))))
+        except ValueError:
+            wait_seconds = 10
+        print(f"TRELLO RATE LIMIT: retrying after {wait_seconds}s")
+        time.sleep(wait_seconds)
+        response = requests.request(method, url, **kwargs)
+    return response
+
+
 def trello_get(path, params=None):
     params = params or {}
     params.update({"key": API_KEY, "token": TOKEN})
-    r = requests.get(f"{BASE}{path}", params=params, timeout=20)
+    r = trello_request("GET", f"{BASE}{path}", params=params, timeout=20)
 
     if not r.ok:
         print("TRELLO GET ERROR:", r.status_code, r.text)
@@ -108,7 +123,7 @@ def trello_get(path, params=None):
 def trello_post(path, params=None):
     params = params or {}
     params.update({"key": API_KEY, "token": TOKEN})
-    r = requests.post(f"{BASE}{path}", params=params, timeout=20)
+    r = trello_request("POST", f"{BASE}{path}", params=params, timeout=20)
 
     if not r.ok:
         print("TRELLO POST ERROR:", r.status_code, r.text)
@@ -120,7 +135,7 @@ def trello_post(path, params=None):
 def trello_post_body(path, data=None):
     data = data or {}
     data.update({"key": API_KEY, "token": TOKEN})
-    r = requests.post(f"{BASE}{path}", data=data, timeout=20)
+    r = trello_request("POST", f"{BASE}{path}", data=data, timeout=20)
 
     if not r.ok:
         print("TRELLO POST BODY ERROR:", r.status_code, r.text)
@@ -132,7 +147,7 @@ def trello_post_body(path, data=None):
 def trello_put_body(path, data=None):
     data = data or {}
     data.update({"key": API_KEY, "token": TOKEN})
-    r = requests.put(f"{BASE}{path}", data=data, timeout=20)
+    r = trello_request("PUT", f"{BASE}{path}", data=data, timeout=20)
 
     if not r.ok:
         print("TRELLO PUT BODY ERROR:", r.status_code, r.text)
@@ -144,7 +159,7 @@ def trello_put_body(path, data=None):
 def trello_delete(path, params=None):
     params = params or {}
     params.update({"key": API_KEY, "token": TOKEN})
-    r = requests.delete(f"{BASE}{path}", params=params, timeout=20)
+    r = trello_request("DELETE", f"{BASE}{path}", params=params, timeout=20)
     if not r.ok:
         print("TRELLO DELETE ERROR:", r.status_code, r.text)
     r.raise_for_status()
