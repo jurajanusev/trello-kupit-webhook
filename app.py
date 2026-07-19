@@ -543,7 +543,7 @@ def sync_project_continuity_registry(project):
             "name": "REGISTER REKVIZÍT", "idBoard": board["id"], "pos": "bottom"
         })
     start = max(0, int(request.args.get("start", "0")))
-    limit = min(30, max(1, int(request.args.get("limit", "20"))))
+    limit = min(100, max(1, int(request.args.get("limit", "20"))))
     registry_marker_start = "<!-- PROP-REGISTRY:START -->"
     registry_marker_end = "<!-- PROP-REGISTRY:END -->"
     scene_marker_start = "<!-- PROP-CONTINUITY:START -->"
