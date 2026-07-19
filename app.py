@@ -808,6 +808,57 @@ def inspect_dok4_checklist_text():
                     "items": matches[:500]})
 
 
+@app.route("/api/delete-dok4-duplicate-guard-badges", methods=["POST"])
+def delete_dok4_duplicate_guard_badges():
+    if request.headers.get("X-Cleanup-Key") != "dok4-guard-badge-cleanup-19jul-6e94a1bf":
+        return jsonify({"error": "forbidden"}), 403
+
+    def folded(text):
+        value = unicodedata.normalize("NFKD", text or "")
+        return "".join(ch for ch in value if not unicodedata.combining(ch)).strip().upper()
+
+    board = trello_get("/boards/lzNy4AtY", {"fields": "id,name,url"})
+    lists = trello_get(f"/boards/{board['id']}/lists", {
+        "fields": "id,name,closed", "filter": "open"
+    })
+    target_list = next((item for item in lists if folded(item["name"]) == "VSETKY EPIZODY"), None)
+    if not target_list:
+        return jsonify({"error": "VSETKY EPIZODY list not found"}), 404
+    duplicates = []
+    cards = trello_get(f"/lists/{target_list['id']}/cards", {
+        "fields": "id,name,shortUrl,closed", "filter": "open", "limit": 1000,
+        "checklists": "all", "checklist_fields": "name",
+    })
+    for card in cards:
+        for checklist in card.get("checklists", []):
+            if folded(checklist.get("name")) != "POZNAMKY Z PORADY":
+                continue
+            for item in checklist.get("checkItems", []):
+                text = folded(item.get("name"))
+                if "STRAZNIK" in text and "VISACKA" in text:
+                    duplicates.append({"card": card, "checklist": checklist, "item": item})
+    mode = request.args.get("mode", "dry-run")
+    if mode == "dry-run":
+        return jsonify({"status": "dry-run", "duplicates": len(duplicates),
+                        "cards": len({item['card']['id'] for item in duplicates}),
+                        "sample": [{"card": item["card"]["name"],
+                                    "url": item["card"]["shortUrl"],
+                                    "item": item["item"]["name"]} for item in duplicates[:40]]})
+    if mode != "apply":
+        return jsonify({"error": "invalid mode"}), 400
+    limit = min(50, max(1, int(request.args.get("limit", "25"))))
+    batch = duplicates[:limit]
+    deleted = []; errors = []
+    for duplicate in batch:
+        try:
+            trello_delete(f"/checklists/{duplicate['checklist']['id']}/checkItems/{duplicate['item']['id']}")
+            deleted.append({"card": duplicate["card"]["name"], "item": duplicate["item"]["name"]})
+        except Exception as exc:
+            errors.append({"card": duplicate["card"]["name"], "error": str(exc)})
+    return jsonify({"status": "applied", "processed": len(batch), "deleted": deleted,
+                    "errors": errors, "remaining": max(0, len(duplicates) - len(batch))})
+
+
 def get_card(card_id):
     return trello_get(f"/cards/{card_id}", {
         "fields": "name,idList,idBoard,shortUrl,desc,due"
@@ -3623,14 +3674,19 @@ def setup_dunaj_meeting_workflow():
         batch = [item for item in incomplete_checklists if not created_template_card or item["card"]["id"] != created_template_card["id"]][:limit]
         created = 1 if created_template_card else 0
         errors = []
+
+        def create_clean_meeting_checklist(card_id):
+            clean = trello_post_body("/checklists", {
+                "idCard": card_id, "name": "POZNÁMKY Z PORADY", "pos": "bottom"
+            })
+            for clean_item_name in checklist_items:
+                trello_post_body(f"/checklists/{clean['id']}/checkItems", {"name": clean_item_name})
+
         for item in batch:
             try:
                 if item["checklist"] and (not item["item_names"] or item["only_obsolete"]):
                     trello_delete(f"/checklists/{item['checklist']['id']}")
-                    trello_post_body("/checklists", {
-                        "idCard": item["card"]["id"], "name": "POZNÁMKY Z PORADY",
-                        "pos": "bottom", "idChecklistSource": meeting_checklist["id"],
-                    })
+                    create_clean_meeting_checklist(item["card"]["id"])
                 elif item["checklist"]:
                     for obsolete in item["obsolete_items"]:
                         trello_delete(f"/checklists/{item['checklist']['id']}/checkItems/{obsolete['id']}")
@@ -3638,10 +3694,7 @@ def setup_dunaj_meeting_workflow():
                         if item_name.upper() not in item["item_names"]:
                             trello_post_body(f"/checklists/{item['checklist']['id']}/checkItems", {"name": item_name})
                 else:
-                    trello_post_body("/checklists", {
-                        "idCard": item["card"]["id"], "name": "POZNÁMKY Z PORADY",
-                        "pos": "bottom", "idChecklistSource": meeting_checklist["id"],
-                    })
+                    create_clean_meeting_checklist(item["card"]["id"])
                 created += 1
             except Exception as exc:
                 errors.append({"card": item["card"]["name"], "error": str(exc)})
