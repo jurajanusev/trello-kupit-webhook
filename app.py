@@ -2302,6 +2302,17 @@ def sync_dunaj_schedule():
             base_scene_id = re.sub(r"[A-Z]+$", "", row["scene_id"], flags=re.I)
             if base_scene_id != row["scene_id"]:
                 candidates = cards_by_scene.get(base_scene_id, [])
+                if not candidates:
+                    search_result = trello_get("/search", {
+                        "query": base_scene_id, "idBoards": board["id"],
+                        "modelTypes": "cards", "cards_limit": 100,
+                        "card_fields": "id,name,desc,idList,shortUrl,due,dueComplete,pos,closed",
+                    })
+                    candidates = []
+                    for candidate in search_result.get("cards", []):
+                        match = re.match(r"^\s*([0-9]{1,2})\s*/\s*([0-9]+[A-Z]*)(?:\.|\s|$)", candidate.get("name", ""), re.I)
+                        if match and normalize_scene_id(match.group(1), match.group(2)) == base_scene_id:
+                            candidates.append(candidate)
                 matched_scene_id = base_scene_id
                 fallback_match = bool(candidates)
         if not candidates:
@@ -2425,6 +2436,8 @@ def sync_dunaj_schedule():
             current_name = open_lists.get(card["idList"], {}).get("name")
             if card["idList"] != target["id"]:
                 update["idList"] = target["id"]
+            if card.get("closed"):
+                update["closed"] = "false"
             if current_name == "NATOČENÉ OBRAZY" or card.get("dueComplete"):
                 update["dueComplete"] = "false"
             if item["fallback_match"]:
