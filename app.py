@@ -2783,6 +2783,18 @@ def sync_dunaj_prop_cards():
             "existing_cards": [card["name"] for card in item["existing"]],
         } for item in plans[:40]]}), 200
 
+    if mode == "archive-unmatched-auto":
+        archived = []
+        skipped = []
+        for card in unmatched_todo:
+            if "Vytvorené automaticky z checklist položky." not in card.get("desc", ""):
+                skipped.append({"id": card["id"], "name": card["name"]})
+                continue
+            trello_put_body(f"/cards/{card['id']}", {"closed": "true"})
+            archived.append({"id": card["id"], "name": card["name"]})
+        return jsonify({"status": "unmatched-auto-archived", "archived": archived,
+                        "archived_count": len(archived), "skipped": skipped})
+
     if mode != "apply":
         return jsonify({"error": "invalid mode"}), 400
     start = max(0, int(request.args.get("start", "0")))
