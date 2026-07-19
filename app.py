@@ -661,6 +661,47 @@ def sync_project_continuity_registry(project):
     return jsonify({"error": "invalid mode"}), 400
 
 
+@app.route("/api/inspect-dok4-registry-list", methods=["GET"])
+def inspect_dok4_registry_list():
+    if request.headers.get("X-Continuity-Sync-Key") != "continuity-registry-19jul-51ea730c":
+        return jsonify({"error": "forbidden"}), 403
+    try:
+        board = trello_get("/boards/lzNy4AtY", {"fields": "id,name"})
+        lists = trello_get(f"/boards/{board['id']}/lists", {
+            "fields": "id,name,closed", "filter": "open"
+        })
+        registry = next((item for item in lists
+                         if item["name"].strip().casefold() == "register rekvizít".casefold()), None)
+        if not registry:
+            return jsonify({"error": "registry list not found"}), 404
+        cards = trello_get(f"/lists/{registry['id']}/cards", {
+            "fields": "id,name,desc,shortUrl,closed,pos", "filter": "open", "limit": 1000
+        })
+        by_identity = {}
+        without_identity = []
+        for card in cards:
+            match = re.search(r"\*\*IDENTITA:\*\*\s*`([^`]+)`", card.get("desc", ""), flags=re.I)
+            if match:
+                by_identity.setdefault(match.group(1).strip(), []).append(card)
+            else:
+                without_identity.append(card)
+        duplicates = [{"identity": key, "cards": len(value),
+                       "names": [card["name"] for card in value]}
+                      for key, value in by_identity.items() if len(value) > 1]
+        return jsonify({"board": board["name"], "list": registry["name"],
+                        "active_cards_returned": len(cards),
+                        "unique_identities": len(by_identity),
+                        "duplicate_identities": len(duplicates),
+                        "duplicate_extra_cards": sum(item["cards"] - 1 for item in duplicates),
+                        "without_identity": len(without_identity),
+                        "duplicate_sample": duplicates[:30]})
+    except requests.HTTPError as exc:
+        response = exc.response
+        return jsonify({"error": "Trello request failed",
+                        "status_code": response.status_code if response is not None else None,
+                        "details": response.text[:2000] if response is not None else str(exc)}), 502
+
+
 @app.route("/api/move-dok4-medical-prep", methods=["POST"])
 def move_dok4_medical_prep():
     if request.headers.get("X-Medical-Prep-Key") != "dok4-medical-prep-19jul-70ac3e91":
