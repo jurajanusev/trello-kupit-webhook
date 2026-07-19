@@ -2249,7 +2249,6 @@ def find_dunaj_board():
 
 @app.route("/api/sync-dunaj-schedule", methods=["POST"])
 def sync_dunaj_schedule():
-    return jsonify({"error": "endpoint disabled"}), 410
     if request.headers.get("X-Sync-Key") != "dunaj-1516-schedule-19jul-2f8c41d6":
         return jsonify({"error": "forbidden"}), 403
 
@@ -2297,6 +2296,14 @@ def sync_dunaj_schedule():
     window_cards = []
     for row in window_rows:
         candidates = cards_by_scene.get(row["scene_id"], [])
+        matched_scene_id = row["scene_id"]
+        fallback_match = False
+        if not candidates:
+            base_scene_id = re.sub(r"[A-Z]+$", "", row["scene_id"], flags=re.I)
+            if base_scene_id != row["scene_id"]:
+                candidates = cards_by_scene.get(base_scene_id, [])
+                matched_scene_id = base_scene_id
+                fallback_match = bool(candidates)
         if not candidates:
             window_missing.append(row["scene_id"])
         elif len(candidates) > 1:
@@ -2305,7 +2312,10 @@ def sync_dunaj_schedule():
                 "cards": [{"name": c["name"], "url": c["shortUrl"], "list": open_lists.get(c["idList"], {}).get("name")} for c in candidates],
             })
         else:
-            window_cards.append({"row": row, "card": candidates[0]})
+            window_cards.append({
+                "row": row, "card": candidates[0],
+                "matched_scene_id": matched_scene_id, "fallback_match": fallback_match,
+            })
 
     def date_list_name(date_text):
         _, month, day = (int(part) for part in date_text.split("-"))
@@ -2349,6 +2359,7 @@ def sync_dunaj_schedule():
             "missing_target_lists": missing_target_lists, "window_by_date": window_by_date,
             "window_sample": [{
                 "scene_id": item["row"]["scene_id"], "date": item["row"]["shooting_date"],
+                "matched_scene_id": item["matched_scene_id"], "fallback_match": item["fallback_match"],
                 "order": item["row"]["order"], "unit": item["row"]["unit"],
                 "from": open_lists.get(item["card"]["idList"], {}).get("name"),
                 "to": target_names[item["row"]["shooting_date"]], "url": item["card"]["shortUrl"],
@@ -2416,6 +2427,28 @@ def sync_dunaj_schedule():
                 update["idList"] = target["id"]
             if current_name == "NATOČENÉ OBRAZY" or card.get("dueComplete"):
                 update["dueComplete"] = "false"
+            if item["fallback_match"]:
+                start_marker = "<!-- DUNAJ-SCHEDULE-METADATA:START -->"
+                end_marker = "<!-- DUNAJ-SCHEDULE-METADATA:END -->"
+                metadata = (
+                    f"{start_marker}\n"
+                    f"**ČÍSLO OBRAZU:** {row['scene_id']}\n"
+                    f"**ZDROJ:** predbežná dispo DUNAJ 16 z 19. 7. 2026\n"
+                    f"**NATÁČACÍ DEŇ:** {row['shooting_day']}\n"
+                    f"**DÁTUM NATÁČANIA:** {row['shooting_date']}\n"
+                    f"**PORADIE DŇA:** {row['order']}\n"
+                    f"**UNIT:** {row['unit']}\n"
+                    f"**LOKÁCIA:** {row['location']}\n"
+                    f"**POSTAVY:** {row['characters']}\n"
+                    f"{end_marker}"
+                )
+                old_desc = card.get("desc", "")
+                if start_marker in old_desc and end_marker in old_desc:
+                    pattern = re.escape(start_marker) + r".*?" + re.escape(end_marker)
+                    update["desc"] = re.sub(pattern, lambda _: metadata, old_desc, count=1, flags=re.S)
+                else:
+                    update["desc"] = metadata + ("\n\n" + old_desc if old_desc else "")
+                update["due"] = f"{row['shooting_date']}T10:00:00.000Z"
             try:
                 result = trello_put_body(f"/cards/{card['id']}", update)
                 entry = {"scene_id": row["scene_id"], "date": row["shooting_date"], "order": row["order"], "list": target_name, "url": result["shortUrl"]}
