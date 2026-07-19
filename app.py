@@ -2601,6 +2601,45 @@ def dunaj_props_inventory():
                     "todo_samples": todo_samples, "scene_samples": scene_samples})
 
 
+@app.route("/api/dunaj-z-items", methods=["GET"])
+def dunaj_z_items():
+    if request.headers.get("X-Inventory-Key") != "dunaj-props-inventory-2bc741e9":
+        return jsonify({"error": "forbidden"}), 403
+    list_id = request.args.get("idList", "").strip()
+    if not list_id:
+        return jsonify({"error": "idList required"}), 400
+    board_list = trello_get(f"/lists/{list_id}", {"fields": "id,name,idBoard,closed"})
+    board = trello_get("/boards/qCPeWA3e", {"fields": "id"})
+    if board_list.get("idBoard") != board["id"]:
+        return jsonify({"error": "wrong board"}), 400
+    cards = trello_get(f"/lists/{list_id}/cards", {
+        "fields": "id,name,desc,due,shortUrl,closed", "filter": "open", "limit": 1000,
+        "checklists": "all", "checklist_fields": "name",
+    })
+    occurrences = []
+    scene_cards = 0
+    for card in cards:
+        match = re.match(r"^\s*([0-9]{1,2})\s*/\s*([0-9]+[A-Z]*)(?:\.|\s|$)", card.get("name", ""), re.I)
+        if not match:
+            continue
+        scene_cards += 1
+        scene_id = normalize_scene_id(match.group(1), match.group(2))
+        for checklist in card.get("checklists", []):
+            for item in checklist.get("checkItems", []):
+                item_name = item.get("name", "").strip()
+                if CHECKLIST_TAG.lower() not in item_name.lower():
+                    continue
+                occurrences.append({
+                    "item": item_name, "clean": normalize_item_name(item_name),
+                    "scene_id": scene_id, "card_name": card["name"], "url": card["shortUrl"],
+                    "due": card.get("due"), "list": board_list["name"],
+                    "context": card.get("desc", "")[:3000],
+                })
+    return jsonify({"list": board_list["name"], "cards": len(cards),
+                    "scene_cards": scene_cards, "occurrences": occurrences,
+                    "occurrences_count": len(occurrences)})
+
+
 @app.route("/trello-webhook", methods=["POST"])
 def trello_webhook():
     data = request.json
