@@ -928,6 +928,59 @@ def reorder_dok4_scene_checklists():
                     "errors": errors, "remaining": max(0, len(cards_to_reorder) - len(batch))})
 
 
+@app.route("/api/remove-dok4-meeting-placeholders", methods=["POST"])
+def remove_dok4_meeting_placeholders():
+    if request.headers.get("X-Placeholder-Key") != "dok4-remove-meeting-placeholders-19jul-a6e81f24":
+        return jsonify({"error": "forbidden"}), 403
+
+    def folded(text):
+        value = unicodedata.normalize("NFKD", text or "")
+        return "".join(ch for ch in value if not unicodedata.combining(ch)).strip().upper()
+
+    exact_placeholders = {"[ZMENA]", "[ZRUSENE]", "[PRIDANE]", "[POZIADAVKY]", "[PODLA LOKACIE]"}
+    board = trello_get("/boards/lzNy4AtY", {"fields": "id,name,url"})
+    lists = trello_get(f"/boards/{board['id']}/lists", {
+        "fields": "id,name,closed", "filter": "open"
+    })
+    matches = []
+    for board_list in lists:
+        cards = trello_get(f"/lists/{board_list['id']}/cards", {
+            "fields": "id,name,shortUrl,closed", "filter": "open", "limit": 1000,
+            "checklists": "all", "checklist_fields": "name",
+        })
+        for card in cards:
+            for checklist in card.get("checklists", []):
+                if folded(checklist.get("name")) != "POZNAMKY Z PORADY":
+                    continue
+                for item in checklist.get("checkItems", []):
+                    if folded(item.get("name")) in exact_placeholders:
+                        matches.append({"card": card, "checklist": checklist,
+                                        "item": item, "list": board_list["name"]})
+    mode = request.args.get("mode", "dry-run")
+    if mode == "dry-run":
+        counts = {}
+        for match in matches:
+            name = match["item"]["name"]
+            counts[name] = counts.get(name, 0) + 1
+        return jsonify({"status": "dry-run", "items_to_delete": len(matches),
+                        "cards_affected": len({match['card']['id'] for match in matches}),
+                        "counts": counts})
+    if mode != "apply":
+        return jsonify({"error": "invalid mode"}), 400
+    limit = min(75, max(1, int(request.args.get("limit", "30"))))
+    batch = matches[:limit]
+    deleted = []; errors = []
+    for match in batch:
+        try:
+            trello_delete(f"/checklists/{match['checklist']['id']}/checkItems/{match['item']['id']}")
+            deleted.append({"card": match["card"]["name"], "item": match["item"]["name"]})
+        except Exception as exc:
+            errors.append({"card": match["card"]["name"], "item": match["item"]["name"],
+                           "error": str(exc)})
+    return jsonify({"status": "applied", "processed": len(batch), "deleted": deleted,
+                    "errors": errors, "remaining": max(0, len(matches) - len(batch))})
+
+
 def get_card(card_id):
     return trello_get(f"/cards/{card_id}", {
         "fields": "name,idList,idBoard,shortUrl,desc,due"
@@ -3638,7 +3691,8 @@ def setup_dunaj_meeting_workflow():
         scan_lists = [item for item in lists if item["id"] == requested_list_id]
         if not scan_lists:
             return jsonify({"error": "idList not found on board"}), 404
-    checklist_items = ["[ZMENA]", "[ZRUŠENÉ]", "[PRIDANÉ]", "[POŽIADAVKY]", "[PODĽA LOKÁCIE]"]
+    # Meeting notes are intentionally free-form; do not prefill placeholders.
+    checklist_items = []
     expected_names = {name.upper() for name in checklist_items}
     old_template_names = {"PRIDAŤ", "UPRAVIŤ", "ZRUŠIŤ", "KONTINUITA", "ZABEZPEČIŤ",
                           "NETREBA ZABEZPEČIŤ", "SCHVÁLENÉ", "OTÁZKA"}

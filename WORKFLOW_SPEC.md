@@ -58,8 +58,8 @@ Tento postup sa pouziva pre projekty Dunaj, DOK 4 a Riverdale:
 ### Poznamky z porady
 
 - Checklist `POZNÁMKY Z PORADY` sa pripravuje iba na aktivnych obrazovych kartach projektov Dunaj, DOK 4 a Riverdale; karty v zoznamoch natocenych sa vynechavaju.
-- Predpripravene polozky su `[ZMENA]`, `[ZRUŠENÉ]`, `[PRIDANÉ]`, `[POŽIADAVKY]` a `[PODĽA LOKÁCIE]`.
-- Pouzivatel pocas porady dopise text za prislusnu znacku. Synchronizacia po porade interpretuje iba tieto strukturovane polozky a pred zapisom ukaze dry-run.
+- Checklist `POZNÁMKY Z PORADY` zostava bez predpripravenych poloziek; poznamky sa zapisuju volnym sposobom ako v povodnom workflowe.
+- Synchronizacia po porade najprv zobrazi dry-run a nejednoznacne volne poznamky oznaci na potvrdenie.
 - Po zapracovani porady sa najprv aktualizuju zlucene Trello ToDo karty a potom Microsoft To Do.
 
 ### Microsoft To Do
