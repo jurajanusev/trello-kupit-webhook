@@ -2246,6 +2246,190 @@ def find_dunaj_board():
     return jsonify({"matches": matches, "boards_checked": len(boards)})
 
 
+@app.route("/api/sync-dunaj-schedule", methods=["POST"])
+def sync_dunaj_schedule():
+    if request.headers.get("X-Sync-Key") != "dunaj-1516-schedule-19jul-2f8c41d6":
+        return jsonify({"error": "forbidden"}), 403
+
+    window_start = "2026-07-20"
+    window_end = "2026-07-26"
+    schedule_path = os.path.join(os.path.dirname(__file__), "dunaj_schedule_2026-07-19.json")
+    with open(schedule_path, "r", encoding="utf-8") as handle:
+        schedule_rows = json.load(handle)["rows"]
+    row_by_scene = {row["scene_id"]: row for row in schedule_rows}
+
+    board = trello_get("/boards/Kd1WK2R0", {"fields": "id,name,url"})
+    board_lists = trello_get(f"/boards/{board['id']}/lists", {"fields": "id,name,closed"})
+    open_lists = {item["id"]: item for item in board_lists if not item.get("closed")}
+    lists_by_name = {item["name"]: item for item in open_lists.values()}
+    cards = []
+    for list_id in open_lists:
+        cards.extend(trello_get(f"/lists/{list_id}/cards", {
+            "fields": "id,name,desc,idList,shortUrl,due,dueComplete,pos,closed", "filter": "open", "limit": 1000
+        }))
+
+    cards_by_scene = {}
+    for card in cards:
+        match = re.match(r"^\s*([0-9]{1,2})\s*/\s*([0-9]+[A-Z]*)(?:\.|\s|$)", card.get("name", ""), re.I)
+        if match:
+            scene_id = normalize_scene_id(match.group(1), match.group(2))
+            if scene_id:
+                cards_by_scene.setdefault(scene_id, []).append(card)
+
+    matched = []
+    missing = []
+    duplicate_ids = []
+    for scene_id, row in row_by_scene.items():
+        candidates = cards_by_scene.get(scene_id, [])
+        if not candidates:
+            missing.append(scene_id)
+        else:
+            if len(candidates) > 1:
+                duplicate_ids.append(scene_id)
+            for card in candidates:
+                matched.append({"scene_id": scene_id, "row": row, "card": card})
+
+    window_rows = [row for row in schedule_rows if window_start <= row["shooting_date"] <= window_end]
+    window_missing = []
+    window_duplicates = []
+    window_cards = []
+    for row in window_rows:
+        candidates = cards_by_scene.get(row["scene_id"], [])
+        if not candidates:
+            window_missing.append(row["scene_id"])
+        elif len(candidates) > 1:
+            window_duplicates.append({
+                "scene_id": row["scene_id"],
+                "cards": [{"name": c["name"], "url": c["shortUrl"], "list": open_lists.get(c["idList"], {}).get("name")} for c in candidates],
+            })
+        else:
+            window_cards.append({"row": row, "card": candidates[0]})
+
+    def date_list_name(date_text):
+        _, month, day = (int(part) for part in date_text.split("-"))
+        return f"{day}.{month}."
+
+    shooting_dates = sorted({row["shooting_date"] for row in window_rows})
+    target_names = {date_text: date_list_name(date_text) for date_text in shooting_dates}
+    missing_target_lists = [name for name in target_names.values() if name not in lists_by_name]
+
+    mode = request.args.get("mode", "dry-run")
+    if mode == "dry-run":
+        matched_by_list = {}
+        for item in matched:
+            name = open_lists.get(item["card"]["idList"], {}).get("name", "UNKNOWN")
+            matched_by_list[name] = matched_by_list.get(name, 0) + 1
+        window_by_date = {}
+        for row in window_rows:
+            window_by_date.setdefault(row["shooting_date"], {
+                "target_list": target_names[row["shooting_date"]], "schedule_rows": 0,
+                "cards_found_unique": 0, "already_correct": 0, "to_move": 0,
+            })["schedule_rows"] += 1
+        for item in window_cards:
+            row = item["row"]
+            current = open_lists.get(item["card"]["idList"], {}).get("name")
+            info = window_by_date[row["shooting_date"]]
+            info["cards_found_unique"] += 1
+            info["already_correct" if current == target_names[row["shooting_date"]] else "to_move"] += 1
+        return jsonify({
+            "status": "dry-run", "board": board["name"], "board_url": board["url"],
+            "open_lists": [item["name"] for item in open_lists.values()],
+            "open_cards": len(cards), "schedule_rows": len(schedule_rows),
+            "matched_scene_ids": len(schedule_rows) - len(missing), "matched_card_copies": len(matched),
+            "missing_count": len(missing), "missing_sample": missing[:60],
+            "duplicate_scene_ids_count": len(duplicate_ids), "duplicate_scene_ids_sample": duplicate_ids[:30],
+            "matched_by_list": matched_by_list,
+            "window_start": window_start, "window_end": window_end,
+            "window_schedule_rows": len(window_rows), "window_unique_cards": len(window_cards),
+            "window_missing_count": len(window_missing), "window_missing": window_missing,
+            "window_duplicates_count": len(window_duplicates), "window_duplicates": window_duplicates[:20],
+            "shooting_dates": shooting_dates, "days_without_shooting": 7 - len(shooting_dates),
+            "missing_target_lists": missing_target_lists, "window_by_date": window_by_date,
+            "window_sample": [{
+                "scene_id": item["row"]["scene_id"], "date": item["row"]["shooting_date"],
+                "order": item["row"]["order"], "unit": item["row"]["unit"],
+                "from": open_lists.get(item["card"]["idList"], {}).get("name"),
+                "to": target_names[item["row"]["shooting_date"]], "url": item["card"]["shortUrl"],
+            } for item in window_cards[:40]],
+        })
+
+    if mode == "metadata":
+        batch_start = max(0, int(request.args.get("start", "0")))
+        batch_limit = min(75, max(1, int(request.args.get("limit", "40"))))
+        batch = matched[batch_start:batch_start + batch_limit]
+        start_marker = "<!-- DUNAJ-SCHEDULE-METADATA:START -->"
+        end_marker = "<!-- DUNAJ-SCHEDULE-METADATA:END -->"
+        updated = []; unchanged = 0; moved = []; errors = []
+        for item in batch:
+            row = item["row"]; card = item["card"]
+            metadata = (
+                f"{start_marker}\n"
+                f"**ČÍSLO OBRAZU:** {row['scene_id']}\n"
+                f"**ZDROJ:** predbežná dispo DUNAJ 16 z 19. 7. 2026\n"
+                f"**NATÁČACÍ DEŇ:** {row['shooting_day']}\n"
+                f"**DÁTUM NATÁČANIA:** {row['shooting_date']}\n"
+                f"**PORADIE DŇA:** {row['order']}\n"
+                f"**UNIT:** {row['unit']}\n"
+                f"**LOKÁCIA:** {row['location']}\n"
+                f"**POSTAVY:** {row['characters']}\n"
+                f"{end_marker}"
+            )
+            old_desc = card.get("desc", "")
+            if start_marker in old_desc and end_marker in old_desc:
+                pattern = re.escape(start_marker) + r".*?" + re.escape(end_marker)
+                new_desc = re.sub(pattern, lambda _: metadata, old_desc, count=1, flags=re.S)
+            else:
+                new_desc = metadata + ("\n\n" + old_desc if old_desc else "")
+            expected_due = f"{row['shooting_date']}T10:00:00.000Z"
+            if new_desc == old_desc and card.get("due", "")[:10] == row["shooting_date"]:
+                unchanged += 1; continue
+            try:
+                result = trello_put_body(f"/cards/{card['id']}", {"desc": new_desc, "due": expected_due})
+                if result.get("idList") != card.get("idList"):
+                    moved.append(item["scene_id"])
+                updated.append(item["scene_id"])
+            except Exception as exc:
+                errors.append({"scene_id": item["scene_id"], "error": str(exc)})
+        return jsonify({
+            "status": "metadata-applied", "matched_card_copies": len(matched),
+            "batch_start": batch_start, "batch_size": len(batch),
+            "remaining": max(0, len(matched) - batch_start - len(batch)),
+            "updated": len(updated), "unchanged": unchanged,
+            "moved_count": len(moved), "errors_count": len(errors), "errors": errors[:20],
+        })
+
+    if mode == "window":
+        for date_text, name in target_names.items():
+            if name not in lists_by_name:
+                lists_by_name[name] = trello_post_body("/lists", {
+                    "idBoard": board["id"], "name": name, "pos": "bottom"
+                })
+        moved = []; reordered = []; errors = []
+        for item in sorted(window_cards, key=lambda value: (value["row"]["shooting_date"], value["row"]["order"])):
+            row = item["row"]; card = item["card"]
+            target_name = target_names[row["shooting_date"]]; target = lists_by_name[target_name]
+            update = {"pos": row["order"] * 16384}
+            current_name = open_lists.get(card["idList"], {}).get("name")
+            if card["idList"] != target["id"]:
+                update["idList"] = target["id"]
+            if current_name == "NATOČENÉ OBRAZY" or card.get("dueComplete"):
+                update["dueComplete"] = "false"
+            try:
+                result = trello_put_body(f"/cards/{card['id']}", update)
+                entry = {"scene_id": row["scene_id"], "date": row["shooting_date"], "order": row["order"], "list": target_name, "url": result["shortUrl"]}
+                (moved if "idList" in update else reordered).append(entry)
+            except Exception as exc:
+                errors.append({"scene_id": row["scene_id"], "error": str(exc)})
+        return jsonify({
+            "status": "window-applied", "lists_created": missing_target_lists,
+            "moved_count": len(moved), "reordered_count": len(reordered),
+            "window_missing_count": len(window_missing), "window_duplicates_count": len(window_duplicates),
+            "errors_count": len(errors), "errors": errors[:30], "moved": moved,
+        })
+
+    return jsonify({"error": "invalid mode"}), 400
+
+
 @app.route("/trello-webhook", methods=["POST"])
 def trello_webhook():
     data = request.json
