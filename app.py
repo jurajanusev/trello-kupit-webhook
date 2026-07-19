@@ -2722,7 +2722,7 @@ def sync_dunaj_prop_cards():
                             group["refs"].add(ref)
 
     todo_cards = trello_get(f"/lists/{todo_list['id']}/cards", {
-        "fields": "id,name,desc,due,shortUrl,closed,pos", "filter": "open", "limit": 1000
+        "fields": "id,name,desc,due,shortUrl,closed,pos", "filter": "all", "limit": 1000
     })
     todo_by_key = {}
     for card in todo_cards:
@@ -2748,7 +2748,7 @@ def sync_dunaj_prop_cards():
         ))
         earliest = next(((scene_id, card) for scene_id, card in ordered_scenes if card.get("due")),
                         ordered_scenes[0] if ordered_scenes else (None, None))
-        existing = sorted(todo_by_key.get(key, []), key=lambda card: card.get("pos", 0))
+        existing = sorted(todo_by_key.get(key, []), key=lambda card: (bool(card.get("closed")), card.get("pos", 0)))
         plans.append({
             "key": key, "display": group["display"], "linked": ordered_scenes,
             "contexts": contexts, "earliest_scene": earliest[0], "earliest_card": earliest[1],
@@ -2759,10 +2759,10 @@ def sync_dunaj_prop_cards():
     summary = {
         "board": board["name"], "scene_cards_scanned": scanned_scene_cards,
         "tagged_occurrences": tagged_occurrences, "unique_props": len(plans),
-        "todo_cards_before": len(todo_cards),
+        "todo_cards_before": sum(1 for card in todo_cards if not card.get("closed")),
         "to_create": sum(1 for item in plans if not item["existing"]),
         "to_update": sum(1 for item in plans if item["existing"]),
-        "duplicates_to_archive": sum(max(0, len(item["existing"]) - 1) for item in plans),
+        "duplicates_to_archive": sum(max(0, sum(1 for card in item["existing"] if not card.get("closed")) - 1) for item in plans),
         "without_due": sum(1 for item in plans if not item["earliest_card"] or not item["earliest_card"].get("due")),
     }
     mode = request.args.get("mode", "dry-run")
@@ -2814,6 +2814,8 @@ def sync_dunaj_prop_cards():
             else:
                 new_desc = synced + ("\n\n---\n\n**PÔVODNÝ ZÁZNAM / RUČNÉ POZNÁMKY:**\n\n" + old_desc if old_desc else "")
             payload = {"desc": new_desc}
+            if primary.get("closed"):
+                payload["closed"] = "false"
             if earliest_card and earliest_card.get("due"):
                 payload["due"] = earliest_card["due"]
             try:
@@ -2840,6 +2842,8 @@ def sync_dunaj_prop_cards():
                 errors.append({"prop": plan["display"], "error": str(exc)})
                 continue
         for duplicate in plan["existing"][1:]:
+            if duplicate.get("closed"):
+                continue
             try:
                 trello_put_body(f"/cards/{duplicate['id']}", {"closed": "true"})
                 archived.append(duplicate["id"])
