@@ -928,8 +928,8 @@ def reorder_dok4_scene_checklists():
                     "errors": errors, "remaining": max(0, len(cards_to_reorder) - len(batch))})
 
 
-@app.route("/api/remove-dok4-meeting-placeholders", methods=["POST"])
-def remove_dok4_meeting_placeholders():
+@app.route("/api/remove-<project>-meeting-placeholders", methods=["POST"])
+def remove_project_meeting_placeholders(project):
     if request.headers.get("X-Placeholder-Key") != "dok4-remove-meeting-placeholders-19jul-a6e81f24":
         return jsonify({"error": "forbidden"}), 403
 
@@ -937,8 +937,12 @@ def remove_dok4_meeting_placeholders():
         value = unicodedata.normalize("NFKD", text or "")
         return "".join(ch for ch in value if not unicodedata.combining(ch)).strip().upper()
 
+    boards = {"dunaj": "qCPeWA3e", "dok4": "lzNy4AtY", "riverdale": "CzuD55PR"}
+    board_ref = boards.get(project.casefold())
+    if not board_ref:
+        return jsonify({"error": "unknown project"}), 404
     exact_placeholders = {"[ZMENA]", "[ZRUSENE]", "[PRIDANE]", "[POZIADAVKY]", "[PODLA LOKACIE]"}
-    board = trello_get("/boards/lzNy4AtY", {"fields": "id,name,url"})
+    board = trello_get(f"/boards/{board_ref}", {"fields": "id,name,url"})
     lists = trello_get(f"/boards/{board['id']}/lists", {
         "fields": "id,name,closed", "filter": "open"
     })
@@ -964,7 +968,8 @@ def remove_dok4_meeting_placeholders():
         for match in matches:
             name = match["item"]["name"]
             counts[name] = counts.get(name, 0) + 1
-        return jsonify({"status": "dry-run", "items_to_delete": len(matches),
+        return jsonify({"status": "dry-run", "project": project, "board": board["name"],
+                        "items_to_delete": len(matches),
                         "cards_affected": len({match['card']['id'] for match in matches}),
                         "counts": counts})
     if mode != "apply":
