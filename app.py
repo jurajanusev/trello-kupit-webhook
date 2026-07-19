@@ -213,6 +213,52 @@ def graph_post(path, access_token, payload):
     return r.json()
 
 
+def graph_patch(path, access_token, payload):
+    r = requests.patch(
+        f"{GRAPH_BASE}{path}",
+        headers={
+            "Authorization": f"Bearer {access_token}",
+            "Content-Type": "application/json",
+        },
+        json=payload,
+        timeout=20
+    )
+    if not r.ok:
+        print("GRAPH PATCH ERROR:", r.status_code, r.text)
+    r.raise_for_status()
+    return r.json()
+
+
+def graph_get_all(path, access_token, params=None):
+    values = []
+    url = f"{GRAPH_BASE}{path}"
+    first = True
+    while url:
+        r = requests.get(
+            url,
+            headers={"Authorization": f"Bearer {access_token}"},
+            params=(params or {}) if first else None,
+            timeout=20
+        )
+        if not r.ok:
+            print("GRAPH GET ALL ERROR:", r.status_code, r.text)
+        r.raise_for_status()
+        data = r.json()
+        values.extend(data.get("value", []))
+        url = data.get("@odata.nextLink")
+        first = False
+    return values
+
+
+def todo_due_payload(trello_due):
+    if not trello_due:
+        return None
+    return {
+        "dateTime": f"{trello_due[:10]}T12:00:00.0000000",
+        "timeZone": "Central Europe Standard Time",
+    }
+
+
 def todo_task_exists(access_token, title):
     data = graph_get(
         f"/me/todo/lists/{TODO_LIST_ID}/tasks",
@@ -266,6 +312,107 @@ def create_todo_task(item_name, original_item_name, card_info, matching_cards):
     )
     print("TODO TASK CREATED:", task.get("id"), task.get("title"))
     return task
+
+
+@app.route("/api/sync-dunaj-microsoft-todo", methods=["POST"])
+def sync_dunaj_microsoft_todo():
+    if request.headers.get("X-Microsoft-Sync-Key") != "dunaj-ms-todo-sync-19jul-84c2f1a7":
+        return jsonify({"error": "forbidden"}), 403
+    if not microsoft_enabled():
+        return jsonify({"error": "Microsoft To Do is not configured"}), 503
+
+    lists = trello_get("/boards/qCPeWA3e/lists", {
+        "fields": "id,name,closed", "filter": "open"
+    })
+    todo_list = next((item for item in lists if item.get("name", "").strip().casefold() == "todo"), None)
+    if not todo_list:
+        return jsonify({"error": "Dunaj ToDo list not found"}), 404
+    cards = trello_get(f"/lists/{todo_list['id']}/cards", {
+        "fields": "id,name,desc,due,shortUrl,closed,pos", "filter": "open", "limit": 1000
+    })
+    cards.sort(key=lambda card: (card.get("name", "").casefold(), card.get("id", "")))
+
+    access_token = get_microsoft_access_token()
+    tasks = graph_get_all(
+        f"/me/todo/lists/{TODO_LIST_ID}/tasks", access_token,
+        params={"$top": 100, "$select": "id,title,body,dueDateTime,status"}
+    )
+    tasks_by_title = {}
+    for task in tasks:
+        tasks_by_title.setdefault(task.get("title", "").strip().casefold(), []).append(task)
+
+    plans = []
+    for card in cards:
+        matches = tasks_by_title.get(card["name"].strip().casefold(), [])
+        desired_due = todo_due_payload(card.get("due"))
+        desired_body = (
+            "Synchronizované automaticky z Trello karty rekvizity.\n\n"
+            f"Trello: {card['shortUrl']}\n\n{card.get('desc', '')}"
+        )[:24000]
+        primary = matches[0] if matches else None
+        changes = {}
+        if primary:
+            if (primary.get("body") or {}).get("content", "") != desired_body:
+                changes["body"] = {"content": desired_body, "contentType": "text"}
+            current_due = (primary.get("dueDateTime") or {}).get("dateTime", "")[:10]
+            desired_date = card.get("due", "")[:10] if card.get("due") else ""
+            if desired_date and current_due != desired_date:
+                changes["dueDateTime"] = desired_due
+        plans.append({
+            "card": card, "task": primary, "changes": changes,
+            "duplicate_tasks": matches[1:], "desired_due": desired_due,
+        })
+
+    summary = {
+        "trello_cards": len(cards), "microsoft_tasks": len(tasks),
+        "matched": sum(1 for plan in plans if plan["task"]),
+        "to_create": sum(1 for plan in plans if not plan["task"]),
+        "to_update": sum(1 for plan in plans if plan["task"] and plan["changes"]),
+        "unchanged": sum(1 for plan in plans if plan["task"] and not plan["changes"]),
+        "duplicate_exact_titles": sum(len(plan["duplicate_tasks"]) for plan in plans),
+        "without_due": sum(1 for card in cards if not card.get("due")),
+    }
+    mode = request.args.get("mode", "dry-run")
+    if mode == "dry-run":
+        return jsonify({"status": "dry-run", **summary, "sample": [{
+            "title": plan["card"]["name"], "trello_due": (plan["card"].get("due") or "")[:10] or None,
+            "action": "create" if not plan["task"] else ("update" if plan["changes"] else "unchanged"),
+            "fields": sorted(plan["changes"]), "duplicates": len(plan["duplicate_tasks"]),
+        } for plan in plans[:30]]})
+    if mode != "apply":
+        return jsonify({"error": "invalid mode"}), 400
+
+    actionable = [plan for plan in plans if not plan["task"] or plan["changes"]]
+    start = max(0, int(request.args.get("start", "0")))
+    limit = min(25, max(1, int(request.args.get("limit", "15"))))
+    batch = actionable[start:start + limit]
+    created = []; updated = []; errors = []
+    for plan in batch:
+        card = plan["card"]
+        try:
+            if plan["task"]:
+                task = graph_patch(
+                    f"/me/todo/lists/{TODO_LIST_ID}/tasks/{plan['task']['id']}",
+                    access_token, plan["changes"]
+                )
+                updated.append({"title": task.get("title"), "due": (task.get("dueDateTime") or {}).get("dateTime")})
+            else:
+                payload = {
+                    "title": card["name"],
+                    "body": {"content": (
+                        "Synchronizované automaticky z Trello karty rekvizity.\n\n"
+                        f"Trello: {card['shortUrl']}\n\n{card.get('desc', '')}"
+                    )[:24000], "contentType": "text"},
+                }
+                if plan["desired_due"]:
+                    payload["dueDateTime"] = plan["desired_due"]
+                task = graph_post(f"/me/todo/lists/{TODO_LIST_ID}/tasks", access_token, payload)
+                created.append({"title": task.get("title"), "due": (task.get("dueDateTime") or {}).get("dateTime")})
+        except Exception as exc:
+            errors.append({"title": card["name"], "error": str(exc)})
+    return jsonify({"status": "applied", **summary, "actionable": len(actionable),
+                    "processed": len(batch), "created": created, "updated": updated,
+                    "errors": errors, "remaining": max(0, len(actionable) - start - len(batch))})
 
 
 def get_card(card_id):
