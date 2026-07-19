@@ -2562,6 +2562,45 @@ def reorder_dunaj_date_lists():
                     "planned": planned, "duplicates": duplicate_info})
 
 
+@app.route("/api/dunaj-props-inventory", methods=["GET"])
+def dunaj_props_inventory():
+    if request.headers.get("X-Inventory-Key") != "dunaj-props-inventory-2bc741e9":
+        return jsonify({"error": "forbidden"}), 403
+    board = trello_get("/boards/qCPeWA3e", {"fields": "id,name,url"})
+    lists = trello_get(f"/boards/{board['id']}/lists", {"fields": "id,name,pos,closed", "filter": "open"})
+    summary = []
+    todo_samples = []
+    scene_samples = []
+    for board_list in sorted(lists, key=lambda item: item["pos"]):
+        cards = trello_get(f"/lists/{board_list['id']}/cards", {
+            "fields": "id,name,desc,due,shortUrl,closed", "filter": "open", "limit": 1000
+        })
+        scene_cards = []
+        for card in cards:
+            match = re.match(r"^\s*([0-9]{1,2})\s*/\s*([0-9]+[A-Z]*)(?:\.|\s|$)", card.get("name", ""), re.I)
+            if match:
+                scene_cards.append(card)
+        summary.append({
+            "id": board_list["id"], "name": board_list["name"], "pos": board_list["pos"],
+            "cards": len(cards), "scene_cards": len(scene_cards),
+        })
+        if board_list["name"].strip().lower() == "todo":
+            todo_samples = [{
+                "id": card["id"], "name": card["name"], "desc": card.get("desc", ""),
+                "due": card.get("due"), "url": card["shortUrl"],
+            } for card in cards[:20]]
+        if scene_cards and len(scene_samples) < 12:
+            for card in scene_cards[:3]:
+                scene_samples.append({
+                    "list": board_list["name"], "id": card["id"], "name": card["name"],
+                    "desc": card.get("desc", "")[:1500], "due": card.get("due"), "url": card["shortUrl"],
+                })
+                if len(scene_samples) >= 12:
+                    break
+    return jsonify({"board": board["name"], "lists": summary,
+                    "todo_samples": todo_samples, "scene_samples": scene_samples})
+
+
 @app.route("/trello-webhook", methods=["POST"])
 def trello_webhook():
     data = request.json
