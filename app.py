@@ -2513,6 +2513,54 @@ def sync_dunaj_schedule():
     return jsonify({"error": "invalid mode"}), 400
 
 
+@app.route("/api/reorder-dunaj-date-lists", methods=["POST"])
+def reorder_dunaj_date_lists():
+    if request.headers.get("X-Reorder-Key") != "dunaj-date-lists-19jul-8d3f01a7":
+        return jsonify({"error": "forbidden"}), 403
+
+    board = trello_get("/boards/qCPeWA3e", {"fields": "id,name,url"})
+    lists = trello_get(f"/boards/{board['id']}/lists", {"fields": "id,name,pos,closed", "filter": "open"})
+    lists = sorted(lists, key=lambda item: item["pos"])
+    anchor = next((item for item in lists if item["name"] == "SERIA 15,16"), None)
+    if not anchor:
+        return jsonify({"error": "SERIA 15,16 list not found"}), 404
+
+    target_names = ["20.7.", "22.7.", "23.7.", "24.7.", "25.7."]
+    selected = []
+    duplicate_info = {}
+    for name in target_names:
+        candidates = [item for item in lists if item["name"] == name]
+        if not candidates:
+            return jsonify({"error": f"{name} list not found"}), 404
+        counted = []
+        for candidate in candidates:
+            cards = trello_get(f"/lists/{candidate['id']}/cards", {"fields": "id", "filter": "open"})
+            counted.append((len(cards), candidate))
+        counted.sort(key=lambda value: (-value[0], value[1]["pos"]))
+        selected.append(counted[0][1])
+        if len(counted) > 1:
+            duplicate_info[name] = [{"id": item["id"], "cards": count, "pos": item["pos"]} for count, item in counted]
+
+    selected_ids = {item["id"] for item in selected}
+    following = [item for item in lists if item["id"] not in selected_ids and item["pos"] > anchor["pos"]]
+    next_pos = following[0]["pos"] if following else anchor["pos"] + 16384 * (len(selected) + 1)
+    step = (next_pos - anchor["pos"]) / (len(selected) + 1)
+    planned = [{"id": item["id"], "name": item["name"], "cards": next(
+        len(trello_get(f"/lists/{item['id']}/cards", {"fields": "id", "filter": "open"}))
+        for candidate in [item]
+    ), "pos": anchor["pos"] + step * index} for index, item in enumerate(selected, start=1)]
+
+    if request.args.get("mode", "dry-run") == "apply":
+        updated = []
+        for item in planned:
+            result = trello_put_body(f"/lists/{item['id']}", {"pos": item["pos"]})
+            updated.append({"id": result["id"], "name": result["name"], "pos": result["pos"]})
+        return jsonify({"status": "applied", "anchor": anchor["name"], "updated": updated, "duplicates": duplicate_info})
+
+    return jsonify({"status": "dry-run", "board": board["name"], "anchor": anchor,
+                    "planned": planned, "duplicates": duplicate_info})
+
+
 @app.route("/trello-webhook", methods=["POST"])
 def trello_webhook():
     data = request.json
