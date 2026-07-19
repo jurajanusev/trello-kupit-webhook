@@ -2955,10 +2955,13 @@ def sync_dunaj_prop_cards():
 
 @app.route("/api/setup-dunaj-meeting-workflow", methods=["POST"])
 def setup_dunaj_meeting_workflow():
-    return jsonify({"error": "endpoint disabled"}), 410
-    if request.headers.get("X-Meeting-Setup-Key") != "dunaj-meeting-setup-4a91c7de":
+    if request.headers.get("X-Meeting-Setup-Key") != "meeting-setup-riverdale-dok4-b618e2c4":
         return jsonify({"error": "forbidden"}), 403
-    board = trello_get("/boards/qCPeWA3e", {"fields": "id,name,url"})
+    project = request.args.get("project", "").strip().lower()
+    board_refs = {"riverdale": "CzuD55PR", "dok4": "lzNy4AtY"}
+    if project not in board_refs:
+        return jsonify({"error": "project must be riverdale or dok4"}), 400
+    board = trello_get(f"/boards/{board_refs[project]}", {"fields": "id,name,url"})
     lists = trello_get(f"/boards/{board['id']}/lists", {"fields": "id,name,closed", "filter": "open"})
     requested_list_id = request.args.get("idList", "").strip()
     scan_lists = lists
@@ -2973,7 +2976,9 @@ def setup_dunaj_meeting_workflow():
     scene_cards = []
     meeting_checklist = None
     for board_list in scan_lists:
-        if board_list["name"].strip().upper().startswith("NATOCENE"):
+        folded_list_name = unicodedata.normalize("NFKD", board_list["name"])
+        folded_list_name = "".join(char for char in folded_list_name if not unicodedata.combining(char)).upper()
+        if "NATOC" in folded_list_name:
             continue
         cards = trello_get(f"/lists/{board_list['id']}/cards", {
             "fields": "id,name,shortUrl", "filter": "open", "limit": 1000,
@@ -2995,10 +3000,10 @@ def setup_dunaj_meeting_workflow():
                                 "only_obsolete": bool(existing_names and existing_names.issubset(old_template_names)),
                                 "complete": bool(existing and is_complete)})
 
-    todo_list = next(item for item in lists if item["name"].strip().lower() == "todo")
+    todo_list = next((item for item in lists if item["name"].strip().lower() == "todo"), None)
     todo_cards = trello_get(f"/lists/{todo_list['id']}/cards", {
         "fields": "id,name,desc,due,shortUrl", "filter": "open", "limit": 1000
-    })
+    }) if todo_list else []
     marker_start = "<!-- DUNAJ-PROP-SYNC:START -->"
     marker_end = "<!-- DUNAJ-PROP-SYNC:END -->"
     props_to_clean = []
