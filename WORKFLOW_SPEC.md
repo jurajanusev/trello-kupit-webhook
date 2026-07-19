@@ -44,6 +44,16 @@ Tento postup sa pouziva pre projekty Dunaj, DOK 4 a Riverdale:
 - Datove zoznamy sa zoradia chronologicky hned za hlavnym zoznamom serialu.
 - Zaverecna kontrola musi potvrdit pocet najdenych kariet, nulove duplicity a nulovy pocet zostavajucich presunov; vsetky jednorazove endpointy sa potom vypnu.
 
+### ToDo rekvizity oznacene `[z]`
+
+- Jedna fyzicka rekvizita ma v zozname `ToDo` presne jednu aktivnu kartu, aj ked sa objavuje vo viacerych obrazoch.
+- Nazov zachovava format `nazov rekvizity - karta najskorsieho obrazu`.
+- Technicke znacky `[z]`, `[H]`, `[S]`, cisla kontinuity a text `nadv.` nie su sucastou identity rekvizity; zostavaju ako kontext v popise.
+- Popis obsahuje klikatelne odkazy na vsetky najdene obrazove karty, povodny text polozky ako akciu/kontext a zoznam kontinuity.
+- Due date je datum najskorsieho naplanovaneho obrazu, v ktorom rekvizita hra. Ak obraz este nema datum, karta ostane bez due date do dalsej aktualizacie planu.
+- Webhook pri novom `[z]` najprv hlada existujucu kartu podla normalizovaneho nazvu. Ak ju najde, doplni obraz a podla potreby posunie due date na skorsi termin; nevytvori novu kartu.
+- Pri cisteni sa archivuju iba overene automaticke duplicity. Rucne karty a rucne poznamky sa zachovavaju.
+
 Nastenky:
 
 - Dunaj: `Dunaj - Rekvizity` - `https://trello.com/b/qCPeWA3e/dunaj-rekvizity`
