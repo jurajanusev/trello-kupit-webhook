@@ -487,13 +487,15 @@ def sync_project_continuity_registry(project):
                     continue
                 for item in checklist.get("checkItems", []):
                     raw = item.get("name", "").strip()
-                    key, display = canonical_prop(raw)
+                    full_context = tagged_prop_text(raw)
+                    identity_source = re.split(r"\s+[–—-]\s+", full_context, maxsplit=1)[0].strip()
+                    key, display = canonical_prop(identity_source)
                     if not key or key in {"test", "x"}:
                         continue
-                    occurrence = {"scene_id": scene_id, "card": card, "context": tagged_prop_text(raw)}
+                    occurrence = {"scene_id": scene_id, "card": card, "context": full_context}
                     group = prop_groups.setdefault(key, {"display": display, "occurrences": []})
                     group["occurrences"].append(occurrence)
-                    props.append({"key": key, "context": tagged_prop_text(raw)})
+                    props.append({"key": key, "context": full_context})
             if props:
                 scene_cards.append({"card": card, "scene_id": scene_id, "props": props})
 
