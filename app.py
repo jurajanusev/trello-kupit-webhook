@@ -11,6 +11,17 @@ import unicodedata
 
 app = Flask(__name__)
 
+
+@app.errorhandler(requests.HTTPError)
+def handle_requests_http_error(exc):
+    response = exc.response
+    return jsonify({
+        "error": "upstream request failed",
+        "status_code": response.status_code if response is not None else None,
+        "details": response.text[:3000] if response is not None else str(exc),
+        "url": response.url if response is not None else None,
+    }), 502
+
 API_KEY = os.environ["TRELLO_KEY"]
 TOKEN = os.environ["TRELLO_TOKEN"]
 MICROSOFT_CLIENT_ID = os.environ.get("MICROSOFT_CLIENT_ID")
