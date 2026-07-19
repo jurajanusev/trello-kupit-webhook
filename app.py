@@ -638,6 +638,83 @@ def sync_project_continuity_registry(project):
     return jsonify({"error": "invalid mode"}), 400
 
 
+@app.route("/api/move-dok4-medical-prep", methods=["POST"])
+def move_dok4_medical_prep():
+    if request.headers.get("X-Medical-Prep-Key") != "dok4-medical-prep-19jul-70ac3e91":
+        return jsonify({"error": "forbidden"}), 403
+
+    def folded(text):
+        value = unicodedata.normalize("NFKD", text or "")
+        return "".join(ch for ch in value if not unicodedata.combining(ch)).strip().upper()
+
+    board = trello_get("/boards/lzNy4AtY", {"fields": "id,name,url"})
+    lists = trello_get(f"/boards/{board['id']}/lists", {
+        "fields": "id,name,closed", "filter": "open"
+    })
+    moves = []
+    for board_list in lists:
+        cards = trello_get(f"/lists/{board_list['id']}/cards", {
+            "fields": "id,name,shortUrl,closed", "filter": "open", "limit": 1000,
+            "checklists": "all", "checklist_fields": "name",
+        })
+        for card in cards:
+            if not scene_id_from_card_name(card.get("name")):
+                continue
+            source = next((checklist for checklist in card.get("checklists", [])
+                           if folded(checklist.get("name")) == "REKVIZITY"), None)
+            if not source:
+                continue
+            target = next((checklist for checklist in card.get("checklists", [])
+                           if folded(checklist.get("name")) == "LEKARSKA PRIPRAVA"), None)
+            target_names = {item.get("name", "").strip().casefold()
+                            for item in (target or {}).get("checkItems", [])}
+            for item in source.get("checkItems", []):
+                item_name = item.get("name", "").strip()
+                if not re.match(r"^LEKARSKA\s+PRIPRAVA\s*:", folded(item_name)):
+                    continue
+                moves.append({"card": card, "source": source, "target": target,
+                              "item": item, "already_in_target": item_name.casefold() in target_names,
+                              "list": board_list["name"]})
+
+    mode = request.args.get("mode", "dry-run")
+    if mode == "dry-run":
+        return jsonify({"status": "dry-run", "board": board["name"],
+                        "items_to_move": len(moves),
+                        "cards_affected": len({move['card']['id'] for move in moves}),
+                        "already_in_target": sum(1 for move in moves if move["already_in_target"]),
+                        "sample": [{"card": move["card"]["name"], "url": move["card"]["shortUrl"],
+                                    "list": move["list"], "item": move["item"]["name"]}
+                                   for move in moves[:50]]})
+    if mode != "apply":
+        return jsonify({"error": "invalid mode"}), 400
+
+    limit = min(50, max(1, int(request.args.get("limit", "25"))))
+    batch = moves[:limit]
+    targets_by_card = {}
+    moved = []; errors = []
+    for move in batch:
+        try:
+            target = move["target"] or targets_by_card.get(move["card"]["id"])
+            if not target:
+                target = trello_post_body("/checklists", {
+                    "idCard": move["card"]["id"], "name": "LEKÁRSKA PRÍPRAVA", "pos": "bottom"
+                })
+                targets_by_card[move["card"]["id"]] = target
+            if not move["already_in_target"]:
+                trello_post_body(f"/checklists/{target['id']}/checkItems", {
+                    "name": move["item"]["name"],
+                    "checked": "true" if move["item"].get("state") == "complete" else "false",
+                    "pos": move["item"].get("pos", "bottom"),
+                })
+            trello_delete(f"/checklists/{move['source']['id']}/checkItems/{move['item']['id']}")
+            moved.append({"card": move["card"]["name"], "item": move["item"]["name"]})
+        except Exception as exc:
+            errors.append({"card": move["card"]["name"], "item": move["item"]["name"],
+                           "error": str(exc)})
+    return jsonify({"status": "applied", "processed": len(batch), "moved": moved,
+                    "errors": errors, "remaining": max(0, len(moves) - len(batch))})
+
+
 def get_card(card_id):
     return trello_get(f"/cards/{card_id}", {
         "fields": "name,idList,idBoard,shortUrl,desc,due"
