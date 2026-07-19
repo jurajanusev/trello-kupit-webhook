@@ -2765,12 +2765,17 @@ def sync_dunaj_prop_cards():
         "duplicates_to_archive": sum(max(0, len(item["existing"]) - 1) for item in plans),
         "without_due": sum(1 for item in plans if not item["earliest_card"] or not item["earliest_card"].get("due")),
     }
+    matched_todo_ids = {card["id"] for item in plans for card in item["existing"]}
+    unmatched_todo = [card for card in todo_cards if card["id"] not in matched_todo_ids]
     mode = request.args.get("mode", "dry-run")
     if mode == "dry-run":
         return jsonify({"status": "dry-run", **summary,
                         "missing_card_sample": [{"key": item["key"], "prop": item["display"],
                                                  "earliest_scene": item["earliest_scene"]}
                                                 for item in plans if not item["existing"]][:30],
+                        "unmatched_todo_sample": [{"id": card["id"], "name": card["name"],
+                                                   "url": card["shortUrl"], "due": card.get("due")}
+                                                  for card in unmatched_todo[:30]],
                         "sample": [{
             "prop": item["display"], "scenes": [scene_id for scene_id, _ in item["linked"]],
             "earliest_scene": item["earliest_scene"],
