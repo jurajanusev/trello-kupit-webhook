@@ -2237,6 +2237,7 @@ def split_dok4_scene_07_39():
 
 @app.route("/api/find-dunaj-board", methods=["GET"])
 def find_dunaj_board():
+    return jsonify({"error": "endpoint disabled"}), 410
     if request.headers.get("X-Inspect-Key") != "find-dunaj-board-6e20a4f9":
         return jsonify({"error": "forbidden"}), 403
     boards = trello_get("/members/me/boards", {
@@ -2248,6 +2249,7 @@ def find_dunaj_board():
 
 @app.route("/api/sync-dunaj-schedule", methods=["POST"])
 def sync_dunaj_schedule():
+    return jsonify({"error": "endpoint disabled"}), 410
     if request.headers.get("X-Sync-Key") != "dunaj-1516-schedule-19jul-2f8c41d6":
         return jsonify({"error": "forbidden"}), 403
 
