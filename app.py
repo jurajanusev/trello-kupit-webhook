@@ -2767,7 +2767,11 @@ def sync_dunaj_prop_cards():
     }
     mode = request.args.get("mode", "dry-run")
     if mode == "dry-run":
-        return jsonify({"status": "dry-run", **summary, "sample": [{
+        return jsonify({"status": "dry-run", **summary,
+                        "missing_card_sample": [{"key": item["key"], "prop": item["display"],
+                                                 "earliest_scene": item["earliest_scene"]}
+                                                for item in plans if not item["existing"]][:30],
+                        "sample": [{
             "prop": item["display"], "scenes": [scene_id for scene_id, _ in item["linked"]],
             "earliest_scene": item["earliest_scene"],
             "due": item["earliest_card"].get("due") if item["earliest_card"] else None,
