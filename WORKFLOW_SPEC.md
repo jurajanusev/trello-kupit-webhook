@@ -28,3 +28,24 @@ Schvalene nastavenie pre dalsi vyvoj:
 - Pred vytvorenim system hlada existujucu kartu rovnakej rekvizity. Ak existuje, nevytvori duplikat, ale doplni novy obraz, kontext a spatny odkaz.
 - Odstranenie alebo zmena labelu nesmie automaticky zmazat kartu rekvizity; oznaci vztah na kontrolu, aby sa nestratili rucne poznamky.
 - ToDo stav je vlastnost karty rekvizity. Nie je potrebne vytvarat dalsiu kopiu tej istej rekvizity v samostatnom ToDo zozname.
+
+## Pravidelna aktualizacia natacacich planov
+
+Tento postup sa pouziva pre projekty Dunaj, DOK 4 a Riverdale:
+
+- Kazdy novy plan sa najprv spracuje v rezime dry-run bez zapisov do Trella.
+- Pred zapisom sa overi spravna nastenka, pocet riadkov planu, zhodne karty, chybajuce obrazy, duplicity a zoznamy cielovych dni.
+- Metadata planu sa zapisu do ohraniceneho bloku v popise a nesmu prepisat povodny dej, rekvizity, kontinuitu, dialogy ani rucne poznamky.
+- Karta dostane Trello due date podla datumu natacania; aktualizacia datumu sama neoznaci kartu ako dokoncenu.
+- Pri chybajucom variante s koncovym pismenom sa moze pouzit jednoznacna zakladna karta bez pismena, napriklad `23/35F -> 23/35`. Fallback musi byt viditelny v dry-rune.
+- Ak neexistuje ani zakladna karta, karta sa nevytvara naslepo. Chybajuci obraz sa oznami a po doplneni karty sa synchronizacia zopakuje.
+- Pripravuju sa iba zoznamy pre nasledujucich 7 kalendarnych dni. Pre dni bez natacania sa prazdny zoznam nevytvara.
+- Karty sa presunu do datovych zoznamov a zoradia podla poradia dna. Retake sa moze vratit aj zo zoznamu natocenych a vtedy sa `dueComplete` nastavi na `false`.
+- Datove zoznamy sa zoradia chronologicky hned za hlavnym zoznamom serialu.
+- Zaverecna kontrola musi potvrdit pocet najdenych kariet, nulove duplicity a nulovy pocet zostavajucich presunov; vsetky jednorazove endpointy sa potom vypnu.
+
+Nastenky:
+
+- Dunaj: `Dunaj - Rekvizity` - `https://trello.com/b/qCPeWA3e/dunaj-rekvizity`
+- DOK 4: `DOK 4` - `https://trello.com/b/lzNy4AtY/dok-4`
+- Riverdale: `Riverdale` - `https://trello.com/b/CzuD55PR/riverdale`
