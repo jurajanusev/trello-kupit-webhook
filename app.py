@@ -859,6 +859,75 @@ def delete_dok4_duplicate_guard_badges():
                     "errors": errors, "remaining": max(0, len(duplicates) - len(batch))})
 
 
+@app.route("/api/reorder-dok4-scene-checklists", methods=["POST"])
+def reorder_dok4_scene_checklists():
+    if request.headers.get("X-Reorder-Key") != "dok4-checklist-order-19jul-91bd4e62":
+        return jsonify({"error": "forbidden"}), 403
+
+    def folded(text):
+        value = unicodedata.normalize("NFKD", text or "")
+        return "".join(ch for ch in value if not unicodedata.combining(ch)).strip().upper()
+
+    desired = ["REKVIZITY", "SET", "POZNAMKY Z PORADY", "INFO Z NATACANIA"]
+    board = trello_get("/boards/lzNy4AtY", {"fields": "id,name,url"})
+    lists = trello_get(f"/boards/{board['id']}/lists", {
+        "fields": "id,name,closed", "filter": "open"
+    })
+    cards_to_reorder = []; skipped_incomplete = []; already_ordered = 0; scene_cards = 0
+    for board_list in lists:
+        if "NATOC" in folded(board_list["name"]):
+            continue
+        cards = trello_get(f"/lists/{board_list['id']}/cards", {
+            "fields": "id,name,shortUrl,closed", "filter": "open", "limit": 1000,
+            "checklists": "all", "checklist_fields": "name,pos",
+        })
+        for card in cards:
+            if not scene_id_from_card_name(card.get("name")):
+                continue
+            scene_cards += 1
+            by_name = {}
+            for checklist in card.get("checklists", []):
+                by_name.setdefault(folded(checklist.get("name")), checklist)
+            missing = [name for name in desired if name not in by_name]
+            if missing:
+                skipped_incomplete.append({"card": card, "list": board_list["name"], "missing": missing})
+                continue
+            current = [folded(item.get("name")) for item in sorted(
+                [by_name[name] for name in desired], key=lambda item: item.get("pos", 0)
+            )]
+            if current == desired:
+                already_ordered += 1
+            else:
+                cards_to_reorder.append({"card": card, "list": board_list["name"], "checklists": by_name})
+
+    mode = request.args.get("mode", "dry-run")
+    if mode == "dry-run":
+        return jsonify({"status": "dry-run", "board": board["name"],
+                        "active_scene_cards": scene_cards,
+                        "cards_to_reorder": len(cards_to_reorder),
+                        "already_ordered": already_ordered,
+                        "incomplete_skipped": len(skipped_incomplete),
+                        "incomplete_sample": [{"card": item["card"]["name"],
+                                               "list": item["list"], "missing": item["missing"]}
+                                              for item in skipped_incomplete[:40]]})
+    if mode != "apply":
+        return jsonify({"error": "invalid mode"}), 400
+    limit = min(40, max(1, int(request.args.get("limit", "20"))))
+    batch = cards_to_reorder[:limit]
+    updated = []; errors = []
+    for item in batch:
+        try:
+            # Moving in reverse order to top guarantees these four checklists
+            # are the first four, while preserving any additional checklists.
+            for name in reversed(desired):
+                trello_put_body(f"/checklists/{item['checklists'][name]['id']}", {"pos": "top"})
+            updated.append(item["card"]["name"])
+        except Exception as exc:
+            errors.append({"card": item["card"]["name"], "error": str(exc)})
+    return jsonify({"status": "applied", "processed": len(batch), "updated": updated,
+                    "errors": errors, "remaining": max(0, len(cards_to_reorder) - len(batch))})
+
+
 def get_card(card_id):
     return trello_get(f"/cards/{card_id}", {
         "fields": "name,idList,idBoard,shortUrl,desc,due"
