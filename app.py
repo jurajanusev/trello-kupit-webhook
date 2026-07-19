@@ -95,16 +95,19 @@ GRAPH_BASE = "https://graph.microsoft.com/v1.0"
 
 
 def trello_request(method, url, **kwargs):
-    response = requests.request(method, url, **kwargs)
-    if response.status_code == 429:
+    response = None
+    for attempt in range(6):
+        response = requests.request(method, url, **kwargs)
+        if response.status_code != 429:
+            return response
         retry_after = response.headers.get("Retry-After", "10")
         try:
             wait_seconds = max(1, min(30, int(float(retry_after))))
         except ValueError:
             wait_seconds = 10
-        print(f"TRELLO RATE LIMIT: retrying after {wait_seconds}s")
+        wait_seconds = min(30, wait_seconds + attempt * 3)
+        print(f"TRELLO RATE LIMIT: attempt {attempt + 1}, retrying after {wait_seconds}s")
         time.sleep(wait_seconds)
-        response = requests.request(method, url, **kwargs)
     return response
 
 
