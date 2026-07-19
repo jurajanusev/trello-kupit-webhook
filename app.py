@@ -520,6 +520,8 @@ def sync_project_continuity_registry(project):
         plans.append({"key": key, "display": group["display"], "occurrences": occurrences,
                       "existing": registry_by_key.get(key, [])})
     plans.sort(key=lambda item: item["display"].casefold())
+    matched_registry_ids = {card["id"] for plan in plans for card in plan["existing"]}
+    unmatched_registry = [card for card in registry_cards if card["id"] not in matched_registry_ids]
 
     mode = request.args.get("mode", "dry-run")
     summary = {
@@ -530,13 +532,17 @@ def sync_project_continuity_registry(project):
         "registry_to_create": sum(1 for plan in plans if not plan["existing"]),
         "registry_to_update": sum(1 for plan in plans if plan["existing"]),
         "registry_duplicates": sum(max(0, len(plan["existing"]) - 1) for plan in plans),
+        "unmatched_registry_cards": len(unmatched_registry),
         "scene_cards_to_update": len(scene_cards),
     }
     if mode == "dry-run":
         return jsonify({"status": "dry-run", **summary, "repeated_sample": [{
             "prop": plan["display"],
             "scenes": [occ["scene_id"] for occ in plan["occurrences"]],
-        } for plan in plans if len(plan["occurrences"]) > 1][:40]})
+        } for plan in plans if len(plan["occurrences"]) > 1][:40],
+                        "unmatched_sample": [{"id": card["id"], "name": card["name"],
+                                              "url": card["shortUrl"]}
+                                             for card in unmatched_registry[:40]]})
 
     if not registry_list:
         registry_list = trello_post_body("/lists", {
@@ -548,6 +554,23 @@ def sync_project_continuity_registry(project):
     registry_marker_end = "<!-- PROP-REGISTRY:END -->"
     scene_marker_start = "<!-- PROP-CONTINUITY:START -->"
     scene_marker_end = "<!-- PROP-CONTINUITY:END -->"
+
+    if mode == "archive-unmatched-auto":
+        auto_cards = [card for card in unmatched_registry
+                      if registry_marker_start in card.get("desc", "")
+                      and registry_marker_end in card.get("desc", "")]
+        batch = auto_cards[start:start + limit]
+        archived = []; errors = []
+        for card in batch:
+            try:
+                trello_put_body(f"/cards/{card['id']}", {"closed": "true"})
+                archived.append(card["id"])
+            except Exception as exc:
+                errors.append({"card": card["name"], "error": str(exc)})
+        return jsonify({"status": "unmatched-archived", **summary,
+                        "eligible": len(auto_cards), "processed": len(batch),
+                        "archived": archived, "errors": errors,
+                        "remaining": max(0, len(auto_cards) - start - len(batch))})
 
     if mode == "apply-registry":
         apply_plans = ([plan for plan in plans if not plan["existing"]]
