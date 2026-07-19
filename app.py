@@ -332,11 +332,17 @@ def sync_dunaj_microsoft_todo():
     })
     cards.sort(key=lambda card: (card.get("name", "").casefold(), card.get("id", "")))
 
-    access_token = get_microsoft_access_token()
-    tasks = graph_get_all(
-        f"/me/todo/lists/{TODO_LIST_ID}/tasks", access_token,
-        params={"$top": 100, "$select": "id,title,body,dueDateTime,status"}
-    )
+    try:
+        access_token = get_microsoft_access_token()
+        tasks = graph_get_all(
+            f"/me/todo/lists/{TODO_LIST_ID}/tasks", access_token,
+            params={"$top": 100, "$select": "id,title,body,dueDateTime,status"}
+        )
+    except requests.HTTPError as exc:
+        response = exc.response
+        return jsonify({"error": "Microsoft Graph request failed",
+                        "status_code": response.status_code if response is not None else None,
+                        "details": (response.text[:2000] if response is not None else str(exc))}), 502
     tasks_by_title = {}
     for task in tasks:
         tasks_by_title.setdefault(task.get("title", "").strip().casefold(), []).append(task)
