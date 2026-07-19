@@ -130,6 +130,16 @@ def trello_put_body(path, data=None):
     return r.json()
 
 
+def trello_delete(path, params=None):
+    params = params or {}
+    params.update({"key": API_KEY, "token": TOKEN})
+    r = requests.delete(f"{BASE}{path}", params=params, timeout=20)
+    if not r.ok:
+        print("TRELLO DELETE ERROR:", r.status_code, r.text)
+    r.raise_for_status()
+    return r.json() if r.text else {}
+
+
 def normalize_scene_id(episode, scene):
     """Normalize 8/05, 08 / 5 and 08/005A to the same stable ID 08/5 or 08/5A."""
     match = re.fullmatch(r"0*([0-9]+)([A-Z]*)", str(scene).strip(), re.I)
@@ -2949,6 +2959,9 @@ def setup_dunaj_meeting_workflow():
         return jsonify({"error": "forbidden"}), 403
     board = trello_get("/boards/qCPeWA3e", {"fields": "id,name,url"})
     lists = trello_get(f"/boards/{board['id']}/lists", {"fields": "id,name,closed", "filter": "open"})
+    checklist_items = ["PRIDAŤ", "UPRAVIŤ", "ZRUŠIŤ", "KONTINUITA", "ZABEZPEČIŤ",
+                       "NETREBA ZABEZPEČIŤ", "SCHVÁLENÉ", "OTÁZKA"]
+    expected_names = {name.upper() for name in checklist_items}
     scene_cards = []
     meeting_checklist = None
     for board_list in lists:
@@ -2961,9 +2974,12 @@ def setup_dunaj_meeting_workflow():
                 continue
             checklists = card.get("checklists", [])
             existing = next((item for item in checklists if item.get("name", "").strip().upper() == "POZNÁMKY Z PORADY"), None)
-            if existing and not meeting_checklist:
+            existing_names = {item.get("name", "").strip().upper() for item in (existing or {}).get("checkItems", [])}
+            is_complete = expected_names.issubset(existing_names)
+            if existing and is_complete and not meeting_checklist:
                 meeting_checklist = existing
-            scene_cards.append({"card": card, "has_meeting": bool(existing)})
+            scene_cards.append({"card": card, "checklist": existing, "item_names": existing_names,
+                                "complete": bool(existing and is_complete)})
 
     todo_list = next(item for item in lists if item["name"].strip().lower() == "todo")
     todo_cards = trello_get(f"/lists/{todo_list['id']}/cards", {
@@ -2980,11 +2996,15 @@ def setup_dunaj_meeting_workflow():
                 props_to_clean.append({"card": card, "marker": marker})
 
     mode = request.args.get("mode", "dry-run")
-    missing_checklists = [item for item in scene_cards if not item["has_meeting"]]
+    missing_checklists = [item for item in scene_cards if not item["checklist"]]
+    incomplete_checklists = [item for item in scene_cards if not item["complete"]]
+    empty_checklists = [item for item in scene_cards if item["checklist"] and not item["item_names"]]
     if mode == "dry-run":
         return jsonify({
             "status": "dry-run", "board": board["name"],
             "scene_cards": len(scene_cards), "checklists_present": len(scene_cards) - len(missing_checklists),
+            "checklists_complete": len(scene_cards) - len(incomplete_checklists),
+            "checklists_incomplete": len(incomplete_checklists), "checklists_empty": len(empty_checklists),
             "checklists_missing": len(missing_checklists), "todo_cards": len(todo_cards),
             "prop_descriptions_to_clean": len(props_to_clean),
             "meeting_checklist_sample": {
@@ -3007,30 +3027,43 @@ def setup_dunaj_meeting_workflow():
                         "errors_count": len(errors), "errors": errors})
 
     if mode == "add-checklists":
-        checklist_items = ["PRIDAŤ", "UPRAVIŤ", "ZRUŠIŤ", "KONTINUITA", "ZABEZPEČIŤ",
-                           "NETREBA ZABEZPEČIŤ", "SCHVÁLENÉ", "OTÁZKA"]
         created_template_card = None
-        if not meeting_checklist and missing_checklists:
-            created_template_card = missing_checklists[0]["card"]
-            meeting_checklist = trello_post_body("/checklists", {
-                "idCard": created_template_card["id"], "name": "POZNÁMKY Z PORADY", "pos": "bottom"
-            })
+        if not meeting_checklist and incomplete_checklists:
+            template_item = incomplete_checklists[0]
+            created_template_card = template_item["card"]
+            meeting_checklist = template_item["checklist"]
+            if not meeting_checklist:
+                meeting_checklist = trello_post_body("/checklists", {
+                    "idCard": created_template_card["id"], "name": "POZNÁMKY Z PORADY", "pos": "bottom"
+                })
             for item_name in checklist_items:
-                trello_post_body(f"/checklists/{meeting_checklist['id']}/checkItems", {"name": item_name})
-        batch = [item for item in missing_checklists if not created_template_card or item["card"]["id"] != created_template_card["id"]][:limit]
+                if item_name.upper() not in template_item["item_names"]:
+                    trello_post_body(f"/checklists/{meeting_checklist['id']}/checkItems", {"name": item_name})
+        batch = [item for item in incomplete_checklists if not created_template_card or item["card"]["id"] != created_template_card["id"]][:limit]
         created = 1 if created_template_card else 0
         errors = []
         for item in batch:
             try:
-                trello_post_body("/checklists", {
-                    "idCard": item["card"]["id"], "name": "POZNÁMKY Z PORADY",
-                    "pos": "bottom", "idChecklistSource": meeting_checklist["id"],
-                })
+                if item["checklist"] and not item["item_names"]:
+                    trello_delete(f"/checklists/{item['checklist']['id']}")
+                    trello_post_body("/checklists", {
+                        "idCard": item["card"]["id"], "name": "POZNÁMKY Z PORADY",
+                        "pos": "bottom", "idChecklistSource": meeting_checklist["id"],
+                    })
+                elif item["checklist"]:
+                    for item_name in checklist_items:
+                        if item_name.upper() not in item["item_names"]:
+                            trello_post_body(f"/checklists/{item['checklist']['id']}/checkItems", {"name": item_name})
+                else:
+                    trello_post_body("/checklists", {
+                        "idCard": item["card"]["id"], "name": "POZNÁMKY Z PORADY",
+                        "pos": "bottom", "idChecklistSource": meeting_checklist["id"],
+                    })
                 created += 1
             except Exception as exc:
                 errors.append({"card": item["card"]["name"], "error": str(exc)})
         return jsonify({"status": "checklists-added", "created": created,
-                        "remaining": max(0, len(missing_checklists) - created),
+                        "remaining": max(0, len(incomplete_checklists) - created),
                         "errors_count": len(errors), "errors": errors[:20]})
 
     return jsonify({"error": "invalid mode"}), 400
