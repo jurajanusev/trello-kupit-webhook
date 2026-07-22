@@ -3321,6 +3321,25 @@ def sync_dunaj_schedule():
     target_names = {date_text: date_list_name(date_text) for date_text in shooting_dates}
     missing_target_lists = [name for name in target_names.values() if name not in lists_by_name]
 
+    expected_target_by_card_id = {
+        item["card"]["id"]: target_names[item["row"]["shooting_date"]]
+        for item in window_cards
+    }
+    stale_date_cards = []
+    stale_by_list = {}
+    for card in cards:
+        current_list = open_lists.get(card["idList"], {}).get("name", "")
+        if not re.fullmatch(r"\d{1,2}\.\d{1,2}\.", current_list):
+            continue
+        scene_id = scene_id_from_card_name(card.get("name"))
+        if not scene_id or card["id"] in expected_target_by_card_id:
+            continue
+        stale_date_cards.append({
+            "id": card["id"], "scene_id": scene_id, "name": card["name"],
+            "from": current_list, "to": "SERIA 15,16", "url": card["shortUrl"],
+        })
+        stale_by_list[current_list] = stale_by_list.get(current_list, 0) + 1
+
     mode = request.args.get("mode", "dry-run")
     if mode != "dry-run":
         return jsonify({"error": "apply modes disabled pending dry-run approval"}), 409
@@ -3358,6 +3377,9 @@ def sync_dunaj_schedule():
             "window_duplicates_count": len(window_duplicates), "window_duplicates": window_duplicates[:20],
             "shooting_dates": shooting_dates, "days_without_shooting": 7 - len(shooting_dates),
             "missing_target_lists": missing_target_lists, "window_by_date": window_by_date,
+            "stale_date_cards_count": len(stale_date_cards),
+            "stale_date_cards_by_list": stale_by_list,
+            "stale_date_cards": stale_date_cards,
             "window_sample": [{
                 "scene_id": item["row"]["scene_id"], "date": item["row"]["shooting_date"],
                 "matched_scene_id": item["matched_scene_id"], "fallback_match": item["fallback_match"],
