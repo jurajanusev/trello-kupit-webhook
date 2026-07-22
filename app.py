@@ -3239,15 +3239,41 @@ def sync_dunaj_schedule():
     matched = []
     missing = []
     duplicate_ids = []
+    fallback_matches = []
     for scene_id, row in row_by_scene.items():
         candidates = cards_by_scene.get(scene_id, [])
+        matched_scene_id = scene_id
+        fallback_match = False
+        if not candidates:
+            base_scene_id = re.sub(r"[A-Z]+$", "", scene_id, flags=re.I)
+            if base_scene_id != scene_id:
+                candidates = cards_by_scene.get(base_scene_id, [])
+                matched_scene_id = base_scene_id
+                fallback_match = bool(candidates)
         if not candidates:
             missing.append(scene_id)
         else:
             if len(candidates) > 1:
                 duplicate_ids.append(scene_id)
+            if fallback_match:
+                fallback_matches.append({
+                    "scene_id": scene_id,
+                    "matched_scene_id": matched_scene_id,
+                    "cards": [{"name": card["name"], "url": card["shortUrl"]} for card in candidates],
+                })
             for card in candidates:
-                matched.append({"scene_id": scene_id, "row": row, "card": card})
+                matched.append({
+                    "scene_id": scene_id, "row": row, "card": card,
+                    "matched_scene_id": matched_scene_id, "fallback_match": fallback_match,
+                })
+
+    matched_scenes_by_card = {}
+    for item in matched:
+        matched_scenes_by_card.setdefault(item["card"]["id"], []).append(item["scene_id"])
+    fallback_card_collisions = [
+        {"card_id": card_id, "scene_ids": scene_ids}
+        for card_id, scene_ids in matched_scenes_by_card.items() if len(scene_ids) > 1
+    ]
 
     window_rows = [row for row in schedule_rows if window_start <= row["shooting_date"] <= window_end]
     window_missing = []
@@ -3322,6 +3348,9 @@ def sync_dunaj_schedule():
             "matched_scene_ids": len(schedule_rows) - len(missing), "matched_card_copies": len(matched),
             "missing_count": len(missing), "missing_sample": missing[:60],
             "duplicate_scene_ids_count": len(duplicate_ids), "duplicate_scene_ids_sample": duplicate_ids[:30],
+            "fallback_matches_count": len(fallback_matches), "fallback_matches": fallback_matches,
+            "fallback_card_collisions_count": len(fallback_card_collisions),
+            "fallback_card_collisions": fallback_card_collisions,
             "matched_by_list": matched_by_list,
             "window_start": window_start, "window_end": window_end,
             "window_schedule_rows": len(window_rows), "window_unique_cards": len(window_cards),
