@@ -783,6 +783,41 @@ def inspect_dok4_registry_list():
                         "details": response.text[:2000] if response is not None else str(exc)}), 502
 
 
+@app.route("/api/inspect-scene-description-structure", methods=["GET"])
+def inspect_scene_description_structure():
+    if request.headers.get("X-Inspect-Key") != "scene-description-structure-22jul-3d861a9f":
+        return jsonify({"error": "forbidden"}), 403
+    boards = {"dok4": "lzNy4AtY", "riverdale": "CzuD55PR"}
+    project = request.args.get("project", "dok4").casefold()
+    board_ref = boards.get(project)
+    if not board_ref:
+        return jsonify({"error": "unknown project"}), 404
+    limit = min(20, max(1, int(request.args.get("limit", "8"))))
+    board = trello_get(f"/boards/{board_ref}", {"fields": "id,name,url"})
+    lists = trello_get(f"/boards/{board['id']}/lists", {
+        "fields": "id,name,pos,closed", "filter": "open"
+    })
+    samples = []
+    for board_list in lists:
+        folded_name = unicodedata.normalize("NFKD", board_list["name"])
+        folded_name = "".join(ch for ch in folded_name if not unicodedata.combining(ch)).upper()
+        if "NATOC" in folded_name or board_list["name"].strip().casefold() in {
+            "todo", "register rekvizít".casefold()
+        }:
+            continue
+        cards = trello_get(f"/lists/{board_list['id']}/cards", {
+            "fields": "id,name,desc,shortUrl,idList,closed", "filter": "open", "limit": 1000
+        })
+        for card in cards:
+            if not scene_id_from_card_name(card.get("name")) or not card.get("desc", "").strip():
+                continue
+            samples.append({"name": card["name"], "url": card["shortUrl"],
+                            "list": board_list["name"], "description": card["desc"]})
+            if len(samples) >= limit:
+                return jsonify({"project": project, "board": board["name"], "samples": samples})
+    return jsonify({"project": project, "board": board["name"], "samples": samples})
+
+
 @app.route("/api/move-dok4-medical-prep", methods=["POST"])
 def move_dok4_medical_prep():
     if request.headers.get("X-Medical-Prep-Key") != "dok4-medical-prep-19jul-70ac3e91":
