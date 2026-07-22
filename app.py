@@ -3407,12 +3407,17 @@ def sync_dunaj_schedule():
 
         start_marker = "<!-- DUNAJ-SCHEDULE-METADATA:START -->"
         end_marker = "<!-- DUNAJ-SCHEDULE-METADATA:END -->"
+        ordered_window_cards = sorted(window_cards, key=lambda value: (
+            value["row"]["shooting_date"], value["row"]["order"]
+        ))
+        batch_start = max(0, int(request.args.get("start", "0")))
+        batch_limit = min(15, max(1, int(request.args.get("limit", "12"))))
+        batch = ordered_window_cards[batch_start:batch_start + batch_limit]
+        remaining = max(0, len(ordered_window_cards) - batch_start - len(batch))
         updated = []
         moved = []
         errors = []
-        for item in sorted(window_cards, key=lambda value: (
-            value["row"]["shooting_date"], value["row"]["order"]
-        )):
+        for item in batch:
             row = item["row"]
             card = item["card"]
             target_name = target_names[row["shooting_date"]]
@@ -3462,7 +3467,7 @@ def sync_dunaj_schedule():
                 errors.append({"scene_id": row["scene_id"], "error": str(exc)})
 
         list_reordered = None
-        if not errors and "27.7." in lists_by_name:
+        if not errors and remaining == 0 and "27.7." in lists_by_name:
             ordered_lists = trello_get(f"/boards/{board['id']}/lists", {
                 "fields": "id,name,pos,closed", "filter": "open",
             })
@@ -3483,6 +3488,7 @@ def sync_dunaj_schedule():
             "status": "window-applied", "board": board["name"],
             "window_rows": len(window_rows), "updated_count": len(updated),
             "moved_count": len(moved), "created_lists": created_lists,
+            "batch_start": batch_start, "batch_size": len(batch), "remaining": remaining,
             "list_reordered": list_reordered,
             "errors_count": len(errors), "errors": errors,
         })
