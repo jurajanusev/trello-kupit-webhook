@@ -3341,7 +3341,7 @@ def sync_dunaj_schedule():
         stale_by_list[current_list] = stale_by_list.get(current_list, 0) + 1
 
     mode = request.args.get("mode", "dry-run")
-    if mode != "dry-run":
+    if mode not in {"dry-run", "apply-window"}:
         return jsonify({"error": "apply modes disabled pending dry-run approval"}), 409
     if mode == "dry-run":
         matched_by_list = {}
@@ -3387,6 +3387,104 @@ def sync_dunaj_schedule():
                 "from": open_lists.get(item["card"]["idList"], {}).get("name"),
                 "to": target_names[item["row"]["shooting_date"]], "url": item["card"]["shortUrl"],
             } for item in window_cards[:40]],
+        })
+
+    if mode == "apply-window":
+        if window_missing or window_duplicates or len(window_cards) != len(window_rows):
+            return jsonify({
+                "error": "window verification failed",
+                "window_rows": len(window_rows), "window_cards": len(window_cards),
+                "missing": window_missing, "duplicates": window_duplicates,
+            }), 409
+
+        created_lists = []
+        for date_text, name in target_names.items():
+            if name not in lists_by_name:
+                lists_by_name[name] = trello_post_body("/lists", {
+                    "idBoard": board["id"], "name": name, "pos": "bottom",
+                })
+                created_lists.append(name)
+
+        start_marker = "<!-- DUNAJ-SCHEDULE-METADATA:START -->"
+        end_marker = "<!-- DUNAJ-SCHEDULE-METADATA:END -->"
+        updated = []
+        moved = []
+        errors = []
+        for item in sorted(window_cards, key=lambda value: (
+            value["row"]["shooting_date"], value["row"]["order"]
+        )):
+            row = item["row"]
+            card = item["card"]
+            target_name = target_names[row["shooting_date"]]
+            target = lists_by_name[target_name]
+            metadata = (
+                f"{start_marker}\n"
+                f"**ČÍSLO OBRAZU:** {row['scene_id']}\n"
+                f"**ZDROJ:** predbežná dispo DUNAJ 16 z 21. 7. 2026\n"
+                f"**NATÁČACÍ DEŇ:** {row['shooting_day']}\n"
+                f"**DÁTUM NATÁČANIA:** {row['shooting_date']}\n"
+                f"**PORADIE DŇA:** {row['order']}\n"
+                f"**UNIT:** {row['unit']}\n"
+                f"**LOKÁCIA:** {row['location']}\n"
+                f"**POSTAVY:** {row['characters']}\n"
+                f"{end_marker}"
+            )
+            old_desc = card.get("desc", "")
+            if start_marker in old_desc and end_marker in old_desc:
+                pattern = re.escape(start_marker) + r".*?" + re.escape(end_marker)
+                new_desc = re.sub(pattern, lambda _: metadata, old_desc, count=1, flags=re.S)
+            else:
+                new_desc = metadata + ("\n\n" + old_desc if old_desc else "")
+            update = {
+                "desc": new_desc,
+                "due": f"{row['shooting_date']}T10:00:00.000Z",
+                "idList": target["id"],
+                "pos": row["order"] * 16384,
+            }
+            current_name = open_lists.get(card.get("idList"), {}).get("name", "")
+            folded_current = unicodedata.normalize("NFKD", current_name)
+            folded_current = "".join(
+                char for char in folded_current if not unicodedata.combining(char)
+            ).upper()
+            if "NATOC" in folded_current or card.get("dueComplete"):
+                update["dueComplete"] = "false"
+            try:
+                result = trello_put_body(f"/cards/{card['id']}", update)
+                entry = {
+                    "scene_id": row["scene_id"], "date": row["shooting_date"],
+                    "order": row["order"], "list": target_name,
+                    "url": result["shortUrl"],
+                }
+                updated.append(entry)
+                if card.get("idList") != target["id"]:
+                    moved.append(entry)
+            except Exception as exc:
+                errors.append({"scene_id": row["scene_id"], "error": str(exc)})
+
+        list_reordered = None
+        if not errors and "27.7." in lists_by_name:
+            ordered_lists = trello_get(f"/boards/{board['id']}/lists", {
+                "fields": "id,name,pos,closed", "filter": "open",
+            })
+            ordered_lists.sort(key=lambda value: value["pos"])
+            list_25 = next((value for value in ordered_lists if value["name"] == "25.7."), None)
+            list_27 = next((value for value in ordered_lists if value["name"] == "27.7."), None)
+            if list_25 and list_27:
+                following = [
+                    value for value in ordered_lists
+                    if value["id"] != list_27["id"] and value["pos"] > list_25["pos"]
+                ]
+                next_pos = following[0]["pos"] if following else list_25["pos"] + 32768
+                desired_pos = (list_25["pos"] + next_pos) / 2
+                result = trello_put_body(f"/lists/{list_27['id']}", {"pos": desired_pos})
+                list_reordered = {"name": result["name"], "pos": result["pos"]}
+
+        return jsonify({
+            "status": "window-applied", "board": board["name"],
+            "window_rows": len(window_rows), "updated_count": len(updated),
+            "moved_count": len(moved), "created_lists": created_lists,
+            "list_reordered": list_reordered,
+            "errors_count": len(errors), "errors": errors,
         })
 
     if mode == "cleanup-stale":
