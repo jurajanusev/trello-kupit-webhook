@@ -818,6 +818,108 @@ def inspect_scene_description_structure():
     return jsonify({"project": project, "board": board["name"], "samples": samples})
 
 
+def riverdale_description_to_dok4_style(card_name, description):
+    metadata_pattern = re.compile(
+        r"\A(<!-- [A-Z0-9_-]*SCHEDULE[A-Z0-9_-]*:START -->.*?"
+        r"<!-- [A-Z0-9_-]*SCHEDULE[A-Z0-9_-]*:END -->\s*)", re.S | re.I
+    )
+    metadata_match = metadata_pattern.match(description)
+    metadata = metadata_match.group(1).strip() if metadata_match else ""
+    remainder = description[metadata_match.end():].strip() if metadata_match else description.strip()
+
+    continuity_start = "<!-- PROP-CONTINUITY:START -->"
+    continuity_end = "<!-- PROP-CONTINUITY:END -->"
+    continuity = ""
+    suffix = ""
+    if continuity_start in remainder and continuity_end in remainder:
+        start = remainder.index(continuity_start)
+        end = remainder.index(continuity_end, start) + len(continuity_end)
+        continuity = remainder[start:end].strip()
+        suffix = remainder[end:].strip()
+        remainder = remainder[:start].strip()
+
+    heading_match = re.match(r"^\s*\d{1,2}\s*/\s*\d+[A-Z]*\.\s*(.*?)(?:\s+—\s+.*)?$",
+                             card_name, flags=re.I)
+    if not heading_match:
+        return None, "scene heading not found"
+    heading = heading_match.group(1).strip()
+
+    postavy_match = re.search(r"(?:\A|\n)POSTAVY:\s*(.*?)(?:\n\n|\Z)", remainder, flags=re.S | re.I)
+    prepis_match = re.search(r"\*\*PREPIS:\s*(.*?)\*\*", remainder, flags=re.S | re.I)
+    if not postavy_match or not prepis_match:
+        if re.search(r"^\s*(?:INT\.|EXT\.).*\n\nPOSTAVY:.*\n\n####\s+\*\*", remainder,
+                     flags=re.S | re.I):
+            return description, "already formatted"
+        return None, "POSTAVY or PREPIS not found"
+
+    characters = postavy_match.group(1).strip()
+    summary = prepis_match.group(1).strip() or "PREPIS"
+    body = remainder[prepis_match.end():].strip()
+    core = "\n\n".join([
+        normalize_scene_heading(heading),
+        f"POSTAVY: {characters}",
+        f"#### **{summary}**",
+        format_dok4_style_body(body) if body else "",
+    ]).strip()
+    pieces = [piece for piece in [metadata, core, continuity, suffix] if piece]
+    return "\n\n".join(pieces), "converted"
+
+
+@app.route("/api/format-riverdale-descriptions-like-dok4", methods=["POST"])
+def format_riverdale_descriptions_like_dok4():
+    if request.headers.get("X-Format-Key") != "riverdale-dok4-description-22jul-81c5f2a4":
+        return jsonify({"error": "forbidden"}), 403
+    board = trello_get("/boards/CzuD55PR", {"fields": "id,name,url"})
+    lists = trello_get(f"/boards/{board['id']}/lists", {
+        "fields": "id,name,pos,closed", "filter": "open"
+    })
+    plans = []; skipped = []; already = []
+    for board_list in lists:
+        if board_list["name"].strip().casefold() in {"todo", "register rekvizít".casefold()}:
+            continue
+        cards = trello_get(f"/lists/{board_list['id']}/cards", {
+            "fields": "id,name,desc,shortUrl,idList,closed", "filter": "open", "limit": 1000
+        })
+        for card in cards:
+            if not scene_id_from_card_name(card.get("name")):
+                continue
+            converted, reason = riverdale_description_to_dok4_style(card["name"], card.get("desc", ""))
+            if reason == "already formatted":
+                already.append(card)
+            elif converted is None:
+                skipped.append({"card": card, "reason": reason, "list": board_list["name"]})
+            elif converted != card.get("desc", ""):
+                plans.append({"card": card, "description": converted, "list": board_list["name"]})
+
+    mode = request.args.get("mode", "dry-run")
+    summary = {"board": board["name"], "to_update": len(plans),
+               "already_formatted": len(already), "skipped": len(skipped)}
+    if mode == "dry-run":
+        return jsonify({"status": "dry-run", **summary,
+                        "preview": [{"name": item["card"]["name"], "url": item["card"]["shortUrl"],
+                                     "before": item["card"].get("desc", "")[:2000],
+                                     "after": item["description"][:2500]}
+                                    for item in plans[:8]],
+                        "skipped_sample": [{"name": item["card"]["name"],
+                                            "url": item["card"]["shortUrl"],
+                                            "reason": item["reason"], "list": item["list"]}
+                                           for item in skipped[:30]]})
+    if mode != "apply":
+        return jsonify({"error": "invalid mode"}), 400
+    limit = min(30, max(1, int(request.args.get("limit", "15"))))
+    batch = plans[:limit]
+    updated = []; errors = []
+    for item in batch:
+        try:
+            trello_put_body(f"/cards/{item['card']['id']}", {"desc": item["description"]})
+            updated.append({"name": item["card"]["name"], "url": item["card"]["shortUrl"]})
+        except Exception as exc:
+            errors.append({"name": item["card"]["name"], "error": str(exc)})
+    return jsonify({"status": "applied", **summary, "processed": len(batch),
+                    "updated": updated, "errors": errors,
+                    "remaining": max(0, len(plans) - len(batch))})
+
+
 @app.route("/api/move-dok4-medical-prep", methods=["POST"])
 def move_dok4_medical_prep():
     if request.headers.get("X-Medical-Prep-Key") != "dok4-medical-prep-19jul-70ac3e91":
@@ -1525,20 +1627,50 @@ def split_character_line(line):
     return [name.strip().title() for name in names if name.strip().upper() not in ignored]
 
 
-def build_trello_description(characters, body):
+def format_dok4_style_body(text):
+    paragraphs = [part.strip() for part in re.split(r"\n\s*\n", text.strip()) if part.strip()]
+    formatted = []
+    dialogue_pattern = re.compile(r"\*\*([^*\n]{1,80}?):\*\*\s*", re.S)
+    for paragraph in paragraphs:
+        if paragraph.startswith("<!--") or paragraph.startswith("####"):
+            formatted.append(paragraph)
+            continue
+        matches = list(dialogue_pattern.finditer(paragraph))
+        if matches and matches[0].start() == 0:
+            blocks = []
+            for index, match in enumerate(matches):
+                end = matches[index + 1].start() if index + 1 < len(matches) else len(paragraph)
+                spoken = paragraph[match.end():end].strip()
+                speaker = match.group(1).strip()
+                blocks.append(f"> **{speaker}:**")
+                if spoken:
+                    blocks.append(f"> **{spoken}**")
+            formatted.append("\n".join(blocks))
+        elif paragraph.startswith(">"):
+            formatted.append(paragraph)
+        elif paragraph.startswith("*") and paragraph.endswith("*"):
+            formatted.append(paragraph)
+        else:
+            formatted.append(f"*{paragraph}*")
+    return "\n\n".join(formatted)
+
+
+def build_trello_description(characters, body, scene_heading=""):
     cleaned = body.strip()
     lines = cleaned.split("\n")
     while lines and (not lines[0].strip() or looks_like_character_line(lines[0].strip())):
         lines.pop(0)
     scene_text = "\n".join(lines).strip()
     lead, rest = split_lead_sentence(scene_text)
-    parts = [
-        f"POSTAVY: {', '.join(name.upper() for name in characters) if characters else 'DOPLNIŤ'}",
-        "",
-        f"**PREPIS: {lead}**" if lead else "**PREPIS:**",
-    ]
+    parts = []
+    if scene_heading:
+        parts.extend([normalize_scene_heading(scene_heading), ""])
+    parts.extend([
+        f"POSTAVY: {', '.join(name.upper() for name in characters) if characters else 'DOPLNIŤ'}", "",
+        f"#### **{lead}**" if lead else "#### **PREPIS**",
+    ])
     if rest:
-        parts.extend(["", format_scene_body(rest)])
+        parts.extend(["", format_dok4_style_body(format_scene_body(rest))])
     return "\n".join(parts).strip()
 
 
@@ -1820,7 +1952,7 @@ def scene_card_from_id(scene_id, title, body):
     card = scene_card(0, title, body)
     card["number"] = scene_id
     card["name"] = card_title
-    card["description"] = build_trello_description(characters, body)
+    card["description"] = build_trello_description(characters, body, title)
     card["characters"] = characters
     card["labels"] = []
     card["checklistName"] = "Rekvizity"
