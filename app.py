@@ -3208,13 +3208,12 @@ def find_dunaj_board():
 
 @app.route("/api/sync-dunaj-schedule", methods=["POST"])
 def sync_dunaj_schedule():
-    return jsonify({"error": "endpoint disabled"}), 410
-    if request.headers.get("X-Sync-Key") != "dunaj-1516-schedule-19jul-2f8c41d6":
+    if request.headers.get("X-Sync-Key") != "dunaj-1516-schedule-21jul-6a4d02c9":
         return jsonify({"error": "forbidden"}), 403
 
-    window_start = "2026-07-20"
-    window_end = "2026-07-26"
-    schedule_path = os.path.join(os.path.dirname(__file__), "dunaj_schedule_2026-07-19.json")
+    window_start = "2026-07-22"
+    window_end = "2026-07-28"
+    schedule_path = os.path.join(os.path.dirname(__file__), "dunaj_schedule_2026-07-21.json")
     with open(schedule_path, "r", encoding="utf-8") as handle:
         schedule_rows = json.load(handle)["rows"]
     row_by_scene = {row["scene_id"]: row for row in schedule_rows}
@@ -3297,6 +3296,8 @@ def sync_dunaj_schedule():
     missing_target_lists = [name for name in target_names.values() if name not in lists_by_name]
 
     mode = request.args.get("mode", "dry-run")
+    if mode != "dry-run":
+        return jsonify({"error": "apply modes disabled pending dry-run approval"}), 409
     if mode == "dry-run":
         matched_by_list = {}
         for item in matched:
@@ -3349,7 +3350,7 @@ def sync_dunaj_schedule():
             metadata = (
                 f"{start_marker}\n"
                 f"**ČÍSLO OBRAZU:** {row['scene_id']}\n"
-                f"**ZDROJ:** predbežná dispo DUNAJ 16 z 19. 7. 2026\n"
+                f"**ZDROJ:** predbežná dispo DUNAJ 16 z 21. 7. 2026\n"
                 f"**NATÁČACÍ DEŇ:** {row['shooting_day']}\n"
                 f"**DÁTUM NATÁČANIA:** {row['shooting_date']}\n"
                 f"**PORADIE DŇA:** {row['order']}\n"
@@ -3406,7 +3407,7 @@ def sync_dunaj_schedule():
                 metadata = (
                     f"{start_marker}\n"
                     f"**ČÍSLO OBRAZU:** {row['scene_id']}\n"
-                    f"**ZDROJ:** predbežná dispo DUNAJ 16 z 19. 7. 2026\n"
+                    f"**ZDROJ:** predbežná dispo DUNAJ 16 z 21. 7. 2026\n"
                     f"**NATÁČACÍ DEŇ:** {row['shooting_day']}\n"
                     f"**DÁTUM NATÁČANIA:** {row['shooting_date']}\n"
                     f"**PORADIE DŇA:** {row['order']}\n"
@@ -3452,7 +3453,7 @@ def sync_dunaj_schedule():
             metadata = (
                 "<!-- DUNAJ-SCHEDULE-METADATA:START -->\n"
                 f"**ČÍSLO OBRAZU:** {scene_id}\n"
-                f"**ZDROJ:** predbežná dispo DUNAJ 16 z 19. 7. 2026\n"
+                f"**ZDROJ:** predbežná dispo DUNAJ 16 z 21. 7. 2026\n"
                 f"**NATÁČACÍ DEŇ:** {row['shooting_day']}\n"
                 f"**DÁTUM NATÁČANIA:** {row['shooting_date']}\n"
                 f"**PORADIE DŇA:** {row['order']}\n"
