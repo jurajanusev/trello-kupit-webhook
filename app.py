@@ -3340,6 +3340,34 @@ def sync_dunaj_schedule():
         })
         stale_by_list[current_list] = stale_by_list.get(current_list, 0) + 1
 
+    window_pending_updates = []
+    for item in window_cards:
+        row = item["row"]
+        card = item["card"]
+        expected_list = target_names[row["shooting_date"]]
+        expected_fragments = [
+            f"**ČÍSLO OBRAZU:** {row['scene_id']}",
+            "**ZDROJ:** predbežná dispo DUNAJ 16 z 21. 7. 2026",
+            f"**NATÁČACÍ DEŇ:** {row['shooting_day']}",
+            f"**DÁTUM NATÁČANIA:** {row['shooting_date']}",
+            f"**PORADIE DŇA:** {row['order']}",
+            f"**UNIT:** {row['unit']}",
+        ]
+        fields = []
+        if open_lists.get(card.get("idList"), {}).get("name") != expected_list:
+            fields.append("list")
+        if (card.get("due") or "")[:10] != row["shooting_date"]:
+            fields.append("due")
+        if any(fragment not in card.get("desc", "") for fragment in expected_fragments):
+            fields.append("metadata")
+        if card.get("dueComplete"):
+            fields.append("dueComplete")
+        if fields:
+            window_pending_updates.append({
+                "scene_id": row["scene_id"], "date": row["shooting_date"],
+                "order": row["order"], "fields": fields, "url": card["shortUrl"],
+            })
+
     mode = request.args.get("mode", "dry-run")
     if mode not in {"dry-run", "apply-window"}:
         return jsonify({"error": "apply modes disabled pending dry-run approval"}), 409
@@ -3380,6 +3408,8 @@ def sync_dunaj_schedule():
             "stale_date_cards_count": len(stale_date_cards),
             "stale_date_cards_by_list": stale_by_list,
             "stale_date_cards": stale_date_cards,
+            "window_pending_updates_count": len(window_pending_updates),
+            "window_pending_updates": window_pending_updates,
             "window_sample": [{
                 "scene_id": item["row"]["scene_id"], "date": item["row"]["shooting_date"],
                 "matched_scene_id": item["matched_scene_id"], "fallback_match": item["fallback_match"],
