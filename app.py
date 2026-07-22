@@ -3341,7 +3341,7 @@ def sync_dunaj_schedule():
         stale_by_list[current_list] = stale_by_list.get(current_list, 0) + 1
 
     mode = request.args.get("mode", "dry-run")
-    if mode != "dry-run":
+    if mode not in {"dry-run", "cleanup-stale"}:
         return jsonify({"error": "apply modes disabled pending dry-run approval"}), 409
     if mode == "dry-run":
         matched_by_list = {}
@@ -3387,6 +3387,29 @@ def sync_dunaj_schedule():
                 "from": open_lists.get(item["card"]["idList"], {}).get("name"),
                 "to": target_names[item["row"]["shooting_date"]], "url": item["card"]["shortUrl"],
             } for item in window_cards[:40]],
+        })
+
+    if mode == "cleanup-stale":
+        series_list = lists_by_name.get("SERIA 15,16")
+        if not series_list:
+            return jsonify({"error": "SERIA 15,16 list not found"}), 404
+        moved = []
+        errors = []
+        for item in stale_date_cards:
+            try:
+                result = trello_put_body(f"/cards/{item['id']}", {
+                    "idList": series_list["id"], "pos": "bottom",
+                })
+                moved.append({
+                    "scene_id": item["scene_id"], "from": item["from"],
+                    "to": "SERIA 15,16", "url": result["shortUrl"],
+                })
+            except Exception as exc:
+                errors.append({"scene_id": item["scene_id"], "error": str(exc)})
+        return jsonify({
+            "status": "stale-date-cards-cleaned", "board": board["name"],
+            "planned_count": len(stale_date_cards), "moved_count": len(moved),
+            "errors_count": len(errors), "errors": errors, "moved": moved,
         })
 
     if mode == "metadata":
