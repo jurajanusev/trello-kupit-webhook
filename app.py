@@ -3341,7 +3341,7 @@ def sync_dunaj_schedule():
         stale_by_list[current_list] = stale_by_list.get(current_list, 0) + 1
 
     mode = request.args.get("mode", "dry-run")
-    if mode not in {"dry-run", "cleanup-stale"}:
+    if mode != "dry-run":
         return jsonify({"error": "apply modes disabled pending dry-run approval"}), 409
     if mode == "dry-run":
         matched_by_list = {}
