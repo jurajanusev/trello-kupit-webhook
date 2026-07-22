@@ -88,6 +88,12 @@ def load_board_config():
 
 BOARD_CONFIG = load_board_config()
 
+BOARD_TARGET_LISTS = {
+    "qCPeWA3e": "69e53446a823be00f2e5e837",  # Dunaj
+    "CzuD55PR": "6a057f30a60d4ab5aee502b6",  # Riverdale
+    "lzNy4AtY": "6a4776f530468dee7ea5fbfc",  # DOK4
+}
+
 CHECKLIST_TAG = os.environ.get("CHECKLIST_TAG", "[Z]")
 
 BASE = "https://api.trello.com/1"
@@ -121,6 +127,19 @@ def trello_get(path, params=None):
 
     r.raise_for_status()
     return r.json()
+
+
+def target_list_id_for_card(card_info):
+    """Resolve the ToDo list for every list on the supported boards."""
+    source_config = BOARD_CONFIG.get(card_info.get("idList"))
+    if source_config:
+        return source_config["target_list_id"]
+
+    board_info = trello_get(
+        f"/boards/{card_info['idBoard']}",
+        {"fields": "shortLink"}
+    )
+    return BOARD_TARGET_LISTS.get(board_info.get("shortLink"))
 
 
 def trello_post(path, params=None):
@@ -4219,20 +4238,10 @@ def trello_webhook():
     except Exception as e:
         return jsonify({"status": "error", "reason": f"failed to load card: {str(e)}"}), 500
 
-    allowed_list_id = card_info["idList"]
-
-    if allowed_list_id in BOARD_CONFIG:
-        target_list_id = BOARD_CONFIG[allowed_list_id]["target_list_id"]
-    else:
-        board_info = trello_get(f"/boards/{card_info['idBoard']}", {"fields": "shortLink"})
-        is_dunaj_scene = (
-            board_info.get("shortLink") == "qCPeWA3e" and
-            re.match(r"^\s*[0-9]{1,2}\s*/\s*[0-9]+[A-Z]*(?:\.|\s|$)", card_info.get("name", ""), re.I)
-        )
-        if not is_dunaj_scene:
-            print("IGNORED: wrong list", allowed_list_id, "configured:", list(BOARD_CONFIG.keys()))
-            return jsonify({"status": "ignored", "reason": "card not in configured list"}), 200
-        target_list_id = "69e53446a823be00f2e5e837"
+    target_list_id = target_list_id_for_card(card_info)
+    if not target_list_id:
+        print("IGNORED: unsupported board", card_info.get("idBoard"))
+        return jsonify({"status": "ignored", "reason": "card not on supported board"}), 200
 
     item_lower = checkitem_name.lower()
     tag_lower = CHECKLIST_TAG.lower()
