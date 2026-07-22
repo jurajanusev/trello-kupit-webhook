@@ -1262,7 +1262,7 @@ def add_scene_to_prop_marker(desc, prop_display, card_info, checklist_item, curr
     return marker
 
 
-def find_cards_with_exact_item(search_term, allowed_list_id, exclude_card_id=None):
+def find_cards_with_exact_item(search_term, board_id, exclude_card_id=None):
     print("SEARCH TERM:", search_term)
     matching_cards = []
     search_norm = normalize_item_name(search_term)
@@ -1275,10 +1275,10 @@ def find_cards_with_exact_item(search_term, allowed_list_id, exclude_card_id=Non
     }
 
     try:
-        cards = trello_get(f"/lists/{allowed_list_id}/cards", params)
-        print(f"CARDS LOADED: {len(cards)}")
+        cards = trello_get(f"/boards/{board_id}/cards", params)
+        print(f"CARDS LOADED FROM BOARD: {len(cards)}")
     except Exception as e:
-        print(f"ERROR loading cards from list: {str(e)}")
+        print(f"ERROR loading cards from board: {str(e)}")
         return []
 
     for card in cards:
@@ -4255,7 +4255,7 @@ def trello_webhook():
 
         matching_cards = find_cards_with_exact_item(
             clean_name,
-            allowed_list_id,
+            card_info["idBoard"],
             exclude_card_id=card_id
         )
 
