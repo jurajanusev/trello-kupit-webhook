@@ -4578,7 +4578,14 @@ def handoff_automation_deployment():
         "url": card.get("shortUrl"), "closed": card.get("closed"),
     } for card in candidates]
     if mode == "dry-run":
-        return jsonify({"status": "dry-run", "candidates": compact})
+        raw_compact = [{
+            "id": card["id"], "name": card["name"],
+            "url": card.get("shortUrl"), "closed": card.get("closed"),
+        } for card in search_result.get("cards", [])]
+        return jsonify({
+            "status": "dry-run", "candidates": compact,
+            "search_results": raw_compact,
+        })
     if mode != "apply":
         return jsonify({"error": "mode must be dry-run or apply"}), 400
     if len(candidates) != 1:
