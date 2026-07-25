@@ -321,6 +321,7 @@ def apply(trello, state):
     stale_returned = cleanup_stale(trello, state)
 
     metadata_due_updated = []
+    metadata_errors = []
     unchanged = 0
     for item in state["matches"]:
         row = item["row"]
@@ -332,13 +333,23 @@ def apply(trello, state):
         if (card.get("due") or "")[:10] != row["shooting_date"]:
             payload["due"] = f"{row['shooting_date']}T10:00:00.000Z"
         if payload:
-            result = trello.put(f"/cards/{card['id']}", payload)
-            metadata_due_updated.append({"scene_id": row["scene_id"], "url": result["shortUrl"], "fields": sorted(payload)})
+            try:
+                result = trello.put(f"/cards/{card['id']}", payload)
+                metadata_due_updated.append({
+                    "scene_id": row["scene_id"], "url": result["shortUrl"],
+                    "fields": sorted(payload),
+                })
+            except Exception as exc:
+                metadata_errors.append({
+                    "scene_id": row["scene_id"], "url": card["shortUrl"],
+                    "fields": sorted(payload), "error": str(exc),
+                })
         else:
             unchanged += 1
 
     moved = []
     reordered = []
+    move_errors = []
     for item in sorted(state["window_matches"], key=lambda value: (value["row"]["shooting_date"], value["row"]["order"])):
         row = item["row"]
         card = item["card"]
@@ -349,9 +360,18 @@ def apply(trello, state):
         current_name = state["lists_by_id"][card["idList"]]["name"]
         if "NATOČEN" in current_name.upper() or card.get("dueComplete"):
             payload["dueComplete"] = False
-        result = trello.put(f"/cards/{card['id']}", payload)
-        entry = {"scene_id": row["scene_id"], "list": target["name"], "order": row["order"], "url": result["shortUrl"]}
-        (moved if "idList" in payload else reordered).append(entry)
+        try:
+            result = trello.put(f"/cards/{card['id']}", payload)
+            entry = {
+                "scene_id": row["scene_id"], "list": target["name"],
+                "order": row["order"], "url": result["shortUrl"],
+            }
+            (moved if "idList" in payload else reordered).append(entry)
+        except Exception as exc:
+            move_errors.append({
+                "scene_id": row["scene_id"], "url": card["shortUrl"],
+                "target_list": target["name"], "error": str(exc),
+            })
 
     refreshed_lists = trello.get(f"/boards/{state['board']['id']}/lists", {
         "fields": "id,name,pos,closed", "filter": "open"
@@ -386,7 +406,9 @@ def apply(trello, state):
     return {
         "status": "applied", "created_lists": created_lists,
         "metadata_due_updated": len(metadata_due_updated), "metadata_due_unchanged": unchanged,
+        "metadata_errors_count": len(metadata_errors), "metadata_errors": metadata_errors,
         "moved_count": len(moved), "reordered_count": len(reordered),
+        "move_errors_count": len(move_errors), "move_errors": move_errors,
         "list_order_updates": list_order_updates, "moved": moved,
         "missing_skipped": state["missing"], "archived_duplicates": archived_duplicates,
         "stale_returned": stale_returned,
