@@ -298,7 +298,7 @@ def summary(state, schedule):
     }
 
 
-def apply(trello, state):
+def apply(trello, state, metadata_only=False, skip_metadata=False, metadata_limit=None):
     blockers = {
         "wrong_board": state["board"].get("shortLink") != BOARD_REF,
         "duplicates": len(state["duplicates"]),
@@ -311,19 +311,21 @@ def apply(trello, state):
 
     lists_by_name = {name: values[0] for name, values in state["lists_by_name"].items()}
     created_lists = []
-    for date in state["shooting_dates"]:
-        name = state["target_names"][date]
-        if name not in lists_by_name:
-            item = trello.post("/lists", {"idBoard": state["board"]["id"], "name": name, "pos": "bottom"})
-            lists_by_name[name] = item
-            created_lists.append(name)
+    if not metadata_only:
+        for date in state["shooting_dates"]:
+            name = state["target_names"][date]
+            if name not in lists_by_name:
+                item = trello.post("/lists", {"idBoard": state["board"]["id"], "name": name, "pos": "bottom"})
+                lists_by_name[name] = item
+                created_lists.append(name)
 
-    stale_returned = cleanup_stale(trello, state)
+    stale_returned = [] if metadata_only else cleanup_stale(trello, state)
 
     metadata_due_updated = []
     metadata_errors = []
     unchanged = 0
-    for item in state["matches"]:
+    metadata_processed = 0
+    for item in ([] if skip_metadata else state["matches"]):
         row = item["row"]
         card = item["card"]
         payload = {}
@@ -333,6 +335,9 @@ def apply(trello, state):
         if (card.get("due") or "")[:10] != row["shooting_date"]:
             payload["due"] = f"{row['shooting_date']}T10:00:00.000Z"
         if payload:
+            if metadata_limit is not None and metadata_processed >= metadata_limit:
+                continue
+            metadata_processed += 1
             try:
                 result = trello.put(f"/cards/{card['id']}", payload)
                 metadata_due_updated.append({
@@ -346,6 +351,15 @@ def apply(trello, state):
                 })
         else:
             unchanged += 1
+
+    if metadata_only:
+        return {
+            "status": "metadata-batch-applied",
+            "metadata_due_updated": len(metadata_due_updated),
+            "metadata_due_unchanged": unchanged,
+            "metadata_errors_count": len(metadata_errors),
+            "metadata_errors": metadata_errors,
+        }
 
     moved = []
     reordered = []

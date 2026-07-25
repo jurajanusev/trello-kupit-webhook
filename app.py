@@ -4511,8 +4511,10 @@ def sync_dok4_current_schedule():
         return jsonify({"error": "forbidden"}), 403
 
     mode = request.args.get("mode", "dry-run")
-    if mode not in {"dry-run", "apply"}:
-        return jsonify({"error": "mode must be dry-run or apply"}), 400
+    if mode not in {"dry-run", "apply", "metadata", "window"}:
+        return jsonify({
+            "error": "mode must be dry-run, apply, metadata, or window"
+        }), 400
 
     as_of = request.args.get("as_of", "2026-07-25")
     schedule_path = os.path.join(
@@ -4530,7 +4532,15 @@ def sync_dok4_current_schedule():
     if mode == "dry-run":
         return jsonify(summarize_dok4_schedule(state, schedule))
 
-    result = apply_dok4_schedule(trello, state)
+    if mode == "metadata":
+        result = apply_dok4_schedule(
+            trello, state, metadata_only=True,
+            metadata_limit=min(40, max(1, int(request.args.get("limit", "35")))),
+        )
+    elif mode == "window":
+        result = apply_dok4_schedule(trello, state, skip_metadata=True)
+    else:
+        result = apply_dok4_schedule(trello, state)
     result.update({
         "window_type": "next_shooting_days",
         "window_as_of": as_of,
