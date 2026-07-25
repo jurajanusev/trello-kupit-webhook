@@ -3976,6 +3976,7 @@ def sync_dunaj_schedule():
 
 @app.route("/api/inspect-dunaj-merged-scenes", methods=["POST"])
 def inspect_dunaj_merged_scenes():
+    return jsonify({"error": "completed one-off endpoint disabled"}), 410
     if request.headers.get("X-Sync-Key") != "dunaj-1516-schedule-21jul-6a4d02c9":
         return jsonify({"error": "forbidden"}), 403
 
