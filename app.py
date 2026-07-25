@@ -9,8 +9,16 @@ import os
 import json
 import unicodedata
 import time
+from update_dok4_plan_local import (
+    Trello as Dok4ScheduleTrello,
+    apply as apply_dok4_schedule,
+    build_state as build_dok4_schedule_state,
+    summary as summarize_dok4_schedule,
+)
 
 app = Flask(__name__)
+
+DOK4_CURRENT_SCHEDULE_KEY = "dok4-current-schedule-25jul-6db82f10"
 
 
 @app.errorhandler(requests.HTTPError)
@@ -4490,6 +4498,45 @@ def trello_webhook():
 
     processed_actions.add(action_id)
     return jsonify({"status": "ok", "mode": "card_and_todo", "todo": todo_status}), 200
+
+
+@app.route("/api/sync-dok4-current-schedule", methods=["POST"])
+def sync_dok4_current_schedule():
+    """Synchronize DOK 4 from the latest supplied plan.
+
+    The active window is the next seven shooting dates on or after ``as_of``.
+    Calendar days without shooting never consume a slot.
+    """
+    if request.headers.get("X-Sync-Key") != DOK4_CURRENT_SCHEDULE_KEY:
+        return jsonify({"error": "forbidden"}), 403
+
+    mode = request.args.get("mode", "dry-run")
+    if mode not in {"dry-run", "apply"}:
+        return jsonify({"error": "mode must be dry-run or apply"}), 400
+
+    as_of = request.args.get("as_of", "2026-07-25")
+    schedule_path = os.path.join(
+        os.path.dirname(__file__), "dok4_schedule_2026-07-25.json"
+    )
+    with open(schedule_path, "r", encoding="utf-8") as handle:
+        schedule_document = json.load(handle)
+
+    source_date = schedule_document.get("source", {}).get("dated", as_of)
+    schedule = schedule_document["rows"]
+    trello = Dok4ScheduleTrello(API_KEY, TOKEN)
+    state = build_dok4_schedule_state(
+        trello, schedule, source_date=source_date, as_of=as_of
+    )
+    if mode == "dry-run":
+        return jsonify(summarize_dok4_schedule(state, schedule))
+
+    result = apply_dok4_schedule(trello, state)
+    result.update({
+        "window_type": "next_shooting_days",
+        "window_as_of": as_of,
+        "shooting_dates": state["shooting_dates"],
+    })
+    return jsonify(result)
 
 
 if __name__ == "__main__":

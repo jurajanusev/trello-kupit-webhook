@@ -12,8 +12,8 @@ Schvalene nastavenie pre dalsi vyvoj:
 - Import natacacieho planu podla `diel/obraz` doplni datum, den, unit a poradie a presunie povodnu kartu do zoznamu daneho natacacieho dna.
 - Datum natacania sa zaroven nastavi do Trello `due date` funkcionality. Technicky cas terminu je 12:00 v casovej zone Europe/Bratislava, aby sa datum pri zobrazeni neposunul.
 - Synchronizacia due date nemeni `dueComplete`; stav dokoncenia sa riadi samostatne podla skutocneho natocenia obrazu.
-- Zoznamy jednotlivych natacacich dni a presuny kariet sa vytvaraju najviac 7 kalendarnych dni dopredu, aby na nastenke nevznikalo prilis vela buducich zoznamov.
-- Obrazy naplanovane dalej ako 7 dni maju datum a metadata v popise, ale zostavaju vo svojom aktualnom zozname.
+- Zoznamy jednotlivych natacacich dni a presuny kariet sa vytvaraju pre najblizsich 7 natacacich dni podla planu, nie pre 7 kalendarnych dni.
+- Dni volna sa do limitu nepocitaju. Obrazy naplanovane po siedmom najblizsom natacacom dni maju datum a metadata v popise, ale zostavaju vo svojom aktualnom zozname.
 - Po potvrdeni natocenia sa tato ista karta presunie do `NATOCENE OBRAZY`; nevytvara sa kopia.
 - Ak novy plan obsahuje variant obrazu s pismenom, ale existuje iba zakladna karta bez pismena, system moze pouzit fallback, napriklad `04/43B -> 04/43` alebo `09/16A -> 09/16`; taketo parovanie musi byt viditelne v dry-rune.
 - Obraz v `NATOCENE OBRAZY` nie je definitivne zamknuty. Ak sa v novom plane objavi na prekrucanie, povodna karta sa presunie spat do prislusneho natacacieho dna, dostane novy due date a `dueComplete` sa nastavi na `false`.
@@ -39,7 +39,7 @@ Tento postup sa pouziva pre projekty Dunaj, DOK 4 a Riverdale:
 - Karta dostane Trello due date podla datumu natacania; aktualizacia datumu sama neoznaci kartu ako dokoncenu.
 - Pri chybajucom variante s koncovym pismenom sa moze pouzit jednoznacna zakladna karta bez pismena, napriklad `23/35F -> 23/35`. Fallback musi byt viditelny v dry-rune.
 - Ak neexistuje ani zakladna karta, karta sa nevytvara naslepo. Chybajuci obraz sa oznami a po doplneni karty sa synchronizacia zopakuje.
-- Pripravuju sa iba zoznamy pre nasledujucich 7 kalendarnych dni. Pre dni bez natacania sa prazdny zoznam nevytvara.
+- Pripravuju sa iba zoznamy pre najblizsich 7 natacacich dni. Dni volna sa do limitu nepocitaju a prazdny zoznam sa pre ne nevytvara.
 - Karty sa presunu do datovych zoznamov a zoradia podla poradia dna. Retake sa moze vratit aj zo zoznamu natocenych a vtedy sa `dueComplete` nastavi na `false`.
 - Datove zoznamy sa zoradia chronologicky hned za hlavnym zoznamom serialu.
 - Zaverecna kontrola musi potvrdit pocet najdenych kariet, nulove duplicity a nulovy pocet zostavajucich presunov; vsetky jednorazove endpointy sa potom vypnu.
