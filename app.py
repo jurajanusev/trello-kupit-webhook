@@ -3402,6 +3402,7 @@ def find_dunaj_board():
 
 @app.route("/api/sync-dunaj-schedule", methods=["POST"])
 def sync_dunaj_schedule():
+    return jsonify({"error": "completed one-off endpoint disabled"}), 410
     if request.headers.get("X-Sync-Key") != "dunaj-1516-schedule-21jul-6a4d02c9":
         return jsonify({"error": "forbidden"}), 403
 
