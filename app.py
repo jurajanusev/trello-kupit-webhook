@@ -3740,10 +3740,14 @@ def sync_dunaj_schedule():
                         retained_old_lists.append({
                             "name": old_list["name"],
                             "remaining_cards": len(remaining_cards),
+                            "cards": [{
+                                "name": card["name"],
+                                "url": card.get("shortUrl"),
+                            } for card in remaining_cards],
                         })
                     else:
                         trello_put_body(
-                            f"/lists/{old_list['id']}/closed", {"value": True}
+                            f"/lists/{old_list['id']}", {"closed": "true"}
                         )
                         archived_old_lists.append(old_list["name"])
                 except Exception as exc:
