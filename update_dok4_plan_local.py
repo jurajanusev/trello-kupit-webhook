@@ -81,6 +81,7 @@ def date_list_name(date_text):
 
 
 def metadata(row, source_date):
+    source_date = row.get("source_date", source_date)
     source_day = datetime.strptime(source_date, "%Y-%m-%d").date()
     source_date_display = f"{source_day.day}. {source_day.month}. {source_day.year}"
     return (

@@ -4507,7 +4507,6 @@ def sync_dok4_current_schedule():
     The active window is the next seven shooting dates on or after ``as_of``.
     Calendar days without shooting never consume a slot.
     """
-    return jsonify({"error": "completed one-off endpoint disabled"}), 410
     if request.headers.get("X-Sync-Key") != DOK4_CURRENT_SCHEDULE_KEY:
         return jsonify({"error": "forbidden"}), 403
 
@@ -4523,9 +4522,14 @@ def sync_dok4_current_schedule():
     )
     with open(schedule_path, "r", encoding="utf-8") as handle:
         schedule_document = json.load(handle)
+    supplement_path = os.path.join(
+        os.path.dirname(__file__), "dok4_schedule_supplement_2026-07-26.json"
+    )
+    with open(supplement_path, "r", encoding="utf-8") as handle:
+        supplement_document = json.load(handle)
 
     source_date = schedule_document.get("source", {}).get("dated", as_of)
-    schedule = schedule_document["rows"]
+    schedule = supplement_document["rows"] + schedule_document["rows"]
     trello = Dok4ScheduleTrello(API_KEY, TOKEN)
     state = build_dok4_schedule_state(
         trello, schedule, source_date=source_date, as_of=as_of
