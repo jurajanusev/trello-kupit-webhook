@@ -3718,6 +3718,7 @@ def sync_dunaj_schedule():
         list_reordered = None
         archived_old_lists = []
         retained_old_lists = []
+        old_list_cleanup_errors = []
         list_order_updates = []
         list_order_errors = []
         if not errors and remaining == 0:
@@ -3731,17 +3732,24 @@ def sync_dunaj_schedule():
                     continue
                 if old_list["name"] in active_names:
                     continue
-                remaining_cards = trello_get(f"/lists/{old_list['id']}/cards", {
-                    "fields": "id,name,shortUrl", "filter": "open", "limit": 1000,
-                })
-                if remaining_cards:
-                    retained_old_lists.append({
-                        "name": old_list["name"],
-                        "remaining_cards": len(remaining_cards),
+                try:
+                    remaining_cards = trello_get(f"/lists/{old_list['id']}/cards", {
+                        "fields": "id,name,shortUrl", "filter": "open", "limit": 1000,
                     })
-                else:
-                    trello_put_body(f"/lists/{old_list['id']}", {"closed": True})
-                    archived_old_lists.append(old_list["name"])
+                    if remaining_cards:
+                        retained_old_lists.append({
+                            "name": old_list["name"],
+                            "remaining_cards": len(remaining_cards),
+                        })
+                    else:
+                        trello_put_body(
+                            f"/lists/{old_list['id']}/closed", {"value": True}
+                        )
+                        archived_old_lists.append(old_list["name"])
+                except Exception as exc:
+                    old_list_cleanup_errors.append({
+                        "name": old_list["name"], "error": str(exc),
+                    })
 
             ordered_lists = trello_get(f"/boards/{board['id']}/lists", {
                 "fields": "id,name,pos,closed", "filter": "open",
@@ -3788,6 +3796,8 @@ def sync_dunaj_schedule():
             "list_reordered": list_reordered,
             "archived_old_lists": archived_old_lists,
             "retained_old_lists": retained_old_lists,
+            "old_list_cleanup_errors_count": len(old_list_cleanup_errors),
+            "old_list_cleanup_errors": old_list_cleanup_errors,
             "list_order_updates": list_order_updates,
             "list_order_errors_count": len(list_order_errors),
             "list_order_errors": list_order_errors,
