@@ -295,6 +295,7 @@ def summary(state, schedule):
         "series_anchor": ({"name": state["anchor"]["name"], "pos": state["anchor"]["pos"]}
                           if state["anchor"] else None),
         "existing_date_lists": [item[2]["name"] for item in state["date_lists"]],
+        "board_list_order": [item["name"] for item in state["lists"]],
     }
 
 
@@ -387,6 +388,23 @@ def apply(trello, state, metadata_only=False, skip_metadata=False, metadata_limi
                 "target_list": target["name"], "error": str(exc),
             })
 
+    archived_old_lists = []
+    retained_old_lists = []
+    active_date_names = set(state["target_names"].values())
+    for _, _, old_list in state["date_lists"]:
+        if old_list["name"] in active_date_names:
+            continue
+        remaining_cards = trello.get(f"/lists/{old_list['id']}/cards", {
+            "fields": "id,name,shortUrl", "filter": "open", "limit": 1000,
+        })
+        if remaining_cards:
+            retained_old_lists.append({
+                "name": old_list["name"], "remaining_cards": len(remaining_cards),
+            })
+        else:
+            trello.put(f"/lists/{old_list['id']}", {"closed": True})
+            archived_old_lists.append(old_list["name"])
+
     refreshed_lists = trello.get(f"/boards/{state['board']['id']}/lists", {
         "fields": "id,name,pos,closed", "filter": "open"
     })
@@ -406,10 +424,14 @@ def apply(trello, state, metadata_only=False, skip_metadata=False, metadata_limi
     else:
         step = 16384
     list_order_updates = []
+    list_order_errors = []
     for index, (_, _, item) in enumerate(date_items, start=1):
         desired_pos = anchor["pos"] + step * index
-        result = trello.put(f"/lists/{item['id']}", {"pos": desired_pos})
-        list_order_updates.append({"name": result["name"], "pos": result["pos"]})
+        try:
+            result = trello.put(f"/lists/{item['id']}", {"pos": desired_pos})
+            list_order_updates.append({"name": result["name"], "pos": result["pos"]})
+        except Exception as exc:
+            list_order_errors.append({"name": item["name"], "error": str(exc)})
 
     archived_duplicates = []
     for item in state["resolved_duplicates"]:
@@ -424,6 +446,10 @@ def apply(trello, state, metadata_only=False, skip_metadata=False, metadata_limi
         "moved_count": len(moved), "reordered_count": len(reordered),
         "move_errors_count": len(move_errors), "move_errors": move_errors,
         "list_order_updates": list_order_updates, "moved": moved,
+        "list_order_errors_count": len(list_order_errors),
+        "list_order_errors": list_order_errors,
+        "archived_old_lists": archived_old_lists,
+        "retained_old_lists": retained_old_lists,
         "missing_skipped": state["missing"], "archived_duplicates": archived_duplicates,
         "stale_returned": stale_returned,
     }
