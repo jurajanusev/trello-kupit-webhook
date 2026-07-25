@@ -3979,34 +3979,154 @@ def inspect_dunaj_merged_scenes():
     if request.headers.get("X-Sync-Key") != "dunaj-1516-schedule-21jul-6a4d02c9":
         return jsonify({"error": "forbidden"}), 403
 
+    mode = request.args.get("mode", "dry-run")
+    if mode not in {"dry-run", "apply"}:
+        return jsonify({"error": "invalid mode"}), 400
+
     board = trello_get("/boards/qCPeWA3e", {"fields": "id,name,url"})
     lists = trello_get(f"/boards/{board['id']}/lists", {
         "fields": "id,name,closed", "filter": "all",
     })
     lists_by_id = {item["id"]: item for item in lists}
-    matches = []
-    seen = set()
-    for query in ("23/34", "24/08", "24/8"):
-        result = trello_get("/search", {
-            "query": query, "idBoards": board["id"], "modelTypes": "cards",
-            "cards_limit": 100,
-            "card_fields": "id,name,desc,idList,shortUrl,due,dueComplete,closed,pos",
+    open_lists_by_name = {
+        item["name"]: item for item in lists if not item.get("closed")
+    }
+    target_23_list = open_lists_by_name.get("6.8.")
+    if not target_23_list:
+        return jsonify({"error": "target list 6.8. not found"}), 404
+
+    # Persistent exceptional matching rules:
+    # - the PDF abbreviates FLASH as F, while the Trello card uses FLASH;
+    # - 24/08A and 24/08B are intentionally represented by one 24/08 card.
+    rules = {
+        "23/34F": {"card_id": "6a34e640305cf71b2dd1b86e", "canonical": "23/34FLASH"},
+        "24/8A+24/8B": {"card_id": "6a34e68ac33c7998d2ff70ef", "canonical": "24/08"},
+    }
+    cards = {}
+    for rule_name, rule in rules.items():
+        card = trello_get(f"/cards/{rule['card_id']}", {
+            "fields": "id,name,desc,idBoard,idList,shortUrl,due,dueComplete,closed,pos",
         })
-        for card in result.get("cards", []):
-            if card["id"] in seen:
-                continue
-            seen.add(card["id"])
-            matches.append({
-                "id": card["id"], "name": card["name"],
-                "url": card.get("shortUrl"), "closed": card.get("closed"),
-                "list": lists_by_id.get(card.get("idList"), {}).get("name"),
-                "list_closed": lists_by_id.get(card.get("idList"), {}).get("closed"),
-                "due": card.get("due"), "due_complete": card.get("dueComplete"),
-                "description_length": len(card.get("desc", "")),
-                "description_start": card.get("desc", "")[:1200],
-            })
+        if card.get("idBoard") != board["id"]:
+            return jsonify({"error": f"{rule_name} card is not on the Dunaj board"}), 409
+        cards[rule_name] = card
+
+    start_marker = "<!-- DUNAJ-SCHEDULE-METADATA:START -->"
+    end_marker = "<!-- DUNAJ-SCHEDULE-METADATA:END -->"
+
+    def merge_metadata(old_desc, metadata):
+        if start_marker in old_desc and end_marker in old_desc:
+            pattern = re.escape(start_marker) + r".*?" + re.escape(end_marker)
+            return re.sub(pattern, lambda _: metadata, old_desc, count=1, flags=re.S)
+        return metadata + ("\n\n" + old_desc if old_desc else "")
+
+    metadata_23 = (
+        f"{start_marker}\n"
+        "**ČÍSLO OBRAZU:** 23/34FLASH\n"
+        "**ZDROJ:** predbežná dispo DUNAJ 16 z 25. 7. 2026\n"
+        "**NATÁČACÍ DEŇ:** 81\n"
+        "**DÁTUM NATÁČANIA:** 2026-08-06\n"
+        "**PORADIE DŇA:** 2\n"
+        "**UNIT:** 1st unit\n"
+        "**LOKÁCIA:** KLAUSOVCI - SALÓN\n"
+        "**POSTAVY:** Oleg, Astrid, Boris\n"
+        f"{end_marker}"
+    )
+    metadata_24 = (
+        f"{start_marker}\n"
+        "**ČÍSLO OBRAZU:** 24/08 (24/08A + 24/08B)\n"
+        "**ZDROJ:** predbežná dispo DUNAJ 16 z 25. 7. 2026\n"
+        "**NATÁČACÍ DEŇ:** 87\n"
+        "**DÁTUM NATÁČANIA:** 2026-08-16\n"
+        "**PORADIE DŇA:** 8-9\n"
+        "**UNIT:** 1st unit\n"
+        "**LOKÁCIA:** KABARET - ZÁZEMIE / KABARET\n"
+        "**POSTAVY:** René, Lena, Gita\n"
+        f"{end_marker}"
+    )
+    desired = {
+        "23/34F": {
+            "name_prefix": "23/34FLASH",
+            "desc": merge_metadata(cards["23/34F"].get("desc", ""), metadata_23),
+            "due": "2026-08-06T10:00:00.000Z",
+            "idList": target_23_list["id"],
+            "pos": 32768,
+        },
+        "24/8A+24/8B": {
+            "name_prefix": "24/08",
+            "desc": merge_metadata(cards["24/8A+24/8B"].get("desc", ""), metadata_24),
+            "due": "2026-08-16T10:00:00.000Z",
+            # 16. 8. is outside the current seven-shooting-day window.
+            "idList": cards["24/8A+24/8B"]["idList"],
+            "pos": cards["24/8A+24/8B"].get("pos"),
+        },
+    }
+
+    planned = []
+    missing = []
+    for rule_name, card in cards.items():
+        wanted = desired[rule_name]
+        changes = {}
+        if card.get("closed"):
+            changes["closed"] = False
+        if not card.get("name", "").upper().startswith(wanted["name_prefix"]):
+            changes["name_prefix"] = wanted["name_prefix"]
+        if card.get("desc", "") != wanted["desc"]:
+            changes["desc"] = "replace schedule metadata block"
+        if (card.get("due") or "")[:10] != wanted["due"][:10]:
+            changes["due"] = wanted["due"]
+        if card.get("dueComplete"):
+            changes["dueComplete"] = False
+        if card.get("idList") != wanted["idList"]:
+            changes["list"] = {
+                "from": lists_by_id.get(card.get("idList"), {}).get("name"),
+                "to": lists_by_id.get(wanted["idList"], {}).get("name"),
+            }
+        if rule_name == "23/34F" and float(card.get("pos", 0)) != float(wanted["pos"]):
+            changes["pos"] = wanted["pos"]
+        planned.append({
+            "rule": rule_name, "canonical": rules[rule_name]["canonical"],
+            "card": card["name"], "url": card.get("shortUrl"), "changes": changes,
+        })
+        if not card.get("id"):
+            missing.append(rule_name)
+
+    if mode == "dry-run":
+        return jsonify({
+            "status": "dry-run", "board": board["name"],
+            "rules": rules, "planned": planned,
+            "missing_count": len(missing), "missing": missing,
+            "duplicate_count": 0, "fallback_count": 0,
+            "collision_count": 0,
+            "pending_updates_count": sum(bool(item["changes"]) for item in planned),
+        })
+
+    updated = []
+    for item in planned:
+        if not item["changes"]:
+            continue
+        rule_name = item["rule"]
+        card = cards[rule_name]
+        wanted = desired[rule_name]
+        payload = {
+            "desc": wanted["desc"], "due": wanted["due"],
+            "dueComplete": "false", "closed": "false",
+        }
+        if card.get("idList") != wanted["idList"]:
+            payload["idList"] = wanted["idList"]
+        if rule_name == "23/34F":
+            payload["pos"] = wanted["pos"]
+        result = trello_put_body(f"/cards/{card['id']}", payload)
+        updated.append({
+            "rule": rule_name, "canonical": rules[rule_name]["canonical"],
+            "card": result.get("name"), "url": result.get("shortUrl"),
+        })
+
     return jsonify({
-        "status": "dry-run", "board": board["name"], "matches": matches,
+        "status": "applied", "board": board["name"],
+        "updated_count": len(updated), "updated": updated,
+        "missing_count": 0, "duplicate_count": 0,
+        "fallback_count": 0, "collision_count": 0,
     })
 
 
