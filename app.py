@@ -4549,6 +4549,64 @@ def sync_dok4_current_schedule():
     return jsonify(result)
 
 
+@app.route("/api/handoff-automation-deployment", methods=["POST"])
+def handoff_automation_deployment():
+    if request.headers.get("X-Sync-Key") != DOK4_CURRENT_SCHEDULE_KEY:
+        return jsonify({"error": "forbidden"}), 403
+
+    search_result = trello_get("/search", {
+        "query": "Trello nasadenie automatizácie",
+        "modelTypes": "cards",
+        "cards_limit": 100,
+        "card_fields": "id,name,shortUrl,idBoard,idList,closed",
+    })
+
+    def folded(value):
+        value = unicodedata.normalize("NFKD", value or "")
+        return "".join(char for char in value if not unicodedata.combining(char)).casefold()
+
+    candidates = []
+    for card in search_result.get("cards", []):
+        name = folded(card.get("name"))
+        if all(term in name for term in ("trello", "nasadenie", "automatizacie")):
+            candidates.append(card)
+
+    mode = request.args.get("mode", "dry-run")
+    compact = [{
+        "id": card["id"], "name": card["name"],
+        "url": card.get("shortUrl"), "closed": card.get("closed"),
+    } for card in candidates]
+    if mode == "dry-run":
+        return jsonify({"status": "dry-run", "candidates": compact})
+    if mode != "apply":
+        return jsonify({"error": "mode must be dry-run or apply"}), 400
+    if len(candidates) != 1:
+        return jsonify({
+            "error": "expected exactly one deployment card",
+            "candidates": compact,
+        }), 409
+
+    note = (
+        "DOK 4 - aktualizácia natáčacieho plánu z predbežky 25. 7. 2026\n\n"
+        "Nasadené produkčné commity: 6311748, 895e271, af734ce, "
+        "74a78c6, 744492b.\n"
+        "Trvalé pravidlo: pripravovať najbližších 7 natáčacích dní, "
+        "nie 7 kalendárnych dní.\n"
+        "Aktívne dni: 28. 7., 29. 7., 30. 7., 31. 7., 2. 8., 3. 8., 9. 8.\n"
+        "Finálny dry-run: čakajúce presuny 0, neaktuálne karty 0, "
+        "metadata/due pending 0, duplicity 0, fallback kolízie 0.\n"
+        "Chýbajúci obraz v aktívnom okne: 11/37; nevytvorený naslepo."
+    )
+    action = trello_post_body(
+        f"/cards/{candidates[0]['id']}/actions/comments", {"text": note}
+    )
+    return jsonify({
+        "status": "applied",
+        "card": compact[0],
+        "comment_id": action.get("id"),
+    })
+
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
