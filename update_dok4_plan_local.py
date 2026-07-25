@@ -365,16 +365,23 @@ def apply(trello, state, metadata_only=False, skip_metadata=False, metadata_limi
     moved = []
     reordered = []
     move_errors = []
+    window_unchanged = 0
     for item in sorted(state["window_matches"], key=lambda value: (value["row"]["shooting_date"], value["row"]["order"])):
         row = item["row"]
         card = item["card"]
         target = lists_by_name[state["target_names"][row["shooting_date"]]]
-        payload = {"pos": row["order"] * 16384}
+        expected_pos = row["order"] * 16384
+        payload = {}
         if card["idList"] != target["id"]:
             payload["idList"] = target["id"]
+        if abs(float(card.get("pos") or 0) - expected_pos) > 0.5:
+            payload["pos"] = expected_pos
         current_name = state["lists_by_id"][card["idList"]]["name"]
         if "NATOČEN" in current_name.upper() or card.get("dueComplete"):
             payload["dueComplete"] = False
+        if not payload:
+            window_unchanged += 1
+            continue
         try:
             result = trello.put(f"/cards/{card['id']}", payload)
             entry = {
@@ -444,6 +451,7 @@ def apply(trello, state, metadata_only=False, skip_metadata=False, metadata_limi
         "metadata_due_updated": len(metadata_due_updated), "metadata_due_unchanged": unchanged,
         "metadata_errors_count": len(metadata_errors), "metadata_errors": metadata_errors,
         "moved_count": len(moved), "reordered_count": len(reordered),
+        "window_unchanged": window_unchanged,
         "move_errors_count": len(move_errors), "move_errors": move_errors,
         "list_order_updates": list_order_updates, "moved": moved,
         "list_order_errors_count": len(list_order_errors),
