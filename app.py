@@ -4812,7 +4812,6 @@ def sync_dok4_current_schedule():
 
 @app.route("/api/handoff-automation-deployment", methods=["POST"])
 def handoff_automation_deployment():
-    return jsonify({"error": "completed one-off endpoint disabled"}), 410
     if request.headers.get("X-Sync-Key") != DOK4_CURRENT_SCHEDULE_KEY:
         return jsonify({"error": "forbidden"}), 403
 
@@ -4857,15 +4856,16 @@ def handoff_automation_deployment():
         }), 409
 
     note = (
-        "DOK 4 - aktualizácia natáčacieho plánu z predbežky 25. 7. 2026\n\n"
-        "Nasadené produkčné commity: 6311748, 895e271, af734ce, "
-        "74a78c6, 744492b.\n"
-        "Trvalé pravidlo: pripravovať najbližších 7 natáčacích dní, "
-        "nie 7 kalendárnych dní.\n"
-        "Aktívne dni: 28. 7., 29. 7., 30. 7., 31. 7., 2. 8., 3. 8., 9. 8.\n"
-        "Finálny dry-run: čakajúce presuny 0, neaktuálne karty 0, "
-        "metadata/due pending 0, duplicity 0, fallback kolízie 0.\n"
-        "Chýbajúci obraz v aktívnom okne: 11/37; nevytvorený naslepo."
+        "Dunaj - doplnenie chýbajúcich obrazov z plánu 25. 7. 2026\n\n"
+        "Nasadené produkčné commity: 66eb42d, c93dd5c.\n"
+        "Trvalé párovanie: 23/34F -> existujúca karta 23/34FLASH; "
+        "24/08A + 24/08B -> jedna existujúca karta 24/08.\n"
+        "23/34FLASH: natáčací deň 81, 6. 8. 2026, poradie 2, "
+        "1st unit, KLAUSOVCI - SALÓN, Oleg/Astrid/Boris; karta presunutá na 6.8.\n"
+        "24/08: spoločné poradie 8-9, natáčací deň 87, 16. 8. 2026, "
+        "lokácie KABARET - ZÁZEMIE / KABARET, postavy René/Lena/Gita.\n"
+        "Finálny dry-run: čakajúce zmeny 0, chýbajúce 0, duplicity 0, "
+        "fallback 0, kolízie 0. Jednorazový opravný endpoint vypnutý."
     )
     action = trello_post_body(
         f"/cards/{candidates[0]['id']}/actions/comments", {"text": note}
