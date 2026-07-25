@@ -3974,6 +3974,42 @@ def sync_dunaj_schedule():
     return jsonify({"error": "invalid mode"}), 400
 
 
+@app.route("/api/inspect-dunaj-merged-scenes", methods=["POST"])
+def inspect_dunaj_merged_scenes():
+    if request.headers.get("X-Sync-Key") != "dunaj-1516-schedule-21jul-6a4d02c9":
+        return jsonify({"error": "forbidden"}), 403
+
+    board = trello_get("/boards/qCPeWA3e", {"fields": "id,name,url"})
+    lists = trello_get(f"/boards/{board['id']}/lists", {
+        "fields": "id,name,closed", "filter": "all",
+    })
+    lists_by_id = {item["id"]: item for item in lists}
+    matches = []
+    seen = set()
+    for query in ("23/34", "24/08", "24/8"):
+        result = trello_get("/search", {
+            "query": query, "idBoards": board["id"], "modelTypes": "cards",
+            "cards_limit": 100,
+            "card_fields": "id,name,desc,idList,shortUrl,due,dueComplete,closed,pos",
+        })
+        for card in result.get("cards", []):
+            if card["id"] in seen:
+                continue
+            seen.add(card["id"])
+            matches.append({
+                "id": card["id"], "name": card["name"],
+                "url": card.get("shortUrl"), "closed": card.get("closed"),
+                "list": lists_by_id.get(card.get("idList"), {}).get("name"),
+                "list_closed": lists_by_id.get(card.get("idList"), {}).get("closed"),
+                "due": card.get("due"), "due_complete": card.get("dueComplete"),
+                "description_length": len(card.get("desc", "")),
+                "description_start": card.get("desc", "")[:1200],
+            })
+    return jsonify({
+        "status": "dry-run", "board": board["name"], "matches": matches,
+    })
+
+
 @app.route("/api/reorder-dunaj-date-lists", methods=["POST"])
 def reorder_dunaj_date_lists():
     return jsonify({"error": "endpoint disabled"}), 410
