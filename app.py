@@ -4507,6 +4507,7 @@ def sync_dok4_current_schedule():
     The active window is the next seven shooting dates on or after ``as_of``.
     Calendar days without shooting never consume a slot.
     """
+    return jsonify({"error": "completed one-off endpoint disabled"}), 410
     if request.headers.get("X-Sync-Key") != DOK4_CURRENT_SCHEDULE_KEY:
         return jsonify({"error": "forbidden"}), 403
 
@@ -4551,6 +4552,7 @@ def sync_dok4_current_schedule():
 
 @app.route("/api/handoff-automation-deployment", methods=["POST"])
 def handoff_automation_deployment():
+    return jsonify({"error": "completed one-off endpoint disabled"}), 410
     if request.headers.get("X-Sync-Key") != DOK4_CURRENT_SCHEDULE_KEY:
         return jsonify({"error": "forbidden"}), 403
 
