@@ -4554,8 +4554,9 @@ def handoff_automation_deployment():
     if request.headers.get("X-Sync-Key") != DOK4_CURRENT_SCHEDULE_KEY:
         return jsonify({"error": "forbidden"}), 403
 
+    search_query = request.args.get("query", "nasadenie")
     search_result = trello_get("/search", {
-        "query": "Trello nasadenie automatizácie",
+        "query": search_query,
         "modelTypes": "cards",
         "cards_limit": 100,
         "card_fields": "id,name,shortUrl,idBoard,idList,closed",
@@ -4568,7 +4569,7 @@ def handoff_automation_deployment():
     candidates = []
     for card in search_result.get("cards", []):
         name = folded(card.get("name"))
-        if all(term in name for term in ("trello", "nasadenie", "automatizacie")):
+        if "nasaden" in name:
             candidates.append(card)
 
     mode = request.args.get("mode", "dry-run")
