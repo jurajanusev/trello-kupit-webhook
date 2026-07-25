@@ -3474,6 +3474,12 @@ def sync_dunaj_schedule():
         {"card_id": card_id, "scene_ids": scene_ids}
         for card_id, scene_ids in matched_scenes_by_card.items() if len(scene_ids) > 1
     ]
+    collision_card_ids = {
+        item["card_id"] for item in fallback_card_collisions
+    }
+    matched_for_updates = [
+        item for item in matched if item["card"]["id"] not in collision_card_ids
+    ]
 
     window_rows = [
         row for row in schedule_rows
@@ -3630,7 +3636,10 @@ def sync_dunaj_schedule():
         })
 
     if mode == "apply-window":
-        if window_missing or window_duplicates or len(window_cards) != len(window_rows):
+        if (
+            window_duplicates
+            or len(window_cards) + len(window_missing) != len(window_rows)
+        ):
             return jsonify({
                 "error": "window verification failed",
                 "window_rows": len(window_rows), "window_cards": len(window_cards),
@@ -3773,6 +3782,7 @@ def sync_dunaj_schedule():
         return jsonify({
             "status": "window-applied", "board": board["name"],
             "window_rows": len(window_rows), "updated_count": len(updated),
+            "missing_skipped": window_missing,
             "moved_count": len(moved), "created_lists": created_lists,
             "batch_start": batch_start, "batch_size": len(batch), "remaining": remaining,
             "list_reordered": list_reordered,
@@ -3815,7 +3825,7 @@ def sync_dunaj_schedule():
     if mode == "metadata":
         batch_start = max(0, int(request.args.get("start", "0")))
         batch_limit = min(75, max(1, int(request.args.get("limit", "40"))))
-        batch = matched[batch_start:batch_start + batch_limit]
+        batch = matched_for_updates[batch_start:batch_start + batch_limit]
         start_marker = "<!-- DUNAJ-SCHEDULE-METADATA:START -->"
         end_marker = "<!-- DUNAJ-SCHEDULE-METADATA:END -->"
         updated = []; unchanged = 0; moved = []; errors = []
@@ -3850,9 +3860,11 @@ def sync_dunaj_schedule():
             except Exception as exc:
                 errors.append({"scene_id": item["scene_id"], "error": str(exc)})
         return jsonify({
-            "status": "metadata-applied", "matched_card_copies": len(matched),
+            "status": "metadata-applied",
+            "matched_card_copies": len(matched_for_updates),
+            "fallback_collisions_skipped": fallback_card_collisions,
             "batch_start": batch_start, "batch_size": len(batch),
-            "remaining": max(0, len(matched) - batch_start - len(batch)),
+            "remaining": max(0, len(matched_for_updates) - batch_start - len(batch)),
             "updated": len(updated), "unchanged": unchanged,
             "moved_count": len(moved), "errors_count": len(errors), "errors": errors[:20],
         })
