@@ -3402,15 +3402,20 @@ def find_dunaj_board():
 
 @app.route("/api/sync-dunaj-schedule", methods=["POST"])
 def sync_dunaj_schedule():
-    return jsonify({"error": "endpoint disabled"}), 410
     if request.headers.get("X-Sync-Key") != "dunaj-1516-schedule-21jul-6a4d02c9":
         return jsonify({"error": "forbidden"}), 403
 
-    window_start = "2026-07-22"
-    window_end = "2026-07-28"
-    schedule_path = os.path.join(os.path.dirname(__file__), "dunaj_schedule_2026-07-21.json")
+    as_of = request.args.get("as_of", "2026-07-25")
+    schedule_path = os.path.join(os.path.dirname(__file__), "dunaj_schedule_2026-07-25.json")
     with open(schedule_path, "r", encoding="utf-8") as handle:
         schedule_rows = json.load(handle)["rows"]
+    shooting_dates = sorted({
+        row["shooting_date"] for row in schedule_rows
+        if row["shooting_date"] >= as_of
+    })[:7]
+    shooting_date_set = set(shooting_dates)
+    window_start = shooting_dates[0] if shooting_dates else None
+    window_end = shooting_dates[-1] if shooting_dates else None
     row_by_scene = {row["scene_id"]: row for row in schedule_rows}
 
     board = trello_get("/boards/qCPeWA3e", {"fields": "id,name,url"})
@@ -3470,7 +3475,10 @@ def sync_dunaj_schedule():
         for card_id, scene_ids in matched_scenes_by_card.items() if len(scene_ids) > 1
     ]
 
-    window_rows = [row for row in schedule_rows if window_start <= row["shooting_date"] <= window_end]
+    window_rows = [
+        row for row in schedule_rows
+        if row["shooting_date"] in shooting_date_set
+    ]
     window_missing = []
     window_duplicates = []
     window_cards = []
@@ -3512,7 +3520,6 @@ def sync_dunaj_schedule():
         _, month, day = (int(part) for part in date_text.split("-"))
         return f"{day}.{month}."
 
-    shooting_dates = sorted({row["shooting_date"] for row in window_rows})
     target_names = {date_text: date_list_name(date_text) for date_text in shooting_dates}
     missing_target_lists = [name for name in target_names.values() if name not in lists_by_name]
 
@@ -3542,7 +3549,7 @@ def sync_dunaj_schedule():
         expected_list = target_names[row["shooting_date"]]
         expected_fragments = [
             f"**ČÍSLO OBRAZU:** {row['scene_id']}",
-            "**ZDROJ:** predbežná dispo DUNAJ 16 z 21. 7. 2026",
+            "**ZDROJ:** predbežná dispo DUNAJ 16 z 25. 7. 2026",
             f"**NATÁČACÍ DEŇ:** {row['shooting_day']}",
             f"**DÁTUM NATÁČANIA:** {row['shooting_date']}",
             f"**PORADIE DŇA:** {row['order']}",
@@ -3564,7 +3571,7 @@ def sync_dunaj_schedule():
             })
 
     mode = request.args.get("mode", "dry-run")
-    if mode not in {"dry-run", "apply-window"}:
+    if mode not in {"dry-run", "apply-window", "cleanup-stale", "metadata"}:
         return jsonify({"error": "apply modes disabled pending dry-run approval"}), 409
     if mode == "dry-run":
         matched_by_list = {}
@@ -3586,6 +3593,11 @@ def sync_dunaj_schedule():
         return jsonify({
             "status": "dry-run", "board": board["name"], "board_url": board["url"],
             "open_lists": [item["name"] for item in open_lists.values()],
+            "board_list_order": [item["name"] for item in open_lists.values()],
+            "existing_date_lists": [
+                item["name"] for item in open_lists.values()
+                if re.fullmatch(r"\d{1,2}\.\d{1,2}\.", item["name"])
+            ],
             "open_cards": len(cards), "schedule_rows": len(schedule_rows),
             "matched_scene_ids": len(schedule_rows) - len(missing), "matched_card_copies": len(matched),
             "missing_count": len(missing), "missing_sample": missing[:60],
@@ -3598,7 +3610,10 @@ def sync_dunaj_schedule():
             "window_schedule_rows": len(window_rows), "window_unique_cards": len(window_cards),
             "window_missing_count": len(window_missing), "window_missing": window_missing,
             "window_duplicates_count": len(window_duplicates), "window_duplicates": window_duplicates[:20],
-            "shooting_dates": shooting_dates, "days_without_shooting": 7 - len(shooting_dates),
+            "window_type": "next_shooting_days",
+            "window_as_of": as_of,
+            "shooting_dates": shooting_dates,
+            "shooting_days_selected": len(shooting_dates),
             "missing_target_lists": missing_target_lists, "window_by_date": window_by_date,
             "stale_date_cards_count": len(stale_date_cards),
             "stale_date_cards_by_list": stale_by_list,
@@ -3650,7 +3665,7 @@ def sync_dunaj_schedule():
             metadata = (
                 f"{start_marker}\n"
                 f"**ČÍSLO OBRAZU:** {row['scene_id']}\n"
-                f"**ZDROJ:** predbežná dispo DUNAJ 16 z 21. 7. 2026\n"
+                f"**ZDROJ:** predbežná dispo DUNAJ 16 z 25. 7. 2026\n"
                 f"**NATÁČACÍ DEŇ:** {row['shooting_day']}\n"
                 f"**DÁTUM NATÁČANIA:** {row['shooting_date']}\n"
                 f"**PORADIE DŇA:** {row['order']}\n"
@@ -3692,22 +3707,68 @@ def sync_dunaj_schedule():
                 errors.append({"scene_id": row["scene_id"], "error": str(exc)})
 
         list_reordered = None
-        if not errors and remaining == 0 and "27.7." in lists_by_name:
+        archived_old_lists = []
+        retained_old_lists = []
+        list_order_updates = []
+        list_order_errors = []
+        if not errors and remaining == 0:
             ordered_lists = trello_get(f"/boards/{board['id']}/lists", {
                 "fields": "id,name,pos,closed", "filter": "open",
             })
             ordered_lists.sort(key=lambda value: value["pos"])
-            list_25 = next((value for value in ordered_lists if value["name"] == "25.7."), None)
-            list_27 = next((value for value in ordered_lists if value["name"] == "27.7."), None)
-            if list_25 and list_27:
+            active_names = set(target_names.values())
+            for old_list in ordered_lists:
+                if not re.fullmatch(r"\d{1,2}\.\d{1,2}\.", old_list["name"]):
+                    continue
+                if old_list["name"] in active_names:
+                    continue
+                remaining_cards = trello_get(f"/lists/{old_list['id']}/cards", {
+                    "fields": "id,name,shortUrl", "filter": "open", "limit": 1000,
+                })
+                if remaining_cards:
+                    retained_old_lists.append({
+                        "name": old_list["name"],
+                        "remaining_cards": len(remaining_cards),
+                    })
+                else:
+                    trello_put_body(f"/lists/{old_list['id']}", {"closed": True})
+                    archived_old_lists.append(old_list["name"])
+
+            ordered_lists = trello_get(f"/boards/{board['id']}/lists", {
+                "fields": "id,name,pos,closed", "filter": "open",
+            })
+            ordered_lists.sort(key=lambda value: value["pos"])
+            anchor = next(
+                (value for value in ordered_lists if value["name"] == "SERIA 15,16"),
+                None,
+            )
+            date_lists = [
+                value for value in ordered_lists if value["name"] in active_names
+            ]
+            date_lists.sort(key=lambda value: shooting_dates[
+                list(target_names.values()).index(value["name"])
+            ])
+            if anchor:
+                date_ids = {value["id"] for value in date_lists}
                 following = [
                     value for value in ordered_lists
-                    if value["id"] != list_27["id"] and value["pos"] > list_25["pos"]
+                    if value["id"] not in date_ids and value["pos"] > anchor["pos"]
                 ]
-                next_pos = following[0]["pos"] if following else list_25["pos"] + 32768
-                desired_pos = (list_25["pos"] + next_pos) / 2
-                result = trello_put_body(f"/lists/{list_27['id']}", {"pos": desired_pos})
-                list_reordered = {"name": result["name"], "pos": result["pos"]}
+                next_pos = following[0]["pos"] if following else anchor["pos"] + 131072
+                step = (next_pos - anchor["pos"]) / (len(date_lists) + 1)
+                for index, date_list in enumerate(date_lists, start=1):
+                    try:
+                        result = trello_put_body(
+                            f"/lists/{date_list['id']}",
+                            {"pos": anchor["pos"] + step * index},
+                        )
+                        list_order_updates.append({
+                            "name": result["name"], "pos": result["pos"],
+                        })
+                    except Exception as exc:
+                        list_order_errors.append({
+                            "name": date_list["name"], "error": str(exc),
+                        })
 
         return jsonify({
             "status": "window-applied", "board": board["name"],
@@ -3715,6 +3776,11 @@ def sync_dunaj_schedule():
             "moved_count": len(moved), "created_lists": created_lists,
             "batch_start": batch_start, "batch_size": len(batch), "remaining": remaining,
             "list_reordered": list_reordered,
+            "archived_old_lists": archived_old_lists,
+            "retained_old_lists": retained_old_lists,
+            "list_order_updates": list_order_updates,
+            "list_order_errors_count": len(list_order_errors),
+            "list_order_errors": list_order_errors,
             "errors_count": len(errors), "errors": errors,
         })
 
@@ -3724,7 +3790,10 @@ def sync_dunaj_schedule():
             return jsonify({"error": "SERIA 15,16 list not found"}), 404
         moved = []
         errors = []
-        for item in stale_date_cards:
+        batch_start = max(0, int(request.args.get("start", "0")))
+        batch_limit = min(40, max(1, int(request.args.get("limit", "25"))))
+        batch = stale_date_cards[batch_start:batch_start + batch_limit]
+        for item in batch:
             try:
                 result = trello_put_body(f"/cards/{item['id']}", {
                     "idList": series_list["id"], "pos": "bottom",
@@ -3738,6 +3807,8 @@ def sync_dunaj_schedule():
         return jsonify({
             "status": "stale-date-cards-cleaned", "board": board["name"],
             "planned_count": len(stale_date_cards), "moved_count": len(moved),
+            "batch_start": batch_start, "batch_size": len(batch),
+            "remaining": max(0, len(stale_date_cards) - batch_start - len(batch)),
             "errors_count": len(errors), "errors": errors, "moved": moved,
         })
 
@@ -3753,7 +3824,7 @@ def sync_dunaj_schedule():
             metadata = (
                 f"{start_marker}\n"
                 f"**ČÍSLO OBRAZU:** {row['scene_id']}\n"
-                f"**ZDROJ:** predbežná dispo DUNAJ 16 z 21. 7. 2026\n"
+                f"**ZDROJ:** predbežná dispo DUNAJ 16 z 25. 7. 2026\n"
                 f"**NATÁČACÍ DEŇ:** {row['shooting_day']}\n"
                 f"**DÁTUM NATÁČANIA:** {row['shooting_date']}\n"
                 f"**PORADIE DŇA:** {row['order']}\n"

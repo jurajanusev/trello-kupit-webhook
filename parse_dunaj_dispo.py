@@ -71,7 +71,7 @@ def parse(pdf_path):
                     })
 
     return {
-        "source": "predbežná dispo DUNAJ 16 z 21. 7. 2026",
+        "source": "predbežná dispo DUNAJ 16 z 25. 7. 2026",
         "rows": rows,
     }
 
