@@ -204,6 +204,16 @@ class CiernyKamenPayloadTest(unittest.TestCase):
             response.json["error"], "completed SET fix endpoint disabled"
         )
 
+    def test_completed_marker_fix_endpoint_is_gone(self):
+        response = app.app.test_client().post(
+            "/api/fix-cierny-kamen-n-marker",
+            headers={"X-Marker-Key": app.CIERNY_KAMEN_N_MARKER_KEY},
+        )
+        self.assertEqual(response.status_code, 410)
+        self.assertEqual(
+            response.json["error"], "completed marker endpoint disabled"
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

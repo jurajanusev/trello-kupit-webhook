@@ -7798,6 +7798,8 @@ def cierny_kamen_marker_batch(
 
 @app.route("/api/fix-cierny-kamen-n-marker", methods=["POST"])
 def fix_cierny_kamen_n_marker():
+    return jsonify({"error": "completed marker endpoint disabled"}), 410
+
     if request.headers.get("X-Marker-Key") != CIERNY_KAMEN_N_MARKER_KEY:
         return jsonify({"error": "forbidden"}), 403
     phase = request.args.get("phase", "dry-run").strip().casefold()
