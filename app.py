@@ -5909,6 +5909,251 @@ def audit_cierny_kamen_import():
     })
 
 
+CIERNY_KAMEN_CLEANUP_KEY = "cierny-kamen-cleanup-27jul-4bd36e81"
+CIERNY_KAMEN_BOARD_REF = "CzuD55PR"
+CIERNY_KAMEN_PROP_REGISTRY_LIST_ID = "6a5cbe13db1f160d97ae6474"
+CIERNY_KAMEN_EXPECTED_OLD_SCENE_CARDS = 373
+CIERNY_KAMEN_EXPECTED_OLD_PROP_CARDS = 93
+CIERNY_KAMEN_TEST_LIST_NAME = "TEST 2 — OBRAZY"
+
+
+def cierny_kamen_cleanup_snapshot():
+    board = trello_get(
+        f"/boards/{CIERNY_KAMEN_BOARD_REF}",
+        {"fields": "id,name,url,closed,shortLink"},
+    )
+    if board.get("shortLink") != CIERNY_KAMEN_BOARD_REF:
+        raise RuntimeError("Cierny Kamen cleanup resolved an unexpected board")
+
+    lists = trello_get(f"/boards/{board['id']}/lists", {
+        "fields": "id,name,pos,closed", "filter": "all",
+    })
+    cards = trello_get(f"/boards/{board['id']}/cards", {
+        "fields": "id,name,idList,shortUrl,closed",
+        "filter": "all", "limit": 1000,
+    })
+    lists_by_id = {item["id"]: item for item in lists}
+
+    scene_cards = []
+    active_production_cards = []
+    for card in cards:
+        scene_info = cierny_kamen_scene_name_info(card.get("name", ""))
+        if not scene_info:
+            continue
+        enriched = {
+            **card,
+            **scene_info,
+            "list_name": lists_by_id.get(card.get("idList"), {}).get("name"),
+            "list_closed": bool(
+                lists_by_id.get(card.get("idList"), {}).get("closed")
+            ),
+        }
+        enriched["active"] = (
+            not card.get("closed") and not enriched["list_closed"]
+        )
+        scene_cards.append(enriched)
+        if enriched["active"] and not enriched["test"]:
+            active_production_cards.append(enriched)
+
+    prop_cards = [
+        card for card in cards
+        if card.get("idList") == CIERNY_KAMEN_PROP_REGISTRY_LIST_ID
+    ]
+    prop_list = lists_by_id.get(CIERNY_KAMEN_PROP_REGISTRY_LIST_ID)
+    active_prop_cards = [
+        card for card in prop_cards
+        if not card.get("closed")
+        and prop_list
+        and not prop_list.get("closed")
+    ]
+    test_lists = [
+        item for item in lists
+        if cierny_kamen_audit_folded(item.get("name"))
+        == cierny_kamen_audit_folded(CIERNY_KAMEN_TEST_LIST_NAME)
+    ]
+    card_counts_by_list = {}
+    for card in cards:
+        card_counts_by_list[card.get("idList")] = (
+            card_counts_by_list.get(card.get("idList"), 0) + 1
+        )
+
+    return {
+        "board": board,
+        "lists": lists,
+        "cards": cards,
+        "scene_cards": sorted(scene_cards, key=lambda card: card["id"]),
+        "active_production_cards": active_production_cards,
+        "prop_cards": sorted(prop_cards, key=lambda card: card["id"]),
+        "active_prop_cards": active_prop_cards,
+        "test_lists": test_lists,
+        "card_counts_by_list": card_counts_by_list,
+    }
+
+
+def cierny_kamen_cleanup_summary(snapshot):
+    scene_cards = snapshot["scene_cards"]
+    prop_cards = snapshot["prop_cards"]
+    return {
+        "board": {
+            "id": snapshot["board"]["id"],
+            "name": snapshot["board"].get("name"),
+            "url": snapshot["board"].get("url"),
+        },
+        "scene_cards_remaining": len(scene_cards),
+        "production_scenes_remaining": sum(
+            not card["test"] for card in scene_cards
+        ),
+        "test_scenes_remaining": sum(card["test"] for card in scene_cards),
+        "active_production_scenes": len(
+            snapshot["active_production_cards"]
+        ),
+        "prop_registry_cards_remaining": len(prop_cards),
+        "active_prop_registry_cards": len(snapshot["active_prop_cards"]),
+        "test_lists": [
+            {
+                "id": item["id"],
+                "name": item.get("name"),
+                "closed": bool(item.get("closed")),
+                "cards": snapshot["card_counts_by_list"].get(item["id"], 0),
+            }
+            for item in snapshot["test_lists"]
+        ],
+        "scene_sample": [
+            {
+                "id": card["id"],
+                "name": card.get("name"),
+                "url": card.get("shortUrl"),
+                "list": card.get("list_name"),
+                "card_closed": bool(card.get("closed")),
+                "list_closed": card.get("list_closed"),
+            }
+            for card in scene_cards[:10]
+        ],
+        "prop_sample": [
+            {
+                "id": card["id"],
+                "name": card.get("name"),
+                "url": card.get("shortUrl"),
+                "card_closed": bool(card.get("closed")),
+            }
+            for card in prop_cards[:10]
+        ],
+    }
+
+
+def cierny_kamen_cleanup_guard(snapshot):
+    if snapshot["board"].get("closed"):
+        return "board is archived"
+    if snapshot["active_production_cards"]:
+        return "active production scene cards exist; refusing cleanup"
+    if snapshot["active_prop_cards"]:
+        return "active prop registry cards exist; refusing cleanup"
+    if len(snapshot["scene_cards"]) > CIERNY_KAMEN_EXPECTED_OLD_SCENE_CARDS:
+        return "scene target count exceeds audited maximum"
+    if len(snapshot["prop_cards"]) > CIERNY_KAMEN_EXPECTED_OLD_PROP_CARDS:
+        return "prop target count exceeds audited maximum"
+    return None
+
+
+@app.route("/api/cleanup-cierny-kamen-old-data", methods=["POST"])
+def cleanup_cierny_kamen_old_data():
+    if request.headers.get("X-Cleanup-Key") != CIERNY_KAMEN_CLEANUP_KEY:
+        return jsonify({"error": "forbidden"}), 403
+
+    mode = request.args.get("mode", "dry-run").strip().casefold()
+    scope = request.args.get("scope", "all").strip().casefold()
+    try:
+        limit = int(request.args.get("limit", "25"))
+    except ValueError:
+        return jsonify({"error": "limit must be an integer"}), 400
+    if mode not in {"dry-run", "apply", "audit"}:
+        return jsonify({"error": "mode must be dry-run, apply, or audit"}), 400
+    if scope not in {"all", "scenes", "registry", "finalize"}:
+        return jsonify({
+            "error": "scope must be all, scenes, registry, or finalize"
+        }), 400
+    if limit < 1 or limit > 25:
+        return jsonify({"error": "limit must be between 1 and 25"}), 400
+
+    before = cierny_kamen_cleanup_snapshot()
+    guard_error = cierny_kamen_cleanup_guard(before)
+    before_summary = cierny_kamen_cleanup_summary(before)
+    if guard_error:
+        return jsonify({
+            "status": "blocked",
+            "error": guard_error,
+            "before": before_summary,
+        }), 409
+
+    if mode in {"dry-run", "audit"}:
+        clean = (
+            not before["scene_cards"]
+            and not before["prop_cards"]
+            and not any(
+                not item.get("closed") for item in before["test_lists"]
+            )
+        )
+        return jsonify({
+            "status": mode,
+            "clean": clean,
+            "writes": 0,
+            "before": before_summary,
+        }), 200
+
+    deleted = []
+    archived_lists = []
+    if scope in {"all", "scenes"}:
+        for card in before["scene_cards"][:limit]:
+            trello_delete(f"/cards/{card['id']}")
+            deleted.append({
+                "kind": "scene",
+                "id": card["id"],
+                "name": card.get("name"),
+                "url": card.get("shortUrl"),
+            })
+    elif scope == "registry":
+        for card in before["prop_cards"][:limit]:
+            trello_delete(f"/cards/{card['id']}")
+            deleted.append({
+                "kind": "prop",
+                "id": card["id"],
+                "name": card.get("name"),
+                "url": card.get("shortUrl"),
+            })
+    elif scope == "finalize":
+        if before["scene_cards"] or before["prop_cards"]:
+            return jsonify({
+                "status": "blocked",
+                "error": "cards remain; finalize is not allowed yet",
+                "before": before_summary,
+            }), 409
+        for item in before["test_lists"]:
+            if item.get("closed"):
+                continue
+            if before["card_counts_by_list"].get(item["id"], 0):
+                return jsonify({
+                    "status": "blocked",
+                    "error": "test list is not empty",
+                    "list_id": item["id"],
+                    "before": before_summary,
+                }), 409
+            trello_put_body(f"/lists/{item['id']}", {"closed": "true"})
+            archived_lists.append({
+                "id": item["id"], "name": item.get("name"),
+            })
+
+    after = cierny_kamen_cleanup_snapshot()
+    return jsonify({
+        "status": "applied",
+        "scope": scope,
+        "deleted": deleted,
+        "deleted_count": len(deleted),
+        "archived_lists": archived_lists,
+        "before": before_summary,
+        "after": cierny_kamen_cleanup_summary(after),
+    }), 200
+
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
