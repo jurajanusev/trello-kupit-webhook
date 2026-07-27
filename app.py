@@ -6477,6 +6477,72 @@ def cierny_kamen_create_checklists(card_id, checklists):
     return created
 
 
+def cierny_kamen_repair_scene_card(
+    card, scene, prop_urls, set_urls, label_ids
+):
+    expected_desc = cierny_kamen_scene_description(
+        scene, prop_urls, set_urls
+    )
+    expected_checklists = cierny_kamen_scene_checklists(
+        scene, prop_urls, set_urls
+    )
+    if card.get("name") != scene["name"]:
+        raise RuntimeError(f"{scene['scene_id']} existing name mismatch")
+    if card.get("desc") != expected_desc:
+        raise RuntimeError(
+            f"{scene['scene_id']} existing description mismatch"
+        )
+    expected_labels = sorted(label_ids[name] for name in scene["labels"])
+    if sorted(card.get("idLabels", [])) != expected_labels:
+        raise RuntimeError(f"{scene['scene_id']} existing labels mismatch")
+
+    checklists = trello_get(
+        f"/cards/{card['id']}/checklists",
+        {"checkItems": "all", "fields": "id,name,pos"},
+    )
+    checklists = sorted(checklists, key=lambda item: item.get("pos", 0))
+    if len(checklists) > len(CIERNY_KAMEN_IMPORT_CHECKLISTS):
+        raise RuntimeError(f"{scene['scene_id']} has extra checklists")
+    repaired = []
+    for index, checklist in enumerate(checklists):
+        expected_name = CIERNY_KAMEN_IMPORT_CHECKLISTS[index]
+        if checklist.get("name") != expected_name:
+            raise RuntimeError(
+                f"{scene['scene_id']} checklist prefix mismatch"
+            )
+        expected_items = expected_checklists[expected_name]
+        actual_items = [
+            item.get("name")
+            for item in sorted(
+                checklist.get("checkItems", []),
+                key=lambda entry: entry.get("pos", 0),
+            )
+        ]
+        if actual_items != expected_items[:len(actual_items)]:
+            raise RuntimeError(
+                f"{scene['scene_id']} {expected_name} item prefix mismatch"
+            )
+        for item in expected_items[len(actual_items):]:
+            trello_post_body(
+                f"/checklists/{checklist['id']}/checkItems",
+                {"name": item, "pos": "bottom"},
+            )
+            repaired.append(f"{expected_name}:item")
+
+    for checklist_name in CIERNY_KAMEN_IMPORT_CHECKLISTS[len(checklists):]:
+        checklist = trello_post_body(
+            f"/cards/{card['id']}/checklists",
+            {"name": checklist_name, "pos": "bottom"},
+        )
+        for item in expected_checklists[checklist_name]:
+            trello_post_body(
+                f"/checklists/{checklist['id']}/checkItems",
+                {"name": item, "pos": "bottom"},
+            )
+        repaired.append(f"{checklist_name}:checklist")
+    return repaired
+
+
 def cierny_kamen_import_registry_batch(
     payload, state, target, start, limit, scene_urls
 ):
@@ -6856,6 +6922,7 @@ def import_cierny_kamen():
         selected = payload["scenes"][start:start + limit]
         created = []
         unchanged = []
+        repaired = []
         label_ids = {
             name: matches[0]["id"]
             for name, matches in audit["desired_labels"].items()
@@ -6863,7 +6930,16 @@ def import_cierny_kamen():
         for scene in selected:
             existing = audit["scene_cards"].get(scene["scene_id"], [])
             if existing:
-                unchanged.append(scene["scene_id"])
+                changes = cierny_kamen_repair_scene_card(
+                    existing[0], scene, prop_urls, set_urls, label_ids
+                )
+                if changes:
+                    repaired.append({
+                        "scene_id": scene["scene_id"],
+                        "changes": changes,
+                    })
+                else:
+                    unchanged.append(scene["scene_id"])
                 continue
             description = cierny_kamen_scene_description(
                 scene, prop_urls, set_urls
@@ -6889,6 +6965,7 @@ def import_cierny_kamen():
             "start": start,
             "selected": len(selected),
             "created": created,
+            "repaired": repaired,
             "unchanged": unchanged,
             "remaining": max(
                 0, len(payload["scenes"]) - start - len(selected)
