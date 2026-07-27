@@ -6156,6 +6156,916 @@ def cleanup_cierny_kamen_old_data():
     }), 200
 
 
+CIERNY_KAMEN_IMPORT_KEY = "cierny-kamen-full-import-27jul-8e31f7c2"
+CIERNY_KAMEN_IMPORT_CHECKLISTS = [
+    "REKVIZITY",
+    "SET",
+    "INFO Z PORADY",
+    "INFO Z NATÁČANIA",
+    "OTÁZKY NA PORADU",
+]
+
+
+def cierny_kamen_import_payload():
+    path = Path(__file__).with_name("cierny_kamen_import_payload.json")
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def cierny_kamen_import_state(payload):
+    board = trello_get(
+        f"/boards/{payload['board_ref']}",
+        {"fields": "id,name,url,closed,shortLink"},
+    )
+    lists = trello_get(f"/boards/{board['id']}/lists", {
+        "fields": "id,name,pos,closed", "filter": "all",
+    })
+    labels = trello_get(f"/boards/{board['id']}/labels", {
+        "fields": "id,name,color", "limit": 1000,
+    })
+    cards = trello_get(f"/boards/{board['id']}/cards", {
+        "fields": "id,name,desc,idList,shortUrl,closed,idLabels",
+        "filter": "all", "limit": 1000,
+    })
+    return {
+        "board": board,
+        "lists": lists,
+        "labels": labels,
+        "cards": cards,
+        "lists_by_id": {item["id"]: item for item in lists},
+    }
+
+
+def cierny_kamen_exact_named(items, name, include_closed=False):
+    expected = cierny_kamen_audit_folded(name)
+    return [
+        item for item in items
+        if cierny_kamen_audit_folded(item.get("name")) == expected
+        and (include_closed or not item.get("closed"))
+    ]
+
+
+def cierny_kamen_registry_marker(kind, key):
+    return f"<!-- CIERNY-KAMEN-REGISTRY:{kind}:{key} -->"
+
+
+def cierny_kamen_registry_cards(state, kind, payload):
+    registry = (
+        payload["prop_registry"]
+        if kind == "PROP" else payload["set_registry"]
+    )
+    result = {}
+    duplicates = {}
+    for key in registry:
+        marker = cierny_kamen_registry_marker(kind, key)
+        matches = [
+            card for card in state["cards"]
+            if marker in (card.get("desc") or "")
+        ]
+        if len(matches) == 1:
+            result[key] = matches[0]
+        elif len(matches) > 1:
+            duplicates[key] = matches
+    return result, duplicates
+
+
+def cierny_kamen_scene_cards_by_id(state):
+    by_id = {}
+    for card in state["cards"]:
+        info = cierny_kamen_scene_name_info(card.get("name", ""))
+        if not info or info["test"]:
+            continue
+        by_id.setdefault(info["scene_id"], []).append(card)
+    return by_id
+
+
+def cierny_kamen_target_audit(payload, state):
+    scene_lists = cierny_kamen_exact_named(
+        state["lists"], payload["scene_list_name"]
+    )
+    prop_lists = cierny_kamen_exact_named(
+        state["lists"], payload["prop_registry_list_name"]
+    )
+    set_lists = cierny_kamen_exact_named(
+        state["lists"], payload["set_registry_list_name"]
+    )
+    desired_labels = {}
+    for label_name in ("Nadväzná rekvizita", "Nadväzný set", "Auto"):
+        matches = cierny_kamen_exact_named(state["labels"], label_name, True)
+        desired_labels[label_name] = matches
+    scene_cards = cierny_kamen_scene_cards_by_id(state)
+    source_ids = {scene["scene_id"] for scene in payload["scenes"]}
+    collisions = {
+        scene_id: [
+            {
+                "id": card["id"],
+                "name": card.get("name"),
+                "url": card.get("shortUrl"),
+                "list": state["lists_by_id"].get(
+                    card.get("idList"), {}
+                ).get("name"),
+            }
+            for card in matches
+        ]
+        for scene_id, matches in scene_cards.items()
+        if scene_id in source_ids and (
+            len(matches) > 1
+            or not all(
+                "<!-- CIERNY-KAMEN-SCHEDULE-METADATA:START -->"
+                in (card.get("desc") or "")
+                for card in matches
+            )
+        )
+    }
+    blockers = []
+    if len(scene_lists) != 1:
+        blockers.append(
+            f"expected one open {payload['scene_list_name']} list"
+        )
+    if len(prop_lists) != 1:
+        blockers.append(
+            f"expected one open {payload['prop_registry_list_name']} list"
+        )
+    if len(set_lists) > 1:
+        blockers.append(
+            f"found multiple open {payload['set_registry_list_name']} lists"
+        )
+    for label_name, matches in desired_labels.items():
+        if len(matches) != 1:
+            blockers.append(f"expected one existing label: {label_name}")
+    if collisions:
+        blockers.append("scene ID collisions exist")
+    return {
+        "scene_lists": scene_lists,
+        "prop_lists": prop_lists,
+        "set_lists": set_lists,
+        "desired_labels": desired_labels,
+        "scene_cards": scene_cards,
+        "collisions": collisions,
+        "blockers": blockers,
+    }
+
+
+def cierny_kamen_continuity_text(item, registry_url):
+    previous = item.get("previous")
+    following = item.get("next")
+    previous_text = (
+        f"{previous['scene_id']}: {previous['state']}"
+        if previous else "prvý výskyt"
+    )
+    next_text = (
+        f"{following['scene_id']}: {following['state']}"
+        if following else "ďalší potvrdený obraz neurčený"
+    )
+    return (
+        f"<> {item['stable_name']} — {item['action']} | "
+        f"← {previous_text} | TU: {item['current_state']} | "
+        f"→ {next_text} | KARTA: {registry_url}"
+    )
+
+
+def cierny_kamen_plain_item(item):
+    return item.get("source_text") or (
+        f"{item['stable_name']} — {item['action']}"
+    )
+
+
+def cierny_kamen_scene_description(scene, prop_urls, set_urls):
+    prop_context = [
+        f"- **{item['stable_name']}** — {item['action']}"
+        for item in scene["props"]
+    ] or ["- Bez samostatnej rekvizity určenej v zdroji."]
+    continuity = []
+    links = []
+    for item in scene["props"]:
+        if item.get("continuity"):
+            continuity.append(
+                f"- {item['stable_name']}: kontinuálna rekvizita."
+            )
+            links.append(
+                f"- {item['stable_name']}: {prop_urls[item['registry_key']]}"
+            )
+    for item in scene["set_items"]:
+        if item.get("continuity"):
+            continuity.append(
+                f"- {item['stable_name']}: kontinuálny set."
+            )
+            links.append(
+                f"- {item['stable_name']}: {set_urls[item['registry_key']]}"
+            )
+    if not continuity:
+        continuity = ["- Bez potvrdenej nadväznosti."]
+    if not links:
+        links = ["- Bez samostatného odkazu."]
+    characters = ", ".join(scene["characters"]) or "neuvedené"
+    return (
+        "<!-- CIERNY-KAMEN-SCHEDULE-METADATA:START -->\n"
+        f"ČÍSLO OBRAZU: {scene['scene_id']}\n"
+        f"ZDROJ: Čierny Kameň – scenár epizódy {scene['episode']:02d}\n"
+        "NATÁČACÍ DEŇ: nenaplánované\n"
+        "DÁTUM: nenaplánované\n"
+        "PORADIE: nenaplánované\n"
+        "UNIT: nenaplánované\n"
+        f"LOKÁCIA: {scene['location']}\n"
+        f"POSTAVY: {characters}\n"
+        "<!-- CIERNY-KAMEN-SCHEDULE-METADATA:END -->\n\n"
+        f"## {scene['prepis']}\n\n"
+        "### REKVIZITY V KONTEXTE\n"
+        f"{chr(10).join(prop_context)}\n\n"
+        "### KONTINUITA\n"
+        f"{chr(10).join(continuity)}\n\n"
+        "### ODKAZY\n"
+        f"{chr(10).join(links)}\n\n"
+        "### RUČNÉ DOPLNENIA\n\n"
+        "### AKCIA A DIALÓGY\n"
+        f"{scene['action_markdown']}"
+    )
+
+
+def cierny_kamen_scene_checklists(scene, prop_urls, set_urls):
+    prop_items = [
+        (
+            cierny_kamen_continuity_text(
+                item, prop_urls[item["registry_key"]]
+            )
+            if item.get("continuity")
+            else cierny_kamen_plain_item(item)
+        )
+        for item in scene["props"]
+    ]
+    set_items = [
+        (
+            cierny_kamen_continuity_text(
+                item, set_urls[item["registry_key"]]
+            )
+            if item.get("continuity")
+            else cierny_kamen_plain_item(item)
+        )
+        for item in scene["set_items"]
+    ]
+    return {
+        "REKVIZITY": prop_items,
+        "SET": set_items,
+        "INFO Z PORADY": [],
+        "INFO Z NATÁČANIA": [],
+        "OTÁZKY NA PORADU": [],
+    }
+
+
+def cierny_kamen_registry_description(kind, key, entry, scene_urls):
+    marker = cierny_kamen_registry_marker(kind, key)
+    title = (
+        "HLAVNÁ KARTA KONTINUÁLNEJ REKVIZITY"
+        if kind == "PROP" else "HLAVNÁ KARTA KONTINUÁLNEHO SETU"
+    )
+    aliases = ", ".join(entry.get("aliases") or [entry["identity"]])
+    timeline = []
+    for occurrence in entry["occurrences"]:
+        url = scene_urls.get(occurrence["scene_id"])
+        if url:
+            timeline.append(
+                f"- [{occurrence['scene_id']}]({url}) — "
+                f"{occurrence['action']}"
+            )
+        else:
+            timeline.append(
+                f"- {occurrence['scene_id']} — karta obrazu zatiaľ "
+                f"nie je importovaná — {occurrence['action']}"
+            )
+    fixed = (
+        "Jedna stabilná identita naprieč všetkými obrazmi; konkrétny "
+        "kus a jeho stav sa potvrdzujú podľa časovej osi."
+        if kind == "PROP"
+        else "Zachovať identitu priestoru, rozmiestnenie a pevné "
+        "scénografické prvky podľa časovej osi."
+    )
+    return (
+        f"{marker}\n"
+        f"# {title}\n\n"
+        f"**IDENTITA:** `{entry['identity']}`\n\n"
+        f"**ALIASY:** {aliases}\n\n"
+        f"**FIXNÉ VLASTNOSTI:** {fixed}\n\n"
+        "## ČASOVÁ OS A ODKAZY NA OBRAZY\n"
+        f"{chr(10).join(timeline)}\n\n"
+        "## RUČNÉ POZNÁMKY\n"
+    )
+
+
+def cierny_kamen_create_card(list_id, name, desc, label_ids=None):
+    data = {"idList": list_id, "name": name, "desc": desc, "pos": "bottom"}
+    if label_ids:
+        data["idLabels"] = ",".join(label_ids)
+    return trello_post_body("/cards", data)
+
+
+def cierny_kamen_create_checklists(card_id, checklists):
+    created = []
+    for checklist_name in CIERNY_KAMEN_IMPORT_CHECKLISTS:
+        checklist = trello_post_body(
+            f"/cards/{card_id}/checklists",
+            {"name": checklist_name, "pos": "bottom"},
+        )
+        for item in checklists[checklist_name]:
+            trello_post_body(
+                f"/checklists/{checklist['id']}/checkItems",
+                {"name": item, "pos": "bottom"},
+            )
+        created.append({
+            "id": checklist["id"],
+            "name": checklist_name,
+            "items": len(checklists[checklist_name]),
+        })
+    return created
+
+
+def cierny_kamen_import_registry_batch(
+    payload, state, target, start, limit, scene_urls
+):
+    kind = target["kind"]
+    entries = (
+        payload["prop_registry"]
+        if kind == "PROP" else payload["set_registry"]
+    )
+    list_id = target["list_id"]
+    existing, duplicates = cierny_kamen_registry_cards(
+        state, kind, payload
+    )
+    if duplicates:
+        raise RuntimeError(f"duplicate {kind} registry identities")
+    keys = sorted(entries)[start:start + limit]
+    created = []
+    unchanged = []
+    for key in keys:
+        if key in existing:
+            unchanged.append(key)
+            continue
+        entry = entries[key]
+        card = cierny_kamen_create_card(
+            list_id,
+            entry["identity"],
+            cierny_kamen_registry_description(
+                kind, key, entry, scene_urls
+            ),
+        )
+        created.append({
+            "key": key, "id": card["id"], "url": card.get("shortUrl"),
+        })
+    return {
+        "kind": kind,
+        "start": start,
+        "selected": len(keys),
+        "created": created,
+        "unchanged": unchanged,
+        "remaining": max(0, len(entries) - start - len(keys)),
+    }
+
+
+def cierny_kamen_registry_urls(payload, state):
+    prop_cards, prop_duplicates = cierny_kamen_registry_cards(
+        state, "PROP", payload
+    )
+    set_cards, set_duplicates = cierny_kamen_registry_cards(
+        state, "SET", payload
+    )
+    if prop_duplicates or set_duplicates:
+        raise RuntimeError("duplicate registry marker")
+    return (
+        {key: card.get("shortUrl") for key, card in prop_cards.items()},
+        {key: card.get("shortUrl") for key, card in set_cards.items()},
+    )
+
+
+@app.route("/api/import-cierny-kamen", methods=["POST"])
+def import_cierny_kamen():
+    if request.headers.get("X-Import-Key") != CIERNY_KAMEN_IMPORT_KEY:
+        return jsonify({"error": "forbidden"}), 403
+    payload = cierny_kamen_import_payload()
+    phase = request.args.get("phase", "dry-run").strip().casefold()
+    try:
+        start = int(request.args.get("start", "0"))
+        limit = int(request.args.get("limit", "5"))
+    except ValueError:
+        return jsonify({"error": "start and limit must be integers"}), 400
+    if start < 0 or limit < 1 or limit > 10:
+        return jsonify({"error": "invalid start/limit"}), 400
+
+    state = cierny_kamen_import_state(payload)
+    audit = cierny_kamen_target_audit(payload, state)
+    if audit["blockers"]:
+        return jsonify({
+            "status": "blocked",
+            "blockers": audit["blockers"],
+            "collisions": audit["collisions"],
+        }), 409
+
+    scene_urls = {
+        scene_id: matches[0].get("shortUrl")
+        for scene_id, matches in audit["scene_cards"].items()
+        if len(matches) == 1
+    }
+    if phase == "dry-run":
+        return jsonify({
+            "status": "dry-run",
+            "writes": 0,
+            "board": {
+                "id": state["board"]["id"],
+                "name": state["board"].get("name"),
+                "url": state["board"].get("url"),
+            },
+            "source": payload["stats"],
+            "episode_counts": payload["episode_counts"],
+            "targets": {
+                "scene_list": [
+                    {"id": item["id"], "name": item["name"]}
+                    for item in audit["scene_lists"]
+                ],
+                "prop_registry_list": [
+                    {"id": item["id"], "name": item["name"]}
+                    for item in audit["prop_lists"]
+                ],
+                "set_registry_list": [
+                    {"id": item["id"], "name": item["name"]}
+                    for item in audit["set_lists"]
+                ],
+                "set_registry_will_be_created": not audit["set_lists"],
+                "labels": {
+                    name: [
+                        {"id": item["id"], "name": item["name"]}
+                        for item in matches
+                    ]
+                    for name, matches in audit["desired_labels"].items()
+                },
+            },
+            "existing_imported_scenes": len(scene_urls),
+            "scene_collisions": audit["collisions"],
+            "missing_prepis": payload["stats"]["missing_prepis"],
+            "missing_action": payload["stats"]["missing_action"],
+        }), 200
+
+    if phase == "init":
+        if audit["set_lists"]:
+            return jsonify({
+                "status": "unchanged",
+                "set_registry_list": audit["set_lists"][0],
+            }), 200
+        created = trello_post_body("/lists", {
+            "idBoard": state["board"]["id"],
+            "name": payload["set_registry_list_name"],
+            "pos": "bottom",
+        })
+        return jsonify({
+            "status": "created",
+            "set_registry_list": {
+                "id": created["id"], "name": created.get("name"),
+            },
+        }), 200
+
+    if not audit["set_lists"]:
+        return jsonify({
+            "status": "blocked",
+            "error": "REGISTER SETOV must be initialized first",
+        }), 409
+
+    sample_scene = next(
+        scene for scene in payload["scenes"]
+        if scene["scene_id"] == "02/28"
+    )
+    sample_prop_keys = sorted({
+        item["registry_key"] for item in sample_scene["props"]
+        if item.get("continuity")
+    })
+    sample_set_keys = sorted({
+        item["registry_key"] for item in sample_scene["set_items"]
+        if item.get("continuity")
+    })
+    if phase == "sample-registries":
+        created = []
+        unchanged = []
+        for kind, keys, entries, list_id in (
+            (
+                "PROP", sample_prop_keys, payload["prop_registry"],
+                audit["prop_lists"][0]["id"],
+            ),
+            (
+                "SET", sample_set_keys, payload["set_registry"],
+                audit["set_lists"][0]["id"],
+            ),
+        ):
+            existing, duplicates = cierny_kamen_registry_cards(
+                state, kind, payload
+            )
+            if duplicates:
+                return jsonify({
+                    "status": "blocked",
+                    "error": f"duplicate {kind} registry identities",
+                }), 409
+            for key in keys:
+                if key in existing:
+                    unchanged.append({"kind": kind, "key": key})
+                    continue
+                entry = entries[key]
+                card = cierny_kamen_create_card(
+                    list_id,
+                    entry["identity"],
+                    cierny_kamen_registry_description(
+                        kind, key, entry, scene_urls
+                    ),
+                )
+                created.append({
+                    "kind": kind, "key": key,
+                    "id": card["id"], "url": card.get("shortUrl"),
+                })
+        return jsonify({
+            "status": "applied",
+            "created": created,
+            "unchanged": unchanged,
+        }), 200
+
+    if phase in {"prop-registries", "set-registries"}:
+        target = {
+            "kind": "PROP" if phase == "prop-registries" else "SET",
+            "list_id": (
+                audit["prop_lists"][0]["id"]
+                if phase == "prop-registries"
+                else audit["set_lists"][0]["id"]
+            ),
+        }
+        result = cierny_kamen_import_registry_batch(
+            payload, state, target, start, limit, scene_urls
+        )
+        return jsonify({"status": "applied", **result}), 200
+
+    prop_urls, set_urls = cierny_kamen_registry_urls(payload, state)
+    required_prop_keys = set(payload["prop_registry"])
+    required_set_keys = set(payload["set_registry"])
+
+    if phase == "sample-scene":
+        missing_props = set(sample_prop_keys) - set(prop_urls)
+        missing_sets = set(sample_set_keys) - set(set_urls)
+        if missing_props or missing_sets:
+            return jsonify({
+                "status": "blocked",
+                "error": "sample registry cards must exist first",
+                "missing_prop_registry": sorted(missing_props),
+                "missing_set_registry": sorted(missing_sets),
+            }), 409
+        existing = audit["scene_cards"].get("02/28", [])
+        if existing:
+            return jsonify({
+                "status": "unchanged",
+                "scene_id": "02/28",
+                "url": existing[0].get("shortUrl"),
+            }), 200
+        label_ids = {
+            name: matches[0]["id"]
+            for name, matches in audit["desired_labels"].items()
+        }
+        card = cierny_kamen_create_card(
+            audit["scene_lists"][0]["id"],
+            sample_scene["name"],
+            cierny_kamen_scene_description(
+                sample_scene, prop_urls, set_urls
+            ),
+            [label_ids[name] for name in sample_scene["labels"]],
+        )
+        checklists = cierny_kamen_create_checklists(
+            card["id"],
+            cierny_kamen_scene_checklists(
+                sample_scene, prop_urls, set_urls
+            ),
+        )
+        return jsonify({
+            "status": "created",
+            "scene_id": "02/28",
+            "id": card["id"],
+            "url": card.get("shortUrl"),
+            "checklists": checklists,
+        }), 200
+
+    if phase == "sample-links":
+        missing_props = set(sample_prop_keys) - set(prop_urls)
+        missing_sets = set(sample_set_keys) - set(set_urls)
+        if missing_props or missing_sets or "02/28" not in scene_urls:
+            return jsonify({
+                "status": "blocked",
+                "error": "sample cards are incomplete",
+            }), 409
+        updated = []
+        for kind, keys, entries in (
+            ("PROP", sample_prop_keys, payload["prop_registry"]),
+            ("SET", sample_set_keys, payload["set_registry"]),
+        ):
+            registry_cards, duplicates = cierny_kamen_registry_cards(
+                state, kind, payload
+            )
+            if duplicates:
+                return jsonify({
+                    "status": "blocked", "error": "duplicate registry cards"
+                }), 409
+            for key in keys:
+                desired = cierny_kamen_registry_description(
+                    kind, key, entries[key], scene_urls
+                )
+                card = registry_cards[key]
+                if card.get("desc") != desired:
+                    trello_put_body(
+                        f"/cards/{card['id']}", {"desc": desired}
+                    )
+                    updated.append({"kind": kind, "key": key})
+        return jsonify({"status": "applied", "updated": updated}), 200
+
+    if phase == "audit-sample":
+        missing_props = set(sample_prop_keys) - set(prop_urls)
+        missing_sets = set(sample_set_keys) - set(set_urls)
+        matches = audit["scene_cards"].get("02/28", [])
+        errors = []
+        if missing_props or missing_sets:
+            errors.append("sample registry card missing")
+        if len(matches) != 1:
+            errors.append(f"sample scene card count is {len(matches)}")
+        if errors:
+            return jsonify({
+                "status": "audit", "valid": False, "errors": errors,
+            }), 409
+        card = matches[0]
+        expected_desc = cierny_kamen_scene_description(
+            sample_scene, prop_urls, set_urls
+        )
+        expected_checklists = cierny_kamen_scene_checklists(
+            sample_scene, prop_urls, set_urls
+        )
+        checklists = trello_get(
+            f"/cards/{card['id']}/checklists",
+            {"checkItems": "all", "fields": "id,name,pos"},
+        )
+        checklists = sorted(
+            checklists, key=lambda item: item.get("pos", 0)
+        )
+        actual_names = [item.get("name") for item in checklists]
+        if card.get("name") != sample_scene["name"]:
+            errors.append("name mismatch")
+        if card.get("desc") != expected_desc:
+            errors.append("description mismatch")
+        if actual_names != CIERNY_KAMEN_IMPORT_CHECKLISTS:
+            errors.append("checklist order/name mismatch")
+        else:
+            for checklist in checklists:
+                actual_items = [
+                    item.get("name")
+                    for item in sorted(
+                        checklist.get("checkItems", []),
+                        key=lambda entry: entry.get("pos", 0),
+                    )
+                ]
+                if actual_items != expected_checklists[checklist["name"]]:
+                    errors.append(
+                        f"{checklist['name']} items mismatch"
+                    )
+        prop_text = "\n".join(expected_checklists["REKVIZITY"])
+        if "<> Alexova gitara" not in prop_text:
+            errors.append("Alexova gitara continuity item missing")
+        if "KARTA: https://trello.com/c/" not in prop_text:
+            errors.append("real registry URL missing")
+        if len(expected_checklists["SET"]) != 4:
+            errors.append("sample SET item count mismatch")
+        return jsonify({
+            "status": "audit",
+            "valid": not errors,
+            "errors": errors,
+            "scene_id": "02/28",
+            "url": card.get("shortUrl"),
+            "description_length": len(card.get("desc") or ""),
+            "checklists": [
+                {
+                    "name": checklist["name"],
+                    "items": len(checklist.get("checkItems", [])),
+                }
+                for checklist in checklists
+            ],
+            "prop_item": expected_checklists["REKVIZITY"][0],
+        }), 200 if not errors else 409
+
+    if set(prop_urls) != required_prop_keys or set(set_urls) != required_set_keys:
+        return jsonify({
+            "status": "blocked",
+            "error": "all registry cards must exist before scene import",
+            "missing_prop_registry": sorted(required_prop_keys - set(prop_urls)),
+            "missing_set_registry": sorted(required_set_keys - set(set_urls)),
+        }), 409
+
+    if phase == "scenes":
+        selected = payload["scenes"][start:start + limit]
+        created = []
+        unchanged = []
+        label_ids = {
+            name: matches[0]["id"]
+            for name, matches in audit["desired_labels"].items()
+        }
+        for scene in selected:
+            existing = audit["scene_cards"].get(scene["scene_id"], [])
+            if existing:
+                unchanged.append(scene["scene_id"])
+                continue
+            description = cierny_kamen_scene_description(
+                scene, prop_urls, set_urls
+            )
+            card = cierny_kamen_create_card(
+                audit["scene_lists"][0]["id"],
+                scene["name"],
+                description,
+                [label_ids[name] for name in scene["labels"]],
+            )
+            checklists = cierny_kamen_create_checklists(
+                card["id"],
+                cierny_kamen_scene_checklists(scene, prop_urls, set_urls),
+            )
+            created.append({
+                "scene_id": scene["scene_id"],
+                "id": card["id"],
+                "url": card.get("shortUrl"),
+                "checklists": checklists,
+            })
+        return jsonify({
+            "status": "applied",
+            "start": start,
+            "selected": len(selected),
+            "created": created,
+            "unchanged": unchanged,
+            "remaining": max(
+                0, len(payload["scenes"]) - start - len(selected)
+            ),
+        }), 200
+
+    if phase in {"prop-links", "set-links"}:
+        kind = "PROP" if phase == "prop-links" else "SET"
+        entries = (
+            payload["prop_registry"]
+            if kind == "PROP" else payload["set_registry"]
+        )
+        registry_cards, duplicates = cierny_kamen_registry_cards(
+            state, kind, payload
+        )
+        if duplicates:
+            return jsonify({
+                "status": "blocked", "error": "duplicate registry cards"
+            }), 409
+        keys = sorted(entries)[start:start + limit]
+        updated = []
+        unchanged = []
+        for key in keys:
+            card = registry_cards[key]
+            desired = cierny_kamen_registry_description(
+                kind, key, entries[key], scene_urls
+            )
+            if card.get("desc") == desired:
+                unchanged.append(key)
+                continue
+            trello_put_body(f"/cards/{card['id']}", {"desc": desired})
+            updated.append(key)
+        return jsonify({
+            "status": "applied",
+            "kind": kind,
+            "start": start,
+            "selected": len(keys),
+            "updated": updated,
+            "unchanged": unchanged,
+            "remaining": max(0, len(entries) - start - len(keys)),
+        }), 200
+
+    if phase == "audit-scenes":
+        selected = payload["scenes"][start:start + limit]
+        errors = []
+        verified = []
+        label_ids = {
+            name: matches[0]["id"]
+            for name, matches in audit["desired_labels"].items()
+        }
+        for scene in selected:
+            matches = audit["scene_cards"].get(scene["scene_id"], [])
+            if len(matches) != 1:
+                errors.append({
+                    "scene_id": scene["scene_id"],
+                    "error": f"card count is {len(matches)}",
+                })
+                continue
+            card = matches[0]
+            expected_desc = cierny_kamen_scene_description(
+                scene, prop_urls, set_urls
+            )
+            expected_labels = sorted(
+                label_ids[name] for name in scene["labels"]
+            )
+            checklists = trello_get(
+                f"/cards/{card['id']}/checklists",
+                {"checkItems": "all", "fields": "id,name,pos"},
+            )
+            checklists = sorted(
+                checklists, key=lambda item: item.get("pos", 0)
+            )
+            expected_checklists = cierny_kamen_scene_checklists(
+                scene, prop_urls, set_urls
+            )
+            actual_names = [item.get("name") for item in checklists]
+            item_errors = []
+            if actual_names != CIERNY_KAMEN_IMPORT_CHECKLISTS:
+                item_errors.append("checklist order/name mismatch")
+            else:
+                for checklist in checklists:
+                    actual_items = [
+                        item.get("name")
+                        for item in sorted(
+                            checklist.get("checkItems", []),
+                            key=lambda entry: entry.get("pos", 0),
+                        )
+                    ]
+                    if actual_items != expected_checklists[checklist["name"]]:
+                        item_errors.append(
+                            f"{checklist['name']} items mismatch"
+                        )
+            if card.get("name") != scene["name"]:
+                item_errors.append("name mismatch")
+            if card.get("desc") != expected_desc:
+                item_errors.append("description mismatch")
+            if sorted(card.get("idLabels", [])) != expected_labels:
+                item_errors.append("label mismatch")
+            if "ORIGINÁLNY SCENÁR" in (card.get("desc") or ""):
+                item_errors.append("duplicate original-script section")
+            if "KARTA: <" in (card.get("desc") or ""):
+                item_errors.append("placeholder URL")
+            if item_errors:
+                errors.append({
+                    "scene_id": scene["scene_id"],
+                    "errors": item_errors,
+                })
+            else:
+                verified.append({
+                    "scene_id": scene["scene_id"],
+                    "url": card.get("shortUrl"),
+                    "description_length": len(card.get("desc") or ""),
+                    "checklist_item_counts": {
+                        checklist["name"]: len(
+                            checklist.get("checkItems", [])
+                        )
+                        for checklist in checklists
+                    },
+                })
+        return jsonify({
+            "status": "audit",
+            "start": start,
+            "selected": len(selected),
+            "verified": verified,
+            "errors": errors,
+            "remaining": max(
+                0, len(payload["scenes"]) - start - len(selected)
+            ),
+            "unique_scene_cards": sum(
+                len(matches) == 1
+                for scene_id, matches in audit["scene_cards"].items()
+                if scene_id in {
+                    scene["scene_id"] for scene in payload["scenes"]
+                }
+            ),
+        }), 200 if not errors else 409
+
+    if phase in {"audit-props", "audit-sets"}:
+        kind = "PROP" if phase == "audit-props" else "SET"
+        entries = (
+            payload["prop_registry"]
+            if kind == "PROP" else payload["set_registry"]
+        )
+        registry_cards, duplicates = cierny_kamen_registry_cards(
+            state, kind, payload
+        )
+        keys = sorted(entries)[start:start + limit]
+        errors = []
+        verified = []
+        for key in keys:
+            card = registry_cards.get(key)
+            if not card:
+                errors.append({"key": key, "error": "missing"})
+                continue
+            expected = cierny_kamen_registry_description(
+                kind, key, entries[key], scene_urls
+            )
+            if card.get("desc") != expected:
+                errors.append({"key": key, "error": "description mismatch"})
+            else:
+                verified.append({
+                    "key": key, "url": card.get("shortUrl"),
+                })
+        return jsonify({
+            "status": "audit",
+            "kind": kind,
+            "start": start,
+            "selected": len(keys),
+            "verified": verified,
+            "errors": errors,
+            "duplicates": sorted(duplicates),
+            "remaining": max(0, len(entries) - start - len(keys)),
+        }), 200 if not errors and not duplicates else 409
+
+    return jsonify({"error": "unknown phase"}), 400
+
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
