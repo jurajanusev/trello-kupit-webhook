@@ -5028,6 +5028,8 @@ def riverdale_test_0228_audit(card, target_list):
 
 @app.route("/api/create-riverdale-test-02-28", methods=["POST"])
 def create_riverdale_test_02_28():
+    return jsonify({"error": "completed one-off endpoint disabled"}), 410
+
     if request.headers.get("X-Test-Key") != RIVERDALE_TEST_0228_KEY:
         return jsonify({"error": "forbidden"}), 403
 
