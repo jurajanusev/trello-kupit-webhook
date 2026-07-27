@@ -5238,6 +5238,369 @@ def create_riverdale_test_02_28():
     }), status_code
 
 
+RIVERDALE_GUITAR_LINK_KEY = "riverdale-guitar-link-27jul-8f2c5d41"
+RIVERDALE_GUITAR_TEST_LIST = "TEST 2 — REGISTER KONTINUITY"
+RIVERDALE_GUITAR_TEST_NAME = "[TEST] Alexova gitara"
+
+
+def normalize_riverdale_prop_identity(value):
+    folded_value = unicodedata.normalize("NFKD", value or "")
+    folded_value = "".join(
+        character for character in folded_value
+        if not unicodedata.combining(character)
+    ).casefold()
+    folded_value = re.sub(r"\[[^\]]+\]", " ", folded_value)
+    folded_value = re.sub(r"[^a-z0-9]+", " ", folded_value)
+    return re.sub(r"\s+", " ", folded_value).strip()
+
+
+def riverdale_guitar_candidates(cards, lists_by_id):
+    aliases = ("alexova gitara", "gitara alexa", "alex guitar")
+    candidates = []
+    for card in cards:
+        name_identity = normalize_riverdale_prop_identity(card.get("name", ""))
+        description_identity = normalize_riverdale_prop_identity(card.get("desc", ""))
+        name_match = any(
+            name_identity == alias
+            or name_identity.startswith(f"{alias} ")
+            or f" {alias} " in f" {name_identity} "
+            for alias in aliases
+        )
+        explicit_identity = any(
+            f"identita {alias}" in description_identity for alias in aliases
+        )
+        if not name_match and not explicit_identity:
+            continue
+        candidates.append({
+            **card,
+            "list_name": lists_by_id.get(card.get("idList"), {}).get("name"),
+            "matched_by": (
+                "name-and-identity" if name_match and explicit_identity
+                else "name" if name_match else "identity"
+            ),
+        })
+    return candidates
+
+
+def riverdale_guitar_check_item(card_url):
+    return (
+        "<…> Alexova gitara — Alex na nej sedí na gauči, hrá a spieva "
+        "pred Bety, Kikom a Veronikou | ← 01/39: Alex na nej hrá na terase "
+        "| TU: gitara je funkčná a nepoškodená; overiť rovnaký konkrétny "
+        "kus, farbu a popruh | → ďalší potvrdený obraz neurčený | KARTA: "
+        f"{card_url}"
+    )
+
+
+def trello_card_has_attachment(card_id, target_url):
+    attachments = trello_get(f"/cards/{card_id}/attachments", {
+        "fields": "id,name,url", "limit": 1000,
+    })
+    normalized_target = (target_url or "").rstrip("/")
+    return any(
+        (attachment.get("url") or "").rstrip("/") == normalized_target
+        for attachment in attachments
+    )
+
+
+@app.route("/api/link-riverdale-test-02-28-guitar", methods=["POST"])
+def link_riverdale_test_02_28_guitar():
+    if request.headers.get("X-Test-Key") != RIVERDALE_GUITAR_LINK_KEY:
+        return jsonify({"error": "forbidden"}), 403
+    mode = request.args.get("mode", "dry-run")
+    if mode not in {"dry-run", "apply", "audit"}:
+        return jsonify({"error": "mode must be dry-run, apply, or audit"}), 400
+
+    board = trello_get("/boards/CzuD55PR", {"fields": "id,name,url"})
+    lists = trello_get(f"/boards/{board['id']}/lists", {
+        "fields": "id,name,pos,closed", "filter": "open",
+    })
+    lists_by_id = {item["id"]: item for item in lists}
+    cards = trello_get(f"/boards/{board['id']}/cards", {
+        "fields": "id,name,desc,idList,shortUrl,closed",
+        "filter": "open", "limit": 1000,
+    })
+    production_cards = [
+        card for card in cards
+        if re.match(r"^\s*0?2\s*/\s*0?28(?:\D|$)", card.get("name", ""), re.I)
+        and not card.get("name", "").lstrip().upper().startswith("[TEST]")
+    ]
+    test_scenes = [
+        card for card in cards
+        if re.match(
+            r"^\s*\[TEST\]\s*0?2\s*/\s*0?28(?:\D|$)",
+            card.get("name", ""),
+            re.I,
+        )
+    ]
+    scene_ids = {card["id"] for card in production_cards + test_scenes}
+    prop_candidates = riverdale_guitar_candidates(
+        [card for card in cards if card["id"] not in scene_ids],
+        lists_by_id,
+    )
+    safe_registry_lists = [
+        item for item in lists
+        if "TEST" in item["name"].upper()
+        and any(
+            marker in normalize_riverdale_prop_identity(item["name"])
+            for marker in ("rekviz", "register", "kontin", "nadv")
+        )
+    ]
+    exact_registry_lists = [
+        item for item in lists if item["name"] == RIVERDALE_GUITAR_TEST_LIST
+    ]
+    overview = {
+        "status": mode,
+        "board": {"id": board["id"], "name": board["name"], "url": board.get("url")},
+        "production_02_28_count": len(production_cards),
+        "production_02_28": [
+            {"id": card["id"], "name": card["name"], "url": card.get("shortUrl")}
+            for card in production_cards
+        ],
+        "test_scene_02_28_count": len(test_scenes),
+        "test_scene_02_28": [
+            {"id": card["id"], "name": card["name"], "url": card.get("shortUrl")}
+            for card in test_scenes
+        ],
+        "guitar_candidate_count": len(prop_candidates),
+        "guitar_duplicate_count": max(0, len(prop_candidates) - 1),
+        "guitar_candidates": [
+            {
+                "id": card["id"], "name": card["name"],
+                "url": card.get("shortUrl"), "list": card.get("list_name"),
+                "matched_by": card.get("matched_by"),
+            }
+            for card in prop_candidates
+        ],
+        "safe_registry_lists": [
+            {"id": item["id"], "name": item["name"]}
+            for item in safe_registry_lists
+        ],
+        "exact_test_registry_list_count": len(exact_registry_lists),
+        "will_create_test_prop_card": len(prop_candidates) == 0,
+        "will_create_test_registry_list": (
+            len(prop_candidates) == 0
+            and len(safe_registry_lists) == 0
+        ),
+        "intended_item_template": (
+            riverdale_guitar_check_item(prop_candidates[0].get("shortUrl"))
+            if len(prop_candidates) == 1
+            else riverdale_guitar_check_item("<skutočný Trello shortUrl po vytvorení>")
+        ),
+    }
+    overview["ready_to_apply"] = (
+        len(production_cards) == 1
+        and len(test_scenes) == 1
+        and len(prop_candidates) <= 1
+        and (
+            len(prop_candidates) == 1
+            or len(exact_registry_lists) == 1
+            or len(safe_registry_lists) == 1
+            or len(safe_registry_lists) == 0
+        )
+    )
+    if mode == "dry-run":
+        return jsonify(overview)
+
+    if len(production_cards) != 1 or len(test_scenes) != 1:
+        return jsonify({
+            **overview,
+            "error": "expected exactly one production and one test 02/28 scene",
+        }), 409
+    if len(prop_candidates) > 1:
+        return jsonify({
+            **overview,
+            "error": "ambiguous Alexova gitara identity; duplicates must be resolved first",
+        }), 409
+
+    production_before = {
+        field: production_cards[0].get(field)
+        for field in ("id", "name", "desc", "idList", "shortUrl", "closed")
+    }
+    scene = test_scenes[0]
+    created_prop_card = False
+    created_registry_list = False
+
+    if prop_candidates:
+        prop_card = prop_candidates[0]
+    elif mode == "audit":
+        return jsonify({
+            **overview,
+            "error": "audit cannot find an Alexova gitara identity card",
+        }), 409
+    else:
+        if len(exact_registry_lists) == 1:
+            registry_list = exact_registry_lists[0]
+        elif len(safe_registry_lists) == 1:
+            registry_list = safe_registry_lists[0]
+        elif len(safe_registry_lists) == 0:
+            registry_list = trello_post_body("/lists", {
+                "idBoard": board["id"],
+                "name": RIVERDALE_GUITAR_TEST_LIST,
+                "pos": "bottom",
+            })
+            created_registry_list = True
+        else:
+            return jsonify({
+                **overview,
+                "error": "multiple safe test registry lists; target is ambiguous",
+            }), 409
+        prop_card = trello_post_body("/cards", {
+            "idList": registry_list["id"],
+            "name": RIVERDALE_GUITAR_TEST_NAME,
+            "desc": (
+                "**IDENTITA:** `Alexova gitara`\n"
+                "**STAV:** TESTOVACIA hlavná kontinuitná karta\n\n"
+                "### SÚVISIACE OBRAZY\n\n"
+                "- 01/39 — Alex na gitare hrá na terase.\n"
+                f"- [TEST] 02/28 — {scene['shortUrl']}\n\n"
+                "### KONTINUITA\n\n"
+                "V 02/28 je gitara funkčná a nepoškodená. Overiť rovnaký "
+                "konkrétny kus, farbu a popruh ako v 01/39."
+            ),
+            "pos": "bottom",
+        })
+        created_prop_card = True
+
+    expected_item = riverdale_guitar_check_item(prop_card["shortUrl"])
+    if mode == "apply":
+        checklists = trello_get(f"/cards/{scene['id']}/checklists", {
+            "fields": "id,name,pos", "checkItems": "all",
+        })
+        prop_checklists = [
+            checklist for checklist in checklists
+            if checklist.get("name") == "REKVIZITY"
+        ]
+        if len(prop_checklists) != 1:
+            return jsonify({
+                **overview,
+                "error": "expected exactly one REKVIZITY checklist",
+                "prop_card_url": prop_card.get("shortUrl"),
+            }), 409
+        checklist = prop_checklists[0]
+        guitar_items = [
+            item for item in checklist.get("checkItems", [])
+            if "alexova gitara" in normalize_riverdale_prop_identity(item.get("name"))
+        ]
+        if len(guitar_items) > 1:
+            return jsonify({
+                **overview,
+                "error": "duplicate Alexova gitara checklist items",
+                "prop_card_url": prop_card.get("shortUrl"),
+            }), 409
+        if guitar_items:
+            if guitar_items[0].get("name") != expected_item:
+                trello_put_body(
+                    f"/cards/{scene['id']}/checkItem/{guitar_items[0]['id']}",
+                    {"name": expected_item},
+                )
+        else:
+            trello_post_body(
+                f"/checklists/{checklist['id']}/checkItems",
+                {"name": expected_item, "pos": "bottom"},
+            )
+
+        if not trello_card_has_attachment(scene["id"], prop_card["shortUrl"]):
+            trello_post_body(f"/cards/{scene['id']}/attachments", {
+                "url": prop_card["shortUrl"], "name": "Hlavná karta — Alexova gitara",
+            })
+        if not trello_card_has_attachment(prop_card["id"], scene["shortUrl"]):
+            trello_post_body(f"/cards/{prop_card['id']}/attachments", {
+                "url": scene["shortUrl"], "name": "Testovací obraz 02/28",
+            })
+
+    current_production = trello_get(f"/cards/{production_cards[0]['id']}", {
+        "fields": "id,name,desc,idList,shortUrl,closed",
+    })
+    production_after = {
+        field: current_production.get(field)
+        for field in ("id", "name", "desc", "idList", "shortUrl", "closed")
+    }
+    current_scene = trello_get(f"/cards/{scene['id']}", {
+        "fields": "id,name,desc,idList,shortUrl,closed",
+    })
+    current_checklists = trello_get(f"/cards/{scene['id']}/checklists", {
+        "fields": "id,name,pos", "checkItems": "all",
+    })
+    current_prop_checklists = [
+        checklist for checklist in current_checklists
+        if checklist.get("name") == "REKVIZITY"
+    ]
+    current_guitar_items = [
+        item for checklist in current_prop_checklists
+        for item in checklist.get("checkItems", [])
+        if "alexova gitara" in normalize_riverdale_prop_identity(item.get("name"))
+    ]
+    refreshed_cards = trello_get(f"/boards/{board['id']}/cards", {
+        "fields": "id,name,desc,idList,shortUrl,closed",
+        "filter": "open", "limit": 1000,
+    })
+    refreshed_candidates = riverdale_guitar_candidates(
+        [
+            card for card in refreshed_cards
+            if card["id"] not in {production_cards[0]["id"], scene["id"]}
+        ],
+        {
+            item["id"]: item
+            for item in trello_get(f"/boards/{board['id']}/lists", {
+                "fields": "id,name,pos,closed", "filter": "open",
+            })
+        },
+    )
+    scene_links_prop = trello_card_has_attachment(
+        current_scene["id"], prop_card["shortUrl"]
+    )
+    prop_links_scene = trello_card_has_attachment(
+        prop_card["id"], current_scene["shortUrl"]
+    )
+    item_matches = (
+        len(current_guitar_items) == 1
+        and current_guitar_items[0].get("name") == expected_item
+    )
+    valid = (
+        production_after == production_before
+        and len(refreshed_candidates) == 1
+        and refreshed_candidates[0]["id"] == prop_card["id"]
+        and item_matches
+        and scene_links_prop
+        and prop_links_scene
+    )
+    return jsonify({
+        "status": "applied-and-audited" if mode == "apply" else "audit",
+        "board": overview["board"],
+        "created_test_prop_card": created_prop_card,
+        "created_test_registry_list": created_registry_list,
+        "production_02_28_untouched": production_after == production_before,
+        "guitar_candidate_count": len(refreshed_candidates),
+        "guitar_duplicate_count": max(0, len(refreshed_candidates) - 1),
+        "prop_card": {
+            "id": prop_card["id"],
+            "name": prop_card.get("name"),
+            "url": prop_card.get("shortUrl"),
+            "list": next(
+                (
+                    item["name"] for item in lists
+                    if item["id"] == prop_card.get("idList")
+                ),
+                RIVERDALE_GUITAR_TEST_LIST if created_registry_list else None,
+            ),
+        },
+        "scene_card": {
+            "id": current_scene["id"],
+            "name": current_scene.get("name"),
+            "url": current_scene.get("shortUrl"),
+        },
+        "checklist_item": (
+            current_guitar_items[0].get("name")
+            if len(current_guitar_items) == 1 else None
+        ),
+        "checklist_item_matches": item_matches,
+        "scene_links_prop": scene_links_prop,
+        "prop_links_scene": prop_links_scene,
+        "valid": valid,
+    }), 200 if valid else 409
+
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
