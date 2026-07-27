@@ -5678,6 +5678,13 @@ def audit_cierny_kamen_import():
             **card,
             **info,
             "list_name": lists_by_id.get(card.get("idList"), {}).get("name"),
+            "list_closed": bool(
+                lists_by_id.get(card.get("idList"), {}).get("closed")
+            ),
+            "active": (
+                not card.get("closed")
+                and not lists_by_id.get(card.get("idList"), {}).get("closed")
+            ),
         })
     production_scenes = [card for card in scene_cards if not card["test"]]
     test_scenes = [card for card in scene_cards if card["test"]]
@@ -5693,7 +5700,10 @@ def audit_cierny_kamen_import():
                 "cards": [
                     {
                         "name": card["name"], "url": card.get("shortUrl"),
-                        "list": card.get("list_name"), "closed": card.get("closed"),
+                        "list": card.get("list_name"),
+                        "card_closed": card.get("closed"),
+                        "list_closed": card.get("list_closed"),
+                        "active": card.get("active"),
                     }
                     for card in group
                 ],
@@ -5791,8 +5801,10 @@ def audit_cierny_kamen_import():
         "lists": [
             {
                 "id": item["id"], "name": item["name"],
-                "closed": item.get("closed"), "pos": item.get("pos"),
-                **list_counts.get(item["id"], {}),
+                "list_closed": item.get("closed"), "pos": item.get("pos"),
+                "cards_open": list_counts.get(item["id"], {}).get("open", 0),
+                "cards_closed": list_counts.get(item["id"], {}).get("closed", 0),
+                "cards_total": list_counts.get(item["id"], {}).get("total", 0),
             }
             for item in sorted(lists, key=lambda entry: entry.get("pos", 0))
         ],
@@ -5804,16 +5816,30 @@ def audit_cierny_kamen_import():
         "desired_labels": desired_labels,
         "scene_cards": {
             "production_total": len(production_scenes),
-            "production_open": sum(not card.get("closed") for card in production_scenes),
-            "production_closed": sum(bool(card.get("closed")) for card in production_scenes),
+            "production_active": sum(bool(card.get("active")) for card in production_scenes),
+            "production_card_archived": sum(
+                bool(card.get("closed")) for card in production_scenes
+            ),
+            "production_in_archived_list": sum(
+                bool(card.get("list_closed")) and not card.get("closed")
+                for card in production_scenes
+            ),
             "test_total": len(test_scenes),
-            "test_open": sum(not card.get("closed") for card in test_scenes),
-            "test_closed": sum(bool(card.get("closed")) for card in test_scenes),
+            "test_active": sum(bool(card.get("active")) for card in test_scenes),
+            "test_card_archived": sum(
+                bool(card.get("closed")) for card in test_scenes
+            ),
+            "test_in_archived_list": sum(
+                bool(card.get("list_closed")) and not card.get("closed")
+                for card in test_scenes
+            ),
             "production_sample": [
                 {
                     "scene_id": card["scene_id"], "name": card["name"],
                     "url": card.get("shortUrl"), "list": card.get("list_name"),
-                    "closed": card.get("closed"),
+                    "card_closed": card.get("closed"),
+                    "list_closed": card.get("list_closed"),
+                    "active": card.get("active"),
                 }
                 for card in production_scenes[:30]
             ],
@@ -5821,7 +5847,9 @@ def audit_cierny_kamen_import():
                 {
                     "scene_id": card["scene_id"], "name": card["name"],
                     "url": card.get("shortUrl"), "list": card.get("list_name"),
-                    "closed": card.get("closed"),
+                    "card_closed": card.get("closed"),
+                    "list_closed": card.get("list_closed"),
+                    "active": card.get("active"),
                 }
                 for card in test_scenes
             ],
@@ -5843,7 +5871,10 @@ def audit_cierny_kamen_import():
             ],
             "test_lists": [
                 {"id": item["id"], "name": item["name"],
-                 "closed": item.get("closed"), **list_counts.get(item["id"], {})}
+                "list_closed": item.get("closed"),
+                "cards_open": list_counts.get(item["id"], {}).get("open", 0),
+                "cards_closed": list_counts.get(item["id"], {}).get("closed", 0),
+                "cards_total": list_counts.get(item["id"], {}).get("total", 0)}
                 for item in test_lists
             ],
         },
