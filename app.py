@@ -4880,7 +4880,8 @@ def handoff_automation_deployment():
 
 RIVERDALE_TEST_0228_KEY = "riverdale-test-0228-27jul-4e9c13b7"
 RIVERDALE_TEST_0228_NAME = (
-    "[TEST] 02/28 — Kiko hovorí babám o Patrikovi a Alex hrá na gitare"
+    "[TEST] 02/28. INT. ŠKOLA - KLUBOVŇA, DEŇ 5 — "
+    "BETY, KIKO, ALEX, VERONIKA, KOMPARZ ŠTUDENTI"
 )
 RIVERDALE_TEST_0228_LIST = "TEST 2 — OBRAZY"
 RIVERDALE_TEST_0228_DESC = """<!-- RIVERDALE-SCHEDULE-METADATA:START -->
@@ -4914,69 +4915,53 @@ Zatiaľ bez pridaných odkazov.
 
 ### AKCIA A DIALÓGY
 
-Kiko kráča medzi Bety a Veronikou. Prichádzajú do klubovne.
-Ešte nejakí študenti sa trúsia von, iní tam ostávajú, čiže
-si hneď nevšimnú Alexa. Postavia sa k automatu a vyberajú
-si z neho niečo na jedenie. Bety stláča gombíky ako prvá.
-Veronika naposledy Bety priznala, že sa správala ako mrcha,
-nemá chuť sa s ňou veľmi baviť. Veronika to vníma, snaží sa
-komunikovať aspoň s Kikom, otočí sa naňho.
-VERONIKA
-Čo od teba chcel Patrik?
-KIKO
-To ani on sám nevie. Ďalší
-nevyautovaný gay. Mňa už tieto games
-nebavia.
-VERONIKA
-Podľa mňa ťa práve takéto hry
-vzrušujú.
-Veronika Kika nachytala a Bety sa na tom pobaví.
-BETY
-To je pravda.
-KIKO
-Dont judge me.
-Nejakí študenti odchádzajú, odkryjú im výhľad a tak si
-všimnú Alexa, ktorý sedí na gauči a brnká si na gitare.
-(Kikovi sa Alex páči, aj keď je hetero a tiež ho štve že
-odmietol Bety), tak sa hneď naňho vyškerí a ide k nemu
-a podpichne ho.
-KIKO
-Ou, ou! Tu je náš spievajúci
-basketbalový heartbreaker.
-Všetci traja - Bety, Veronika aj Alex urobia grimasu. Bety
-len zašomre (už s Alexom nekomunikuje ako predtým).
-BETY
-Nevšímaj si ho.
-Prisadnú si k nemu aj Veronika a Bety.
-KIKO
-Naopak, všímaj si ma! Stojím za to.
-Nový song?
-Alex je v rozpakoch (ešte sa trochu ostýcha hrať a spievať
-pred ľuďmi a zároveň je to preňho ťažšia situácia, keď je
-tam zároveň Bety aj Veronika.)
-ALEX
-Neviem, len som si tak brnkal....
-KIKO
-C’mon!
-Pozrie na Alexa a ukáže pohľadom na Bety, že je nutné ju
-rozveseliť.
-VERONIKA
-Nenechaj sa prosiť.
-Alex začne brnkať peknú melódiu, potom potichu spievať,
-Kiko ho povzbudzuje palcami hore, Alex spieva viac nahlas,
-znie to veľmi dobre. No Bety sa rozľútostní, prebehnú jej
-spomienky na otváraciu párty a na Alexovo odmietnutie.
-FB 1/42. BETY A ALEX TANCUJÚ NA PLESE
-FB 1/49. PRED DOMOM KEĎ BETTY DOSTALA OD ALEXA ODMIETNUTIE
-A SMUTNO VCHÁDZA DNU
-Bety má slzy v očiach. Alex si to všimne, prestáva hrať
-a spievať. Citlivo sa spýta.
-ALEX
-Si v pohode?
-Bety sa pousmeje. No je to silený úsmev.
-BETY
-Áno, som úplne v pohode.
-Bety uteká preč."""
+*Kiko kráča medzi Bety a Veronikou. Prichádzajú do klubovne. Ešte nejakí študenti sa trúsia von, iní tam ostávajú, čiže si hneď nevšimnú Alexa. Postavia sa k automatu a vyberajú si z neho niečo na jedenie. Bety stláča gombíky ako prvá. Veronika naposledy Bety priznala, že sa správala ako mrcha, nemá chuť sa s ňou veľmi baviť. Veronika to vníma, snaží sa komunikovať aspoň s Kikom, otočí sa naňho.*
+
+> **VERONIKA:**
+> **Čo od teba chcel Patrik?**
+
+> **KIKO:**
+> **To ani on sám nevie. Ďalší nevyautovaný gay. Mňa už tieto games nebavia.**
+
+> **VERONIKA:**
+> **Podľa mňa ťa práve takéto hry vzrušujú. Veronika Kika nachytala a Bety sa na tom pobaví.**
+
+> **BETY:**
+> **To je pravda.**
+
+> **KIKO:**
+> **Dont judge me. Nejakí študenti odchádzajú, odkryjú im výhľad a tak si všimnú Alexa, ktorý sedí na gauči a brnká si na gitare. (Kikovi sa Alex páči, aj keď je hetero a tiež ho štve že odmietol Bety), tak sa hneď naňho vyškerí a ide k nemu a podpichne ho.**
+
+> **KIKO:**
+> **Ou, ou! Tu je náš spievajúci basketbalový heartbreaker. Všetci traja - Bety, Veronika aj Alex urobia grimasu. Bety len zašomre (už s Alexom nekomunikuje ako predtým).**
+
+> **BETY:**
+> **Nevšímaj si ho. Prisadnú si k nemu aj Veronika a Bety.**
+
+> **KIKO:**
+> **Naopak, všímaj si ma! Stojím za to. Nový song? Alex je v rozpakoch (ešte sa trochu ostýcha hrať a spievať pred ľuďmi a zároveň je to preňho ťažšia situácia, keď je tam zároveň Bety aj Veronika.)**
+
+> **ALEX:**
+> **Neviem, len som si tak brnkal....**
+
+> **KIKO:**
+> **C’mon! Pozrie na Alexa a ukáže pohľadom na Bety, že je nutné ju rozveseliť.**
+
+> **VERONIKA:**
+> **Nenechaj sa prosiť. Alex začne brnkať peknú melódiu, potom potichu spievať, Kiko ho povzbudzuje palcami hore, Alex spieva viac nahlas, znie to veľmi dobre. No Bety sa rozľútostní, prebehnú jej spomienky na otváraciu párty a na Alexovo odmietnutie.**
+
+> **FB 1/42. BETY A ALEX TANCUJÚ NA PLESE:**
+
+> **FB 1/49. PRED DOMOM KEĎ BETTY DOSTALA OD ALEXA ODMIETNUTIE:**
+
+> **A SMUTNO VCHÁDZA DNU:**
+> **Bety má slzy v očiach. Alex si to všimne, prestáva hrať a spievať. Citlivo sa spýta.**
+
+> **ALEX:**
+> **Si v pohode? Bety sa pousmeje. No je to silený úsmev.**
+
+> **BETY:**
+> **Áno, som úplne v pohode. Bety uteká preč.**"""
 RIVERDALE_TEST_0228_CHECKLISTS = [
     ("REKVIZITY", [
         "Alexova gitara — Alex na nej hrá a spieva pred Bety, Kikom a Veronikou; overiť možnú kontinuitu rovnakého konkrétneho kusu, farby, popruhu a stavu s obrazom 01/39.",
@@ -5043,8 +5028,6 @@ def riverdale_test_0228_audit(card, target_list):
 
 @app.route("/api/create-riverdale-test-02-28", methods=["POST"])
 def create_riverdale_test_02_28():
-    return jsonify({"error": "completed one-off endpoint disabled"}), 410
-
     if request.headers.get("X-Test-Key") != RIVERDALE_TEST_0228_KEY:
         return jsonify({"error": "forbidden"}), 403
 
@@ -5127,14 +5110,14 @@ def create_riverdale_test_02_28():
     }
 
     if mode == "dry-run":
-        overview["collision_free"] = len(test_cards) == 0
+        overview["collision_free"] = len(test_cards) <= 1
         overview["ready_to_apply"] = (
             len(production_cards) == 1
             and (
                 len(target_lists) == 1
                 or (len(target_lists) == 0 and len(safe_test_lists) == 0)
             )
-            and len(test_cards) == 0
+            and len(test_cards) <= 1
         )
         return jsonify(overview)
 
@@ -5161,7 +5144,7 @@ def create_riverdale_test_02_28():
                 "list so apply can create it"
             ),
         }), 409
-    if len(test_cards) > 1 or (len(test_cards) == 1 and len(exact_test_cards) != 1):
+    if len(test_cards) > 1:
         return jsonify({
             **overview,
             "error": "ambiguous or duplicate [TEST] 02/28 cards",
@@ -5169,8 +5152,8 @@ def create_riverdale_test_02_28():
 
     target_list = target_lists[0]
     if mode == "apply":
-        if exact_test_cards:
-            card = exact_test_cards[0]
+        if test_cards:
+            card = test_cards[0]
             card = trello_put_body(f"/cards/{card['id']}", {
                 "name": RIVERDALE_TEST_0228_NAME,
                 "desc": RIVERDALE_TEST_0228_DESC,
