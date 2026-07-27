@@ -6057,6 +6057,8 @@ def cierny_kamen_cleanup_guard(snapshot):
 
 @app.route("/api/cleanup-cierny-kamen-old-data", methods=["POST"])
 def cleanup_cierny_kamen_old_data():
+    return jsonify({"error": "completed cleanup endpoint disabled"}), 410
+
     if request.headers.get("X-Cleanup-Key") != CIERNY_KAMEN_CLEANUP_KEY:
         return jsonify({"error": "forbidden"}), 403
 
