@@ -37,6 +37,9 @@ class CiernyKamenPayloadTest(unittest.TestCase):
         )
         self.assertEqual(PAYLOAD["stats"]["missing_prepis"], 0)
         self.assertEqual(PAYLOAD["stats"]["missing_action"], 0)
+        self.assertEqual(PAYLOAD["stats"]["set_items_total"], 267)
+        self.assertEqual(PAYLOAD["stats"]["strict_set_chains"], 5)
+        self.assertEqual(PAYLOAD["stats"]["continuity_set_scenes"], 29)
 
     def test_sample_0228_matches_required_structure(self):
         scene = next(
@@ -71,6 +74,10 @@ class CiernyKamenPayloadTest(unittest.TestCase):
         self.assertEqual(list(checklists), app.CIERNY_KAMEN_IMPORT_CHECKLISTS)
         self.assertEqual(len(checklists["REKVIZITY"]), 1)
         self.assertEqual(len(checklists["SET"]), 4)
+        self.assertNotIn("Nadväzný set", scene["labels"])
+        self.assertFalse(
+            any(item.startswith("<> ") for item in checklists["SET"])
+        )
         prop = checklists["REKVIZITY"][0]
         self.assertTrue(prop.startswith("<> Alexova gitara — "))
         self.assertIn("| ← 01/39: Alex na nej hrá na terase |", prop)
@@ -128,6 +135,25 @@ class CiernyKamenPayloadTest(unittest.TestCase):
         self.assertEqual(
             response.json["error"], "completed import endpoint disabled"
         )
+
+    def test_set_fix_preserves_manual_description_text(self):
+        actual = (
+            "x\n### RUČNÉ DOPLNENIA\nručná poznámka\n"
+            "### AKCIA A DIALÓGY\npôvodná akcia"
+        )
+        desired = (
+            "y\n### RUČNÉ DOPLNENIA\n\n"
+            "### AKCIA A DIALÓGY\nnová akcia"
+        )
+        merged = app.cierny_kamen_preserve_manual_description(
+            actual, desired
+        )
+        self.assertIn(
+            "### RUČNÉ DOPLNENIA\nručná poznámka\n"
+            "### AKCIA A DIALÓGY",
+            merged,
+        )
+        self.assertTrue(merged.endswith("nová akcia"))
 
 
 if __name__ == "__main__":

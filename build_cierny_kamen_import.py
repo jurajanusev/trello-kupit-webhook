@@ -39,6 +39,126 @@ PROP_ALIASES = {
     "gitara": "Alexova gitara",
 }
 
+STRICT_SET_CHAINS = [
+    {
+        "key": "imatrikulacna-party-telocvicna",
+        "identity": (
+            "Imatrikulačná párty – výzdoba a usporiadanie telocvične"
+        ),
+        "reason": (
+            "Párty setup vzniká v 01/40 a pokračuje na tom istom podujatí "
+            "cez pódium a parket do 01/43."
+        ),
+        "scenes": [
+            ("01/40", "vzniká výzdoba, DJ, občerstvenie a parket"),
+            ("01/41", "párty setup pokračuje počas rozhovoru pri akcii"),
+            ("01/42", "setup pokračuje na pódiu počas vystúpenia"),
+            ("01/43", "setup pokračuje na pódiu a parkete do konca akcie"),
+        ],
+    },
+    {
+        "key": "otvorenie-basketbalovej-sezony",
+        "identity": (
+            "Otvorenie basketbalovej sezóny – pódium, hľadisko a "
+            "občerstvenie"
+        ),
+        "reason": (
+            "Špecifický eventový setup je ustanovený v 02/43 a nesie sa "
+            "cez bezprostredné obrazy otvorenia až po balenie v 02/53."
+        ),
+        "scenes": [
+            ("02/43", "vzniká pódium, hľadisko a eventové usporiadanie"),
+            ("02/44", "eventový setup pokračuje pri stole s občerstvením"),
+            ("02/45", "eventový setup pokračuje pred začiatkom programu"),
+            ("02/46", "setup pokračuje na pódiu pri hudobnom vystúpení"),
+            ("02/47A", "setup pokračuje v hľadisku"),
+            ("02/48", "setup pokračuje na pódiu pri otvorení sezóny"),
+            ("02/47B", "setup pokračuje medzi pódiom a hľadiskom"),
+            ("02/49", "setup pokračuje pri nástupe tímov na palubovku"),
+            ("02/50", "setup pokračuje pri pódiu počas Sárinej reakcie"),
+            ("02/51", "setup pokračuje na palubovke"),
+            ("02/47C", "setup pokračuje v hľadisku po Sárinom úteku"),
+            ("02/53", "event končí a tanečnice si pri pódiu balia tašky"),
+        ],
+    },
+    {
+        "key": "aktivovana-skolska-redakcia",
+        "identity": (
+            "Aktivovaná školská redakcia – uprataný a používaný priestor"
+        ),
+        "reason": (
+            "V 03/11 sa roky nepoužívaná miestnosť uprace a zmení na "
+            "aktívnu redakciu; tento stav nesú ďalšie konkrétne obrazy."
+        ),
+        "scenes": [
+            ("03/11", "roky nepoužívaná miestnosť je uprataná a aktivovaná"),
+            ("03/22", "uprataná redakcia sa používa na spoločné stretnutie"),
+            ("03/27", "uprataná redakcia sa používa s pracovným stolom"),
+            ("03/53", "aktívna redakcia pokračuje"),
+            ("05/05", "v redakcii pribúda vyšetrovacia nástenka"),
+            ("05/17", "redakcia s vyšetrovacím setupom pokračuje"),
+            ("05/46", "redakcia s vyšetrovacím setupom pokračuje"),
+            ("05/47LP", "postavy pracujú pred vyšetrovacou nástenkou"),
+        ],
+    },
+    {
+        "key": "kelerova-vysetrovacia-nastenka",
+        "identity": "Kelerova vyšetrovacia nástenka a pracovňa",
+        "reason": (
+            "Rozsiahla nástenka a spisy sú ustanovené v 04/28; v 04/42 "
+            "na ne priamo nadväzuje zničený a vykradnutý stav."
+        ),
+        "scenes": [
+            (
+                "04/28",
+                "nástenka s mapou, fotkami, menami a červenými niťami "
+                "je rozložená; stôl je plný spisov",
+            ),
+            (
+                "04/42",
+                "nástenka je dotrhaná, fotky a informácie chýbajú; "
+                "stôl je rozhádzaný a spis prázdny",
+            ),
+        ],
+    },
+    {
+        "key": "kar-revayovci-hala",
+        "identity": "Kar u Révayovcov – výzdoba a eventové usporiadanie haly",
+        "reason": (
+            "Kvetinová výzdoba okolo Jakubovej fotografie vzniká v 05/13 "
+            "pre kar a pokračuje v tej istej hale v 05/36–05/37."
+        ),
+        "scenes": [
+            (
+                "05/13",
+                "vzniká kvetinová výzdoba okolo Jakubovej fotografie "
+                "a setup pre kar",
+            ),
+            (
+                "05/36",
+                "setup karu pokračuje pri príchode hostí a šatni",
+            ),
+            (
+                "05/37",
+                "setup karu pokračuje pri stole s alkoholom a schodisku",
+            ),
+        ],
+    },
+]
+
+SET_CONTINUITY_QUESTIONS = {
+    "02/19LP": (
+        "Má pietne miesto pri Jakubovej skrinke (kvety, fotografie a "
+        "plyšové hračky) zostať aj v niektorom konkrétnom nasledujúcom "
+        "obraze? Ak áno, určiť prvý a posledný obraz reťazca."
+    ),
+    "02/41": (
+        "Má rozbité sklo automatu z 02/41 zostať viditeľne rozbité v "
+        "03/10 alebo inom konkrétnom nasledujúcom obraze klubovne? "
+        "Bez potvrdenia sa nenadväzuje."
+    ),
+}
+
 
 def folded(value: str) -> str:
     normalized = unicodedata.normalize("NFKD", value or "")
@@ -253,7 +373,6 @@ def build_payload(source_root: Path) -> dict:
         raise ValueError(f"expected 261 scenes, found {len(raw_scenes)}")
 
     prop_occurrences = defaultdict(list)
-    set_occurrences = defaultdict(list)
     for scene in raw_scenes:
         for prop in scene["props"]:
             prop_occurrences[folded(prop["stable_name"])].append({
@@ -262,12 +381,6 @@ def build_payload(source_root: Path) -> dict:
                 "action": prop["action"],
                 "stable_name": prop["stable_name"],
             })
-        set_occurrences[folded(scene["location"])].append({
-            "scene_id": scene["scene_id"],
-            "order": scene["order"],
-            "action": f"prostredie obrazu {scene['scene_id']}",
-            "stable_name": scene["location"],
-        })
 
     prop_registry = {}
     for key, occurrences in prop_occurrences.items():
@@ -281,15 +394,32 @@ def build_payload(source_root: Path) -> dict:
             "occurrences": occurrences,
         }
 
+    scenes_by_id = {scene["scene_id"]: scene for scene in raw_scenes}
     set_registry = {}
-    for key, occurrences in set_occurrences.items():
-        if len(occurrences) < 2:
-            continue
-        set_registry[key] = {
-            "identity": occurrences[0]["stable_name"],
-            "aliases": sorted({
-                occurrence["stable_name"] for occurrence in occurrences
-            }),
+    strict_set_by_scene = {}
+    for chain in STRICT_SET_CHAINS:
+        occurrences = []
+        for scene_id, state in chain["scenes"]:
+            if scene_id not in scenes_by_id:
+                raise ValueError(
+                    f"strict SET chain references missing scene {scene_id}"
+                )
+            occurrence = {
+                "scene_id": scene_id,
+                "order": scenes_by_id[scene_id]["order"],
+                "action": state,
+                "stable_name": chain["identity"],
+            }
+            occurrences.append(occurrence)
+            if scene_id in strict_set_by_scene:
+                raise ValueError(
+                    f"scene belongs to multiple strict SET chains: {scene_id}"
+                )
+            strict_set_by_scene[scene_id] = chain["key"]
+        set_registry[chain["key"]] = {
+            "identity": chain["identity"],
+            "aliases": [chain["identity"]],
+            "reason": chain["reason"],
             "occurrences": occurrences,
         }
 
@@ -330,15 +460,19 @@ def build_payload(source_root: Path) -> dict:
                 }
             prop_items.append(item)
 
-        set_key = folded(scene["location"])
-        set_continuity = set_key in set_registry
+        set_key = strict_set_by_scene.get(scene["scene_id"])
+        set_continuity = bool(set_key)
         if set_continuity:
             previous, following = previous_and_next(
                 set_registry[set_key]["occurrences"], scene["order"]
             )
             primary_set_item = continuity_item(
                 set_registry[set_key]["identity"],
-                f"prostredie obrazu {scene['scene_id']}",
+                next(
+                    occurrence["action"]
+                    for occurrence in set_registry[set_key]["occurrences"]
+                    if occurrence["scene_id"] == scene["scene_id"]
+                ),
                 previous,
                 following,
             )
@@ -368,6 +502,10 @@ def build_payload(source_root: Path) -> dict:
             **scene,
             "props": prop_items,
             "set_items": [primary_set_item, *scene["set_extras"]],
+            "questions": (
+                [SET_CONTINUITY_QUESTIONS[scene["scene_id"]]]
+                if scene["scene_id"] in SET_CONTINUITY_QUESTIONS else []
+            ),
             "labels": [
                 label
                 for label, enabled in (
@@ -398,6 +536,21 @@ def build_payload(source_root: Path) -> dict:
             "unique_scene_ids": len(seen_scene_ids),
             "prop_registry_cards": len(prop_registry),
             "set_registry_cards": len(set_registry),
+            "set_items_total": sum(
+                1 + len(scene["set_extras"]) for scene in raw_scenes
+            ),
+            "strict_set_chains": len(set_registry),
+            "strict_set_chain_reasons": [
+                {
+                    "identity": entry["identity"],
+                    "reason": entry["reason"],
+                    "scenes": [
+                        occurrence["scene_id"]
+                        for occurrence in entry["occurrences"]
+                    ],
+                }
+                for entry in set_registry.values()
+            ],
             "continuity_prop_scenes": sum(
                 "Nadväzná rekvizita" in scene["labels"] for scene in scenes
             ),

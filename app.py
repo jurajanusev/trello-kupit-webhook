@@ -6407,7 +6407,7 @@ def cierny_kamen_scene_checklists(scene, prop_urls, set_urls):
         "SET": set_items,
         "INFO Z PORADY": [],
         "INFO Z NATÁČANIA": [],
-        "OTÁZKY NA PORADU": [],
+        "OTÁZKY NA PORADU": list(scene.get("questions", [])),
     }
 
 
@@ -6438,12 +6438,16 @@ def cierny_kamen_registry_description(kind, key, entry, scene_urls):
         else "Zachovať identitu priestoru, rozmiestnenie a pevné "
         "scénografické prvky podľa časovej osi."
     )
+    reason = (
+        f"\n\n**DÔVOD PRIAMEJ NADVÄZNOSTI:** {entry['reason']}"
+        if entry.get("reason") else ""
+    )
     return (
         f"{marker}\n"
         f"# {title}\n\n"
         f"**IDENTITA:** `{entry['identity']}`\n\n"
         f"**ALIASY:** {aliases}\n\n"
-        f"**FIXNÉ VLASTNOSTI:** {fixed}\n\n"
+        f"**FIXNÉ VLASTNOSTI:** {fixed}{reason}\n\n"
         "## ČASOVÁ OS A ODKAZY NA OBRAZY\n"
         f"{chr(10).join(timeline)}\n\n"
         "## RUČNÉ POZNÁMKY\n"
@@ -7141,6 +7145,473 @@ def import_cierny_kamen():
             "duplicates": sorted(duplicates),
             "remaining": max(0, len(entries) - start - len(keys)),
         }), 200 if not errors and not duplicates else 409
+
+    return jsonify({"error": "unknown phase"}), 400
+
+
+CIERNY_KAMEN_SET_FIX_KEY = "cierny-kamen-strict-sets-27jul-2f60ac91"
+
+
+def cierny_kamen_set_marker_key(card):
+    match = re.search(
+        r"<!-- CIERNY-KAMEN-REGISTRY:SET:(.*?) -->",
+        card.get("desc") or "",
+    )
+    return match.group(1) if match else None
+
+
+def cierny_kamen_preserve_manual_description(actual, desired):
+    pattern = re.compile(
+        r"(### RUČNÉ DOPLNENIA\n)(.*?)(\n### AKCIA A DIALÓGY\n)",
+        flags=re.S,
+    )
+    actual_match = pattern.search(actual or "")
+    desired_match = pattern.search(desired)
+    if not actual_match or not desired_match:
+        raise RuntimeError("manual description section boundary missing")
+    manual = actual_match.group(2)
+    return (
+        desired[:desired_match.start(2)]
+        + manual
+        + desired[desired_match.end(2):]
+    )
+
+
+def cierny_kamen_strict_set_overview(payload, state, audit):
+    set_label_id = audit["desired_labels"]["Nadväzný set"][0]["id"]
+    strict_keys = set(payload["set_registry"])
+    active_set_registry = [
+        card for card in state["cards"]
+        if cierny_kamen_set_marker_key(card)
+        and not card.get("closed")
+        and not state["lists_by_id"].get(
+            card.get("idList"), {}
+        ).get("closed")
+    ]
+    legacy_cards = [
+        card for card in active_set_registry
+        if cierny_kamen_set_marker_key(card) not in strict_keys
+    ]
+    strict_cards = [
+        card for card in active_set_registry
+        if cierny_kamen_set_marker_key(card) in strict_keys
+    ]
+    labeled_scenes = [
+        card for matches in audit["scene_cards"].values()
+        for card in matches
+        if set_label_id in card.get("idLabels", [])
+    ]
+    legacy_manual_notes = []
+    for card in legacy_cards:
+        notes = (card.get("desc") or "").split(
+            "## RUČNÉ POZNÁMKY", 1
+        )
+        if len(notes) == 2 and notes[1].strip():
+            legacy_manual_notes.append({
+                "id": card["id"],
+                "name": card.get("name"),
+                "url": card.get("shortUrl"),
+            })
+    return {
+        "set_items_total": payload["stats"]["set_items_total"],
+        "strict_set_chains": payload["stats"]["strict_set_chains"],
+        "desired_set_labeled_scenes": payload["stats"][
+            "continuity_set_scenes"
+        ],
+        "current_set_labeled_scenes": len(labeled_scenes),
+        "active_legacy_set_registry_cards": len(legacy_cards),
+        "active_strict_set_registry_cards": len(strict_cards),
+        "legacy_registry_manual_notes": legacy_manual_notes,
+        "questions_to_add": sum(
+            len(scene.get("questions", [])) for scene in payload["scenes"]
+        ),
+        "reasons": payload["stats"]["strict_set_chain_reasons"],
+    }
+
+
+def cierny_kamen_fix_scene_sets(
+    card, scene, prop_urls, set_urls, set_label_id
+):
+    desired_desc = cierny_kamen_scene_description(
+        scene, prop_urls, set_urls
+    )
+    desired_desc = cierny_kamen_preserve_manual_description(
+        card.get("desc") or "", desired_desc
+    )
+    updates = []
+    desired_has_label = "Nadväzný set" in scene["labels"]
+    current_labels = list(card.get("idLabels", []))
+    next_labels = [
+        label_id for label_id in current_labels
+        if label_id != set_label_id
+    ]
+    if desired_has_label:
+        next_labels.append(set_label_id)
+    next_labels = sorted(set(next_labels))
+    if sorted(current_labels) != next_labels:
+        updates.append("label")
+    if card.get("desc") != desired_desc:
+        updates.append("description")
+
+    checklists = trello_get(
+        f"/cards/{card['id']}/checklists",
+        {"checkItems": "all", "fields": "id,name,pos"},
+    )
+    checklists = sorted(checklists, key=lambda item: item.get("pos", 0))
+    if [item.get("name") for item in checklists] != (
+        CIERNY_KAMEN_IMPORT_CHECKLISTS
+    ):
+        raise RuntimeError(
+            f"{scene['scene_id']} checklist order/name mismatch"
+        )
+    by_name = {item["name"]: item for item in checklists}
+    set_checklist = by_name["SET"]
+    set_items = sorted(
+        set_checklist.get("checkItems", []),
+        key=lambda item: item.get("pos", 0),
+    )
+    generated_candidates = [
+        item for item in set_items
+        if (
+            item.get("name", "").startswith("<> ")
+            and " | KARTA: https://trello.com/c/" in item.get("name", "")
+        ) or item.get("name") == (
+            f"{scene['location']} — prostredie obrazu {scene['scene_id']}"
+        )
+    ]
+    if len(generated_candidates) != 1:
+        raise RuntimeError(
+            f"{scene['scene_id']} generated SET item count is "
+            f"{len(generated_candidates)}"
+        )
+    expected_set_items = cierny_kamen_scene_checklists(
+        scene, prop_urls, set_urls
+    )["SET"]
+    generated_item = generated_candidates[0]
+    if generated_item.get("name") != expected_set_items[0]:
+        updates.append("set_item")
+
+    question_checklist = by_name["OTÁZKY NA PORADU"]
+    existing_questions = {
+        item.get("name")
+        for item in question_checklist.get("checkItems", [])
+    }
+    missing_questions = [
+        item for item in scene.get("questions", [])
+        if item not in existing_questions
+    ]
+    if missing_questions:
+        updates.append("questions")
+
+    if "description" in updates or "label" in updates:
+        data = {}
+        if "description" in updates:
+            data["desc"] = desired_desc
+        if "label" in updates:
+            data["idLabels"] = ",".join(next_labels)
+        trello_put_body(f"/cards/{card['id']}", data)
+    if "set_item" in updates:
+        trello_put_body(
+            f"/cards/{card['id']}/checkItem/{generated_item['id']}",
+            {"name": expected_set_items[0]},
+        )
+    for question in missing_questions:
+        trello_post_body(
+            f"/checklists/{question_checklist['id']}/checkItems",
+            {"name": question, "pos": "bottom"},
+        )
+    return updates
+
+
+@app.route("/api/fix-cierny-kamen-set-continuity", methods=["POST"])
+def fix_cierny_kamen_set_continuity():
+    if request.headers.get("X-Fix-Key") != CIERNY_KAMEN_SET_FIX_KEY:
+        return jsonify({"error": "forbidden"}), 403
+    payload = cierny_kamen_import_payload()
+    phase = request.args.get("phase", "dry-run").strip().casefold()
+    try:
+        start = int(request.args.get("start", "0"))
+        limit = int(request.args.get("limit", "10"))
+    except ValueError:
+        return jsonify({"error": "start and limit must be integers"}), 400
+    if start < 0 or limit < 1 or limit > 10:
+        return jsonify({"error": "invalid start/limit"}), 400
+
+    state = cierny_kamen_import_state(payload)
+    audit = cierny_kamen_target_audit(payload, state)
+    if audit["blockers"]:
+        return jsonify({
+            "status": "blocked",
+            "blockers": audit["blockers"],
+            "collisions": audit["collisions"],
+        }), 409
+    if len(audit["scene_cards"]) != 261:
+        return jsonify({
+            "status": "blocked",
+            "error": "expected 261 imported scene IDs",
+            "found": len(audit["scene_cards"]),
+        }), 409
+    overview = cierny_kamen_strict_set_overview(payload, state, audit)
+    if phase == "dry-run":
+        return jsonify({
+            "status": "dry-run",
+            "writes": 0,
+            "board": {
+                "id": state["board"]["id"],
+                "name": state["board"].get("name"),
+                "url": state["board"].get("url"),
+            },
+            "overview": overview,
+            "sample_02_28": {
+                "desired_set_label": False,
+                "set_items": [
+                    cierny_kamen_plain_item(item)
+                    for item in next(
+                        scene for scene in payload["scenes"]
+                        if scene["scene_id"] == "02/28"
+                    )["set_items"]
+                ],
+            },
+        }), 200
+
+    if overview["legacy_registry_manual_notes"]:
+        return jsonify({
+            "status": "blocked",
+            "error": "legacy registry cards contain manual notes",
+            "cards": overview["legacy_registry_manual_notes"],
+        }), 409
+
+    set_list_id = audit["set_lists"][0]["id"]
+    scene_urls = {
+        scene_id: matches[0].get("shortUrl")
+        for scene_id, matches in audit["scene_cards"].items()
+        if len(matches) == 1
+    }
+    if phase == "create-registries":
+        existing, duplicates = cierny_kamen_registry_cards(
+            state, "SET", payload
+        )
+        if duplicates:
+            return jsonify({
+                "status": "blocked", "error": "strict registry duplicates"
+            }), 409
+        keys = sorted(payload["set_registry"])[start:start + limit]
+        created = []
+        unchanged = []
+        for key in keys:
+            if key in existing:
+                unchanged.append(key)
+                continue
+            entry = payload["set_registry"][key]
+            card = cierny_kamen_create_card(
+                set_list_id,
+                entry["identity"],
+                cierny_kamen_registry_description(
+                    "SET", key, entry, scene_urls
+                ),
+            )
+            created.append({
+                "key": key, "id": card["id"], "url": card.get("shortUrl"),
+            })
+        return jsonify({
+            "status": "applied",
+            "created": created,
+            "unchanged": unchanged,
+            "remaining": max(
+                0, len(payload["set_registry"]) - start - len(keys)
+            ),
+        }), 200
+
+    prop_urls, set_urls = cierny_kamen_registry_urls(payload, state)
+    if set(set_urls) != set(payload["set_registry"]):
+        return jsonify({
+            "status": "blocked",
+            "error": "all strict SET registry cards must exist first",
+            "missing": sorted(set(payload["set_registry"]) - set(set_urls)),
+        }), 409
+    set_label_id = audit["desired_labels"]["Nadväzný set"][0]["id"]
+
+    if phase == "scenes":
+        selected = payload["scenes"][start:start + limit]
+        changed = []
+        unchanged = []
+        for scene in selected:
+            card = audit["scene_cards"][scene["scene_id"]][0]
+            updates = cierny_kamen_fix_scene_sets(
+                card, scene, prop_urls, set_urls, set_label_id
+            )
+            if updates:
+                changed.append({
+                    "scene_id": scene["scene_id"],
+                    "updates": updates,
+                })
+            else:
+                unchanged.append(scene["scene_id"])
+        return jsonify({
+            "status": "applied",
+            "start": start,
+            "selected": len(selected),
+            "changed": changed,
+            "unchanged": unchanged,
+            "remaining": max(
+                0, len(payload["scenes"]) - start - len(selected)
+            ),
+        }), 200
+
+    if phase == "registry-links":
+        entries = payload["set_registry"]
+        cards, duplicates = cierny_kamen_registry_cards(
+            state, "SET", payload
+        )
+        if duplicates:
+            return jsonify({
+                "status": "blocked", "error": "strict registry duplicates"
+            }), 409
+        keys = sorted(entries)[start:start + limit]
+        updated = []
+        unchanged = []
+        for key in keys:
+            desired = cierny_kamen_registry_description(
+                "SET", key, entries[key], scene_urls
+            )
+            card = cards[key]
+            if card.get("desc") == desired:
+                unchanged.append(key)
+                continue
+            trello_put_body(f"/cards/{card['id']}", {"desc": desired})
+            updated.append(key)
+        return jsonify({
+            "status": "applied",
+            "updated": updated,
+            "unchanged": unchanged,
+        }), 200
+
+    if phase == "archive-legacy":
+        strict_keys = set(payload["set_registry"])
+        legacy = [
+            card for card in state["cards"]
+            if cierny_kamen_set_marker_key(card)
+            and cierny_kamen_set_marker_key(card) not in strict_keys
+            and not card.get("closed")
+        ]
+        selected = sorted(legacy, key=lambda card: card["id"])[
+            start:start + limit
+        ]
+        archived = []
+        for card in selected:
+            trello_put_body(f"/cards/{card['id']}", {"closed": "true"})
+            archived.append({
+                "id": card["id"],
+                "name": card.get("name"),
+                "url": card.get("shortUrl"),
+            })
+        return jsonify({
+            "status": "applied",
+            "archived": archived,
+            "remaining": max(0, len(legacy) - len(selected)),
+        }), 200
+
+    if phase == "audit-scenes":
+        selected = payload["scenes"][start:start + limit]
+        errors = []
+        verified = []
+        for scene in selected:
+            card = audit["scene_cards"][scene["scene_id"]][0]
+            desired_desc = cierny_kamen_preserve_manual_description(
+                card.get("desc") or "",
+                cierny_kamen_scene_description(
+                    scene, prop_urls, set_urls
+                ),
+            )
+            scene_errors = []
+            if card.get("desc") != desired_desc:
+                scene_errors.append("description mismatch")
+            desired_label = "Nadväzný set" in scene["labels"]
+            actual_label = set_label_id in card.get("idLabels", [])
+            if desired_label != actual_label:
+                scene_errors.append("Nadväzný set label mismatch")
+            checklists = trello_get(
+                f"/cards/{card['id']}/checklists",
+                {"checkItems": "all", "fields": "id,name,pos"},
+            )
+            by_name = {item["name"]: item for item in checklists}
+            actual_set = [
+                item.get("name")
+                for item in sorted(
+                    by_name["SET"].get("checkItems", []),
+                    key=lambda item: item.get("pos", 0),
+                )
+            ]
+            expected_set = cierny_kamen_scene_checklists(
+                scene, prop_urls, set_urls
+            )["SET"]
+            if actual_set[:len(expected_set)] != expected_set:
+                scene_errors.append("SET items mismatch")
+            questions = {
+                item.get("name")
+                for item in by_name["OTÁZKY NA PORADU"].get(
+                    "checkItems", []
+                )
+            }
+            if not set(scene.get("questions", [])).issubset(questions):
+                scene_errors.append("question missing")
+            if scene["scene_id"] == "02/28":
+                if actual_label:
+                    scene_errors.append("02/28 has forbidden set label")
+                if any(item.startswith("<> ") for item in actual_set):
+                    scene_errors.append("02/28 has forbidden continuity item")
+            if scene_errors:
+                errors.append({
+                    "scene_id": scene["scene_id"],
+                    "errors": scene_errors,
+                })
+            else:
+                verified.append(scene["scene_id"])
+        return jsonify({
+            "status": "audit",
+            "start": start,
+            "selected": len(selected),
+            "verified": verified,
+            "errors": errors,
+            "remaining": max(
+                0, len(payload["scenes"]) - start - len(selected)
+            ),
+        }), 200 if not errors else 409
+
+    if phase == "audit-final":
+        strict_cards, duplicates = cierny_kamen_registry_cards(
+            state, "SET", payload
+        )
+        final_overview = cierny_kamen_strict_set_overview(
+            payload, state, audit
+        )
+        errors = []
+        if len(strict_cards) != len(payload["set_registry"]):
+            errors.append("strict registry card count mismatch")
+        if duplicates:
+            errors.append("strict registry duplicates")
+        if final_overview["active_legacy_set_registry_cards"]:
+            errors.append("active legacy SET registry cards remain")
+        if (
+            final_overview["current_set_labeled_scenes"]
+            != payload["stats"]["continuity_set_scenes"]
+        ):
+            errors.append("set label count mismatch")
+        for key, entry in payload["set_registry"].items():
+            card = strict_cards.get(key)
+            if not card:
+                continue
+            desired = cierny_kamen_registry_description(
+                "SET", key, entry, scene_urls
+            )
+            if card.get("desc") != desired:
+                errors.append(f"registry description mismatch: {key}")
+        return jsonify({
+            "status": "audit",
+            "valid": not errors,
+            "errors": errors,
+            "overview": final_overview,
+        }), 200 if not errors else 409
 
     return jsonify({"error": "unknown phase"}), 400
 
