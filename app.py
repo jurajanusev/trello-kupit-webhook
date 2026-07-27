@@ -5642,6 +5642,8 @@ def cierny_kamen_scene_name_info(name):
 
 @app.route("/api/audit-cierny-kamen-import", methods=["GET"])
 def audit_cierny_kamen_import():
+    return jsonify({"error": "completed read-only endpoint disabled"}), 410
+
     if request.headers.get("X-Audit-Key") != CIERNY_KAMEN_AUDIT_KEY:
         return jsonify({"error": "forbidden"}), 403
 
