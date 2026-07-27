@@ -6317,7 +6317,7 @@ def cierny_kamen_continuity_text(item, registry_url):
         if following else "ďalší potvrdený obraz neurčený"
     )
     return (
-        f"<> {item['stable_name']} — {item['action']} | "
+        f"<n> {item['stable_name']} — {item['action']} | "
         f"← {previous_text} | TU: {item['current_state']} | "
         f"→ {next_text} | KARTA: {registry_url}"
     )
@@ -6893,7 +6893,7 @@ def import_cierny_kamen():
                         f"{checklist['name']} items mismatch"
                     )
         prop_text = "\n".join(expected_checklists["REKVIZITY"])
-        if "<> Alexova gitara" not in prop_text:
+        if "<n> Alexova gitara" not in prop_text:
             errors.append("Alexova gitara continuity item missing")
         if "KARTA: https://trello.com/c/" not in prop_text:
             errors.append("real registry URL missing")
@@ -7560,7 +7560,7 @@ def fix_cierny_kamen_set_continuity():
             if scene["scene_id"] == "02/28":
                 if actual_label:
                     scene_errors.append("02/28 has forbidden set label")
-                if any(item.startswith("<> ") for item in actual_set):
+                if any(item.startswith("<n> ") for item in actual_set):
                     scene_errors.append("02/28 has forbidden continuity item")
             if scene_errors:
                 errors.append({
@@ -7616,6 +7616,220 @@ def fix_cierny_kamen_set_continuity():
         }), 200 if not errors else 409
 
     return jsonify({"error": "unknown phase"}), 400
+
+
+CIERNY_KAMEN_N_MARKER_KEY = "cierny-kamen-n-marker-27jul-91a24fd6"
+CIERNY_KAMEN_ANY_CONTINUITY_PREFIX = re.compile(
+    r"^(?P<prefix><\s*[nN]?\s*>|\[[nN]\])\s+(?P<suffix>.*)$",
+    flags=re.S,
+)
+
+
+def cierny_kamen_continuity_prefix_parts(value):
+    match = CIERNY_KAMEN_ANY_CONTINUITY_PREFIX.match(value or "")
+    if not match:
+        return None
+    return {
+        "prefix": match.group("prefix"),
+        "suffix": match.group("suffix"),
+        "valid": match.group("prefix") == "<n>",
+    }
+
+
+def cierny_kamen_marker_batch(
+    payload, state, audit, start, limit, apply_changes=False
+):
+    prop_urls, set_urls = cierny_kamen_registry_urls(payload, state)
+    selected = payload["scenes"][start:start + limit]
+    prop_label_id = audit["desired_labels"]["Nadväzná rekvizita"][0]["id"]
+    set_label_id = audit["desired_labels"]["Nadväzný set"][0]["id"]
+    counts = {
+        "expected_continuity_items": 0,
+        "already_lowercase_n": 0,
+        "legacy_empty_angle": 0,
+        "uppercase_angle_n": 0,
+        "square_n": 0,
+        "other_marker_variant": 0,
+        "description_forbidden_markers": 0,
+        "changed": 0,
+    }
+    errors = []
+    changes = []
+    all_pending = []
+    for scene in selected:
+        card = audit["scene_cards"][scene["scene_id"]][0]
+        expected_checklists = cierny_kamen_scene_checklists(
+            scene, prop_urls, set_urls
+        )
+        expected_by_name = {
+            name: [
+                item for item in items if item.startswith("<n> ")
+            ]
+            for name, items in expected_checklists.items()
+        }
+        expected_prop = len(expected_by_name["REKVIZITY"])
+        expected_set = len(expected_by_name["SET"])
+        counts["expected_continuity_items"] += expected_prop + expected_set
+        if (prop_label_id in card.get("idLabels", [])) != bool(expected_prop):
+            errors.append({
+                "scene_id": scene["scene_id"],
+                "error": "Nadväzná rekvizita label/item mismatch",
+            })
+        if (set_label_id in card.get("idLabels", [])) != bool(expected_set):
+            errors.append({
+                "scene_id": scene["scene_id"],
+                "error": "Nadväzný set label/item mismatch",
+            })
+
+        description = card.get("desc") or ""
+        forbidden_in_desc = re.findall(
+            r"(?m)^(?:<>|<N>|\[[nN]\])\s+", description
+        )
+        counts["description_forbidden_markers"] += len(forbidden_in_desc)
+        if forbidden_in_desc:
+            errors.append({
+                "scene_id": scene["scene_id"],
+                "error": "forbidden marker in description",
+            })
+
+        checklists = trello_get(
+            f"/cards/{card['id']}/checklists",
+            {"checkItems": "all", "fields": "id,name,pos"},
+        )
+        by_name = {item["name"]: item for item in checklists}
+        if not all(
+            name in by_name for name in CIERNY_KAMEN_IMPORT_CHECKLISTS
+        ):
+            errors.append({
+                "scene_id": scene["scene_id"],
+                "error": "required checklist missing",
+            })
+            continue
+        expected_suffixes = {
+            name: {item[4:]: item for item in items}
+            for name, items in expected_by_name.items()
+        }
+        pending = []
+        for checklist_name in ("REKVIZITY", "SET"):
+            matched_ids = set()
+            actual_items = by_name[checklist_name].get("checkItems", [])
+            for item in actual_items:
+                parts = cierny_kamen_continuity_prefix_parts(
+                    item.get("name")
+                )
+                if not parts:
+                    continue
+                expected = expected_suffixes[checklist_name].get(
+                    parts["suffix"]
+                )
+                if not expected:
+                    errors.append({
+                        "scene_id": scene["scene_id"],
+                        "error": (
+                            f"unexpected marker item in {checklist_name}: "
+                            f"{item.get('name')}"
+                        ),
+                    })
+                    continue
+                if parts["suffix"] in matched_ids:
+                    errors.append({
+                        "scene_id": scene["scene_id"],
+                        "error": (
+                            f"duplicate marker item in {checklist_name}"
+                        ),
+                    })
+                    continue
+                matched_ids.add(parts["suffix"])
+                prefix = parts["prefix"]
+                if prefix == "<n>":
+                    counts["already_lowercase_n"] += 1
+                elif prefix == "<>":
+                    counts["legacy_empty_angle"] += 1
+                elif prefix == "<N>":
+                    counts["uppercase_angle_n"] += 1
+                elif prefix in {"[N]", "[n]"}:
+                    counts["square_n"] += 1
+                else:
+                    counts["other_marker_variant"] += 1
+                if item.get("name") != expected:
+                    pending.append({
+                        "card_id": card["id"],
+                        "item_id": item["id"],
+                        "checklist": checklist_name,
+                        "old": item.get("name"),
+                        "new": expected,
+                    })
+            missing = set(expected_suffixes[checklist_name]) - matched_ids
+            for suffix in sorted(missing):
+                errors.append({
+                    "scene_id": scene["scene_id"],
+                    "error": (
+                        f"missing continuity item in {checklist_name}: "
+                        f"{suffix}"
+                    ),
+                })
+        if pending:
+            changes.append({
+                "scene_id": scene["scene_id"],
+                "items": len(pending),
+            })
+            all_pending.extend(pending)
+
+    if apply_changes and not errors:
+        for change in all_pending:
+            trello_put_body(
+                f"/cards/{change['card_id']}/checkItem/"
+                f"{change['item_id']}",
+                {"name": change["new"]},
+            )
+            counts["changed"] += 1
+
+    return {
+        "start": start,
+        "selected": len(selected),
+        "counts": counts,
+        "changes": changes,
+        "errors": errors,
+        "remaining": max(
+            0, len(payload["scenes"]) - start - len(selected)
+        ),
+    }
+
+
+@app.route("/api/fix-cierny-kamen-n-marker", methods=["POST"])
+def fix_cierny_kamen_n_marker():
+    if request.headers.get("X-Marker-Key") != CIERNY_KAMEN_N_MARKER_KEY:
+        return jsonify({"error": "forbidden"}), 403
+    phase = request.args.get("phase", "dry-run").strip().casefold()
+    if phase not in {"dry-run", "apply", "audit"}:
+        return jsonify({"error": "phase must be dry-run, apply, or audit"}), 400
+    try:
+        start = int(request.args.get("start", "0"))
+        limit = int(request.args.get("limit", "10"))
+    except ValueError:
+        return jsonify({"error": "start and limit must be integers"}), 400
+    if start < 0 or limit < 1 or limit > 10:
+        return jsonify({"error": "invalid start/limit"}), 400
+
+    payload = cierny_kamen_import_payload()
+    state = cierny_kamen_import_state(payload)
+    audit = cierny_kamen_target_audit(payload, state)
+    if audit["blockers"] or len(audit["scene_cards"]) != 261:
+        return jsonify({
+            "status": "blocked",
+            "blockers": audit["blockers"],
+            "scene_ids": len(audit["scene_cards"]),
+        }), 409
+    result = cierny_kamen_marker_batch(
+        payload, state, audit, start, limit, phase == "apply"
+    )
+    if result["errors"]:
+        return jsonify({"status": "blocked", **result}), 409
+    return jsonify({
+        "status": "applied" if phase == "apply" else phase,
+        "writes": result["counts"]["changed"] if phase == "apply" else 0,
+        **result,
+    }), 200
 
 
 if __name__ == "__main__":

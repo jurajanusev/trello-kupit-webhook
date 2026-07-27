@@ -76,10 +76,10 @@ class CiernyKamenPayloadTest(unittest.TestCase):
         self.assertEqual(len(checklists["SET"]), 4)
         self.assertNotIn("Nadväzný set", scene["labels"])
         self.assertFalse(
-            any(item.startswith("<> ") for item in checklists["SET"])
+            any(item.startswith("<n> ") for item in checklists["SET"])
         )
         prop = checklists["REKVIZITY"][0]
-        self.assertTrue(prop.startswith("<> Alexova gitara — "))
+        self.assertTrue(prop.startswith("<n> Alexova gitara — "))
         self.assertIn("| ← 01/39: Alex na nej hrá na terase |", prop)
         self.assertIn(
             "| TU: gitara je funkčná a nepoškodená; "
@@ -108,6 +108,45 @@ class CiernyKamenPayloadTest(unittest.TestCase):
                     self.assertNotIn("KARTA: <", item)
         self.assertLess(longest_description, 16384)
         self.assertLess(longest_item, 16384)
+
+    def test_all_continuity_items_use_only_lowercase_n_marker(self):
+        forbidden = ("<> ", "<N> ", "[N] ", "[n] ")
+        continuity_items = 0
+        for scene in PAYLOAD["scenes"]:
+            checklists = app.cierny_kamen_scene_checklists(
+                scene, self.prop_urls, self.set_urls
+            )
+            prop_items = checklists["REKVIZITY"]
+            set_items = checklists["SET"]
+            for item in prop_items + set_items:
+                self.assertFalse(item.startswith(forbidden))
+                if app.cierny_kamen_continuity_prefix_parts(item):
+                    continuity_items += 1
+                    self.assertTrue(item.startswith("<n> "))
+            self.assertEqual(
+                "Nadväzná rekvizita" in scene["labels"],
+                any(item.startswith("<n> ") for item in prop_items),
+            )
+            self.assertEqual(
+                "Nadväzný set" in scene["labels"],
+                any(item.startswith("<n> ") for item in set_items),
+            )
+        self.assertGreater(continuity_items, 0)
+
+    def test_marker_parser_recognizes_legacy_variants_but_only_lowercase_is_valid(self):
+        cases = {
+            "<n> Gitara": True,
+            "<> Gitara": False,
+            "<N> Gitara": False,
+            "[N] Gitara": False,
+            "[n] Gitara": False,
+        }
+        for value, valid in cases.items():
+            with self.subTest(value=value):
+                parsed = app.cierny_kamen_continuity_prefix_parts(value)
+                self.assertIsNotNone(parsed)
+                self.assertEqual(parsed["valid"], valid)
+                self.assertEqual(parsed["suffix"], "Gitara")
 
     def test_registry_descriptions_use_only_real_or_pending_scene_links(self):
         scene_urls = {
