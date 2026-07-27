@@ -4878,6 +4878,360 @@ def handoff_automation_deployment():
     })
 
 
+RIVERDALE_TEST_0228_KEY = "riverdale-test-0228-27jul-4e9c13b7"
+RIVERDALE_TEST_0228_NAME = (
+    "[TEST] 02/28 — Kiko hovorí babám o Patrikovi a Alex hrá na gitare"
+)
+RIVERDALE_TEST_0228_LIST = "TEST 2 — OBRAZY"
+RIVERDALE_TEST_0228_DESC = """<!-- RIVERDALE-SCHEDULE-METADATA:START -->
+**ČÍSLO OBRAZU:** 02/28
+**ZDROJ:** Riverdale – scenár epizódy 02
+**NATÁČACÍ DEŇ:** nenaplánované
+**DÁTUM NATÁČANIA:** nenaplánované
+**PORADIE DŇA:** nenaplánované
+**UNIT:** nenaplánované
+**LOKÁCIA:** ŠKOLA – KLUBOVŇA
+**POSTAVY:** BETY, KIKO, ALEX, VERONIKA, KOMPARZ ŠTUDENTI
+<!-- RIVERDALE-SCHEDULE-METADATA:END -->
+
+#### **Kiko hovorí babám o Patrikovi a Alex hrá na gitare**
+
+### REKVIZITY V KONTEXTE
+
+- **Alexova gitara** — Alex sedí na gauči, brnká na nej a následne hrá a spieva pred Bety, Kikom a Veronikou. Overiť, či ide o rovnaký konkrétny kus ako v obraze 01/39, vrátane farby, popruhu a stavu.
+
+### KONTINUITA
+
+- Alexova gitara môže nadväzovať na obraz 01/39; konkrétny kus treba potvrdiť.
+- Automat na jedlo je v obraze 02/28 nepoškodený, pred rozbitím v obraze 02/41.
+- Obraz obsahuje spomienkové návraty na obrazy 01/42 a 01/49.
+
+### ODKAZY
+
+Zatiaľ bez pridaných odkazov.
+
+### RUČNÉ DOPLNENIA
+
+### AKCIA A DIALÓGY
+
+Kiko kráča medzi Bety a Veronikou. Prichádzajú do klubovne.
+Ešte nejakí študenti sa trúsia von, iní tam ostávajú, čiže
+si hneď nevšimnú Alexa. Postavia sa k automatu a vyberajú
+si z neho niečo na jedenie. Bety stláča gombíky ako prvá.
+Veronika naposledy Bety priznala, že sa správala ako mrcha,
+nemá chuť sa s ňou veľmi baviť. Veronika to vníma, snaží sa
+komunikovať aspoň s Kikom, otočí sa naňho.
+VERONIKA
+Čo od teba chcel Patrik?
+KIKO
+To ani on sám nevie. Ďalší
+nevyautovaný gay. Mňa už tieto games
+nebavia.
+VERONIKA
+Podľa mňa ťa práve takéto hry
+vzrušujú.
+Veronika Kika nachytala a Bety sa na tom pobaví.
+BETY
+To je pravda.
+KIKO
+Dont judge me.
+Nejakí študenti odchádzajú, odkryjú im výhľad a tak si
+všimnú Alexa, ktorý sedí na gauči a brnká si na gitare.
+(Kikovi sa Alex páči, aj keď je hetero a tiež ho štve že
+odmietol Bety), tak sa hneď naňho vyškerí a ide k nemu
+a podpichne ho.
+KIKO
+Ou, ou! Tu je náš spievajúci
+basketbalový heartbreaker.
+Všetci traja - Bety, Veronika aj Alex urobia grimasu. Bety
+len zašomre (už s Alexom nekomunikuje ako predtým).
+BETY
+Nevšímaj si ho.
+Prisadnú si k nemu aj Veronika a Bety.
+KIKO
+Naopak, všímaj si ma! Stojím za to.
+Nový song?
+Alex je v rozpakoch (ešte sa trochu ostýcha hrať a spievať
+pred ľuďmi a zároveň je to preňho ťažšia situácia, keď je
+tam zároveň Bety aj Veronika.)
+ALEX
+Neviem, len som si tak brnkal....
+KIKO
+C’mon!
+Pozrie na Alexa a ukáže pohľadom na Bety, že je nutné ju
+rozveseliť.
+VERONIKA
+Nenechaj sa prosiť.
+Alex začne brnkať peknú melódiu, potom potichu spievať,
+Kiko ho povzbudzuje palcami hore, Alex spieva viac nahlas,
+znie to veľmi dobre. No Bety sa rozľútostní, prebehnú jej
+spomienky na otváraciu párty a na Alexovo odmietnutie.
+FB 1/42. BETY A ALEX TANCUJÚ NA PLESE
+FB 1/49. PRED DOMOM KEĎ BETTY DOSTALA OD ALEXA ODMIETNUTIE
+A SMUTNO VCHÁDZA DNU
+Bety má slzy v očiach. Alex si to všimne, prestáva hrať
+a spievať. Citlivo sa spýta.
+ALEX
+Si v pohode?
+Bety sa pousmeje. No je to silený úsmev.
+BETY
+Áno, som úplne v pohode.
+Bety uteká preč."""
+RIVERDALE_TEST_0228_CHECKLISTS = [
+    ("REKVIZITY", [
+        "Alexova gitara — Alex na nej hrá a spieva pred Bety, Kikom a Veronikou; overiť možnú kontinuitu rovnakého konkrétneho kusu, farby, popruhu a stavu s obrazom 01/39.",
+    ]),
+    ("SET", [
+        "Škola – klubovňa — zachovať rozmiestnenie priestoru a zariadenia.",
+        "Automat na jedlo — Bety stláča gombíky a vyberá si jedlo; v 02/28 musí byť nepoškodený, pred rozbitím v 02/41.",
+        "Gauč — Alex na ňom sedí a hrá na gitare.",
+        "Komparzová akcia — časť študentov odchádza a odkryje výhľad na Alexa, ďalší zostávajú v klubovni.",
+    ]),
+    ("INFO Z PORADY", []),
+    ("INFO Z NATÁČANIA", []),
+]
+
+
+def riverdale_test_0228_audit(card, target_list):
+    checklists = sorted(
+        trello_get(f"/cards/{card['id']}/checklists", {
+            "fields": "id,name,pos", "checkItems": "all",
+        }),
+        key=lambda item: item.get("pos", 0),
+    )
+    checklist_summary = [
+        {
+            "name": checklist["name"],
+            "items": [
+                item["name"] for item in sorted(
+                    checklist.get("checkItems", []),
+                    key=lambda entry: entry.get("pos", 0),
+                )
+            ],
+        }
+        for checklist in checklists
+    ]
+    expected_names = [name for name, _ in RIVERDALE_TEST_0228_CHECKLISTS]
+    expected_counts = [len(items) for _, items in RIVERDALE_TEST_0228_CHECKLISTS]
+    actual_names = [item["name"] for item in checklist_summary]
+    actual_counts = [len(item["items"]) for item in checklist_summary]
+    return {
+        "card": {
+            "id": card["id"],
+            "name": card.get("name"),
+            "url": card.get("shortUrl"),
+            "list_id": card.get("idList"),
+            "description_length": len(card.get("desc", "")),
+        },
+        "target_list": {"id": target_list["id"], "name": target_list["name"]},
+        "name_matches": card.get("name") == RIVERDALE_TEST_0228_NAME,
+        "description_matches": card.get("desc") == RIVERDALE_TEST_0228_DESC,
+        "list_matches": card.get("idList") == target_list["id"],
+        "checklists": checklist_summary,
+        "checklist_names_match": actual_names == expected_names,
+        "checklist_item_counts": actual_counts,
+        "checklist_item_counts_match": actual_counts == expected_counts,
+        "valid": (
+            card.get("name") == RIVERDALE_TEST_0228_NAME
+            and card.get("desc") == RIVERDALE_TEST_0228_DESC
+            and card.get("idList") == target_list["id"]
+            and actual_names == expected_names
+            and actual_counts == expected_counts
+        ),
+    }
+
+
+@app.route("/api/create-riverdale-test-02-28", methods=["POST"])
+def create_riverdale_test_02_28():
+    if request.headers.get("X-Test-Key") != RIVERDALE_TEST_0228_KEY:
+        return jsonify({"error": "forbidden"}), 403
+
+    mode = request.args.get("mode", "dry-run")
+    if mode not in {"dry-run", "apply", "audit"}:
+        return jsonify({"error": "mode must be dry-run, apply, or audit"}), 400
+
+    board = trello_get("/boards/CzuD55PR", {"fields": "id,name,url"})
+    lists = trello_get(f"/boards/{board['id']}/lists", {
+        "fields": "id,name,pos,closed", "filter": "open",
+    })
+    target_lists = [
+        item for item in lists if item["name"] == RIVERDALE_TEST_0228_LIST
+    ]
+    safe_test_lists = [
+        {"id": item["id"], "name": item["name"]}
+        for item in lists if "TEST" in item["name"].upper()
+    ]
+
+    cards = trello_get(f"/boards/{board['id']}/cards", {
+        "fields": "id,name,desc,idList,shortUrl,closed",
+        "filter": "open",
+        "limit": 1000,
+    })
+    production_cards = [
+        card for card in cards
+        if re.match(r"^\s*0?2\s*/\s*0?28(?:\D|$)", card.get("name", ""), re.I)
+        and not card.get("name", "").lstrip().upper().startswith("[TEST]")
+    ]
+    test_cards = [
+        card for card in cards
+        if re.match(
+            r"^\s*\[TEST\]\s*0?2\s*/\s*0?28(?:\D|$)",
+            card.get("name", ""),
+            re.I,
+        )
+    ]
+    exact_test_cards = [
+        card for card in test_cards
+        if card.get("name") == RIVERDALE_TEST_0228_NAME
+    ]
+    overview = {
+        "status": mode,
+        "board": {"id": board["id"], "name": board["name"], "url": board.get("url")},
+        "production_02_28": [
+            {
+                "id": card["id"],
+                "name": card["name"],
+                "url": card.get("shortUrl"),
+                "list_id": card.get("idList"),
+            }
+            for card in production_cards
+        ],
+        "production_02_28_count": len(production_cards),
+        "safe_test_lists": safe_test_lists,
+        "target_list_count": len(target_lists),
+        "target_list": (
+            {"id": target_lists[0]["id"], "name": target_lists[0]["name"]}
+            if len(target_lists) == 1 else None
+        ),
+        "test_02_28_count": len(test_cards),
+        "exact_test_02_28_count": len(exact_test_cards),
+        "duplicate_test_02_28_count": max(0, len(test_cards) - 1),
+        "test_02_28": [
+            {"id": card["id"], "name": card["name"], "url": card.get("shortUrl")}
+            for card in test_cards
+        ],
+        "intended": {
+            "name": RIVERDALE_TEST_0228_NAME,
+            "list": RIVERDALE_TEST_0228_LIST,
+            "description_length": len(RIVERDALE_TEST_0228_DESC),
+            "checklists": [
+                {"name": name, "item_count": len(items)}
+                for name, items in RIVERDALE_TEST_0228_CHECKLISTS
+            ],
+        },
+    }
+
+    if mode == "dry-run":
+        overview["collision_free"] = len(test_cards) == 0
+        overview["ready_to_apply"] = (
+            len(production_cards) == 1
+            and len(target_lists) == 1
+            and len(test_cards) == 0
+        )
+        return jsonify(overview)
+
+    if len(production_cards) != 1:
+        return jsonify({
+            **overview,
+            "error": "expected exactly one untouched production 02/28 card",
+        }), 409
+    if len(target_lists) != 1:
+        return jsonify({
+            **overview,
+            "error": "expected exactly one existing TEST 2 — OBRAZY list",
+        }), 409
+    if len(test_cards) > 1 or (len(test_cards) == 1 and len(exact_test_cards) != 1):
+        return jsonify({
+            **overview,
+            "error": "ambiguous or duplicate [TEST] 02/28 cards",
+        }), 409
+
+    target_list = target_lists[0]
+    if mode == "apply":
+        if exact_test_cards:
+            card = exact_test_cards[0]
+            card = trello_put_body(f"/cards/{card['id']}", {
+                "name": RIVERDALE_TEST_0228_NAME,
+                "desc": RIVERDALE_TEST_0228_DESC,
+                "idList": target_list["id"],
+            })
+        else:
+            card = trello_post_body("/cards", {
+                "idList": target_list["id"],
+                "name": RIVERDALE_TEST_0228_NAME,
+                "desc": RIVERDALE_TEST_0228_DESC,
+                "pos": "bottom",
+            })
+
+        existing_checklists = trello_get(f"/cards/{card['id']}/checklists", {
+            "fields": "id,name,pos", "checkItems": "all",
+        })
+        for checklist_name, desired_items in RIVERDALE_TEST_0228_CHECKLISTS:
+            matching = [
+                item for item in existing_checklists
+                if item.get("name") == checklist_name
+            ]
+            if len(matching) > 1:
+                return jsonify({
+                    **overview,
+                    "error": f"duplicate checklist: {checklist_name}",
+                    "card_url": card.get("shortUrl"),
+                }), 409
+            if matching:
+                checklist = matching[0]
+            else:
+                checklist = trello_post_body("/checklists", {
+                    "idCard": card["id"],
+                    "name": checklist_name,
+                    "pos": "bottom",
+                })
+                checklist["checkItems"] = []
+                existing_checklists.append(checklist)
+            existing_names = {
+                item.get("name") for item in checklist.get("checkItems", [])
+            }
+            for item_name in desired_items:
+                if item_name not in existing_names:
+                    trello_post_body(
+                        f"/checklists/{checklist['id']}/checkItems",
+                        {"name": item_name, "pos": "bottom"},
+                    )
+
+    current_cards = trello_get(f"/boards/{board['id']}/cards", {
+        "fields": "id,name,desc,idList,shortUrl,closed",
+        "filter": "open",
+        "limit": 1000,
+    })
+    current_test_cards = [
+        card for card in current_cards
+        if re.match(
+            r"^\s*\[TEST\]\s*0?2\s*/\s*0?28(?:\D|$)",
+            card.get("name", ""),
+            re.I,
+        )
+    ]
+    if len(current_test_cards) != 1:
+        return jsonify({
+            **overview,
+            "error": "audit expected exactly one [TEST] 02/28 card",
+            "audit_test_card_count": len(current_test_cards),
+        }), 409
+
+    current_card = trello_get(f"/cards/{current_test_cards[0]['id']}", {
+        "fields": "id,name,desc,idList,shortUrl,closed",
+    })
+    audit = riverdale_test_0228_audit(current_card, target_list)
+    status_code = 200 if audit["valid"] else 409
+    return jsonify({
+        "status": "applied-and-audited" if mode == "apply" else "audit",
+        "board": overview["board"],
+        "production_02_28_untouched": production_cards[0]["id"] != current_card["id"],
+        "test_02_28_count": len(current_test_cards),
+        "duplicate_test_02_28_count": max(0, len(current_test_cards) - 1),
+        "audit": audit,
+    }), status_code
+
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
