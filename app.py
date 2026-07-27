@@ -5305,6 +5305,8 @@ def trello_card_has_attachment(card_id, target_url):
 
 @app.route("/api/link-riverdale-test-02-28-guitar", methods=["POST"])
 def link_riverdale_test_02_28_guitar():
+    return jsonify({"error": "completed one-off endpoint disabled"}), 410
+
     if request.headers.get("X-Test-Key") != RIVERDALE_GUITAR_LINK_KEY:
         return jsonify({"error": "forbidden"}), 403
     mode = request.args.get("mode", "dry-run")
