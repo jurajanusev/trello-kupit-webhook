@@ -5762,7 +5762,15 @@ def audit_cierny_kamen_import():
     }
     registry_cards = [
         card for card in cards
-        if card.get("idList") in registry_list_ids and not card.get("closed")
+        if card.get("idList") in registry_list_ids
+    ]
+    active_registry_cards = [
+        card for card in registry_cards
+        if not card.get("closed")
+        and not lists_by_id.get(card.get("idList"), {}).get("closed")
+    ]
+    archived_registry_cards = [
+        card for card in registry_cards if card not in active_registry_cards
     ]
     registry_identities = {}
     for card in registry_cards:
@@ -5879,13 +5887,19 @@ def audit_cierny_kamen_import():
             ],
         },
         "registries": {
-            "open_cards": len(registry_cards),
+            "total_cards": len(registry_cards),
+            "active_cards": len(active_registry_cards),
+            "archived_cards": len(archived_registry_cards),
             "unique_identities": len(registry_identities),
             "duplicate_identities": registry_duplicates,
             "cards_sample": [
                 {
                     "name": card["name"], "url": card.get("shortUrl"),
                     "list": lists_by_id.get(card.get("idList"), {}).get("name"),
+                    "card_closed": card.get("closed"),
+                    "list_closed": lists_by_id.get(
+                        card.get("idList"), {}
+                    ).get("closed"),
                 }
                 for card in registry_cards[:100]
             ],
