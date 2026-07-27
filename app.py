@@ -5603,6 +5603,265 @@ def link_riverdale_test_02_28_guitar():
     }), 200 if valid else 409
 
 
+CIERNY_KAMEN_AUDIT_KEY = "cierny-kamen-audit-27jul-31e7c4a9"
+
+
+def cierny_kamen_audit_folded(value):
+    normalized = unicodedata.normalize("NFKD", value or "")
+    normalized = "".join(
+        character for character in normalized
+        if not unicodedata.combining(character)
+    ).casefold()
+    return re.sub(r"\s+", " ", normalized).strip()
+
+
+def cierny_kamen_scene_name_info(name):
+    test_match = re.match(
+        r"^\s*(?P<tags>(?:\[[^\]]*test[^\]]*\]\s*)+)"
+        r"(?P<episode>\d+)\s*/\s*(?P<scene>\d+)\s*(?P<tag>[A-Za-z]*)\b",
+        name or "",
+        flags=re.I,
+    )
+    production_match = re.match(
+        r"^\s*(?P<episode>\d+)\s*/\s*(?P<scene>\d+)\s*(?P<tag>[A-Za-z]*)\b",
+        name or "",
+        flags=re.I,
+    )
+    match = test_match or production_match
+    if not match:
+        return None
+    return {
+        "scene_id": (
+            f"{int(match.group('episode')):02d}/"
+            f"{int(match.group('scene')):02d}"
+            f"{(match.group('tag') or '').upper()}"
+        ),
+        "test": bool(test_match),
+    }
+
+
+@app.route("/api/audit-cierny-kamen-import", methods=["GET"])
+def audit_cierny_kamen_import():
+    if request.headers.get("X-Audit-Key") != CIERNY_KAMEN_AUDIT_KEY:
+        return jsonify({"error": "forbidden"}), 403
+
+    board = trello_get("/boards/CzuD55PR", {"fields": "id,name,url,closed"})
+    lists = trello_get(f"/boards/{board['id']}/lists", {
+        "fields": "id,name,pos,closed", "filter": "all",
+    })
+    labels = trello_get(f"/boards/{board['id']}/labels", {
+        "fields": "id,name,color", "limit": 1000,
+    })
+    cards = trello_get(f"/boards/{board['id']}/cards", {
+        "fields": "id,name,desc,idList,shortUrl,closed",
+        "filter": "all", "limit": 1000,
+    })
+    lists_by_id = {item["id"]: item for item in lists}
+
+    list_counts = {
+        item["id"]: {"open": 0, "closed": 0, "total": 0}
+        for item in lists
+    }
+    for card in cards:
+        counts = list_counts.setdefault(
+            card.get("idList"), {"open": 0, "closed": 0, "total": 0}
+        )
+        counts["closed" if card.get("closed") else "open"] += 1
+        counts["total"] += 1
+
+    scene_cards = []
+    for card in cards:
+        info = cierny_kamen_scene_name_info(card.get("name", ""))
+        if not info:
+            continue
+        scene_cards.append({
+            **card,
+            **info,
+            "list_name": lists_by_id.get(card.get("idList"), {}).get("name"),
+        })
+    production_scenes = [card for card in scene_cards if not card["test"]]
+    test_scenes = [card for card in scene_cards if card["test"]]
+
+    def duplicate_scene_ids(items):
+        by_id = {}
+        for card in items:
+            by_id.setdefault(card["scene_id"], []).append(card)
+        return [
+            {
+                "scene_id": scene_id,
+                "count": len(group),
+                "cards": [
+                    {
+                        "name": card["name"], "url": card.get("shortUrl"),
+                        "list": card.get("list_name"), "closed": card.get("closed"),
+                    }
+                    for card in group
+                ],
+            }
+            for scene_id, group in sorted(by_id.items())
+            if len(group) > 1
+        ]
+
+    def list_name_has(item, markers):
+        folded_name = cierny_kamen_audit_folded(item.get("name", ""))
+        return any(marker in folded_name for marker in markers)
+
+    open_lists = [item for item in lists if not item.get("closed")]
+    scene_target_candidates = [
+        item for item in open_lists
+        if list_name_has(item, ("scenare", "obrazy", "vsetky epizody"))
+        and "test" not in cierny_kamen_audit_folded(item["name"])
+        and not list_name_has(item, ("natocene", "todo", "register", "rekviz"))
+    ]
+    prop_registry_candidates = [
+        item for item in open_lists
+        if list_name_has(item, ("register rekviz", "nadvazne rekviz", "rekvizity"))
+        and "test" not in cierny_kamen_audit_folded(item["name"])
+    ]
+    set_registry_candidates = [
+        item for item in open_lists
+        if list_name_has(item, (
+            "register set", "nadvazny set", "nadvazne set",
+            "set register", "scenograf",
+        ))
+        and "test" not in cierny_kamen_audit_folded(item["name"])
+    ]
+    test_lists = [
+        item for item in lists
+        if "test" in cierny_kamen_audit_folded(item["name"])
+    ]
+
+    desired_labels = {}
+    for desired_name in ("Nadväzná rekvizita", "Nadväzný set", "Auto"):
+        desired_folded = cierny_kamen_audit_folded(desired_name)
+        matches = [
+            label for label in labels
+            if cierny_kamen_audit_folded(label.get("name")) == desired_folded
+        ]
+        desired_labels[desired_name] = {
+            "count": len(matches),
+            "matches": [
+                {"id": label["id"], "name": label.get("name"),
+                 "color": label.get("color")}
+                for label in matches
+            ],
+        }
+
+    registry_list_ids = {
+        item["id"] for item in prop_registry_candidates + set_registry_candidates
+    }
+    registry_cards = [
+        card for card in cards
+        if card.get("idList") in registry_list_ids and not card.get("closed")
+    ]
+    registry_identities = {}
+    for card in registry_cards:
+        identity_match = re.search(
+            r"\*\*IDENTITA:\*\*\s*`?([^`\n]+)",
+            card.get("desc", ""),
+            flags=re.I,
+        )
+        identity = (
+            identity_match.group(1).strip()
+            if identity_match else re.sub(
+                r"^\s*(?:\[[^\]]+\]\s*)+", "", card.get("name", "")
+            ).strip()
+        )
+        identity_key = cierny_kamen_audit_folded(identity)
+        registry_identities.setdefault(identity_key, []).append({
+            "id": card["id"], "name": card["name"], "url": card.get("shortUrl"),
+            "list": lists_by_id.get(card.get("idList"), {}).get("name"),
+            "identity": identity,
+        })
+    registry_duplicates = [
+        {"identity": identity, "count": len(group), "cards": group}
+        for identity, group in sorted(registry_identities.items())
+        if identity and len(group) > 1
+    ]
+
+    return jsonify({
+        "status": "read-only-audit",
+        "board": {
+            "id": board["id"], "name": board["name"], "url": board.get("url"),
+            "closed": board.get("closed"),
+        },
+        "cards_total": len(cards),
+        "cards_open": sum(not card.get("closed") for card in cards),
+        "cards_closed": sum(bool(card.get("closed")) for card in cards),
+        "lists": [
+            {
+                "id": item["id"], "name": item["name"],
+                "closed": item.get("closed"), "pos": item.get("pos"),
+                **list_counts.get(item["id"], {}),
+            }
+            for item in sorted(lists, key=lambda entry: entry.get("pos", 0))
+        ],
+        "labels": [
+            {"id": label["id"], "name": label.get("name"),
+             "color": label.get("color")}
+            for label in labels
+        ],
+        "desired_labels": desired_labels,
+        "scene_cards": {
+            "production_total": len(production_scenes),
+            "production_open": sum(not card.get("closed") for card in production_scenes),
+            "production_closed": sum(bool(card.get("closed")) for card in production_scenes),
+            "test_total": len(test_scenes),
+            "test_open": sum(not card.get("closed") for card in test_scenes),
+            "test_closed": sum(bool(card.get("closed")) for card in test_scenes),
+            "production_sample": [
+                {
+                    "scene_id": card["scene_id"], "name": card["name"],
+                    "url": card.get("shortUrl"), "list": card.get("list_name"),
+                    "closed": card.get("closed"),
+                }
+                for card in production_scenes[:30]
+            ],
+            "test_cards": [
+                {
+                    "scene_id": card["scene_id"], "name": card["name"],
+                    "url": card.get("shortUrl"), "list": card.get("list_name"),
+                    "closed": card.get("closed"),
+                }
+                for card in test_scenes
+            ],
+            "production_duplicate_ids": duplicate_scene_ids(production_scenes),
+            "all_duplicate_ids": duplicate_scene_ids(scene_cards),
+        },
+        "targets": {
+            "scene_candidates": [
+                {"id": item["id"], "name": item["name"]}
+                for item in scene_target_candidates
+            ],
+            "prop_registry_candidates": [
+                {"id": item["id"], "name": item["name"]}
+                for item in prop_registry_candidates
+            ],
+            "set_registry_candidates": [
+                {"id": item["id"], "name": item["name"]}
+                for item in set_registry_candidates
+            ],
+            "test_lists": [
+                {"id": item["id"], "name": item["name"],
+                 "closed": item.get("closed"), **list_counts.get(item["id"], {})}
+                for item in test_lists
+            ],
+        },
+        "registries": {
+            "open_cards": len(registry_cards),
+            "unique_identities": len(registry_identities),
+            "duplicate_identities": registry_duplicates,
+            "cards_sample": [
+                {
+                    "name": card["name"], "url": card.get("shortUrl"),
+                    "list": lists_by_id.get(card.get("idList"), {}).get("name"),
+                }
+                for card in registry_cards[:100]
+            ],
+        },
+    })
+
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
