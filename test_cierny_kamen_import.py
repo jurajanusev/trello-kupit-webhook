@@ -119,6 +119,16 @@ class CiernyKamenPayloadTest(unittest.TestCase):
                 self.assertNotIn("karta obrazu zatiaľ", description)
                 self.assertLess(len(description), 16384)
 
+    def test_completed_import_endpoint_is_gone(self):
+        response = app.app.test_client().post(
+            "/api/import-cierny-kamen",
+            headers={"X-Import-Key": app.CIERNY_KAMEN_IMPORT_KEY},
+        )
+        self.assertEqual(response.status_code, 410)
+        self.assertEqual(
+            response.json["error"], "completed import endpoint disabled"
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

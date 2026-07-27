@@ -6602,6 +6602,8 @@ def cierny_kamen_registry_urls(payload, state):
 
 @app.route("/api/import-cierny-kamen", methods=["POST"])
 def import_cierny_kamen():
+    return jsonify({"error": "completed import endpoint disabled"}), 410
+
     if request.headers.get("X-Import-Key") != CIERNY_KAMEN_IMPORT_KEY:
         return jsonify({"error": "forbidden"}), 403
     payload = cierny_kamen_import_payload()
