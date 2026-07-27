@@ -7325,6 +7325,8 @@ def cierny_kamen_fix_scene_sets(
 
 @app.route("/api/fix-cierny-kamen-set-continuity", methods=["POST"])
 def fix_cierny_kamen_set_continuity():
+    return jsonify({"error": "completed SET fix endpoint disabled"}), 410
+
     if request.headers.get("X-Fix-Key") != CIERNY_KAMEN_SET_FIX_KEY:
         return jsonify({"error": "forbidden"}), 403
     payload = cierny_kamen_import_payload()

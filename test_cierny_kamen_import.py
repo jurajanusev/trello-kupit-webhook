@@ -155,6 +155,16 @@ class CiernyKamenPayloadTest(unittest.TestCase):
         )
         self.assertTrue(merged.endswith("nová akcia"))
 
+    def test_completed_set_fix_endpoint_is_gone(self):
+        response = app.app.test_client().post(
+            "/api/fix-cierny-kamen-set-continuity",
+            headers={"X-Fix-Key": app.CIERNY_KAMEN_SET_FIX_KEY},
+        )
+        self.assertEqual(response.status_code, 410)
+        self.assertEqual(
+            response.json["error"], "completed SET fix endpoint disabled"
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
