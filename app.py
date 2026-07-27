@@ -5103,6 +5103,9 @@ def create_riverdale_test_02_28():
             {"id": target_lists[0]["id"], "name": target_lists[0]["name"]}
             if len(target_lists) == 1 else None
         ),
+        "will_create_target_list": (
+            len(target_lists) == 0 and len(safe_test_lists) == 0
+        ),
         "test_02_28_count": len(test_cards),
         "exact_test_02_28_count": len(exact_test_cards),
         "duplicate_test_02_28_count": max(0, len(test_cards) - 1),
@@ -5125,7 +5128,10 @@ def create_riverdale_test_02_28():
         overview["collision_free"] = len(test_cards) == 0
         overview["ready_to_apply"] = (
             len(production_cards) == 1
-            and len(target_lists) == 1
+            and (
+                len(target_lists) == 1
+                or (len(target_lists) == 0 and len(safe_test_lists) == 0)
+            )
             and len(test_cards) == 0
         )
         return jsonify(overview)
@@ -5135,10 +5141,23 @@ def create_riverdale_test_02_28():
             **overview,
             "error": "expected exactly one untouched production 02/28 card",
         }), 409
+    if (
+        len(target_lists) == 0
+        and len(safe_test_lists) == 0
+        and mode == "apply"
+    ):
+        target_lists = [trello_post_body("/lists", {
+            "idBoard": board["id"],
+            "name": RIVERDALE_TEST_0228_LIST,
+            "pos": "bottom",
+        })]
     if len(target_lists) != 1:
         return jsonify({
             **overview,
-            "error": "expected exactly one existing TEST 2 — OBRAZY list",
+            "error": (
+                "expected exactly one TEST 2 — OBRAZY list, or no safe test "
+                "list so apply can create it"
+            ),
         }), 409
     if len(test_cards) > 1 or (len(test_cards) == 1 and len(exact_test_cards) != 1):
         return jsonify({
