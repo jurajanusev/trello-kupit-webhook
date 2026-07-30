@@ -129,12 +129,19 @@ class CiernyKamenPdfMigrationTest(unittest.TestCase):
                 ),
             )
 
-    def test_migration_endpoint_rejects_wrong_key_before_network(self):
+    def test_completed_migration_endpoint_is_disabled(self):
         response = app.app.test_client().post(
             "/api/migrate-cierny-kamen-pdfs",
-            headers={"X-PDF-Migration-Key": "wrong"},
+            headers={
+                "X-PDF-Migration-Key":
+                    "cierny-kamen-pdf-migration-30jul-4f7c2a91"
+            },
         )
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 410)
+        self.assertEqual(
+            response.json["error"],
+            "completed PDF migration endpoint disabled",
+        )
 
 
 if __name__ == "__main__":

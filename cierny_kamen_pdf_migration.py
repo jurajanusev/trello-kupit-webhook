@@ -410,6 +410,8 @@ def register_routes(flask_app, api):
 
     @flask_app.route("/api/migrate-cierny-kamen-pdfs", methods=["POST"])
     def migrate_cierny_kamen_pdfs():
+        return jsonify({"error": "completed PDF migration endpoint disabled"}), 410
+
         if request.headers.get("X-PDF-Migration-Key") != KEY:
             return jsonify({"error": "forbidden"}), 403
         phase = request.args.get("phase", "overview").strip().casefold()
