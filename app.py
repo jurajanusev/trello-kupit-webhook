@@ -6357,10 +6357,13 @@ def cierny_kamen_scene_description(scene, prop_urls, set_urls):
     if not links:
         links = ["- Bez samostatného odkazu."]
     characters = ", ".join(scene["characters"]) or "neuvedené"
+    source = scene.get("source_pdf") or (
+        f"Čierny Kameň – scenár epizódy {scene['episode']:02d}"
+    )
     return (
         "<!-- CIERNY-KAMEN-SCHEDULE-METADATA:START -->\n"
         f"ČÍSLO OBRAZU: {scene['scene_id']}\n"
-        f"ZDROJ: Čierny Kameň – scenár epizódy {scene['episode']:02d}\n"
+        f"ZDROJ: {source}\n"
         "NATÁČACÍ DEŇ: nenaplánované\n"
         "DÁTUM: nenaplánované\n"
         "PORADIE: nenaplánované\n"
@@ -7832,6 +7835,11 @@ def fix_cierny_kamen_n_marker():
         "writes": result["counts"]["changed"] if phase == "apply" else 0,
         **result,
     }), 200
+
+
+from cierny_kamen_pdf_migration import register_routes
+
+register_routes(app, globals())
 
 
 if __name__ == "__main__":

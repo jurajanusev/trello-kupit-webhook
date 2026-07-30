@@ -1,0 +1,197 @@
+{
+  "totals": {
+    "matched": 261,
+    "renamed": 1,
+    "created": 52,
+    "removed": 0,
+    "content_changed": 38,
+    "title_changed": 4
+  },
+  "episodes": [
+    {
+      "episode": 1,
+      "old": 52,
+      "new": 52,
+      "matched": 52,
+      "renames": [
+        {
+          "from": "01/12FLASH",
+          "to": "01/12LP"
+        }
+      ],
+      "added": [],
+      "removed": [],
+      "content_changed_count": 9,
+      "content_changed": [
+        "01/01",
+        "01/18",
+        "01/21",
+        "01/23",
+        "01/27FLASH",
+        "01/30",
+        "01/33",
+        "01/34",
+        "01/52"
+      ],
+      "title_changed_count": 0,
+      "title_changed": []
+    },
+    {
+      "episode": 2,
+      "old": 60,
+      "new": 60,
+      "matched": 60,
+      "renames": [],
+      "added": [],
+      "removed": [],
+      "content_changed_count": 6,
+      "content_changed": [
+        "02/02FLASH",
+        "02/25",
+        "02/34",
+        "02/36",
+        "02/49",
+        "02/58"
+      ],
+      "title_changed_count": 0,
+      "title_changed": []
+    },
+    {
+      "episode": 3,
+      "old": 55,
+      "new": 55,
+      "matched": 55,
+      "renames": [],
+      "added": [],
+      "removed": [],
+      "content_changed_count": 12,
+      "content_changed": [
+        "03/07",
+        "03/15",
+        "03/29",
+        "03/30",
+        "03/33",
+        "03/38",
+        "03/44",
+        "03/45",
+        "03/47LP",
+        "03/49LP",
+        "03/50",
+        "03/55LP"
+      ],
+      "title_changed_count": 3,
+      "title_changed": [
+        "03/47LP",
+        "03/49LP",
+        "03/50"
+      ]
+    },
+    {
+      "episode": 4,
+      "old": 49,
+      "new": 49,
+      "matched": 49,
+      "renames": [],
+      "added": [],
+      "removed": [],
+      "content_changed_count": 5,
+      "content_changed": [
+        "04/17",
+        "04/20",
+        "04/26",
+        "04/39",
+        "04/50"
+      ],
+      "title_changed_count": 0,
+      "title_changed": []
+    },
+    {
+      "episode": 5,
+      "old": 45,
+      "new": 45,
+      "matched": 45,
+      "renames": [],
+      "added": [],
+      "removed": [],
+      "content_changed_count": 6,
+      "content_changed": [
+        "05/14",
+        "05/17",
+        "05/32",
+        "05/33LP",
+        "05/34",
+        "05/47LP"
+      ],
+      "title_changed_count": 1,
+      "title_changed": [
+        "05/32"
+      ]
+    },
+    {
+      "episode": 6,
+      "old": 0,
+      "new": 52,
+      "matched": 0,
+      "renames": [],
+      "added": [
+        "06/01FLASH",
+        "06/02",
+        "06/03",
+        "06/04",
+        "06/05",
+        "06/06",
+        "06/07",
+        "06/08",
+        "06/09",
+        "06/10",
+        "06/11",
+        "06/12",
+        "06/13",
+        "06/14",
+        "06/15",
+        "06/16",
+        "06/17",
+        "06/18LP",
+        "06/19",
+        "06/20",
+        "06/21",
+        "06/22",
+        "06/23FLASH",
+        "06/24LP",
+        "06/25LP",
+        "06/26",
+        "06/27",
+        "06/28",
+        "06/29",
+        "06/30",
+        "06/31",
+        "06/32",
+        "06/33",
+        "06/34",
+        "06/35",
+        "06/36",
+        "06/37",
+        "06/38",
+        "06/39",
+        "06/40",
+        "06/41LP",
+        "06/42LP",
+        "06/43",
+        "06/44",
+        "06/45",
+        "06/46",
+        "06/47",
+        "06/48",
+        "06/49",
+        "06/50",
+        "06/51",
+        "06/52LP"
+      ],
+      "removed": [],
+      "content_changed_count": 0,
+      "content_changed": [],
+      "title_changed_count": 0,
+      "title_changed": []
+    }
+  ]
+}
