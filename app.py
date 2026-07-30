@@ -6167,8 +6167,12 @@ CIERNY_KAMEN_IMPORT_CHECKLISTS = [
 
 
 def cierny_kamen_import_payload():
+    from cierny_kamen_prop_identities import apply_identity_map
+
     path = Path(__file__).with_name("cierny_kamen_pdf_payload.json")
-    return json.loads(path.read_text(encoding="utf-8"))
+    return apply_identity_map(
+        json.loads(path.read_text(encoding="utf-8"))
+    )
 
 
 def cierny_kamen_import_state(payload):
@@ -7840,6 +7844,10 @@ def fix_cierny_kamen_n_marker():
 from cierny_kamen_pdf_migration import register_routes
 
 register_routes(app, globals())
+
+from cierny_kamen_prop_identity_repair import register_routes as register_prop_identity_routes
+
+register_prop_identity_routes(app, globals())
 
 
 if __name__ == "__main__":
