@@ -172,6 +172,28 @@ def register_routes(flask_app, api):
 
         overview = repair.registry_overview(raw, payload, state)
         if phase == "overview":
+            marker_diagnostics = [
+                {
+                    "name": card.get("name"),
+                    "url": card.get("shortUrl"),
+                    "closed": card.get("closed"),
+                    "list": state["lists_by_id"].get(
+                        card.get("idList"), {}
+                    ).get("name"),
+                    "marker_line": next(
+                        (
+                            line for line in (card.get("desc") or "").splitlines()
+                            if "CIERNY-KAMEN" in line
+                        ),
+                        None,
+                    ),
+                }
+                for card in state["cards"]
+                if (
+                    "CIERNY-KAMEN" in (card.get("desc") or "")
+                    or card.get("idList") == audit["prop_lists"][0]["id"]
+                )
+            ]
             samples = []
             for scene_id in SAMPLE_IDS:
                 scene = by_id[scene_id]
@@ -238,6 +260,7 @@ def register_routes(flask_app, api):
                         "url": item["card"].get("shortUrl"),
                     } for item in overview["stale"]
                 ],
+                "registry_diagnostics": marker_diagnostics,
                 "samples": samples,
                 "writes": 0,
             })
