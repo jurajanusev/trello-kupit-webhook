@@ -140,6 +140,10 @@ def register_routes(flask_app, api):
         "/api/repair-cierny-kamen-prop-identities", methods=["POST"]
     )
     def repair_cierny_kamen_prop_identities():
+        return jsonify({
+            "error": "completed prop identity repair endpoint disabled"
+        }), 410
+
         if request.headers.get("X-Prop-Identity-Key") != KEY:
             return jsonify({"error": "forbidden"}), 403
         phase = request.args.get("phase", "overview").strip().casefold()

@@ -164,6 +164,13 @@ class PropIdentityMapTests(unittest.TestCase):
             {"alexova-gitara": [card]},
         )
 
+    def test_completed_repair_endpoint_is_disabled(self):
+        response = app.app.test_client().post(
+            "/api/repair-cierny-kamen-prop-identities",
+            headers={"X-Prop-Identity-Key": "irrelevant"},
+        )
+        self.assertEqual(response.status_code, 410)
+
 
 if __name__ == "__main__":
     unittest.main()
