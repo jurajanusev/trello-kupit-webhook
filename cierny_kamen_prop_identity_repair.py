@@ -51,7 +51,7 @@ class PropRepair(Migration):
         )
 
     def marker_cards(self, state, kind):
-        prefix = f"<!-- CIERNY-KAMEN-{kind}-REGISTRY:"
+        prefix = f"<!-- CIERNY-KAMEN-REGISTRY:{kind}:"
         result = {}
         for card in state["cards"]:
             if card.get("closed"):

@@ -153,6 +153,17 @@ class PropIdentityMapTests(unittest.TestCase):
         self.assertIn("### RUČNÉ DOPLNENIA\nMANUAL", result)
         self.assertTrue(result.endswith("### AKCIA A DIALÓGY\nVERBATIM"))
 
+    def test_registry_marker_discovery_uses_production_marker_shape(self):
+        repair = PropRepair({"__file__": str(ROOT / "app.py")})
+        card = {
+            "id": "card-1", "closed": False,
+            "desc": "<!-- CIERNY-KAMEN-REGISTRY:PROP:alexova-gitara -->",
+        }
+        self.assertEqual(
+            repair.marker_cards({"cards": [card]}, "PROP"),
+            {"alexova-gitara": [card]},
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
