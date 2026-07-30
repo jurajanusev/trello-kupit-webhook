@@ -147,7 +147,7 @@ class Migration:
         )
         names = [item.get("name") for item in checklists]
         required = self.api["CIERNY_KAMEN_IMPORT_CHECKLISTS"]
-        if names != required:
+        if names != required[:len(names)]:
             return {
                 "errors": [f"checklist order/name mismatch: {names}"],
                 "operations": [],
@@ -167,6 +167,8 @@ class Migration:
         operations = []
         manual_count = 0
         for name in ("REKVIZITY", "SET"):
+            if name not in by_name:
+                continue
             checklist = by_name[name]
             actual_items = sorted(
                 checklist.get("checkItems", []),
@@ -197,20 +199,29 @@ class Migration:
                 ],
                 "add": expected[name],
             })
-        questions = by_name["OTÁZKY NA PORADU"]
-        existing_questions = {
-            item.get("name") for item in questions.get("checkItems", [])
-        }
-        additions = [
-            item for item in expected["OTÁZKY NA PORADU"]
-            if item not in existing_questions
-        ]
-        if additions:
+        if "OTÁZKY NA PORADU" in by_name:
+            questions = by_name["OTÁZKY NA PORADU"]
+            existing_questions = {
+                item.get("name")
+                for item in questions.get("checkItems", [])
+            }
+            additions = [
+                item for item in expected["OTÁZKY NA PORADU"]
+                if item not in existing_questions
+            ]
+            if additions:
+                operations.append({
+                    "type": "append",
+                    "checklist_id": questions["id"],
+                    "name": "OTÁZKY NA PORADU",
+                    "add": additions,
+                })
+        for name in required[len(names):]:
             operations.append({
-                "type": "append",
-                "checklist_id": questions["id"],
-                "name": "OTÁZKY NA PORADU",
-                "add": additions,
+                "type": "create_checklist",
+                "card_id": card["id"],
+                "name": name,
+                "add": expected[name],
             })
         return {
             "errors": [],
@@ -321,7 +332,19 @@ class Migration:
     def apply_checklists(self, operations):
         writes = 0
         for operation in operations:
-            if operation["type"] == "replace":
+            if operation["type"] == "create_checklist":
+                checklist = self.api["trello_post_body"](
+                    f"/cards/{operation['card_id']}/checklists",
+                    {"name": operation["name"], "pos": "bottom"},
+                )
+                writes += 1
+                for name in operation["add"]:
+                    self.api["trello_post_body"](
+                        f"/checklists/{checklist['id']}/checkItems",
+                        {"name": name, "pos": "bottom"},
+                    )
+                    writes += 1
+            elif operation["type"] == "replace":
                 for item in operation["remove"]:
                     self.api["trello_delete"](
                         f"/cards/{operation['card_id']}/checkItem/"
@@ -768,4 +791,3 @@ def register_routes(flask_app, api):
             }), 200
 
         return jsonify({"error": "unknown phase"}), 400
-
