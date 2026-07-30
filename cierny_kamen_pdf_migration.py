@@ -379,6 +379,8 @@ class Migration:
         }
         candidates = []
         for card in state["cards"]:
+            if card.get("closed"):
+                continue
             description = card.get("desc") or ""
             match = re.search(
                 r"<!-- CIERNY-KAMEN-REGISTRY:(PROP|SET):(.*?) -->",
