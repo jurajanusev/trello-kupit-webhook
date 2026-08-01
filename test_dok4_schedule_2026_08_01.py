@@ -2,7 +2,6 @@ import json
 import os
 import unittest
 from pathlib import Path
-from unittest.mock import patch
 
 os.environ.setdefault("TRELLO_KEY", "test-key")
 os.environ.setdefault("TRELLO_TOKEN", "test-token")
@@ -79,35 +78,12 @@ class Dok4AugustScheduleTests(unittest.TestCase):
             "2026-08-14",
         ])
 
-    @patch("app.summarize_dok4_schedule")
-    @patch("app.build_dok4_schedule_state")
-    @patch("app.Dok4ScheduleTrello")
-    def test_endpoint_uses_only_fixed_august_plan(
-        self, trello_class, build_mock, summarize_mock
-    ):
-        build_mock.return_value = {"sentinel": True}
-        summarize_mock.return_value = {"status": "dry-run"}
+    def test_completed_endpoint_is_disabled(self):
         response = app.app.test_client().post(
             "/api/sync-dok4-current-schedule?mode=dry-run&as_of=2026-08-01",
             headers={"X-Sync-Key": app.DOK4_CURRENT_SCHEDULE_KEY},
         )
-        self.assertEqual(response.status_code, 200)
-        args, kwargs = build_mock.call_args
-        self.assertEqual(len(args[1]), 179)
-        self.assertEqual(kwargs, {
-            "source_date": "2026-08-01", "as_of": "2026-08-01"
-        })
-        self.assertEqual(
-            {row["scene_id"] for row in args[1]},
-            {row["scene_id"] for row in ROWS},
-        )
-
-    def test_endpoint_rejects_wrong_as_of(self):
-        response = app.app.test_client().post(
-            "/api/sync-dok4-current-schedule?as_of=2026-08-02",
-            headers={"X-Sync-Key": app.DOK4_CURRENT_SCHEDULE_KEY},
-        )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 410)
 
 
 if __name__ == "__main__":
