@@ -18,7 +18,10 @@ from update_dok4_plan_local import (
 
 app = Flask(__name__)
 
-DOK4_CURRENT_SCHEDULE_KEY = "dok4-current-schedule-25jul-6db82f10"
+DOK4_CURRENT_SCHEDULE_KEY = "dok4-schedule-01aug-4e82c7d1"
+DOK4_CURRENT_SCHEDULE_FILE = "dok4_schedule_2026-08-01.json"
+DOK4_CURRENT_SCHEDULE_AS_OF = "2026-08-01"
+DOK4_CURRENT_SCHEDULE_ROWS = 179
 
 
 @app.errorhandler(requests.HTTPError)
@@ -4762,7 +4765,6 @@ def sync_dok4_current_schedule():
     The active window is the next seven shooting dates on or after ``as_of``.
     Calendar days without shooting never consume a slot.
     """
-    return jsonify({"error": "completed one-off endpoint disabled"}), 410
     if request.headers.get("X-Sync-Key") != DOK4_CURRENT_SCHEDULE_KEY:
         return jsonify({"error": "forbidden"}), 403
 
@@ -4772,20 +4774,33 @@ def sync_dok4_current_schedule():
             "error": "mode must be dry-run, apply, metadata, or window"
         }), 400
 
-    as_of = request.args.get("as_of", "2026-07-25")
+    as_of = request.args.get("as_of", DOK4_CURRENT_SCHEDULE_AS_OF)
+    if as_of != DOK4_CURRENT_SCHEDULE_AS_OF:
+        return jsonify({
+            "error": "this one-off endpoint has a fixed as_of date",
+            "expected_as_of": DOK4_CURRENT_SCHEDULE_AS_OF,
+        }), 400
     schedule_path = os.path.join(
-        os.path.dirname(__file__), "dok4_schedule_2026-07-25.json"
+        os.path.dirname(__file__), DOK4_CURRENT_SCHEDULE_FILE
     )
     with open(schedule_path, "r", encoding="utf-8") as handle:
         schedule_document = json.load(handle)
-    supplement_path = os.path.join(
-        os.path.dirname(__file__), "dok4_schedule_supplement_2026-07-26.json"
-    )
-    with open(supplement_path, "r", encoding="utf-8") as handle:
-        supplement_document = json.load(handle)
 
     source_date = schedule_document.get("source", {}).get("dated", as_of)
-    schedule = supplement_document["rows"] + schedule_document["rows"]
+    schedule = schedule_document["rows"]
+    unique_scene_ids = {row.get("scene_id") for row in schedule}
+    if (
+        source_date != "2026-08-01"
+        or len(schedule) != DOK4_CURRENT_SCHEDULE_ROWS
+        or len(unique_scene_ids) != DOK4_CURRENT_SCHEDULE_ROWS
+        or None in unique_scene_ids
+    ):
+        return jsonify({
+            "error": "schedule source validation failed",
+            "source_date": source_date,
+            "rows": len(schedule),
+            "unique_scene_ids": len(unique_scene_ids),
+        }), 409
     trello = Dok4ScheduleTrello(API_KEY, TOKEN)
     state = build_dok4_schedule_state(
         trello, schedule, source_date=source_date, as_of=as_of
@@ -4803,6 +4818,8 @@ def sync_dok4_current_schedule():
     else:
         result = apply_dok4_schedule(trello, state)
     result.update({
+        "schedule_file": DOK4_CURRENT_SCHEDULE_FILE,
+        "schedule_rows": len(schedule),
         "window_type": "next_shooting_days",
         "window_as_of": as_of,
         "shooting_dates": state["shooting_dates"],
