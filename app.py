@@ -23,6 +23,41 @@ DOK4_CURRENT_SCHEDULE_FILE = "dok4_schedule_2026-08-01.json"
 DOK4_CURRENT_SCHEDULE_AS_OF = "2026-08-01"
 DOK4_CURRENT_SCHEDULE_ROWS = 179
 
+DUNAJ_CURRENT_SCHEDULE_KEY = "dunaj-schedule-01aug-9c4f27b1"
+DUNAJ_CURRENT_SCHEDULE_FILE = "dunaj_schedule_2026-08-01.json"
+DUNAJ_CURRENT_SCHEDULE_AS_OF = "2026-08-02"
+DUNAJ_CURRENT_SOURCE_LABEL = "predbežná dispo DUNAJ 16 z 1. 8. 2026"
+DUNAJ_CURRENT_SOURCE_ROWS = 152
+
+
+def canonicalize_dunaj_schedule_rows(source_rows):
+    """Apply stable user-approved scene aliases and merged-card rules."""
+    schedule_rows = []
+    merged_24 = None
+    for source_row in source_rows:
+        row = dict(source_row)
+        if row["scene_id"] == "23/34F":
+            row["scene_id"] = "23/34FLASH"
+            row["scene"] = "34FLASH"
+        if row["scene_id"] == "24/8A":
+            merged_24 = row
+            continue
+        if row["scene_id"] == "24/8B":
+            if merged_24 is None:
+                raise ValueError("24/8B encountered before 24/8A")
+            merged_24["scene_id"] = "24/8"
+            merged_24["scene"] = "8"
+            merged_24["order_display"] = "8-9"
+            merged_24["location"] = "KABARET - ZÁZEMIE / KABARET"
+            merged_24["characters"] = "René, Lena, Gita"
+            schedule_rows.append(merged_24)
+            merged_24 = None
+            continue
+        schedule_rows.append(row)
+    if merged_24 is not None or len(schedule_rows) != len(source_rows) - 1:
+        raise ValueError("merged scene normalization failed")
+    return schedule_rows
+
 
 @app.errorhandler(requests.HTTPError)
 def handle_requests_http_error(exc):
@@ -3405,14 +3440,35 @@ def find_dunaj_board():
 
 @app.route("/api/sync-dunaj-schedule", methods=["POST"])
 def sync_dunaj_schedule():
-    return jsonify({"error": "completed one-off endpoint disabled"}), 410
-    if request.headers.get("X-Sync-Key") != "dunaj-1516-schedule-21jul-6a4d02c9":
+    if request.headers.get("X-Sync-Key") != DUNAJ_CURRENT_SCHEDULE_KEY:
         return jsonify({"error": "forbidden"}), 403
 
-    as_of = request.args.get("as_of", "2026-07-25")
-    schedule_path = os.path.join(os.path.dirname(__file__), "dunaj_schedule_2026-07-25.json")
+    as_of = request.args.get("as_of", DUNAJ_CURRENT_SCHEDULE_AS_OF)
+    if as_of != DUNAJ_CURRENT_SCHEDULE_AS_OF:
+        return jsonify({
+            "error": "this one-off endpoint has a fixed as_of date",
+            "expected_as_of": DUNAJ_CURRENT_SCHEDULE_AS_OF,
+        }), 400
+    schedule_path = os.path.join(
+        os.path.dirname(__file__), DUNAJ_CURRENT_SCHEDULE_FILE
+    )
     with open(schedule_path, "r", encoding="utf-8") as handle:
-        schedule_rows = json.load(handle)["rows"]
+        schedule_document = json.load(handle)
+    source_schedule_rows = schedule_document["rows"]
+    if (
+        schedule_document.get("source") != DUNAJ_CURRENT_SOURCE_LABEL
+        or len(source_schedule_rows) != DUNAJ_CURRENT_SOURCE_ROWS
+        or len({row.get("scene_id") for row in source_schedule_rows})
+        != DUNAJ_CURRENT_SOURCE_ROWS
+    ):
+        return jsonify({"error": "schedule source validation failed"}), 409
+
+    # Persistent user-approved canonicalization rules. The production cards use
+    # FLASH in full and one combined 24/08 card for both A/B schedule rows.
+    try:
+        schedule_rows = canonicalize_dunaj_schedule_rows(source_schedule_rows)
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 409
     shooting_dates = sorted({
         row["shooting_date"] for row in schedule_rows
         if row["shooting_date"] >= as_of
@@ -3559,10 +3615,10 @@ def sync_dunaj_schedule():
         expected_list = target_names[row["shooting_date"]]
         expected_fragments = [
             f"**ČÍSLO OBRAZU:** {row['scene_id']}",
-            "**ZDROJ:** predbežná dispo DUNAJ 16 z 25. 7. 2026",
+            f"**ZDROJ:** {DUNAJ_CURRENT_SOURCE_LABEL}",
             f"**NATÁČACÍ DEŇ:** {row['shooting_day']}",
             f"**DÁTUM NATÁČANIA:** {row['shooting_date']}",
-            f"**PORADIE DŇA:** {row['order']}",
+            f"**PORADIE DŇA:** {row.get('order_display', row['order'])}",
             f"**UNIT:** {row['unit']}",
         ]
         fields = []
@@ -3578,6 +3634,43 @@ def sync_dunaj_schedule():
             window_pending_updates.append({
                 "scene_id": row["scene_id"], "date": row["shooting_date"],
                 "order": row["order"], "fields": fields, "url": card["shortUrl"],
+            })
+
+    start_marker = "<!-- DUNAJ-SCHEDULE-METADATA:START -->"
+    end_marker = "<!-- DUNAJ-SCHEDULE-METADATA:END -->"
+
+    def expected_schedule_description(card, row):
+        metadata = (
+            f"{start_marker}\n"
+            f"**ČÍSLO OBRAZU:** {row['scene_id']}\n"
+            f"**ZDROJ:** {DUNAJ_CURRENT_SOURCE_LABEL}\n"
+            f"**NATÁČACÍ DEŇ:** {row['shooting_day']}\n"
+            f"**DÁTUM NATÁČANIA:** {row['shooting_date']}\n"
+            f"**PORADIE DŇA:** {row.get('order_display', row['order'])}\n"
+            f"**UNIT:** {row['unit']}\n"
+            f"**LOKÁCIA:** {row['location']}\n"
+            f"**POSTAVY:** {row['characters']}\n"
+            f"{end_marker}"
+        )
+        old_desc = card.get("desc", "")
+        if start_marker in old_desc and end_marker in old_desc:
+            pattern = re.escape(start_marker) + r".*?" + re.escape(end_marker)
+            return re.sub(pattern, lambda _: metadata, old_desc, count=1, flags=re.S)
+        return metadata + ("\n\n" + old_desc if old_desc else "")
+
+    metadata_pending_updates = []
+    for item in matched_for_updates:
+        row = item["row"]
+        card = item["card"]
+        fields = []
+        if expected_schedule_description(card, row) != card.get("desc", ""):
+            fields.append("metadata")
+        if (card.get("due") or "")[:10] != row["shooting_date"]:
+            fields.append("due")
+        if fields:
+            metadata_pending_updates.append({
+                "scene_id": row["scene_id"], "fields": fields,
+                "url": card["shortUrl"],
             })
 
     mode = request.args.get("mode", "dry-run")
@@ -3602,6 +3695,9 @@ def sync_dunaj_schedule():
             info["already_correct" if current == target_names[row["shooting_date"]] else "to_move"] += 1
         return jsonify({
             "status": "dry-run", "board": board["name"], "board_url": board["url"],
+            "schedule_file": DUNAJ_CURRENT_SCHEDULE_FILE,
+            "source_schedule_rows": len(source_schedule_rows),
+            "canonical_schedule_rows": len(schedule_rows),
             "open_lists": [item["name"] for item in open_lists.values()],
             "board_list_order": [item["name"] for item in open_lists.values()],
             "existing_date_lists": [
@@ -3630,6 +3726,7 @@ def sync_dunaj_schedule():
             "stale_date_cards": stale_date_cards,
             "window_pending_updates_count": len(window_pending_updates),
             "window_pending_updates": window_pending_updates,
+            "metadata_due_pending_count": len(metadata_pending_updates),
             "window_sample": [{
                 "scene_id": item["row"]["scene_id"], "date": item["row"]["shooting_date"],
                 "matched_scene_id": item["matched_scene_id"], "fallback_match": item["fallback_match"],
@@ -3678,10 +3775,10 @@ def sync_dunaj_schedule():
             metadata = (
                 f"{start_marker}\n"
                 f"**ČÍSLO OBRAZU:** {row['scene_id']}\n"
-                f"**ZDROJ:** predbežná dispo DUNAJ 16 z 25. 7. 2026\n"
+                f"**ZDROJ:** {DUNAJ_CURRENT_SOURCE_LABEL}\n"
                 f"**NATÁČACÍ DEŇ:** {row['shooting_day']}\n"
                 f"**DÁTUM NATÁČANIA:** {row['shooting_date']}\n"
-                f"**PORADIE DŇA:** {row['order']}\n"
+                f"**PORADIE DŇA:** {row.get('order_display', row['order'])}\n"
                 f"**UNIT:** {row['unit']}\n"
                 f"**LOKÁCIA:** {row['location']}\n"
                 f"**POSTAVY:** {row['characters']}\n"
@@ -3852,10 +3949,10 @@ def sync_dunaj_schedule():
             metadata = (
                 f"{start_marker}\n"
                 f"**ČÍSLO OBRAZU:** {row['scene_id']}\n"
-                f"**ZDROJ:** predbežná dispo DUNAJ 16 z 25. 7. 2026\n"
+                f"**ZDROJ:** {DUNAJ_CURRENT_SOURCE_LABEL}\n"
                 f"**NATÁČACÍ DEŇ:** {row['shooting_day']}\n"
                 f"**DÁTUM NATÁČANIA:** {row['shooting_date']}\n"
-                f"**PORADIE DŇA:** {row['order']}\n"
+                f"**PORADIE DŇA:** {row.get('order_display', row['order'])}\n"
                 f"**UNIT:** {row['unit']}\n"
                 f"**LOKÁCIA:** {row['location']}\n"
                 f"**POSTAVY:** {row['characters']}\n"
