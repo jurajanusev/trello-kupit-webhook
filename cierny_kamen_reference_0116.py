@@ -339,7 +339,14 @@ def register_routes(flask_app, api):
             )
             related = related_section(neighbors, scene_cards)
             new_desc = desired_description(before["card"].get("desc") or "", related)
-            parsed_new = parse_description(new_desc)
+            try:
+                parsed_new = parse_description(new_desc)
+            except ValueError as exc:
+                raise ValueError(
+                    f"{exc}; proposed marker counts: "
+                    f"START={new_desc.count(METADATA_START)}, "
+                    f"END={new_desc.count(METADATA_END)}"
+                ) from exc
             set_checklist, set_item = find_target_set_item(before["checklists"])
             location_urls = metadata_location_urls(parsed["metadata"])
             new_set_item = desired_set_item(set_item.get("name") or "", location_urls)
