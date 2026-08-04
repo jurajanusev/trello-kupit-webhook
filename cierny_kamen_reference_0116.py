@@ -342,9 +342,9 @@ def register_routes(flask_app, api):
             set_checklist, set_item = find_target_set_item(before["checklists"])
             location_urls = metadata_location_urls(parsed["metadata"])
             new_set_item = desired_set_item(set_item.get("name") or "", location_urls)
-        except ValueError as exc:
+        except Exception as exc:
             return jsonify({"status": "blocked", "writes": 0,
-                            "blockers": [str(exc)]}), 409
+                            "blockers": [f"{type(exc).__name__}: {exc}"]}), 409
 
         neighbor_result = {
             "same_space": {
