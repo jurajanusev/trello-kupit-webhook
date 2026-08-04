@@ -331,10 +331,15 @@ def mobile_audit(api, payload, state, scene_cards, support):
         ) for token in ("betin", "bety"))
     ]
     master_candidates = []
+    registry_cards = []
     if len(prop_lists) == 1:
-        master_candidates = [
+        registry_cards = [
             card for card in state["cards"]
-            if not card.get("closed") and card.get("idList") == prop_lists[0]["id"]
+            if card.get("idList") == prop_lists[0]["id"]
+        ]
+        master_candidates = [
+            card for card in registry_cards
+            if not card.get("closed")
             and "betin" in normalize_name(card.get("name"))
             and "mobil" in normalize_name(card.get("name"))
         ]
@@ -361,6 +366,10 @@ def mobile_audit(api, payload, state, scene_cards, support):
         "masters": [{"id": card["id"], "name": card.get("name"),
                      "url": card.get("shortUrl")}
                     for card in master_candidates],
+        "registry_cards": [{
+            "id": card["id"], "name": card.get("name"),
+            "url": card.get("shortUrl"), "closed": card.get("closed"),
+        } for card in registry_cards],
         "broad_card_candidates": [{
             "id": card["id"], "name": card.get("name"),
             "url": card.get("shortUrl"), "closed": card.get("closed"),
