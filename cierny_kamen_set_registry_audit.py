@@ -104,9 +104,13 @@ def build_audit(api, payload, state, checklists):
     )
     registry_lists = source_lists + target_lists
     registry_list_ids = {item["id"] for item in registry_lists}
-    masters = [
+    all_registry_cards = [
         card for card in state["cards"]
-        if not card.get("closed") and card.get("idList") in registry_list_ids
+        if card.get("idList") in registry_list_ids
+    ]
+    masters = [card for card in all_registry_cards if not card.get("closed")]
+    archived_registry_cards = [
+        card for card in all_registry_cards if card.get("closed")
     ]
     master_by_url = {
         base_card_url(card.get("shortUrl")): card
@@ -267,6 +271,8 @@ def build_audit(api, payload, state, checklists):
             "n_only_scenes": len(n_scene_ids - label_scene_ids),
             "n_items": sum(item["n_item_count"] for item in details.values()),
             "master_cards": len(masters),
+            "archived_registry_cards": len(archived_registry_cards),
+            "all_registry_cards_including_archived": len(all_registry_cards),
             "mapping_errors": len(errors),
         },
         "scene_ids": {
@@ -276,6 +282,12 @@ def build_audit(api, payload, state, checklists):
         },
         "scenes": [details[scene_id] for scene_id in union],
         "masters": master_summary,
+        "archived_registry_cards": [{
+            "id": card.get("id"), "name": card.get("name"),
+            "url": card.get("shortUrl"), "registry_key": marker_key(card),
+        } for card in sorted(
+            archived_registry_cards, key=lambda item: item.get("name") or ""
+        )],
         "mapping_errors": errors,
         "rename": {
             "from": SOURCE_LIST_NAME, "to": TARGET_LIST_NAME,
@@ -338,4 +350,3 @@ def register_routes(flask_app, api):
             "protected_before": before, "protected_after": after,
             "protected_equal": protected_equal, "valid": valid,
         }), 200 if valid else 409
-
