@@ -5,6 +5,7 @@ from flask import send_from_directory
 from pathlib import Path
 import re
 import requests
+from board_routing import resolve_target_list_id
 import os
 import json
 import unicodedata
@@ -176,16 +177,27 @@ def trello_get(path, params=None):
 
 
 def target_list_id_for_card(card_info):
-    """Resolve the ToDo list for every list on the supported boards."""
-    source_config = BOARD_CONFIG.get(card_info.get("idList"))
-    if source_config:
-        return source_config["target_list_id"]
+    """Resolve a same-board ToDo list for supported production boards."""
 
-    board_info = trello_get(
-        f"/boards/{card_info['idBoard']}",
-        {"fields": "shortLink"}
+    def board_short_link(board_id):
+        board_info = trello_get(
+            f"/boards/{board_id}", {"fields": "shortLink"}
+        )
+        return board_info.get("shortLink")
+
+    def list_board_id(list_id):
+        list_info = trello_get(
+            f"/lists/{list_id}", {"fields": "idBoard"}
+        )
+        return list_info.get("idBoard")
+
+    return resolve_target_list_id(
+        card_info,
+        BOARD_CONFIG,
+        BOARD_TARGET_LISTS,
+        board_short_link,
+        list_board_id,
     )
-    return BOARD_TARGET_LISTS.get(board_info.get("shortLink"))
 
 
 def trello_post(path, params=None):
@@ -7964,6 +7976,10 @@ register_routes(app, globals())
 from cierny_kamen_prop_identity_repair import register_routes as register_prop_identity_routes
 
 register_prop_identity_routes(app, globals())
+
+from dok4_board_guard_repair import register_routes as register_dok4_board_guard_routes
+
+register_dok4_board_guard_routes(app, globals())
 
 
 if __name__ == "__main__":
