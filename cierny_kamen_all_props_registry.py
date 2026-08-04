@@ -2,7 +2,10 @@ from __future__ import annotations
 
 import re
 import unicodedata
+import hashlib
+import json
 from collections import Counter, defaultdict
+from pathlib import Path
 
 from flask import jsonify, request
 
@@ -17,6 +20,7 @@ CATEGORY_LABELS = (
     "Nadväzná rekvizita", "Nadväzný priestor",
 )
 CARD_URL = re.compile(r"https://trello\.com/c/[A-Za-z0-9]+")
+MAP_PATH = Path(__file__).with_name("cierny_kamen_all_props_registry_map.json")
 
 
 def folded(value):
@@ -39,7 +43,7 @@ def register_routes(flask_app, api):
         if request.headers.get("X-All-Props-Key") != KEY:
             return jsonify({"error": "forbidden"}), 403
         mode = request.args.get("mode", "audit").strip().casefold()
-        if mode != "audit":
+        if mode not in {"audit", "dry-run"}:
             return jsonify({"error": "unsupported mode"}), 400
 
         payload = api["cierny_kamen_import_payload"]()
@@ -131,7 +135,7 @@ def register_routes(flask_app, api):
         label_matches = {
             name: exact_named(state["labels"], name) for name in CATEGORY_LABELS
         }
-        return jsonify({
+        result = {
             "status": "audit", "writes": 0,
             "board": {"id": state["board"]["id"],
                       "name": state["board"].get("name"),
@@ -178,5 +182,196 @@ def register_routes(flask_app, api):
                 for name, matches in label_matches.items()
             },
             "active_duplicate_titles": duplicate_titles,
-        }), 200 if not blockers else 409
+        }
+        if mode == "audit" or blockers:
+            return jsonify(result), 200 if not blockers else 409
 
+        identity_map = json.loads(MAP_PATH.read_text(encoding="utf-8"))
+        map_rows = {row["item_id"]: row for row in identity_map["records"]}
+        current_rows = {row["item_id"]: row for row in items}
+        map_errors = []
+        for item_id in sorted(set(map_rows) - set(current_rows)):
+            map_errors.append({"item_id": item_id, "error": "item removed"})
+        for item_id in sorted(set(current_rows) - set(map_rows)):
+            map_errors.append({"item_id": item_id, "error": "new item"})
+        for item_id in sorted(set(map_rows) & set(current_rows)):
+            digest = hashlib.sha256(
+                (current_rows[item_id]["name"] or "").encode("utf-8")
+            ).hexdigest()
+            if digest != map_rows[item_id]["original_name_sha256"]:
+                map_errors.append({
+                    "item_id": item_id,
+                    "scene_id": current_rows[item_id]["scene_id"],
+                    "error": "item text changed since identity review",
+                })
+
+        by_title = defaultdict(list)
+        by_url = {}
+        for card in prop_cards:
+            by_title[folded(card.get("name"))].append(card)
+            if card.get("shortUrl"):
+                by_url[card["shortUrl"]] = card
+
+        rows_by_identity = defaultdict(list)
+        for row in identity_map["records"]:
+            rows_by_identity[row["stable_name"]].append(row)
+        identity_plans = []
+        target_by_identity = {}
+        identity_conflicts = []
+        for stable_name, rows in sorted(rows_by_identity.items()):
+            linked_urls = sorted({
+                row["existing_registry_url"] for row in rows
+                if row.get("existing_registry_url")
+            })
+            title_cards = by_title[folded(stable_name)]
+            open_cards = [card for card in title_cards if not card.get("closed")]
+            closed_cards = [card for card in title_cards if card.get("closed")]
+            target = None
+            action = None
+            conflict = None
+            if len(linked_urls) > 1:
+                conflict = "identity points to multiple existing registry cards"
+            elif linked_urls:
+                target = by_url.get(linked_urls[0])
+                if not target:
+                    conflict = "linked registry card missing from registry list"
+                else:
+                    action = "reuse_open" if not target.get("closed") else "reopen"
+            elif len(open_cards) == 1:
+                target = open_cards[0]
+                action = "reuse_open"
+            elif len(open_cards) > 1:
+                conflict = "duplicate open registry identity"
+            elif len(closed_cards) == 1:
+                target = closed_cards[0]
+                action = "reopen"
+            elif len(closed_cards) > 1:
+                conflict = "multiple archived registry identities"
+            else:
+                action = "create"
+            if conflict:
+                identity_conflicts.append({
+                    "stable_name": stable_name, "error": conflict,
+                    "urls": linked_urls,
+                })
+            categories = sorted({
+                category for row in rows for category in row["categories"]
+            })
+            plan = {
+                "stable_name": stable_name,
+                "occurrences": len(rows),
+                "scene_ids": sorted({row["scene_id"] for row in rows}),
+                "categories": categories,
+                "action": action,
+                "target": None if not target else {
+                    "id": target["id"], "name": target.get("name"),
+                    "url": target.get("shortUrl"),
+                    "closed": target.get("closed"),
+                },
+                "archived_same_title_not_selected": [
+                    card.get("shortUrl") for card in closed_cards
+                    if not target or card["id"] != target["id"]
+                ],
+                "conflict": conflict,
+            }
+            identity_plans.append(plan)
+            target_by_identity[stable_name] = target
+
+        item_plans = []
+        for row in identity_map["records"]:
+            current = current_rows.get(row["item_id"])
+            target = target_by_identity.get(row["stable_name"])
+            target_url = target.get("shortUrl") if target else None
+            current_urls = [] if not current else current["urls"]
+            if row.get("conflict"):
+                action = "manual_conflict_no_write"
+            elif not current:
+                action = "blocked_missing_item"
+            elif target_url and current_urls == [target_url]:
+                action = "unchanged"
+            elif not current_urls:
+                action = "append_registry_url"
+            else:
+                action = "replace_registry_url"
+            item_plans.append({
+                "scene_id": row["scene_id"], "item_id": row["item_id"],
+                "stable_name": row["stable_name"], "action": action,
+                "target_url": target_url,
+                "ambiguity_question": row.get("ambiguity_question"),
+                "conflict": row.get("conflict"),
+            })
+
+        existing_questions = set()
+        for scene_id, card in scene_cards.items():
+            for checklist in exact_named(
+                support["checklists"].get(card["id"], []),
+                "OTĂZKY NA PORADU",
+            ):
+                existing_questions.update(
+                    folded(item.get("name"))
+                    for item in checklist.get("checkItems", [])
+                )
+        proposed_questions = sorted({
+            row["ambiguity_question"] for row in identity_map["records"]
+            if row.get("ambiguity_question")
+        })
+        questions_to_add = [
+            question for question in proposed_questions
+            if folded(question) not in existing_questions
+        ]
+
+        missing_labels = [
+            name for name, matches in label_matches.items() if not matches
+        ]
+        duplicate_labels = {
+            name: len(matches) for name, matches in label_matches.items()
+            if len(matches) > 1
+        }
+        set_label_matches = label_matches["NadvĂ¤znĂ˝ priestor"]
+        set_cards_to_label = []
+        if len(set_label_matches) == 1:
+            set_label_id = set_label_matches[0]["id"]
+            set_cards_to_label = [
+                card.get("shortUrl") for card in set_cards
+                if set_label_id not in card.get("idLabels", [])
+            ]
+        elif not set_label_matches:
+            set_cards_to_label = [card.get("shortUrl") for card in set_cards]
+
+        dry_blockers = list(map_errors) + list(identity_conflicts)
+        if duplicate_labels:
+            dry_blockers.append({"duplicate_labels": duplicate_labels})
+        action_counts = Counter(plan["action"] for plan in identity_plans)
+        item_action_counts = Counter(plan["action"] for plan in item_plans)
+        category_identity_counts = Counter(
+            category for plan in identity_plans for category in plan["categories"]
+        )
+        result.update({
+            "status": "dry-run",
+            "valid": not dry_blockers,
+            "blockers": dry_blockers,
+            "identity_map_stats": identity_map["stats"],
+            "identity_map_errors": map_errors,
+            "identity_plans": identity_plans,
+            "item_plans": item_plans,
+            "identity_conflicts": identity_conflicts,
+            "questions": {
+                "unique_proposed": len(proposed_questions),
+                "to_add": len(questions_to_add),
+                "items": questions_to_add,
+            },
+            "planned_labels": {
+                "create": missing_labels,
+                "duplicates": duplicate_labels,
+                "category_identity_counts": dict(category_identity_counts),
+                "continuity_set_cards_to_label": len(set_cards_to_label),
+                "continuity_set_urls": set_cards_to_label,
+            },
+            "plan_counts": {
+                "identities": len(identity_plans),
+                "identity_actions": dict(action_counts),
+                "item_actions": dict(item_action_counts),
+                "master_auto_blocks_to_refresh": len(identity_plans),
+            },
+        })
+        return jsonify(result), 200 if not dry_blockers else 409

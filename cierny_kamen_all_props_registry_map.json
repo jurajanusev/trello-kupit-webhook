@@ -1,0 +1,3727 @@
+{
+  "project": "Čierny Kameň",
+  "board_ref": "CzuD55PR",
+  "source": "current Trello read-only audit plus six-PDF identity map",
+  "records": [
+    {
+      "scene_id": "01/02LP",
+      "scene_url": "https://trello.com/c/pJv7oYxx",
+      "item_id": "6a6bb4d6d0ff8bdd36704630",
+      "checklist_id": "6a673bcf236d343b6f387aa6",
+      "original_name": "<n> Auto Jakuba a Sáry — Vidíme zábery na nich z rôznych uhlov aj letecký záber na auto. | ← prvý výskyt | TU: Vidíme zábery na nich z rôznych uhlov aj letecký záber na auto. | → 01/03LP: Jakub a Sára prechádzajú autom lesom. | KARTA: https://trello.com/c/ZMsfZapQ",
+      "original_name_sha256": "8715b6cc7621a7a621349db3e185ac6c15aa9ec235a73fbf0088ce8dd2ddffa8",
+      "stable_name": "Auto Jakuba a Sáry",
+      "categories": [
+        "Auto",
+        "Nadväzná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/ZMsfZapQ",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/03LP",
+      "scene_url": "https://trello.com/c/hXMCvDL9",
+      "item_id": "6a6bb4d77b4d7cfe812d198c",
+      "checklist_id": "6a673bd45a0e13ed5ced00aa",
+      "original_name": "<n> Auto Jakuba a Sáry — Jakub a Sára prechádzajú autom lesom. | ← 01/02LP: Vidíme zábery na nich z rôznych uhlov aj letecký záber na auto. | TU: Jakub a Sára prechádzajú autom lesom. | → 01/04LP: Zastavia autom pri rieke. | KARTA: https://trello.com/c/ZMsfZapQ",
+      "original_name_sha256": "63c3246c21c42d2b136829a841add7a5fd44b6ec081c5cc74bc68a11570a8a1c",
+      "stable_name": "Auto Jakuba a Sáry",
+      "categories": [
+        "Auto",
+        "Nadväzná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/ZMsfZapQ",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/04LP",
+      "scene_url": "https://trello.com/c/awFB44W0",
+      "item_id": "6a6bb4d98952797d38c9514f",
+      "checklist_id": "6a673bd8feffcc3cba072291",
+      "original_name": "<n> Auto Jakuba a Sáry — Zastavia autom pri rieke. | ← 01/03LP: Jakub a Sára prechádzajú autom lesom. | TU: Zastavia autom pri rieke. | → ďalší potvrdený obraz neurčený | KARTA: https://trello.com/c/ZMsfZapQ",
+      "original_name_sha256": "9de430932eaa3aa11d227cbb5958f124875df781f2cdb7e15fe966417a10032d",
+      "stable_name": "Auto Jakuba a Sáry",
+      "categories": [
+        "Auto",
+        "Nadväzná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/ZMsfZapQ",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/06LP",
+      "scene_url": "https://trello.com/c/msSsmsjJ",
+      "item_id": "6a71945fbc40caec67ceb03a",
+      "checklist_id": "6a673be155b028889ab17910",
+      "original_name": "čln",
+      "original_name_sha256": "a76a1437abc8c604cd241a32c65690c458cb499593f35e5f3c3eaaa69cfc9473",
+      "stable_name": "Čln Jakuba a Sáry",
+      "categories": [],
+      "evidence": "explicit_manual_item_map",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/06LP",
+      "scene_url": "https://trello.com/c/msSsmsjJ",
+      "item_id": "6a7194669299d97a3395d3f4",
+      "checklist_id": "6a673be155b028889ab17910",
+      "original_name": "veslá",
+      "original_name_sha256": "1006f2db90e7309ed3ab4fa79b880a556150c76801245b57a473cefa72d78b3d",
+      "stable_name": "Veslá v člne Jakuba a Sáry",
+      "categories": [],
+      "evidence": "explicit_manual_item_map",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/06LP",
+      "scene_url": "https://trello.com/c/msSsmsjJ",
+      "item_id": "6a724179c4d0c0e591337b35",
+      "checklist_id": "6a673be155b028889ab17910",
+      "original_name": "↳ Čln Jakuba a Sáry — Jakub vesluje a Sára sedí v člne počas plavby po rieke.",
+      "original_name_sha256": "ca381b19753291b29427d1937065d78211e42bea146e6ea08d2c91f650d1e684",
+      "stable_name": "Čln Jakuba a Sáry",
+      "categories": [],
+      "evidence": "explicit_companion_of:6a71945fbc40caec67ceb03a",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/06LP",
+      "scene_url": "https://trello.com/c/msSsmsjJ",
+      "item_id": "6a7241798298ee69cc46799b",
+      "checklist_id": "6a673be155b028889ab17910",
+      "original_name": "↳ Veslá v člne Jakuba a Sáry — Jakub nimi vesluje počas plavby po rieke.",
+      "original_name_sha256": "2b494313c57922b8e04fac23bba3a728e2e4a6fde85bfce98a549b8d87609c48",
+      "stable_name": "Veslá v člne Jakuba a Sáry",
+      "categories": [],
+      "evidence": "explicit_companion_of:6a7194669299d97a3395d3f4",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/07",
+      "scene_url": "https://trello.com/c/2EyIHV0S",
+      "item_id": "6a719625fdc7c5f40f736f11",
+      "checklist_id": "6a673be52209a7edbd635ed8",
+      "original_name": "výbava pre skautov",
+      "original_name_sha256": "7d1a106e705734be0bad011c0b72e2454ff64050328033af33b273ede8faa5bc",
+      "stable_name": "Výbava Matejovej skupiny na kurz prežitia",
+      "categories": [],
+      "evidence": "explicit_manual_item_map",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/07",
+      "scene_url": "https://trello.com/c/2EyIHV0S",
+      "item_id": "6a72417a8c187648b5ad35b7",
+      "checklist_id": "6a673be52209a7edbd635ed8",
+      "original_name": "↳ Výbava Matejovej skupiny na kurz prežitia — vybavenie skupiny pri výprave do lesa.",
+      "original_name_sha256": "fdec219982d9d5023e71ae2caa79e7e348600e49ca5da54a07bc261e4fa30fc9",
+      "stable_name": "Výbava Matejovej skupiny na kurz prežitia",
+      "categories": [],
+      "evidence": "explicit_companion_of:6a719625fdc7c5f40f736f11",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/08LP",
+      "scene_url": "https://trello.com/c/iXwMKztV",
+      "item_id": "6a71965dfaec94d790c9ceae",
+      "checklist_id": "6a673c00836f477e0cf33fe7",
+      "original_name": "policajny čln",
+      "original_name_sha256": "96044a01b07995072fe2f6606d3386df62a710f19772a08b63d410d6a8abfbe6",
+      "stable_name": "Policajný čln pátracieho tímu",
+      "categories": [
+        "Auto"
+      ],
+      "evidence": "explicit_manual_item_map",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/08LP",
+      "scene_url": "https://trello.com/c/iXwMKztV",
+      "item_id": "6a72417a4a91652a6b79356b",
+      "checklist_id": "6a673c00836f477e0cf33fe7",
+      "original_name": "<n> Policajný čln pátracieho tímu — policajt z člna koordinuje potápačov pri hľadaní Jakubovho tela | ← prvý výskyt | TU: čln je na hladine a koordinuje pátranie | → 01/09: stále pláva na hladine | KARTA: https://trello.com/c/aeJoAeDj",
+      "original_name_sha256": "64555ee8e548286a7af82a68eebb3e3fdb7f5ad541a2c4b6761cd99354b09503",
+      "stable_name": "Policajný čln pátracieho tímu",
+      "categories": [
+        "Auto"
+      ],
+      "evidence": "explicit_companion_of:6a71965dfaec94d790c9ceae",
+      "existing_registry_url": "https://trello.com/c/aeJoAeDj",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/08LP",
+      "scene_url": "https://trello.com/c/iXwMKztV",
+      "item_id": "6a725c71459d8f609d3b5c06",
+      "checklist_id": "6a673c00836f477e0cf33fe7",
+      "original_name": "↳ Potápačská výstroj policajného pátracieho tímu — traja policajní potápači sa vynárajú a ponárajú pri hľadaní Jakubovho tela.",
+      "original_name_sha256": "cae9231b77df4ea7311a2d73a5cef9cae53873ea541a9802a72aefe3866cff02",
+      "stable_name": "Potápačská výstroj policajného pátracieho tímu",
+      "categories": [],
+      "evidence": "explicit_companion_map",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/09",
+      "scene_url": "https://trello.com/c/MhZebBPO",
+      "item_id": "6a6bb4db2486d11785318103",
+      "checklist_id": "6a673c0435b9a67b2e114e7c",
+      "original_name": "Policajné auto pri rieke — V pozadí za nimi vidíme blikajúce policajné auto, komparz a policajtov.",
+      "original_name_sha256": "e1feb3b709c4fb7f54f7e84d37b613baedd1de5d701006c8a4d18ac1b90c3472",
+      "stable_name": "Policajné auto pri rieke",
+      "categories": [
+        "Auto"
+      ],
+      "evidence": "source_record:01/09#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/09",
+      "scene_url": "https://trello.com/c/MhZebBPO",
+      "item_id": "6a719865853d630a4b816323",
+      "checklist_id": "6a673c0435b9a67b2e114e7c",
+      "original_name": "policajne pásky",
+      "original_name_sha256": "f0897f97fc6d5313e408f1a60dcb3bf7ffe59424c5815ffb7eacdf5eac90efd9",
+      "stable_name": "Policajné pásky na brehu rieky",
+      "categories": [],
+      "evidence": "explicit_manual_item_map",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/09",
+      "scene_url": "https://trello.com/c/MhZebBPO",
+      "item_id": "6a719875a0129510eedba095",
+      "checklist_id": "6a673c0435b9a67b2e114e7c",
+      "original_name": "vybava pre novinarov",
+      "original_name_sha256": "231a1a97c424b044e2ef9707bb1fba4a9f3e8aa06d9b9b6e39a1e54122ce212c",
+      "stable_name": "Výbava Alice a Ivana ako miestnych novinárov",
+      "categories": [],
+      "evidence": "explicit_manual_item_map",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/09",
+      "scene_url": "https://trello.com/c/MhZebBPO",
+      "item_id": "6a7198bef4efd47a99107f28",
+      "checklist_id": "6a673c0435b9a67b2e114e7c",
+      "original_name": "notes pre Kelera",
+      "original_name_sha256": "e85f050bef7dc612b1b623732142418e4d6456abb219f619bc14064044bb8c94",
+      "stable_name": "Kelerov notes pri pátraní — 01/09",
+      "categories": [
+        "Dokument"
+      ],
+      "evidence": "explicit_manual_item_map",
+      "existing_registry_url": null,
+      "ambiguity_question": "01/09 — Upresniť konkrétny typ a vzhľad notesu pre Kelera; scenár ho explicitne neuvádza.",
+      "conflict": null
+    },
+    {
+      "scene_id": "01/09",
+      "scene_url": "https://trello.com/c/MhZebBPO",
+      "item_id": "6a719943ae45a59dca37e89d",
+      "checklist_id": "6a673c0435b9a67b2e114e7c",
+      "original_name": "maják na auto/čln",
+      "original_name_sha256": "c9fe24654c6e23f4d15c225bcddef29480a3006b9dc7686388a14fe4e3eb2443",
+      "stable_name": "Neidentifikovaný policajný maják — 01/09",
+      "categories": [],
+      "evidence": "explicit_manual_item_map",
+      "existing_registry_url": null,
+      "ambiguity_question": "01/09 — Upresniť, či ide o maják policajného auta alebo člna.",
+      "conflict": null
+    },
+    {
+      "scene_id": "01/09",
+      "scene_url": "https://trello.com/c/MhZebBPO",
+      "item_id": "6a72417d7d5e3ae0bf98130a",
+      "checklist_id": "6a673c0435b9a67b2e114e7c",
+      "original_name": "<n> Policajný čln pátracieho tímu — policajný čln stále pláva na hladine počas pátrania | ← 01/08LP: policajt z člna koordinuje potápačov | TU: čln pokračuje v pátraní na hladine | → ďalší potvrdený obraz neurčený | KARTA: https://trello.com/c/aeJoAeDj",
+      "original_name_sha256": "938d2a066d3236753e8f0b2f4b93a17e3f38aaee64204169035ebbb8f13cbd52",
+      "stable_name": "Policajný čln pátracieho tímu",
+      "categories": [
+        "Nadväzná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/aeJoAeDj",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/09",
+      "scene_url": "https://trello.com/c/MhZebBPO",
+      "item_id": "6a72417f88957031a3bd9281",
+      "checklist_id": "6a673c0435b9a67b2e114e7c",
+      "original_name": "↳ Policajné pásky na brehu rieky — ohraničujú priestor pátrania po Jakubovi.",
+      "original_name_sha256": "88094709f6b6026a6b53136d2b770d04bf50265714064307156fef0306be7a05",
+      "stable_name": "Policajné pásky na brehu rieky",
+      "categories": [],
+      "evidence": "explicit_companion_of:6a719865853d630a4b816323",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/09",
+      "scene_url": "https://trello.com/c/MhZebBPO",
+      "item_id": "6a72417f04304547a5c92eb4",
+      "checklist_id": "6a673c0435b9a67b2e114e7c",
+      "original_name": "↳ Výbava Alice a Ivana ako miestnych novinárov — používajú ju pri sledovaní diania na brehu rieky.",
+      "original_name_sha256": "65c2f18c04fc81603df45a15829cc5d9b44f5b775e2d579f8bd7216d76028a0d",
+      "stable_name": "Výbava Alice a Ivana ako miestnych novinárov",
+      "categories": [],
+      "evidence": "explicit_companion_of:6a719875a0129510eedba095",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/09",
+      "scene_url": "https://trello.com/c/MhZebBPO",
+      "item_id": "6a725cb48dbbec5ad53dcd55",
+      "checklist_id": "6a673c0435b9a67b2e114e7c",
+      "original_name": "↳ Maják policajného auta pri rieke — bliká na policajnom aute v pozadí počas pátrania po Jakubovi.",
+      "original_name_sha256": "8297942f317e1b373915579d49ab8922d60a12d5b3dbc783c661623cd823aba2",
+      "stable_name": "Neidentifikovaný policajný maják — 01/09",
+      "categories": [],
+      "evidence": "explicit_companion_of:6a719943ae45a59dca37e89d",
+      "existing_registry_url": null,
+      "ambiguity_question": "01/09 — Upresniť, či ide o maják policajného auta alebo člna.",
+      "conflict": null
+    },
+    {
+      "scene_id": "01/10",
+      "scene_url": "https://trello.com/c/NyT9AtMd",
+      "item_id": "6a71998e8737ac1319f5f5d8",
+      "checklist_id": "6a673c09042c89f9bf7af3ba",
+      "original_name": "<o> Dogyho notebook",
+      "original_name_sha256": "fa0b2b36bf016531e8356362481b8028d62436c8dc92411e7a1cf38b6a2be15c",
+      "stable_name": "Dogyho spisovateľský notebook",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "explicit_manual_item_map",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/10",
+      "scene_url": "https://trello.com/c/NyT9AtMd",
+      "item_id": "6a72418039448d6f98d44d87",
+      "checklist_id": "6a673c09042c89f9bf7af3ba",
+      "original_name": "↳ Dogyho spisovateľský notebook — Dogy pri ňom vo Fefe Beef píše román; rovnaký konkrétny kus v ďalších obrazoch nie je potvrdený.",
+      "original_name_sha256": "51b91951696a2037f2f943f71f6056257de95503231c066e9113dafe991c5d99",
+      "stable_name": "Dogyho spisovateľský notebook",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "explicit_companion_of:6a71998e8737ac1319f5f5d8",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/11FLASH",
+      "scene_url": "https://trello.com/c/9eTo4vTr",
+      "item_id": "6a719b1394c726c5945694fd",
+      "checklist_id": "6a673d8d2b09bd2f9c2fa6bd",
+      "original_name": "<n>Sarina šatka z obr. 1/6 1/5 1/4 1/3 1/2",
+      "original_name_sha256": "2dfbd12ea6df4c5fd2824ae31e693d5a027f86ec075376663eefd5bb4c5c73e0",
+      "stable_name": "Sárina šatka — 01/11FLASH",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "explicit_manual_item_map",
+      "existing_registry_url": null,
+      "ambiguity_question": "01/11FLASH — Potvrdiť, v ktorých obrazoch 01/02LP–01/06LP je Sárina šatka fyzicky viditeľná ako rovnaký konkrétny kus.",
+      "conflict": null
+    },
+    {
+      "scene_id": "01/11FLASH",
+      "scene_url": "https://trello.com/c/9eTo4vTr",
+      "item_id": "6a7241812a7a007f2fcae71b",
+      "checklist_id": "6a673d8d2b09bd2f9c2fa6bd",
+      "original_name": "↳ Sárina šatka — pláva vo vode v paralelnom prestrihu k Sárinej verzii udalostí.",
+      "original_name_sha256": "e66f52f0eec7906319cbc2f4a9da817855d9a7688f1bb83e9ff615d7f6e9c46e",
+      "stable_name": "Sárina šatka — 01/11FLASH",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "explicit_companion_of:6a719b1394c726c5945694fd",
+      "existing_registry_url": null,
+      "ambiguity_question": "01/11FLASH — Potvrdiť, v ktorých obrazoch 01/02LP–01/06LP je Sárina šatka fyzicky viditeľná ako rovnaký konkrétny kus.",
+      "conflict": null
+    },
+    {
+      "scene_id": "01/12LP",
+      "scene_url": "https://trello.com/c/5LXun1lb",
+      "item_id": "6a6bb4dd349de1edd3d7f10f",
+      "checklist_id": "6a673d9043c5b10ac217205d",
+      "original_name": "Sárin fotoalbum s Jakubovými fotografiami",
+      "original_name_sha256": "54b7add19b95984cd2b6ad34531a5a1137520754585768e0f79fee9e2ed3b817",
+      "stable_name": "Sárin fotoalbum s Jakubovými fotografiami",
+      "categories": [
+        "Dokument"
+      ],
+      "evidence": "source_record:01/12LP#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/12LP",
+      "scene_url": "https://trello.com/c/5LXun1lb",
+      "item_id": "6a725cbed0ac52a60bb62a6b",
+      "checklist_id": "6a673d9043c5b10ac217205d",
+      "original_name": "↳ Sárin fotoalbum s Jakubovými fotografiami — Sára si ho v izbe prezerá, plače a pozerá Jakubove fotografie.",
+      "original_name_sha256": "68f323ff857865fa3884d4e829a6906aa99751ff7f0de3764f846370ecf6b8fd",
+      "stable_name": "Sárin fotoalbum s Jakubovými fotografiami",
+      "categories": [
+        "Dokument"
+      ],
+      "evidence": "source_record:01/12LP#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/13",
+      "scene_url": "https://trello.com/c/DIe9x2R1",
+      "item_id": "6a6bb4de43b610fbe3a97ba3",
+      "checklist_id": "6a673d9423741948d945de32",
+      "original_name": "Čierna limuzína Laury a Veroniky — Z čiernej limuzíny (SUV vyššej triedy) vystupuje Veronika a s ňou aj jej mama Laura.",
+      "original_name_sha256": "4974d71961d0773b7f5c5f948fd3d536a8533b06bed78d82cd1d97f31bb18f11",
+      "stable_name": "Čierna limuzína Laury a Veroniky",
+      "categories": [
+        "Auto"
+      ],
+      "evidence": "source_record:01/13#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/13",
+      "scene_url": "https://trello.com/c/DIe9x2R1",
+      "item_id": "6a71b12dd19c73c066b975de",
+      "checklist_id": "6a673d9423741948d945de32",
+      "original_name": "kufre? ak anotak priamo navazne do 1/14",
+      "original_name_sha256": "ba795ffe49112897044479a9589fd9d7e78edeb7ec18b70f31d400b1d170ea1a",
+      "stable_name": "Neidentifikované kufre Laury a Veroniky — 01/13",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "explicit_manual_item_map",
+      "existing_registry_url": null,
+      "ambiguity_question": "01/13 — Potvrdiť počet a fyzickú prítomnosť kufrov a ich väzbu na obraz 01/14.",
+      "conflict": null
+    },
+    {
+      "scene_id": "01/14",
+      "scene_url": "https://trello.com/c/37stzKv6",
+      "item_id": "6a71b14b3bb3ecb82450baa3",
+      "checklist_id": "6a673d9675fe0edcd8d79a8e",
+      "original_name": "kufre ? priamo navazne z 1/13",
+      "original_name_sha256": "50c5bb9b254e17885a74ed832f6764e7f55cf04617ff5b77f4340e7cdb05c038",
+      "stable_name": "Neidentifikované kufre Laury a Veroniky — 01/14",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "explicit_manual_item_map",
+      "existing_registry_url": null,
+      "ambiguity_question": "01/14 — Potvrdiť počet a totožnosť kufrov voči obrazu 01/13.",
+      "conflict": null
+    },
+    {
+      "scene_id": "01/15",
+      "scene_url": "https://trello.com/c/C07F3Ao6",
+      "item_id": "6a725cbff7564fde949d1330",
+      "checklist_id": "6a673d991d9f8bf7bd0ab639",
+      "original_name": "↳ Kikovo auto — Kiko a Bety na ňom prichádzajú pred Betin dom; po zastavení obaja vystúpia.",
+      "original_name_sha256": "ef8ea222044ccd4b65c4a6d380e2255eb06051f9d1cc23e175839ff2cb60f0c1",
+      "stable_name": "Kikovo auto",
+      "categories": [
+        "Auto",
+        "Osobná rekvizita"
+      ],
+      "evidence": "explicit_companion_map",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/16",
+      "scene_url": "https://trello.com/c/ggTQvhD2",
+      "item_id": "6a6bb4e25fbb5519bd5e7d84",
+      "checklist_id": "6a673d9c589b3ff1910ab811",
+      "original_name": "Betin osobný mobil — Bety pri tom pozrie na displej mobilu a Kiko jej mobil pre istotu vezme z ruky, aby Alexovi nenapísala a stretnutie nezrušila. | KARTA: https://trello.com/c/5PcusQA3",
+      "original_name_sha256": "801fb48d5e8089e16aaa20ac30f1fe98e30d6c90f146233630b60f4f01b78ee6",
+      "stable_name": "Betin osobný mobil",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/5PcusQA3",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/16",
+      "scene_url": "https://trello.com/c/ggTQvhD2",
+      "item_id": "6a71b4e68238aa681a30a4f7",
+      "checklist_id": "6a673d9c589b3ff1910ab811",
+      "original_name": "infatilna magnetky z Barcelony - I love Barcelona",
+      "original_name_sha256": "1dc0aad5ea39bdafe542aef9064477068f0697076bc4514c326cc1002a0766b1",
+      "stable_name": "Magnetka „I love Barcelona“ pre Kika",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "explicit_manual_item_map",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/16",
+      "scene_url": "https://trello.com/c/ggTQvhD2",
+      "item_id": "6a71fd14acebab2328107900",
+      "checklist_id": "6a673d9c589b3ff1910ab811",
+      "original_name": "↳ Magnetka „I love Barcelona“ pre Kika — Bety ju dá Kikovi ako suvenír z Barcelony; infantilný vzhľad podľa scenára.",
+      "original_name_sha256": "ee85503cbe0e573d6229c80cb1a1bd0f3242501e2ecadc9ad5e6132f701e5e6f",
+      "stable_name": "Magnetka „I love Barcelona“ pre Kika",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "explicit_companion_of:6a71b4e68238aa681a30a4f7",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/17",
+      "scene_url": "https://trello.com/c/cDGOa7JI",
+      "item_id": "6a6bb4e5ed06f9a6de4ac6d2",
+      "checklist_id": "6a673d9f74e033591a04e3a5",
+      "original_name": "Taška s jedlom pre Veroniku — Fefe prinesie zabalenú tašku s jedlom pre Veroniku a položí ju na pult.",
+      "original_name_sha256": "6f525a3955cf3dc32fe7d99fe619082bff154eab3e4e0f3711afe9ade33bd05c",
+      "stable_name": "Taška s jedlom pre Veroniku",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:01/17#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/17",
+      "scene_url": "https://trello.com/c/cDGOa7JI",
+      "item_id": "6a6bb4e48c3b0dd8f82ad697",
+      "checklist_id": "6a673d9f74e033591a04e3a5",
+      "original_name": "Zabalené jedlo pre Veroniku — Fefe prinesie zabalenú tašku s jedlom pre Veroniku a položí ju na pult.",
+      "original_name_sha256": "0242b4f0c3f3f1e2dda96a03d885ff4fea99c1b04c734b5988c383b2f3d386cb",
+      "stable_name": "Zabalené jedlo pre Veroniku",
+      "categories": [],
+      "evidence": "source_record:01/17#2",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/17",
+      "scene_url": "https://trello.com/c/cDGOa7JI",
+      "item_id": "6a71b6331158d41e172d4a08",
+      "checklist_id": "6a673d9f74e033591a04e3a5",
+      "original_name": "Fefeho farebne limonady",
+      "original_name_sha256": "6acb901da2c8dbb83e6436694cd2b6e921d1a0a7b3175617e82dc414cdc2ede5",
+      "stable_name": "Fefeho farebné limonády pre Bety a Alexa",
+      "categories": [],
+      "evidence": "explicit_manual_item_map",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/17",
+      "scene_url": "https://trello.com/c/cDGOa7JI",
+      "item_id": "6a71b6b07593f469c6b731b4",
+      "checklist_id": "6a673d9f74e033591a04e3a5",
+      "original_name": "2ks hamburger",
+      "original_name_sha256": "ad8c924f5f6067fbf31accdbf5d047ba1875c9f3370107bc9e282e6738d668a1",
+      "stable_name": "Dva burgre v objednávke Veroniky",
+      "categories": [],
+      "evidence": "explicit_manual_item_map",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/17",
+      "scene_url": "https://trello.com/c/cDGOa7JI",
+      "item_id": "6a71b6f7a303c93c2f504ce4",
+      "checklist_id": "6a673d9f74e033591a04e3a5",
+      "original_name": "taška na zabalenie hamburgerov take away",
+      "original_name_sha256": "24582b3dffe8182a24738b5b0f9cdf3db1c4bcdd723c5a57acc8225b7905cc3d",
+      "stable_name": "Taška na objednávku Veroniky",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "explicit_manual_item_map",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/17",
+      "scene_url": "https://trello.com/c/cDGOa7JI",
+      "item_id": "6a71b7642006c9e606a0ad71",
+      "checklist_id": "6a673d9f74e033591a04e3a5",
+      "original_name": "pitie a jedlo pre komparz",
+      "original_name_sha256": "dd992abd6f541185b126033da3b146b41ebf4633f3520ffee030b03f36c07b8d",
+      "stable_name": "Neidentifikované občerstvenie komparzu — 01/17",
+      "categories": [],
+      "evidence": "explicit_manual_item_map",
+      "existing_registry_url": null,
+      "ambiguity_question": "01/17 — Upresniť konkrétne pitie, jedlo a počet kusov pre komparz.",
+      "conflict": null
+    },
+    {
+      "scene_id": "01/17",
+      "scene_url": "https://trello.com/c/cDGOa7JI",
+      "item_id": "6a72420844e9b860e8b100fe",
+      "checklist_id": "6a673d9f74e033591a04e3a5",
+      "original_name": "↳ Fefeho farebné limonády pre Bety a Alexa — obaja ich popíjajú počas stretnutia vo Fefe Beef.",
+      "original_name_sha256": "1105d821187b920f6e2470c0c9306c24e340c86d84ee4ad340cda13df8fb1f97",
+      "stable_name": "Fefeho farebné limonády pre Bety a Alexa",
+      "categories": [],
+      "evidence": "explicit_companion_of:6a71b6331158d41e172d4a08",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/17",
+      "scene_url": "https://trello.com/c/cDGOa7JI",
+      "item_id": "6a7242096207dc6a9f0f2b23",
+      "checklist_id": "6a673d9f74e033591a04e3a5",
+      "original_name": "↳ Dva burgre v objednávke Veroniky — Fefe ich pripraví a zabalí na odnesenie.",
+      "original_name_sha256": "0ca8383a99298cd9191677f9acae322f173fa4a30f1e49e93383c5a4fed57feb",
+      "stable_name": "Dva burgre v objednávke Veroniky",
+      "categories": [],
+      "evidence": "explicit_companion_of:6a71b6b07593f469c6b731b4",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/17",
+      "scene_url": "https://trello.com/c/cDGOa7JI",
+      "item_id": "6a724209af99c3e54a433f8f",
+      "checklist_id": "6a673d9f74e033591a04e3a5",
+      "original_name": "↳ Taška na objednávku Veroniky — Fefe do nej zabalí dva burgre a cibuľové krúžky na odnesenie.",
+      "original_name_sha256": "cfbcfcddeef6bbc587d442ffff1585e4b871f20ddc0917efc6a4953ae2d7169c",
+      "stable_name": "Taška na objednávku Veroniky",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "explicit_companion_of:6a71b6f7a303c93c2f504ce4",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/18",
+      "scene_url": "https://trello.com/c/W2LBhwfi",
+      "item_id": "6a6bb4e7319b15acdfe49001",
+      "checklist_id": "6a673da154ff132917100984",
+      "original_name": "Obálka s Alexovou výplatou zo stavby — ALEX Sorry, oci, meškám… Lukáš zamáva s obálkou v ruke.",
+      "original_name_sha256": "b60678218ac68027ff766b6504622d15de387b3e4c364e30929766b5581fc514",
+      "stable_name": "Obálka s Alexovou výplatou zo stavby",
+      "categories": [],
+      "evidence": "source_record:01/18#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/18",
+      "scene_url": "https://trello.com/c/W2LBhwfi",
+      "item_id": "6a6bb4e7644213e47e1b3df1",
+      "checklist_id": "6a673da154ff132917100984",
+      "original_name": "Alexova výplata zo stavby — LUKÁŠ Okej, veď keď nechceš tie peniaze, čo si si zarobil na stavbe, ja si ich nechám… Alex sa poteší.",
+      "original_name_sha256": "6914821c5fabbf19509e7e7dbdc6edd0c043a7f2a8ba7b13b0be103bd616696e",
+      "stable_name": "Alexova výplata zo stavby",
+      "categories": [],
+      "evidence": "source_record:01/18#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/18",
+      "scene_url": "https://trello.com/c/W2LBhwfi",
+      "item_id": "6a6bb4e78a239d136157bc68",
+      "checklist_id": "6a673da154ff132917100984",
+      "original_name": "Alexov školský batoh — Alex sa chystá do školy, do batoha si hodí posledné veci a zazipsuje ho.",
+      "original_name_sha256": "d6dc9c48fc4a5e23b9f263e09953ae43669477ae9674768d05c6bd53cda62b29",
+      "stable_name": "Alexov školský batoh",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:01/18#2",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/19",
+      "scene_url": "https://trello.com/c/FwaHKQR2",
+      "item_id": "6a6bb4e99152a0b6167874e2",
+      "checklist_id": "6a673da5dbadd1276037b4ce",
+      "original_name": "Betin blister s Ritalinom od Alice — Alica jej podáva blister s liekmi Ritalin.",
+      "original_name_sha256": "0011ca948301926a383f22411886ac635e85ca0a8f20e0af71696727a273fffc",
+      "stable_name": "Betin blister s Ritalinom od Alice",
+      "categories": [],
+      "evidence": "source_record:01/19#0",
+      "existing_registry_url": null,
+      "ambiguity_question": "01/19: potvrdiť, či ide o ten istý fyzický blister Ritalinu ako v druhom výskyte 01/19 / 03/47LP; dovtedy sú vedené oddelene bez nadväznosti.",
+      "conflict": null
+    },
+    {
+      "scene_id": "01/19",
+      "scene_url": "https://trello.com/c/FwaHKQR2",
+      "item_id": "6a6bb4e9437cd20da84c66ec",
+      "checklist_id": "6a673da5dbadd1276037b4ce",
+      "original_name": "Betina školská taška — Bety sa chystá do školy, balí si tašku.",
+      "original_name_sha256": "70b2b51ed18d637bf827c6bf94b584a26249dc707d3bebeb76b0fdf90d9e2326",
+      "stable_name": "Betina školská taška",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:01/19#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/22",
+      "scene_url": "https://trello.com/c/jxbcKcVA",
+      "item_id": "6a6bb4ec8ffb1744c15187a1",
+      "checklist_id": "6a673db850850970e391d39c",
+      "original_name": "Meryin DJ laptop — Lea hrá na klávesoch, vedľa nej Mery obsluhuje DJ pult s laptopom, s looperom, malými klávesmi a inými elektronickými ovládatkami – na ušiach má slúchadlá.",
+      "original_name_sha256": "b67c125a2d8949bd9ac0f5098dacc1624cce440fbce3e721ca58f1dbfa897253",
+      "stable_name": "Meryin DJ laptop",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:01/22#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/22",
+      "scene_url": "https://trello.com/c/jxbcKcVA",
+      "item_id": "6a6bb4ec1bbd0f1498113646",
+      "checklist_id": "6a673db850850970e391d39c",
+      "original_name": "Meryine DJ slúchadlá — Lea hrá na klávesoch, vedľa nej Mery obsluhuje DJ pult s laptopom, s looperom, malými klávesmi a inými elektronickými ovládatkami – na ušiach má slúchadlá.",
+      "original_name_sha256": "68e5a591c9d572a546f8fe5fd1ac2c0b13777f38a374e3f3188b33029dc2e635",
+      "stable_name": "Meryine DJ slúchadlá",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:01/22#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/23",
+      "scene_url": "https://trello.com/c/he2FxaNR",
+      "item_id": "6a6bb4ed00dde76de0239c14",
+      "checklist_id": "6a673dbcec5a0aaff7e6b556",
+      "original_name": "Alexov osobný mobil — Alex si vyberá niečo z automatu, alebo sa zastaví pri nástenke a ťuká do mobilu.",
+      "original_name_sha256": "3c1b0b18d6dfa3c47d8fa6b74ebbac49c07063d620ff821f7370961366dfd49c",
+      "stable_name": "Alexov osobný mobil",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:01/23#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/27FLASH",
+      "scene_url": "https://trello.com/c/MTYqGMwh",
+      "item_id": "6a6bb4f53e7bd4bf73179c6f",
+      "checklist_id": "6a673dc791f78d1d4c954fb4",
+      "original_name": "Dogyho spisovateľský notebook — (prestrih Hľadisko) Kým Sára hovorí ďalej o bratovi, vidíme Alexa spolu sedieť so Sebom a Patrikom, Dogyho s notebookom samého a Bety, Veroniku a Kika.",
+      "original_name_sha256": "fa7dec707c89fab0c9087f69a388a6d142b98361773b6da770c30cff4fe5bde8",
+      "stable_name": "Dogyho spisovateľský notebook",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:01/27FLASH#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/27FLASH",
+      "scene_url": "https://trello.com/c/MTYqGMwh",
+      "item_id": "6a6bb4f5e3fe9f858b716246",
+      "checklist_id": "6a673dc791f78d1d4c954fb4",
+      "original_name": "<n> Olasovej auto — (prestrih Parkovisko) Je noc - Na parkovisku je odstavené Olasovej auto, prší a Alex a Olasová vo vnútri v zahmlenom aute sexujú. | ← prvý výskyt | TU: (prestrih Parkovisko) Je noc - Na parkovisku je odstavené Olasovej auto, prší a Alex a Olasová vo vnútri v zahmlenom aute sexujú. | → 01/32FLASH: (prestrih Pri rieke) Alex a Olasová ležia na deke pri rieke, pri nich je Olasovej odstavené auto, zrazu počujú výstrel, vystrašene sa na seba pozrú. | KARTA: https://trello.com/c/jTy06JAh",
+      "original_name_sha256": "3a1f9c82fbc11089854a0c1cb9b32c6cde470caa7e4cd3423c3524fa310e9834",
+      "stable_name": "Olasovej auto",
+      "categories": [
+        "Auto",
+        "Nadväzná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/jTy06JAh",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/30",
+      "scene_url": "https://trello.com/c/rclI0aGx",
+      "item_id": "6a6bb4f77cd0d573d5da28d5",
+      "checklist_id": "6a673dcfb9e8a3d4f3ab5ffb",
+      "original_name": "Alexov osobný mobil — Alex práve púšťa Bety a Kikovi na mobile pesničku, ktorú nahral, je z toho nesvoj, ale Bety celá žiari.",
+      "original_name_sha256": "e556d2d524bcf8ebd6830d7b9e39475878b7bc51e39c4af34d7417bec1750475",
+      "stable_name": "Alexov osobný mobil",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:01/30#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/30",
+      "scene_url": "https://trello.com/c/rclI0aGx",
+      "item_id": "6a6bb4f7925baa01c459abb4",
+      "checklist_id": "6a673dcfb9e8a3d4f3ab5ffb",
+      "original_name": "Alexova školská taška — Postaví na odchod, berie školskú tašku.",
+      "original_name_sha256": "23fc83b85dbd3d7e31f5496a2ae924ece9686cb0bb546126d9680640d739a6f0",
+      "stable_name": "Alexova školská taška",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:01/30#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/32FLASH",
+      "scene_url": "https://trello.com/c/tWcLHWue",
+      "item_id": "6a6bb4f910ccd0ad970caef2",
+      "checklist_id": "6a673dfd2e5c79ca96a1359a",
+      "original_name": "Alexov osobný mobil — Práve jej na mobile púšťa rovnakú pesničku zo svojho dema, ako pred chvíľkou púšťal Bety a Kikovi.",
+      "original_name_sha256": "12a3f8f24ced80375bda156bd9b1755c826c6cc0bbe0c35fd6aacd6af4438ddb",
+      "stable_name": "Alexov osobný mobil",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:01/32FLASH#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/32FLASH",
+      "scene_url": "https://trello.com/c/tWcLHWue",
+      "item_id": "6a6bb4f9d4626de8d0add12d",
+      "checklist_id": "6a673dfd2e5c79ca96a1359a",
+      "original_name": "<n> Olasovej auto — (prestrih Pri rieke) Alex a Olasová ležia na deke pri rieke, pri nich je Olasovej odstavené auto, zrazu počujú výstrel, vystrašene sa na seba pozrú. | ← 01/27FLASH: (prestrih Parkovisko) Je noc - Na parkovisku je odstavené Olasovej auto, prší a Alex a Olasová vo vnútri v zahmlenom aute sexujú. | TU: (prestrih Pri rieke) Alex a Olasová ležia na deke pri rieke, pri nich je Olasovej odstavené auto, zrazu počujú výstrel, vystrašene sa na seba pozrú. | → 03/55LP: Stálo tam Olasovej auto. | KARTA: https://trello.com/c/jTy06JAh",
+      "original_name_sha256": "74de68c13c45bc61fa36567e5cd70891f0a67ee385f626e17c39f4a977cf21e6",
+      "stable_name": "Olasovej auto",
+      "categories": [
+        "Auto",
+        "Nadväzná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/jTy06JAh",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/32FLASH",
+      "scene_url": "https://trello.com/c/tWcLHWue",
+      "item_id": "6a6b93696e3a87e94cd1015a",
+      "checklist_id": "6a673dfd2e5c79ca96a1359a",
+      "original_name": "<n> Pištoľ / zbraň — OLASOVÁ Naozajstná zbraň znie inak! | ← prvý výskyt | TU: OLASOVÁ Naozajstná zbraň znie inak! | → 04/23: Spod sedadla pomaly vytiahne zbraň a ukáže ju Veronike. | KARTA: https://trello.com/c/AhXdJRMS",
+      "original_name_sha256": "afb9fa2f240e837ac59f13e0fd92d18e8fb5fec710169bd80ddad7fd675e68b6",
+      "stable_name": "Olasovej pištoľ",
+      "categories": [
+        "Nadväzná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/AhXdJRMS",
+      "ambiguity_question": null,
+      "conflict": "Položka opisuje iba dialógovú zmienku o zbrani; autoritatívny identity audit nepotvrdil fyzickú prítomnosť rekvizity v 01/32FLASH."
+    },
+    {
+      "scene_id": "01/33",
+      "scene_url": "https://trello.com/c/Z5TyIcv1",
+      "item_id": "6a6bb4fa4f26d97281a3d366",
+      "checklist_id": "6a673e00a74a7d1f6f17b0fc",
+      "original_name": "Sárin mobil s hudbou na konkurz — (Púšťa ju z mobilu cez JBL).",
+      "original_name_sha256": "222a1c93f745606c055ecaa9b938b1e0d521f3614e16bca89e179e32509aa3ac",
+      "stable_name": "Sárin mobil s hudbou na konkurz",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:01/33#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/34",
+      "scene_url": "https://trello.com/c/u20JjfMc",
+      "item_id": "6a6bb4fce38d5e45ae6c95ef",
+      "checklist_id": "6a673e04eaff35d0fbe8761b",
+      "original_name": "Alexova fľaša s vodou — Alex sa utiera do uteráka a berie si fľašu s vodou.",
+      "original_name_sha256": "cdb370982a2116b3f33ec3d5a87ebaa12d20741fd059cd0940f08342fb431949",
+      "stable_name": "Alexova fľaša s vodou",
+      "categories": [],
+      "evidence": "source_record:01/34#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/38",
+      "scene_url": "https://trello.com/c/4B4Ywyib",
+      "item_id": "6a6bb4fe7971e59ebeb503f8",
+      "checklist_id": "6a673e10e0b4abeb7fed00be",
+      "original_name": "Taxík s Laurinou stratenou taškou — Ráno priniesol taxík jednu vašu stratenú tašku.",
+      "original_name_sha256": "2131d8bb815c37141eced2821518afa198257b484bd78066c0675da39eae7257",
+      "stable_name": "Taxík s Laurinou stratenou taškou",
+      "categories": [
+        "Auto"
+      ],
+      "evidence": "source_record:01/38#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/38",
+      "scene_url": "https://trello.com/c/4B4Ywyib",
+      "item_id": "6a6bb4fedf0b5778b1fb2162",
+      "checklist_id": "6a673e10e0b4abeb7fed00be",
+      "original_name": "Laurine nákupné tašky — Laura prichádza domov a za ňou ide a nesie nákupné tašky Gajdoš.",
+      "original_name_sha256": "0fbf4220dced49c9080a5d41fb751c6a1d2c22d29a2b2cea95ecec6158cca772",
+      "stable_name": "Laurine nákupné tašky",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:01/38#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/39",
+      "scene_url": "https://trello.com/c/aEeSbUVT",
+      "item_id": "6a6bb50050be8273ebcf43ab",
+      "checklist_id": "6a673e139529b776b3b8b338",
+      "original_name": "<n> Alexova stará gitara — Alex spokojne hrá na terase na gitare, brnká a skladá. | ← prvý výskyt | TU: Alex spokojne hrá na terase na gitare, brnká a skladá. | → 02/28: Nejakí študenti odchádzajú, odkryjú im výhľad a tak si všimnú Alexa, ktorý sedí na gauči a brnká si na gitare. | KARTA: https://trello.com/c/x1Wi0No2",
+      "original_name_sha256": "18bb0e3dcf54d94936fca82bf22940fb881c4c2e479cb0ae247c6f9680aa3323",
+      "stable_name": "Alexova stará gitara",
+      "categories": [
+        "Nadväzná rekvizita",
+        "Osobná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/x1Wi0No2",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/40",
+      "scene_url": "https://trello.com/c/ECLlJ5Um",
+      "item_id": "6a6bb50178448f2fbf87a37f",
+      "checklist_id": "6a673e165946cb92eb7a79cb",
+      "original_name": "Nealkoholické občerstvenie na školskej párty — Párty už je v plnom prúde, výzdoba, DJ, jedlo, pitie (nie alkohol, lebo je to školská akcia).",
+      "original_name_sha256": "5cacc19a643ef3aaf0d792b56995d47a6187774adf58580e1bbbd76a40bd4f65",
+      "stable_name": "Nealkoholické občerstvenie na školskej párty",
+      "categories": [],
+      "evidence": "source_record:01/40#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/44",
+      "scene_url": "https://trello.com/c/KPcs2KYD",
+      "item_id": "6a6bb5031cbf22b6ecd31b4b",
+      "checklist_id": "6a673e2b57d982b80d51629e",
+      "original_name": "Drinkové poháre na párty u Sáry — Sedia kade-tade po izbe a popíjajú drinky.",
+      "original_name_sha256": "4bb187fea384c54cb6999e54d608427437117ee30e8a67361baad4c7ba575f90",
+      "stable_name": "Drinkové poháre na párty u Sáry",
+      "categories": [],
+      "evidence": "source_record:01/44#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/49",
+      "scene_url": "https://trello.com/c/RIIV0CJ6",
+      "item_id": "6a6bb50592e39755dd9e86a4",
+      "checklist_id": "6a673e38368202d3f9dcfbcf",
+      "original_name": "Dogyho spisovateľský notebook — Nie je tam nikto, iba Fefe a pri jednom zo stolov sedí Dogy s notebookom a píše svoj román.",
+      "original_name_sha256": "73369f3cc7a7ddc838865efb12b820cc1a8c1e0635c012696598fa37f15d3841",
+      "stable_name": "Dogyho spisovateľský notebook",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:01/49#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/52",
+      "scene_url": "https://trello.com/c/1aRffTmm",
+      "item_id": "6a6bb50c4aa08804342e8de5",
+      "checklist_id": "6a673e5b35c88e3abc3ea8a7",
+      "original_name": "Dogyho spisovateľský notebook — Dogy sedí pri svojom notebooku u Fefeho a píše, my počujeme jeho VO.",
+      "original_name_sha256": "2e2f5176ff7c8b894c7c428e6a614f6d92a19680b71b6cff8eecb0f0f05d8f0d",
+      "stable_name": "Dogyho spisovateľský notebook",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:01/52#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/52",
+      "scene_url": "https://trello.com/c/1aRffTmm",
+      "item_id": "6a6bb50c3888e5abff1d0797",
+      "checklist_id": "6a673e5b35c88e3abc3ea8a7",
+      "original_name": "Alicin reportérsky mobil — 1/53LP PRI RIEKE – STRIHÁK ZÁBEROV - DAY 4 SÁRA, BETY, ALICA, IVAN, ALEX, LUKÁŠ, VERONIKA, LAURA, KIKO, PATRIK, SEBO, DOGY, KELER, POLICAJTI Policajti vynášajú Jakubove telo Policajti opáskovali miesto, kde sa našlo Jakubovo telo, je tam policajné auto, vyšetrovateľ Keler a policajti odnášajú Jakubovo telo už zazipsované na nosidlách, Sára je zničená, Bety tam stojí s rodičmi, Alica ako dychtivá novinárka si urobí na mobil zábery z miesta činu, Bety na ňu hneď zazerá, Alex stojí s otcom.",
+      "original_name_sha256": "a27ccd2978b79017efabf998ac686d4d610f1b258dcab997576542c8bc80e34f",
+      "stable_name": "Alicin reportérsky mobil",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:01/52#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "01/52",
+      "scene_url": "https://trello.com/c/1aRffTmm",
+      "item_id": "6a6bb50bde02ddbad19faac0",
+      "checklist_id": "6a673e5b35c88e3abc3ea8a7",
+      "original_name": "Policajné auto pri náleze Jakubovho tela — 1/53LP PRI RIEKE – STRIHÁK ZÁBEROV - DAY 4 SÁRA, BETY, ALICA, IVAN, ALEX, LUKÁŠ, VERONIKA, LAURA, KIKO, PATRIK, SEBO, DOGY, KELER, POLICAJTI Policajti vynášajú Jakubove telo Policajti opáskovali miesto, kde sa našlo Jakubovo telo, je tam policajné auto, vyšetrovateľ Keler a policajti odnášajú Jakubovo telo už zazipsované na nosidlách, Sára je zničená, Bety tam stojí s rodičmi, Alica ako dychtivá novinárka si urobí na mobil zábery z miesta činu, Bety na ňu hneď zazerá, Alex stojí s otcom.",
+      "original_name_sha256": "048284c6aed8360283a1a3d1f241ba68a0c27063c199d8137185e8633c37904a",
+      "stable_name": "Policajné auto pri náleze Jakubovho tela",
+      "categories": [
+        "Auto"
+      ],
+      "evidence": "source_record:01/52#2",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "02/02FLASH",
+      "scene_url": "https://trello.com/c/CyC60Zrk",
+      "item_id": "6a6bb50e3678aa7f3a1349b4",
+      "checklist_id": "6a673e6240bb5762d48bea9a",
+      "original_name": "<n> Jakubova klubová bunda s číslom 9 — Jakub má na sebe klubovú bundu s číslom 9, ktorá sa neskôr vyskytne v aute dôkaz. | ← prvý výskyt | TU: Jakub má na sebe klubovú bundu s číslom 9, ktorá sa neskôr vyskytne v aute dôkaz. | → 06/41LP: Bety a Dogy nájdu Sofiine auto s bundou a kradnutým tovarom | KARTA: https://trello.com/c/56ELOe0C",
+      "original_name_sha256": "b2eddc41ff096624ef9105c2b4e3b79146d5cc9896045b75e87e5c978124dc24",
+      "stable_name": "Jakubova klubová bunda s číslom 9",
+      "categories": [
+        "Nadväzná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/56ELOe0C",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "02/08",
+      "scene_url": "https://trello.com/c/aMLcYiw8",
+      "item_id": "6a6bb510b89f5f06c7bb9158",
+      "checklist_id": "6a673e71f296c67158122e7c",
+      "original_name": "Alexov osobný mobil — Nahnevane odhodí mobil.",
+      "original_name_sha256": "4b129bfdcfb6f8defc1978bc30128caaaef62198c6dc73223562989e808a6a28",
+      "stable_name": "Alexov osobný mobil",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:02/08#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "02/11",
+      "scene_url": "https://trello.com/c/9MvhyliH",
+      "item_id": "6a6bb512e275bd8a4541cdec",
+      "checklist_id": "6a673e7ef6c35c4e5d7d51e4",
+      "original_name": "Lukášove rýchle raňajky — Lukáš je ráno v kuchyni, dáva si rýchle raňajky, pri ňom je pes Bono, ktorý žobre jedlo.",
+      "original_name_sha256": "2188a90fa476bda9ccb96ff0f8871e852fea1a892ff51a5bd7fa79f501201637",
+      "stable_name": "Lukášove rýchle raňajky",
+      "categories": [],
+      "evidence": "source_record:02/11#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "02/13",
+      "scene_url": "https://trello.com/c/1ItwkR4q",
+      "item_id": "6a6bb5146d01c0ba1cf71309",
+      "checklist_id": "6a673e8479ab52bddaf57f43",
+      "original_name": "Alexova školská taška — Len si vezmem tašku.",
+      "original_name_sha256": "d848ebd4c48e5290643918af72a7fbe94cf3236ab7553e146236ebd88f580742",
+      "stable_name": "Alexova školská taška",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:02/13#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "02/15",
+      "scene_url": "https://trello.com/c/Wv614l8P",
+      "item_id": "6a6bb5162c2f38407b67be27",
+      "checklist_id": "6a673e89ac2e7ad60e2262e3",
+      "original_name": "Alexova odložená bunda — Alex sa vyzlieka pred skrinkou, odkladá si bundu, Dogy je pri ňom.",
+      "original_name_sha256": "77048b29ea1153ad86627d3e11a27ab2ee3432732f8009fe12f0fedf6d0a0ce7",
+      "stable_name": "Alexova odložená bunda",
+      "categories": [],
+      "evidence": "source_record:02/15#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "02/19LP",
+      "scene_url": "https://trello.com/c/oG0RssDG",
+      "item_id": "6a6bb519aac86a944bf99dde",
+      "checklist_id": "6a673ec0dd1667113b8739b6",
+      "original_name": "Spomienkové fotografie pri Jakubovej skrinke — Pri skrinke Jakuba, kde ležia kvety, fotky, plyšové hračky.",
+      "original_name_sha256": "29d49050740bd9abb4806ce181b5467f0ee28d91626f794cec1cf07e674ed78c",
+      "stable_name": "Spomienkové fotografie pri Jakubovej skrinke",
+      "categories": [
+        "Dokument"
+      ],
+      "evidence": "source_record:02/19LP#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "02/19LP",
+      "scene_url": "https://trello.com/c/oG0RssDG",
+      "item_id": "6a6bb519f3b3715db797f74b",
+      "checklist_id": "6a673ec0dd1667113b8739b6",
+      "original_name": "Spomienkové kvety pri Jakubovej skrinke — Pri skrinke Jakuba, kde ležia kvety, fotky, plyšové hračky.",
+      "original_name_sha256": "f45176aa22a9dec33880c6c462656ed2e1914a39d27b5715ce12ea4766b4fef7",
+      "stable_name": "Spomienkové kvety pri Jakubovej skrinke",
+      "categories": [],
+      "evidence": "source_record:02/19LP#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "02/19LP",
+      "scene_url": "https://trello.com/c/oG0RssDG",
+      "item_id": "6a6bb51820c7484710904603",
+      "checklist_id": "6a673ec0dd1667113b8739b6",
+      "original_name": "Spomienkové plyšové hračky pri Jakubovej skrinke — Pri skrinke Jakuba, kde ležia kvety, fotky, plyšové hračky.",
+      "original_name_sha256": "71e58982124af8b72434c52de276f2095850c7fb839809f479f7444efb30dfc3",
+      "stable_name": "Spomienkové plyšové hračky pri Jakubovej skrinke",
+      "categories": [],
+      "evidence": "source_record:02/19LP#2",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "02/27",
+      "scene_url": "https://trello.com/c/7hxFtXyf",
+      "item_id": "6a6bb521e86a0b644706cdf1",
+      "checklist_id": "6a673ed5f8020cb2cf37cad9",
+      "original_name": "Alicin mobil s diktafónom — Alica dychtivo počúva, nahráva si to do mobilu.",
+      "original_name_sha256": "c81e462672380ff030ae61a4d942eed9456df4e7014d8426a78630b36c4777ee",
+      "stable_name": "Alicin mobil s diktafónom",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:02/27#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "02/27",
+      "scene_url": "https://trello.com/c/7hxFtXyf",
+      "item_id": "6a6bb5219a79df103e36ba07",
+      "checklist_id": "6a673ed5f8020cb2cf37cad9",
+      "original_name": "Alicina obálka s úplatkom pre patológa — Alica sa na patológa usmeje, podáva mu obálku s bankovkami(ako zvyčajne).",
+      "original_name_sha256": "8366c8caa9afa1ec30b57a3852c06a9e4da0a78a15b08c8494f93f00633a1750",
+      "stable_name": "Alicina obálka s úplatkom pre patológa",
+      "categories": [],
+      "evidence": "source_record:02/27#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "02/27",
+      "scene_url": "https://trello.com/c/7hxFtXyf",
+      "item_id": "6a6bb5208aea34a955493ce1",
+      "checklist_id": "6a673ed5f8020cb2cf37cad9",
+      "original_name": "Bankovky v Alicinej obálke pre patológa — Alica sa na patológa usmeje, podáva mu obálku s bankovkami(ako zvyčajne).",
+      "original_name_sha256": "6ec145165e57663715a006a1d3567470d31101ba49ea3bf4b518f9139a8fc822",
+      "stable_name": "Bankovky v Alicinej obálke pre patológa",
+      "categories": [],
+      "evidence": "source_record:02/27#2",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "02/27",
+      "scene_url": "https://trello.com/c/7hxFtXyf",
+      "item_id": "6a6bb5202794200670e5d6a9",
+      "checklist_id": "6a673ed5f8020cb2cf37cad9",
+      "original_name": "Diktafón v Alicinom mobile — Vypína diktafón na mobile.",
+      "original_name_sha256": "1024ba08506f6478e27bfd2aae4d845a0ab6224ce9058b1cb2eec05592cae8e6",
+      "stable_name": "Diktafón v Alicinom mobile",
+      "categories": [
+        "Screen"
+      ],
+      "evidence": "source_record:02/27#3",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "02/28",
+      "scene_url": "https://trello.com/c/WtIJgkfL",
+      "item_id": "6a6bb4b3d35714af789ffb65",
+      "checklist_id": "6a673b6fd344dfda826b4a8e",
+      "original_name": "<n> Alexova stará gitara — Nejakí študenti odchádzajú, odkryjú im výhľad a tak si všimnú Alexa, ktorý sedí na gauči a brnká si na gitare. | ← 01/39: Alex spokojne hrá na terase na gitare, brnká a skladá. | TU: Nejakí študenti odchádzajú, odkryjú im výhľad a tak si všimnú Alexa, ktorý sedí na gauči a brnká si na gitare. | → 03/19: Alex je sám v klubovni, brnká si na svojej starej gitare. | KARTA: https://trello.com/c/x1Wi0No2",
+      "original_name_sha256": "b0fce43fab07fd03de2a10d33b03af0edf96d7dbb880e4524de6ebe4ac9811b2",
+      "stable_name": "Alexova stará gitara",
+      "categories": [
+        "Nadväzná rekvizita",
+        "Osobná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/x1Wi0No2",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "02/34",
+      "scene_url": "https://trello.com/c/6cHEI8d1",
+      "item_id": "6a6bb52520c74847109071d1",
+      "checklist_id": "6a673eea190344ef228f14c5",
+      "original_name": "Betin tanečný batoh — Bety sa tvári, že Veroniku ani poriadne nevníma, vyťahuje si z batoha fľašu vody, aby sa napila.",
+      "original_name_sha256": "5afe2253cf4830e1aa565de1af091e0c259588516a4d8844ad09cea7e3b42132",
+      "stable_name": "Betin tanečný batoh",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:02/34#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "02/34",
+      "scene_url": "https://trello.com/c/6cHEI8d1",
+      "item_id": "6a6bb524284b11ebf16da5a9",
+      "checklist_id": "6a673eea190344ef228f14c5",
+      "original_name": "Betina fľaša s vodou — Bety sa tvári, že Veroniku ani poriadne nevníma, vyťahuje si z batoha fľašu vody, aby sa napila.",
+      "original_name_sha256": "17c4deaf02cfd4524529687d189ca6643f664c6011f0c9e566c75cc32452be1b",
+      "stable_name": "Betina fľaša s vodou",
+      "categories": [],
+      "evidence": "source_record:02/34#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "02/35",
+      "scene_url": "https://trello.com/c/4LNYsjRy",
+      "item_id": "6a6bb52753c04f8270a6c2db",
+      "checklist_id": "6a673eed7a9771b7d0a7f1ec",
+      "original_name": "Taška s jedlom pre Alexa — Laura mu podáva tašku s jedlom.",
+      "original_name_sha256": "5c9eacaa6d37bd3baac0fd66cf98b0ea028e74619c32ea4e3b3a96d8271c5312",
+      "stable_name": "Taška s jedlom pre Alexa",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:02/35#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "02/35",
+      "scene_url": "https://trello.com/c/4LNYsjRy",
+      "item_id": "6a6bb5267115faf2b2e21aad",
+      "checklist_id": "6a673eed7a9771b7d0a7f1ec",
+      "original_name": "Jedlo od Fefeho pre Alexa — Laura mu podáva tašku s jedlom.",
+      "original_name_sha256": "acdcfd44a01bb732a73d9712d95b1916380de9a2a669a721d1ddf77c7b614f44",
+      "stable_name": "Jedlo od Fefeho pre Alexa",
+      "categories": [],
+      "evidence": "source_record:02/35#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "02/38",
+      "scene_url": "https://trello.com/c/XlECbgaa",
+      "item_id": "6a6bb528d55352cd033faa32",
+      "checklist_id": "6a673ef4b0836b9a529dc1f6",
+      "original_name": "Jedlo od Fefeho pre Lukáša a Alexa — Alex prichádza domov s jedlom od Fefeho.",
+      "original_name_sha256": "1dc77979d546c923770646d9b51946f53312ddf565e436d2c7003d62df6599ae",
+      "stable_name": "Jedlo od Fefeho pre Lukáša a Alexa",
+      "categories": [],
+      "evidence": "source_record:02/38#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "02/53",
+      "scene_url": "https://trello.com/c/JGqQUGIo",
+      "item_id": "6a6bb52fae118c1a5640c930",
+      "checklist_id": "6a673f43d102fc2bff4871d8",
+      "original_name": "Tanečné tašky skupiny Eclipse — Tanečnice si po konci eventu balia svoje tašky pred pódiom a Bety príde za Veronikou.",
+      "original_name_sha256": "025eb0ce57b70b5dc779bcf6c361d103b93809b0a9f59c773f71c5e57877c07e",
+      "stable_name": "Tanečné tašky skupiny Eclipse",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:02/53#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "02/54",
+      "scene_url": "https://trello.com/c/M24zDU5b",
+      "item_id": "6a6bb531acaa7ae42cf1dc49",
+      "checklist_id": "6a673f4570ddb566bbe4cdea",
+      "original_name": "Poháre Bety a Veroniky na prípitok — A veronika zodvihne na štrngnutie pohár.",
+      "original_name_sha256": "6e197d80e8dcc9c44e031769af9265f2e30aa280d0579e980b0d74d21f76e745",
+      "stable_name": "Poháre Bety a Veroniky na prípitok",
+      "categories": [],
+      "evidence": "source_record:02/54#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "02/55",
+      "scene_url": "https://trello.com/c/TXLXWZP4",
+      "item_id": "6a6bb53273e84fa25854ce92",
+      "checklist_id": "6a673f4800d9aa9863725247",
+      "original_name": "Alicina streamovacia kamera — Alica začína v redakcii svoj podcast pred mikrofónom a streamovacou kamerou.",
+      "original_name_sha256": "d48b024a10932d0dfb7aa02d3758cca2b9ba1b2fd873dd29ff1dcfb1e4f62c7d",
+      "stable_name": "Alicina streamovacia kamera",
+      "categories": [],
+      "evidence": "source_record:02/55#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "02/56",
+      "scene_url": "https://trello.com/c/wH88jb1J",
+      "item_id": "6a6bb53367d799946429f47b",
+      "checklist_id": "6a673f4be9d23383bd9a3a4c",
+      "original_name": "Notebook Klaudie a Oskara na sledovanie podcastu — Klaudia a Oskar sledujú Alicin podcast na laptope.",
+      "original_name_sha256": "689502dc09a7a230af33ad825ed6cd7b47cb66457f18ac5808eb2fb94884eb04",
+      "stable_name": "Notebook Klaudie a Oskara na sledovanie podcastu",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:02/56#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "03/01LP",
+      "scene_url": "https://trello.com/c/kMqcKZiD",
+      "item_id": "6a6bb535214dc7b7aa87504c",
+      "checklist_id": "6a673f6fda6ff35ebf885ee2",
+      "original_name": "Dogyho spisovateľský notebook — Dogy sedí s notebookom za stolom a píše, do toho počuť jeho voiceover.",
+      "original_name_sha256": "d4fa94a817ff25321c5bf3e769b82b685e82f16d0813e3b6e12cd13e2590ffd0",
+      "stable_name": "Dogyho spisovateľský notebook",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:03/01LP#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "03/05FLASH",
+      "scene_url": "https://trello.com/c/wCuoGLzM",
+      "item_id": "6a6bb537018b6c379aba05b3",
+      "checklist_id": "6a673f7960408ec841e32872",
+      "original_name": "Auto Jakuba a Sáry — FB 1/5 JAKUB A SÁRA PRI RIEKE (VYSTUPUJÚ Z AUTA, DRŽIA SA ZA RUKY) FB 1/6 JAKUB A SÁRA V ČLNE (IDÚ K ČLNU, JAKUB VESLUJE NA DRUHÚ STRANU, (prestrih Flash1) (Flash) Jakub a Sára sa na druhom brehu rieky lúčia, objímajú sa.",
+      "original_name_sha256": "73e1fdfc27d2cd879200ca51327033eaa27977f62c99484be8abf50b471633a4",
+      "stable_name": "Auto Jakuba a Sáry",
+      "categories": [
+        "Auto"
+      ],
+      "evidence": "source_record:03/05FLASH#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "03/07",
+      "scene_url": "https://trello.com/c/HmJZhycl",
+      "item_id": "6a6bb538a4c9efddd7a7cef2",
+      "checklist_id": "6a673f7ff1b8d84cd52f3042",
+      "original_name": "Betin osobný mobil — Bety už je nejaký čas zo školy doma, pozerá Alicin podcast na mobile (použije sa obraz 2/55). | KARTA: https://trello.com/c/5PcusQA3",
+      "original_name_sha256": "c2ee00ff66d6778980b86149d3a86ff6c632c315878c7745b4bfdaa902b36882",
+      "stable_name": "Betin osobný mobil",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/5PcusQA3",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "03/10",
+      "scene_url": "https://trello.com/c/ZVB6mRaz",
+      "item_id": "6a6bb5391da170c42a745d4d",
+      "checklist_id": "6a673f8bd3afb3c9e4bf382a",
+      "original_name": "Mobily Bety a Veroniky — Bety a Veronika niečo riešia na mobiloch.",
+      "original_name_sha256": "617c71104d68cd00ffade22e730dbb13716e4d96549aacccce4bef49252513fa",
+      "stable_name": "Mobily Bety a Veroniky",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:03/10#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "03/11",
+      "scene_url": "https://trello.com/c/j1vcSqmT",
+      "item_id": "6a6bb53b7111b28999358f58",
+      "checklist_id": "6a673f8fb5c5457b467065e0",
+      "original_name": "Dogyho školský batoh — Dogy sa postaví a prehodí si cez plece batoh.",
+      "original_name_sha256": "0023e997aae140f0b1a77eedd0e541c5ad1581cc10a26ca0e9a80fe44c0b5640",
+      "stable_name": "Dogyho školský batoh",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:03/11#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "03/13",
+      "scene_url": "https://trello.com/c/jYcSzT6g",
+      "item_id": "6a6bb53c01b3bfbb119feb3d",
+      "checklist_id": "6a673f95cd49e1eac39e3ea8",
+      "original_name": "Fifov osobný mobil — Ako správni puberťáci si robia selfíčko na Fifov telefón.",
+      "original_name_sha256": "30b7e6768801499da7315ba67f8498410c7abd7c80f702589a4856f28b1d25ee",
+      "stable_name": "Fifov osobný mobil",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:03/13#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "03/15",
+      "scene_url": "https://trello.com/c/5WjmN5us",
+      "item_id": "6a6bb5422ed692cec24a2ce6",
+      "checklist_id": "6a673f9b95f0e09e6f79d887",
+      "original_name": "Mobily študentov so slutshamingovou fotkou — Okolo vtedy idú viacerí študenti a pozerajú do mobilov.",
+      "original_name_sha256": "703a3647e1da51b0af9d22f394c0bc9f2397796746d469b84035a8d37f013591",
+      "stable_name": "Mobily študentov so slutshamingovou fotkou",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:03/15#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "03/15",
+      "scene_url": "https://trello.com/c/5WjmN5us",
+      "item_id": "6a6bb542b9ffe0597856d114",
+      "checklist_id": "6a673f9b95f0e09e6f79d887",
+      "original_name": "Slutshamingová fotografia Veroniky — Uvidí svoju fotku s Fifom z večera, ale na jej tvári je prirobená stekajúca biela lepkavá tekutina (nie realisticky, skôr prehnane a symbolicky).",
+      "original_name_sha256": "441316e1dcd74c810b6fc28310531c603d215e629e474ef526087bab6bfa7a7e",
+      "stable_name": "Slutshamingová fotografia Veroniky",
+      "categories": [
+        "Dokument",
+        "Screen"
+      ],
+      "evidence": "source_record:03/15#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "03/15",
+      "scene_url": "https://trello.com/c/5WjmN5us",
+      "item_id": "6a6bb542877ae035297c5840",
+      "checklist_id": "6a673f9b95f0e09e6f79d887",
+      "original_name": "Veronikin školský batoh — Veronika si vyberá zošity z batoha a ukladá ich do skrinky.",
+      "original_name_sha256": "addbb43dbe37abc8053cb47b2470552a40ace832c26efa5799344f228ebd4e04",
+      "stable_name": "Veronikin školský batoh",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:03/15#2",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "03/16",
+      "scene_url": "https://trello.com/c/X1gOx6FK",
+      "item_id": "6a6bb54454a8791c313b1d75",
+      "checklist_id": "6a673f9f54942e87debffc42",
+      "original_name": "Veronikin osobný mobil — Dvere sa zrazu prudko otvoria — Zúrivá Veronika nakráča dnu s telefónom v ruke, za ňou cupitá zahanbená Bety.",
+      "original_name_sha256": "221ccb5d35cd6c8ba2f5c07e3bb9b922b9cf171355f60af56708702047d6fa6a",
+      "stable_name": "Veronikin osobný mobil",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:03/16#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "03/16",
+      "scene_url": "https://trello.com/c/X1gOx6FK",
+      "item_id": "6a6bb544e79a85d3165a0fab",
+      "checklist_id": "6a673f9f54942e87debffc42",
+      "original_name": "Slutshamingová fotografia Veroniky — (V skutočnosti zverejnil slutshamingovú fotku Veroniky preto, lebo ho odmietla a udrela do rozkroku).",
+      "original_name_sha256": "a67de47814ffd7135705d7f83f78c3356c4708f89fbe4d9a06c43d795340a6dc",
+      "stable_name": "Slutshamingová fotografia Veroniky",
+      "categories": [
+        "Dokument",
+        "Screen"
+      ],
+      "evidence": "source_record:03/16#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "03/19",
+      "scene_url": "https://trello.com/c/VjyNsNga",
+      "item_id": "6a6bb5461391bb12c0feac6b",
+      "checklist_id": "6a673ff376197a2f776a9696",
+      "original_name": "<n> Alexova stará gitara — Alex je sám v klubovni, brnká si na svojej starej gitare. | ← 02/28: Nejakí študenti odchádzajú, odkryjú im výhľad a tak si všimnú Alexa, ktorý sedí na gauči a brnká si na gitare. | TU: Alex je sám v klubovni, brnká si na svojej starej gitare. | → 03/25: Alex sa potrebuje dostať nepozorovane z domu a prepašovať so sebou gitaru. | KARTA: https://trello.com/c/x1Wi0No2",
+      "original_name_sha256": "6becc47d59cd67f5c1c0d0aafe2e9f913d4927584ad2d839f95ae78bb34a12e5",
+      "stable_name": "Alexova stará gitara",
+      "categories": [
+        "Nadväzná rekvizita",
+        "Osobná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/x1Wi0No2",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "03/20",
+      "scene_url": "https://trello.com/c/8M1uHsFp",
+      "item_id": "6a6bb54746f36f8937fd98fe",
+      "checklist_id": "6a673ff52d9d6070e2d9d3c2",
+      "original_name": "Veronikin osobný mobil — Veronika odloží telefón.",
+      "original_name_sha256": "f76ac693de524d9d466236c8dbc92cc8e9aa25a878d564220e8008ef2f7b7848",
+      "stable_name": "Veronikin osobný mobil",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:03/20#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "03/20",
+      "scene_url": "https://trello.com/c/8M1uHsFp",
+      "item_id": "6a6bb5478a3f697f9601de3a",
+      "checklist_id": "6a673ff52d9d6070e2d9d3c2",
+      "original_name": "Slutshamingová fotografia Veroniky — Ešte raz rozklikáva profil, z ktorého tú fotku dostala, ale tam je prázdno, bol vytvorený len dnes.",
+      "original_name_sha256": "bccc505a2ae6bcf91af07190a56896e52982eee8814bb534b6bfd3d222a7efe5",
+      "stable_name": "Slutshamingová fotografia Veroniky",
+      "categories": [
+        "Dokument",
+        "Screen"
+      ],
+      "evidence": "source_record:03/20#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "03/22",
+      "scene_url": "https://trello.com/c/owJUXj0F",
+      "item_id": "6a6bb54a9f7ebc5738d49b6a",
+      "checklist_id": "6a673ffc829087a8920cd75c",
+      "original_name": "Betin osobný mobil — Bety ukáže na svojom mobile onú fotku, má ju aj ona. | KARTA: https://trello.com/c/5PcusQA3",
+      "original_name_sha256": "1263483e0805bc0d1e5adfdb2e137b88fe2fb3e2ded2aba13172ab61dfd8b85d",
+      "stable_name": "Betin osobný mobil",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/5PcusQA3",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "03/22",
+      "scene_url": "https://trello.com/c/owJUXj0F",
+      "item_id": "6a6bb549344a434cba6be578",
+      "checklist_id": "6a673ffc829087a8920cd75c",
+      "original_name": "Slutshamingové fotografie obetí — VERONIKA Takže aj tvoju fotku poslal všetkým v škole?",
+      "original_name_sha256": "626ccc61b779d6e4c3854dd0361aed069c7db81ff6b005d534cabc125be10ca4",
+      "stable_name": "Slutshamingové fotografie obetí",
+      "categories": [
+        "Dokument",
+        "Screen"
+      ],
+      "evidence": "source_record:03/22#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "03/25",
+      "scene_url": "https://trello.com/c/PfwH3SnQ",
+      "item_id": "6a6bb54b12431a73a6c17d71",
+      "checklist_id": "6a674005b7710a16e1590d06",
+      "original_name": "<n> Alexova stará gitara — Alex sa potrebuje dostať nepozorovane z domu a prepašovať so sebou gitaru. | ← 03/19: Alex je sám v klubovni, brnká si na svojej starej gitare. | TU: Alex sa potrebuje dostať nepozorovane z domu a prepašovať so sebou gitaru. | → 03/32: Lukáš ho čaká na schodisku, hneď si všimne, že nesie gitaru. | KARTA: https://trello.com/c/x1Wi0No2",
+      "original_name_sha256": "7307a08fa5a1441b6d1b03bbf8f46735af5d5d5dc0f82f5ad293246f8273cb90",
+      "stable_name": "Alexova stará gitara",
+      "categories": [
+        "Nadväzná rekvizita",
+        "Osobná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/x1Wi0No2",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "03/27",
+      "scene_url": "https://trello.com/c/ncFCB0MU",
+      "item_id": "6a6bb54ed1e9f811b9a4a3d8",
+      "checklist_id": "6a67400b70ad196ca7b36724",
+      "original_name": "Betin notebook na pátranie v DCčku — Bety (už po tanečnom tréningu) sedí s notebookom za stolom v redakcii a usilovne sa snaží nejak porozumieť systému DCčka (Discord, skrátene DCčko).",
+      "original_name_sha256": "778f394d81270358c37f30d82166a79044339f063a650f10cffaa0e6af9bd9ef",
+      "stable_name": "Betin notebook na pátranie v DCčku",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:03/27#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "03/27",
+      "scene_url": "https://trello.com/c/ncFCB0MU",
+      "item_id": "6a6bb54eb59e22abbae24d50",
+      "checklist_id": "6a67400b70ad196ca7b36724",
+      "original_name": "Kikov osobný mobil — Kiko vedľa nej ťuká do mobilu a nahlas žasne.",
+      "original_name_sha256": "0a5463e6a9c38260696545524e265846d061f3c50a278ab8024a829d370d7d7a",
+      "stable_name": "Kikov osobný mobil",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:03/27#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "03/27",
+      "scene_url": "https://trello.com/c/ncFCB0MU",
+      "item_id": "6a6bb54d2e4670660668528d",
+      "checklist_id": "6a67400b70ad196ca7b36724",
+      "original_name": "Slutshamingová fotografia Veroniky — Veronika neodpovedá, je tiež zaujatá ťukaním do notebooku, striedavo stále pozerá na mobile na tú fotku, pokúša sa ju zväčšiť a nájsť nejakú stopu, ale krúti hlavou, evidentne sa jej nedarí.",
+      "original_name_sha256": "09f7e5b22ec3131505442af02bc47dba29a6f2ef90581af59b8f8f3938004402",
+      "stable_name": "Slutshamingová fotografia Veroniky",
+      "categories": [
+        "Dokument",
+        "Screen"
+      ],
+      "evidence": "source_record:03/27#2",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "03/28",
+      "scene_url": "https://trello.com/c/5WHtQSgT",
+      "item_id": "6a6bb5500529452e4e94d669",
+      "checklist_id": "6a67400f0cab9cee50f78cd4",
+      "original_name": "Mobil použitý na otvorenie tajného kanála — Akýkoľvek mobil.",
+      "original_name_sha256": "5056f48698065df59d6d2eb3b4cfa343f030885268c24cbcf8d097f36d99b178",
+      "stable_name": "Mobil použitý na otvorenie tajného kanála",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:03/28#0",
+      "existing_registry_url": null,
+      "ambiguity_question": "03/28: potvrdiť vlastníka alebo fyzickú totožnosť rekvizity „Mobil použitý na otvorenie tajného kanála“; dovtedy je bez nadväznosti.",
+      "conflict": null
+    },
+    {
+      "scene_id": "03/28",
+      "scene_url": "https://trello.com/c/5WHtQSgT",
+      "item_id": "6a6bb54fef32ab455580066f",
+      "checklist_id": "6a67400f0cab9cee50f78cd4",
+      "original_name": "Tímová selfie tanečnej skupiny — Veronika sa pohŕdavo pozrie na teamovú selfie fotku nalepenú na stene vedľa dverí.",
+      "original_name_sha256": "bd4749583d424e11f682b6d5c90be44446a5f692ebd11303e5879653feed2531",
+      "stable_name": "Tímová selfie tanečnej skupiny",
+      "categories": [
+        "Dokument",
+        "Screen"
+      ],
+      "evidence": "source_record:03/28#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "03/32",
+      "scene_url": "https://trello.com/c/aBDoY8na",
+      "item_id": "6a6bb552214dc7b7aa878d38",
+      "checklist_id": "6a674023270c1b24ce64ded1",
+      "original_name": "<n> Alexova stará gitara — Lukáš ho čaká na schodisku, hneď si všimne, že nesie gitaru. | ← 03/25: Alex sa potrebuje dostať nepozorovane z domu a prepašovať so sebou gitaru. | TU: Lukáš ho čaká na schodisku, hneď si všimne, že nesie gitaru. | → ďalší potvrdený obraz neurčený | KARTA: https://trello.com/c/x1Wi0No2",
+      "original_name_sha256": "f25eced4e795c08326e2fc3f50fcd0ce1c456900970014fc76e0a382d428d208",
+      "stable_name": "Alexova stará gitara",
+      "categories": [
+        "Nadväzná rekvizita",
+        "Osobná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/x1Wi0No2",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "03/34",
+      "scene_url": "https://trello.com/c/SNIqlHcN",
+      "item_id": "6a6bb554463cc0b610d269bc",
+      "checklist_id": "6a67402abe267e07d84c4ca4",
+      "original_name": "Laurin pohár na víno — Laura jej ide vytiahnuť pohár na víno.",
+      "original_name_sha256": "8274650e485e7f1791cde131f871c7b0d5ff8ce0c523c109c6a6ff71327c93c6",
+      "stable_name": "Laurin pohár na víno",
+      "categories": [],
+      "evidence": "source_record:03/34#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "03/39",
+      "scene_url": "https://trello.com/c/WKN0S3vm",
+      "item_id": "6a6bb55c8839c2aec43c2bf9",
+      "checklist_id": "6a67a7d3e8517530f4818f98",
+      "original_name": "Olasovej drink z amfiteátra — K stánku si príde kúpiť drink aj Olasová.",
+      "original_name_sha256": "8694044b24ff8c0c7552b8589a39b9750618eab3fd0ec89d63a83c71e9d153b1",
+      "stable_name": "Olasovej drink z amfiteátra",
+      "categories": [],
+      "evidence": "source_record:03/39#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "03/42",
+      "scene_url": "https://trello.com/c/LaoZ6Jgh",
+      "item_id": "6a6bb55dd12f4b497885d334",
+      "checklist_id": "6a67a7dd4f2ac6a626f95f51",
+      "original_name": "Fifov drink s uvoľňovačom — Bety a Veronika sa potom otočia chrbtom k Fifovi a začnú miešať drinky.",
+      "original_name_sha256": "e5f12fb0ef59c8bee2e3877129a68a0eba73a22d38d9892a3c7bdf57f5988736",
+      "stable_name": "Fifov drink s uvoľňovačom",
+      "categories": [],
+      "evidence": "source_record:03/42#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "03/44",
+      "scene_url": "https://trello.com/c/HsBbOgkV",
+      "item_id": "6a6bb55f22c5e300a488f45f",
+      "checklist_id": "6a67a7e39885e5d0d385b9df",
+      "original_name": "Veronikin osobný mobil — Nad ním stojí Bety, a už očividne nervózna a mierne vyplašená Veronika, stojí meter od nich s telefónom v ruke.",
+      "original_name_sha256": "a5f110dd1d25872660b9fe4ef0d99d41d1163ec956ca7a72022d986f38be3135",
+      "stable_name": "Veronikin osobný mobil",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:03/44#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "03/44",
+      "scene_url": "https://trello.com/c/HsBbOgkV",
+      "item_id": "6a6bb55f998121a229e67644",
+      "checklist_id": "6a67a7e39885e5d0d385b9df",
+      "original_name": "Kľúče od pút použitých na Fifa — VERONIKA Bety, daj mi ovládač aj kľúče od pút!",
+      "original_name_sha256": "6903ff2123d830b40af3357241d4f6a9d7e044dca94f96eba8d5607c1cdb974b",
+      "stable_name": "Kľúče od pút použitých na Fifa",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:03/44#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "03/45",
+      "scene_url": "https://trello.com/c/sdiSGPTZ",
+      "item_id": "6a6bb5603536abcac21d6483",
+      "checklist_id": "6a67a7e6729bfd8837b95594",
+      "original_name": "<n> Alexova gitara od Lukáša — Lukáš vtedy spoza stola vytiahne gitaru v puzdre. | ← prvý výskyt | TU: Lukáš vtedy spoza stola vytiahne gitaru v puzdre. | → 04/44: Díva sa na opretú gitaru a má slzy na krajíčku. | KARTA: https://trello.com/c/LSIdt0l0",
+      "original_name_sha256": "e9f0878db26a2a67c13e51209f86dead4c25863fe5476bed67ab0a17b41daa06",
+      "stable_name": "Alexova gitara od Lukáša",
+      "categories": [
+        "Nadväzná rekvizita",
+        "Osobná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/LSIdt0l0",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "03/46",
+      "scene_url": "https://trello.com/c/zQCBfZxO",
+      "item_id": "6a6bb56286018baf8031b66e",
+      "checklist_id": "6a67a7e9bdad548a760c226a",
+      "original_name": "Veronikin osobný mobil so Scrollom — Prichádza Veronika s mobilom v ruke (má v ňom otvorený Scroll).",
+      "original_name_sha256": "6b3f6cf402f7e21aa7a07a153472d1e76dc91fe7d11a1f4525f9bfd944cf1482",
+      "stable_name": "Veronikin osobný mobil so Scrollom",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:03/46#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "03/47LP",
+      "scene_url": "https://trello.com/c/4XrnFVsw",
+      "item_id": "6a6bb56438784dbe6f681422",
+      "checklist_id": "6a67a7ec2201ca515f55bc3b",
+      "original_name": "Poloprázdny blister s Ritalinom v Betinej skrinke — Na poličke nad ňou je krabička liekov (Ritalin), Do toho znie navrchu poloprázdny blister.",
+      "original_name_sha256": "3d9cbc6c7ac443198093f4313317af1c96932dc8a55f71d10aadcd70dc850a5d",
+      "stable_name": "Poloprázdny blister s Ritalinom v Betinej skrinke",
+      "categories": [],
+      "evidence": "source_record:03/47LP#0",
+      "existing_registry_url": null,
+      "ambiguity_question": "03/47LP: potvrdiť, či ide o ten istý fyzický blister Ritalinu ako v druhom výskyte 01/19 / 03/47LP; dovtedy sú vedené oddelene bez nadväznosti.",
+      "conflict": null
+    },
+    {
+      "scene_id": "03/47LP",
+      "scene_url": "https://trello.com/c/4XrnFVsw",
+      "item_id": "6a6bb56460010aec5b357331",
+      "checklist_id": "6a67a7ec2201ca515f55bc3b",
+      "original_name": "Fotografia Bety a Alexa v Betinej skrinke — LP : Kamera vojde do skrinky Bety cez zatvorené dvierka, kde je fotka Bety a Alexa, usmievajú sa.",
+      "original_name_sha256": "2d121726951a479417090e5c5d814d9596cd753cc2d5490e019d1fa24f1b5bc1",
+      "stable_name": "Fotografia Bety a Alexa v Betinej skrinke",
+      "categories": [
+        "Dokument"
+      ],
+      "evidence": "source_record:03/47LP#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "03/48LP",
+      "scene_url": "https://trello.com/c/MHSCDBK6",
+      "item_id": "6a6bb567903f65ac81fda367",
+      "checklist_id": "6a67a7ef4a675cfdd370dbcf",
+      "original_name": "Čmelského mobil s tajným kanálom — Čmelský je mimoriadne vytočený, v rukách drží telefón a pozerá striedavo doňho a na chalanov.",
+      "original_name_sha256": "a979266199eeb79d3363869f882ebe39064f8ebf3bac22918615c0fbf4abd700",
+      "stable_name": "Čmelského mobil s tajným kanálom",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:03/48LP#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "03/50",
+      "scene_url": "https://trello.com/c/sbTX6Hif",
+      "item_id": "6a6bb568c21d428f52e9fe49",
+      "checklist_id": "6a67a7fd692c09f3578d8d80",
+      "original_name": "Sárin osobný mobil — Postáva tu aj Sára a čumí do mobilu.",
+      "original_name_sha256": "76de0a9ccb67c0f17703f79f77422b1a005786aeff07d05e0b43557f513d0ed9",
+      "stable_name": "Sárin osobný mobil",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:03/50#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "03/51",
+      "scene_url": "https://trello.com/c/SPDzjNnS",
+      "item_id": "6a6bb5696a8ec454a63681df",
+      "checklist_id": "6a67a800e7112a68355009c0",
+      "original_name": "Betin osobný mobil — Bety zatvára svoju skrinku, niečo si prezerá v mobile. | KARTA: https://trello.com/c/5PcusQA3",
+      "original_name_sha256": "c988023972bcc98a8c1c8736f5d4e940a792fc23421c133cb422955bd20fa5c9",
+      "stable_name": "Betin osobný mobil",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/5PcusQA3",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "03/54FLASH",
+      "scene_url": "https://trello.com/c/6LvLFLQA",
+      "item_id": "6a6bb56b10c6cd125fb7b94d",
+      "checklist_id": "6a67a8085928fd2f307c5048",
+      "original_name": "Auto odstavené pri rieke — Auto pri rieke",
+      "original_name_sha256": "a6770f4192eab53b476eb9698fcb3b1fb1a78d6baa918141c1704c1979b94d3c",
+      "stable_name": "Auto odstavené pri rieke",
+      "categories": [
+        "Auto"
+      ],
+      "evidence": "source_record:03/54FLASH#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "03/55LP",
+      "scene_url": "https://trello.com/c/SZgBgNK8",
+      "item_id": "6a6bb56c4045416ae21f0305",
+      "checklist_id": "6a67a80b5c47ef9561d20c10",
+      "original_name": "<n> Olasovej auto — Stálo tam Olasovej auto. | ← 01/32FLASH: (prestrih Pri rieke) Alex a Olasová ležia na deke pri rieke, pri nich je Olasovej odstavené auto, zrazu počujú výstrel, vystrašene sa na seba pozrú. | TU: Stálo tam Olasovej auto. | → 04/23: Pred školou stojí staršie, jazdené Olasovej auto bez centrálneho uzamykania. | KARTA: https://trello.com/c/jTy06JAh",
+      "original_name_sha256": "34cf2f9ee18f557c78205860d1f9275c98789c53cffe397cb11a78e5b29630f8",
+      "stable_name": "Olasovej auto",
+      "categories": [
+        "Auto",
+        "Nadväzná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/jTy06JAh",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/01LP",
+      "scene_url": "https://trello.com/c/q22XKQFO",
+      "item_id": "6a6bb56d5f05c97cbc941057",
+      "checklist_id": "6a67a80e9435279384eaf1a4",
+      "original_name": "Dogyho osobný mobil — Odhryzne si z burgra, pozerá z okna, skroluje v mobile, čašníčka mu utiera stôl.",
+      "original_name_sha256": "e4180535d75d5b64b61b3d360883ac7f1475c150cc6eda4a8564262204acba7b",
+      "stable_name": "Dogyho osobný mobil",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:04/01LP#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/06LP",
+      "scene_url": "https://trello.com/c/IbmvaClW",
+      "item_id": "6a6bb5703614e2a25d6115eb",
+      "checklist_id": "6a67b082e11b6ee10bf7e7f7",
+      "original_name": "<n> Betin pôvodný denník — Potom sa otočí, z nočného stolíka vytiahne denník a píše, začneme počuť jej VO. | ← prvý výskyt | TU: Potom sa otočí, z nočného stolíka vytiahne denník a píše, začneme počuť jej VO. | → 04/14: Bety je už doma, píše si denník, ale je naštvaná, musí stále myslieť na Alexa a Olasovú. | KARTA: https://trello.com/c/Vpjifk5i",
+      "original_name_sha256": "9a460ac3c3ae4ce6419b39e31291785289ca58b4bbb1067cb04f78db95fdabef",
+      "stable_name": "Betin pôvodný denník",
+      "categories": [
+        "Dokument",
+        "Nadväzná rekvizita",
+        "Osobná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/Vpjifk5i",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/06LP",
+      "scene_url": "https://trello.com/c/IbmvaClW",
+      "item_id": "6a6bb5703087359000935c71",
+      "checklist_id": "6a67b082e11b6ee10bf7e7f7",
+      "original_name": "Zarámovaná fotografia Bety a Alexa z detstva — Najprv záber na Bety ako leží na posteli a pozerá na fotku s Alexom (môže byť v rámiku z detstva) popri tom ešte doznieva Dogyho VO, v ktorom hovorí o tom, že dievča od vedľa sa musí vysporiadať s tým, že jej najlepší kamarát má niečo s ich učiteľkou hudby.",
+      "original_name_sha256": "8c4524efeb1e36e8027ee3aa0b5b607df32c176a450a2c4e064d9049b806a728",
+      "stable_name": "Zarámovaná fotografia Bety a Alexa z detstva",
+      "categories": [
+        "Dokument"
+      ],
+      "evidence": "source_record:04/06LP#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/08",
+      "scene_url": "https://trello.com/c/4YRjTaJM",
+      "item_id": "6a6bb57128551560bc95a30a",
+      "checklist_id": "6a67b0870fbffbf4ad182ef6",
+      "original_name": "Alexova kytica pre Olasovú — Alex s kyticou kvetou mieri za Olasovou.",
+      "original_name_sha256": "55834fe5a5fa4d0deb637ae83169cb7393348af94843ff1302e46f48c34b4739",
+      "stable_name": "Alexova kytica pre Olasovú",
+      "categories": [],
+      "evidence": "source_record:04/08#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/09",
+      "scene_url": "https://trello.com/c/hQ26Hevb",
+      "item_id": "6a6bb577a966b397a7468d3b",
+      "checklist_id": "6a67b089baf9c5f571b8c272",
+      "original_name": "Dogyho mobil s oznámením mesta — Kikovi podáva mobil s odfoteným oznámením mesta o zavretí amfiteátra.",
+      "original_name_sha256": "cd9235d9ad6f65aec647919903a3b6019e1e13c0f9e5e6cfdcde52c5b8a77146",
+      "stable_name": "Dogyho mobil s oznámením mesta",
+      "categories": [
+        "Osobná rekvizita",
+        "Screen"
+      ],
+      "evidence": "source_record:04/09#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/10",
+      "scene_url": "https://trello.com/c/zDK8TWb3",
+      "item_id": "6a6bb579dc31373e672d3a5d",
+      "checklist_id": "6a67b08c43e09d1dd87ede34",
+      "original_name": "Tržba za drinky u Fefeho — S handrou za pásom si chce zobrať peniaze za drinky, ktoré ležia na stole.",
+      "original_name_sha256": "fb2971fbb8501b3d5fd645ee57dce6cfda621e8bac1db7637ae284e300b8c5da",
+      "stable_name": "Tržba za drinky u Fefeho",
+      "categories": [],
+      "evidence": "source_record:04/10#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/10",
+      "scene_url": "https://trello.com/c/zDK8TWb3",
+      "item_id": "6a6bb57907614fe93be94022",
+      "checklist_id": "6a67b08c43e09d1dd87ede34",
+      "original_name": "Drinkové poháre hostí u Fefeho — S handrou za pásom si chce zobrať peniaze za drinky, ktoré ležia na stole.",
+      "original_name_sha256": "a4b721b98a07a879ca7eb330c8d6ebab1069e6a9414d70ee8e476a91fbeaa0c8",
+      "stable_name": "Drinkové poháre hostí u Fefeho",
+      "categories": [],
+      "evidence": "source_record:04/10#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/14",
+      "scene_url": "https://trello.com/c/fUPuyIjB",
+      "item_id": "6a6bb57cc011748f10791fe3",
+      "checklist_id": "6a67b098ad352e3d15b09333",
+      "original_name": "<n> Betin pôvodný denník — Bety je už doma, píše si denník, ale je naštvaná, musí stále myslieť na Alexa a Olasovú. | ← 04/06LP: Potom sa otočí, z nočného stolíka vytiahne denník a píše, začneme počuť jej VO. | TU: Bety je už doma, píše si denník, ale je naštvaná, musí stále myslieť na Alexa a Olasovú. | → ďalší potvrdený obraz neurčený | KARTA: https://trello.com/c/Vpjifk5i",
+      "original_name_sha256": "26dfed93245f8bde95770c9dcf8d152390cd951c26d2d0b768513f9d79d7e91b",
+      "stable_name": "Betin pôvodný denník",
+      "categories": [
+        "Dokument",
+        "Nadväzná rekvizita",
+        "Osobná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/Vpjifk5i",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/14",
+      "scene_url": "https://trello.com/c/fUPuyIjB",
+      "item_id": "6a6bb57cabe2694f213231ed",
+      "checklist_id": "6a67b098ad352e3d15b09333",
+      "original_name": "Betin notebook na pátranie po Olasovej — Vezme si svoj notebook a vidíme, že do vyhľadávača napíše jej meno – Lucia Olasová.",
+      "original_name_sha256": "fa6f43d2ab603e4d2929312ccc3fae90cfaede06ae2bb0c7992f054f82825700",
+      "stable_name": "Betin notebook na pátranie po Olasovej",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:04/14#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/15",
+      "scene_url": "https://trello.com/c/AefvnMGI",
+      "item_id": "6a6bb57d1e8b21a95c3ac622",
+      "checklist_id": "6a67b09beb047a2d681eee7a",
+      "original_name": "Sárin osobný mobil — Sára vytiahne mobil, odfotí si ich a tajomne sa usmeje.",
+      "original_name_sha256": "470d4a21a8b1be7397912e08cd97ca53b9a0edc56cd0c3bd2400d840941efb3a",
+      "stable_name": "Sárin osobný mobil",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:04/15#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/16",
+      "scene_url": "https://trello.com/c/CdCS4GjK",
+      "item_id": "6a6bb57e8a3fd564232b7b83",
+      "checklist_id": "6a67b09e2d765d7723feda3d",
+      "original_name": "Dogyho osobný mobil — Dogy ťuká do mobilu, Alex je napätý, díva sa pred seba.",
+      "original_name_sha256": "4644c9e21327f0462ffeecf7f40bd99b6407a240695bba9026c6fdae7b0b5d8f",
+      "stable_name": "Dogyho osobný mobil",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:04/16#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/18",
+      "scene_url": "https://trello.com/c/6BKMlHvL",
+      "item_id": "6a6bb580ef8b9d1061fe67f4",
+      "checklist_id": "6a67b0a3714608541e067e72",
+      "original_name": "Sárin mobil s fotografiou Laury a Andyho — Sára vyťahuje mobil a ukazuje im fotku Veronikinej mamy s Vlkom.",
+      "original_name_sha256": "906c9a5d902ef142385d01f0cfabb7c1dec5e7a921e10e5fa38485067d2c05c3",
+      "stable_name": "Sárin mobil s fotografiou Laury a Andyho",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:04/18#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/18",
+      "scene_url": "https://trello.com/c/6BKMlHvL",
+      "item_id": "6a6bb5806d9d3710cc29dc1f",
+      "checklist_id": "6a67b0a3714608541e067e72",
+      "original_name": "Sárina fotografia Laury a Andyho — Sára vyťahuje mobil a ukazuje im fotku Veronikinej mamy s Vlkom.",
+      "original_name_sha256": "51db79ae230afdee4f5fdf8e7c44ac6f02e9b1191d233bdadbd6f514b70bbfab",
+      "stable_name": "Sárina fotografia Laury a Andyho",
+      "categories": [
+        "Dokument",
+        "Screen"
+      ],
+      "evidence": "source_record:04/18#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/19",
+      "scene_url": "https://trello.com/c/8aZUzTWa",
+      "item_id": "6a6bb5829d5e51a85e2578f4",
+      "checklist_id": "6a67b0a565af0b247e8737d9",
+      "original_name": "Laurin pohár vína — Laura je stále v pracovnom odeve, akurát si vyložila nohy po únavnom dni u Fefeho a naliala si pohár vína.",
+      "original_name_sha256": "21e0e19ff55362a64d35cd818cca5311fe93ef6bf591704688ce9a659b0769a1",
+      "stable_name": "Laurin pohár vína",
+      "categories": [],
+      "evidence": "source_record:04/19#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/20",
+      "scene_url": "https://trello.com/c/Oraw6Esp",
+      "item_id": "6a6bb5843d78910cf1a2422a",
+      "checklist_id": "6a67b0a880d8e1a678be069d",
+      "original_name": "Zarámované fotografie primátorky Kamenickej — Obzerá si zarámované fotky na stenách – v hlavnej úlohe primátorka.",
+      "original_name_sha256": "d664030506b53fe556af925fc7bbf2dd7c432e649532e5e4ba8f3b20b50f9cfa",
+      "stable_name": "Zarámované fotografie primátorky Kamenickej",
+      "categories": [
+        "Dokument"
+      ],
+      "evidence": "source_record:04/20#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/21",
+      "scene_url": "https://trello.com/c/xfgFjsKI",
+      "item_id": "6a6bb5852b70e8293c5a2aa8",
+      "checklist_id": "6a67b0ab3d3f2a9c0af86dbb",
+      "original_name": "Betin mobil so screenshotom parte — Bety mu podá mobil so screenshotom oznámenia o úmrtí nejakej staršej pani. | KARTA: https://trello.com/c/5PcusQA3",
+      "original_name_sha256": "0b4d12b8057ad2f85d1afe8e875cbc7b7b694e40f8ccc1e79a1b9914fcb79bff",
+      "stable_name": "Betin osobný mobil",
+      "categories": [],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/5PcusQA3",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/23",
+      "scene_url": "https://trello.com/c/FovJMqGz",
+      "item_id": "6a6bb5889498f96f8c8daccd",
+      "checklist_id": "6a67b0b0c21e5658b7bdd877",
+      "original_name": "<n> Olasovej pištoľ — Spod sedadla pomaly vytiahne zbraň a ukáže ju Veronike. | ← prvý výskyt | TU: Spod sedadla pomaly vytiahne zbraň a ukáže ju Veronike. | → 04/30: Kôš položí na posteľ a otvorí šuplík, vloží doň oblečenie, potom otvorí druhý a nájde tam zbraň. | KARTA: https://trello.com/c/AhXdJRMS",
+      "original_name_sha256": "6c3fdf01e3ef5ab49be13144b76bab5e2d5b00cee7cc9c979fdf2aeaf9c33186",
+      "stable_name": "Olasovej pištoľ",
+      "categories": [
+        "Nadväzná rekvizita",
+        "Osobná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/AhXdJRMS",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/23",
+      "scene_url": "https://trello.com/c/FovJMqGz",
+      "item_id": "6a6bb5888d96e340cf7ddac0",
+      "checklist_id": "6a67b0b0c21e5658b7bdd877",
+      "original_name": "<n> Olasovej auto — Pred školou stojí staršie, jazdené Olasovej auto bez centrálneho uzamykania. | ← 03/55LP: Stálo tam Olasovej auto. | TU: Pred školou stojí staršie, jazdené Olasovej auto bez centrálneho uzamykania. | → 04/48: Olasová už má naložené svoje autom vecami, prichádza k autu a do toho počujeme doznievať VO Bety ako o nej hovorí. | KARTA: https://trello.com/c/jTy06JAh",
+      "original_name_sha256": "8c747593e5ff4f4b1bb6e3464b639baa62a5a82e75427d612cbb5c534001443c",
+      "stable_name": "Olasovej auto",
+      "categories": [
+        "Auto",
+        "Nadväzná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/jTy06JAh",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/23",
+      "scene_url": "https://trello.com/c/FovJMqGz",
+      "item_id": "6a6bb5884e3c37025e706f82",
+      "checklist_id": "6a67b0b0c21e5658b7bdd877",
+      "original_name": "Fotografia Olasovej na falošnom občianskom preukaze — V šere ho skúma – je na ňom fotka Olasovej, ale s úplne iným menom – Katarína Bertyová.",
+      "original_name_sha256": "9c8383ec517f9b5f0054048013190a82ef1ac302240712009f3fea1048fb7bb5",
+      "stable_name": "Fotografia Olasovej na falošnom občianskom preukaze",
+      "categories": [
+        "Dokument",
+        "Screen"
+      ],
+      "evidence": "source_record:04/23#2",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/23",
+      "scene_url": "https://trello.com/c/FovJMqGz",
+      "item_id": "6a6bb58716a9b07a3f97ae91",
+      "checklist_id": "6a67b0b0c21e5658b7bdd877",
+      "original_name": "Betin batoh s planžetou — Bety pri dverách zloží batoh a vytiahne z neho drôt alebo planžetu.",
+      "original_name_sha256": "20fdf9391674673e04e72e08055f88f5bf9a134dba188931f2b018e607d6ba4f",
+      "stable_name": "Betin batoh s planžetou",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:04/23#3",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/23",
+      "scene_url": "https://trello.com/c/FovJMqGz",
+      "item_id": "6a6b9500ddcacf0e068e3044",
+      "checklist_id": "6a67b0b0c21e5658b7bdd877",
+      "original_name": "<n> Pištoľ / zbraň — Spod sedadla pomaly vytiahne zbraň a ukáže ju Veronike. | ← 01/32FLASH: OLASOVÁ Naozajstná zbraň znie inak! | TU: Spod sedadla pomaly vytiahne zbraň a ukáže ju Veronike. | → 04/24: Mala zbraň. | KARTA: https://trello.com/c/AhXdJRMS",
+      "original_name_sha256": "61d24a17ce13462dd27e58eccb111c230e68e219dda089f5e60e2683f4118cbb",
+      "stable_name": "Olasovej pištoľ",
+      "categories": [
+        "Nadväzná rekvizita",
+        "Osobná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/AhXdJRMS",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/24",
+      "scene_url": "https://trello.com/c/gdNkGTKP",
+      "item_id": "6a6bb58accbd15a09a2de32f",
+      "checklist_id": "6a67b0d7bb9ac3c6317db200",
+      "original_name": "Betin mobil s fotografiou občianskeho preukazu — Bety mu pred oči strčí mobil s odfoteným občianskym preukazom. | KARTA: https://trello.com/c/5PcusQA3",
+      "original_name_sha256": "73b61e5c5e3aa95304b4005052cea6717e2023eeb0435faa7a2e42470acae128",
+      "stable_name": "Betin osobný mobil",
+      "categories": [],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/5PcusQA3",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/24",
+      "scene_url": "https://trello.com/c/gdNkGTKP",
+      "item_id": "6a6bb58a1c355874010a44c5",
+      "checklist_id": "6a67b0d7bb9ac3c6317db200",
+      "original_name": "Fotografia Olasovej na falošnom občianskom preukaze — Na fotke je Olasová s iným menom.",
+      "original_name_sha256": "651a7255c1bc99538860eaa0a051e2122ec9945a736a52dcb848de5d07aceec7",
+      "stable_name": "Fotografia Olasovej na falošnom občianskom preukaze",
+      "categories": [
+        "Dokument",
+        "Screen"
+      ],
+      "evidence": "source_record:04/24#2",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/24",
+      "scene_url": "https://trello.com/c/gdNkGTKP",
+      "item_id": "6a6b950cc5448ce4eb9be1d3",
+      "checklist_id": "6a67b0d7bb9ac3c6317db200",
+      "original_name": "<n> Pištoľ / zbraň — Mala zbraň. | ← 04/23: Spod sedadla pomaly vytiahne zbraň a ukáže ju Veronike. | TU: Mala zbraň. | → 04/27: Alex sa pýta Olasovej na zbraň a identitu | KARTA: https://trello.com/c/AhXdJRMS",
+      "original_name_sha256": "e3d9660baa3eb079a7b0621ca547ee55081a63704ab715fbc1cca2c247b19dba",
+      "stable_name": "Olasovej pištoľ",
+      "categories": [
+        "Nadväzná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/AhXdJRMS",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/26",
+      "scene_url": "https://trello.com/c/n7sGTehT",
+      "item_id": "6a6bb58c8ffb1744c153d21b",
+      "checklist_id": "6a67b0dc53a7051d4d84e987",
+      "original_name": "Laurin úplatok pre primátorku — Laura pred ňu na stôl položí koženú tašku s peniazmi, na ktorej sú iniciály L.S.",
+      "original_name_sha256": "dcc554acd25cc94825d3e64e71450a0c4afdb2731b6f27b3e2f88a5a0c8c1b9c",
+      "stable_name": "Laurin úplatok pre primátorku",
+      "categories": [],
+      "evidence": "source_record:04/26#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/26",
+      "scene_url": "https://trello.com/c/n7sGTehT",
+      "item_id": "6a6bb58ce8932ab60d2cecdb",
+      "checklist_id": "6a67b0dc53a7051d4d84e987",
+      "original_name": "Laurina kožená taška s iniciálami L.S. — Laura pred ňu na stôl položí koženú tašku s peniazmi, na ktorej sú iniciály L.S.",
+      "original_name_sha256": "edd31e011bd45b1860c2a84c60c5d313e406962c2613f0e8a5c6c74aedcc363d",
+      "stable_name": "Laurina kožená taška s iniciálami L.S.",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:04/26#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/27",
+      "scene_url": "https://trello.com/c/hZKzDzHP",
+      "item_id": "6a6b9511b1fa066fb686adf5",
+      "checklist_id": "6a67b0df23a87a2732f36275",
+      "original_name": "<n> Pištoľ / zbraň — Alex sa pýta Olasovej na zbraň a identitu | ← 04/24: Mala zbraň. | TU: Alex sa pýta Olasovej na zbraň a identitu | → 04/29: Alex práve povedal Bety, čo sa dozvedel od Olasovej (prečo si zmenila identitu a prečo mala zbraň v aute). | KARTA: https://trello.com/c/AhXdJRMS",
+      "original_name_sha256": "0fa069ca4b625837a2872b77da4eb5a653e409ccda05090dd5704ae67e23c191",
+      "stable_name": "Olasovej pištoľ",
+      "categories": [
+        "Nadväzná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/AhXdJRMS",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/28",
+      "scene_url": "https://trello.com/c/6uniIDDn",
+      "item_id": "6a6bb58fe1f10c08e6117c94",
+      "checklist_id": "6a67b0e16853419af7d95e04",
+      "original_name": "Fotografie osôb na Kelerovej vyšetrovacej nástenke — Na stene visí rozsiahla nástenka – mapa mesta, v strede fotka Jakuba, okolo fotky obyvateľov mesta, príbuzných, kamarátov, ktorí sú pospájaní červenými nitkami a čiarami – je tam Sára, Olasová, Matej, Alica, Laura, mená, štítky, poznámky.",
+      "original_name_sha256": "aeca8dec3cedadf4dabec8a29dd34b6783360463642128a5b6817b8d610cc3b8",
+      "stable_name": "Fotografie osôb na Kelerovej vyšetrovacej nástenke",
+      "categories": [
+        "Dokument"
+      ],
+      "evidence": "source_record:04/28#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/28",
+      "scene_url": "https://trello.com/c/6uniIDDn",
+      "item_id": "6a6bb58f5d4d7ce9b9774567",
+      "checklist_id": "6a67b0e16853419af7d95e04",
+      "original_name": "Kelerove vyšetrovacie spisy a papiere — Keler sedí za stolom plným spisov a papierov a píše.",
+      "original_name_sha256": "4dff0f5fdafe423a26a1f5705881b2c2fc482475bc1175e6f9dc8a7e05fa4b8a",
+      "stable_name": "Kelerove vyšetrovacie spisy a papiere",
+      "categories": [
+        "Dokument"
+      ],
+      "evidence": "source_record:04/28#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/29",
+      "scene_url": "https://trello.com/c/45oyj7ru",
+      "item_id": "6a6b95165f4cd6e184af3e4d",
+      "checklist_id": "6a67b0e4609d2efced3795fc",
+      "original_name": "<n> Pištoľ / zbraň — Alex práve povedal Bety, čo sa dozvedel od Olasovej (prečo si zmenila identitu a prečo mala zbraň v aute). | ← 04/27: Alex sa pýta Olasovej na zbraň a identitu | TU: Alex práve povedal Bety, čo sa dozvedel od Olasovej (prečo si zmenila identitu a prečo mala zbraň v aute). | → 04/30: Kôš položí na posteľ a otvorí šuplík, vloží doň oblečenie, potom otvorí druhý a nájde tam zbraň. | KARTA: https://trello.com/c/AhXdJRMS",
+      "original_name_sha256": "4585e7668ab0e587422050ac5c9c612f2fac414a0e6d14e2e0bb03b9834863b0",
+      "stable_name": "Olasovej pištoľ",
+      "categories": [
+        "Nadväzná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/AhXdJRMS",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/30",
+      "scene_url": "https://trello.com/c/2DQHM5G1",
+      "item_id": "6a6bb591096c937a33fa76a2",
+      "checklist_id": "6a67b0e689c510f8964bd83b",
+      "original_name": "<n> Olasovej pištoľ — Kôš položí na posteľ a otvorí šuplík, vloží doň oblečenie, potom otvorí druhý a nájde tam zbraň. | ← 04/23: Spod sedadla pomaly vytiahne zbraň a ukáže ju Veronike. | TU: Kôš položí na posteľ a otvorí šuplík, vloží doň oblečenie, potom otvorí druhý a nájde tam zbraň. | → 04/31: Na stole pred ňou leží pištoľ, ktorú našla. | KARTA: https://trello.com/c/AhXdJRMS",
+      "original_name_sha256": "6529b81c0517506247b759397e83fc5b66ef4ac0ee73ffc53c52a1f2606b9ffc",
+      "stable_name": "Olasovej pištoľ",
+      "categories": [
+        "Nadväzná rekvizita",
+        "Osobná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/AhXdJRMS",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/30",
+      "scene_url": "https://trello.com/c/2DQHM5G1",
+      "item_id": "6a6bb591acda2af75529ad1e",
+      "checklist_id": "6a67b0e689c510f8964bd83b",
+      "original_name": "Betin pôvodný denník — Premýšľa, zbraň položí a hystericky začne hľadať Betin denník, lebo vie, že si ho píše.",
+      "original_name_sha256": "72fb4ca27b4637331ddb725fa6a0d1f1de1fb5520f844c3fbecad990e50128c4",
+      "stable_name": "Betin pôvodný denník",
+      "categories": [
+        "Dokument",
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:04/30#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/30",
+      "scene_url": "https://trello.com/c/2DQHM5G1",
+      "item_id": "6a6b95189b1f33347203e05c",
+      "checklist_id": "6a67b0e689c510f8964bd83b",
+      "original_name": "<n> Pištoľ / zbraň — Kôš položí na posteľ a otvorí šuplík, vloží doň oblečenie, potom otvorí druhý a nájde tam zbraň. | ← 04/29: Alex práve povedal Bety, čo sa dozvedel od Olasovej (prečo si zmenila identitu a prečo mala zbraň v aute). | TU: Kôš položí na posteľ a otvorí šuplík, vloží doň oblečenie, potom otvorí druhý a nájde tam zbraň. | → 04/31: Na stole pred ňou leží pištoľ, ktorú našla. | KARTA: https://trello.com/c/AhXdJRMS",
+      "original_name_sha256": "416ca401a33643b530c83b9bbc91c48253f460fdd9f0b65448948dd00bfb9b22",
+      "stable_name": "Olasovej pištoľ",
+      "categories": [
+        "Nadväzná rekvizita",
+        "Osobná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/AhXdJRMS",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/31",
+      "scene_url": "https://trello.com/c/gc1577EV",
+      "item_id": "6a6bb593c21d428f52ea8498",
+      "checklist_id": "6a67b0e8ab7627fa7480f778",
+      "original_name": "<n> Olasovej pištoľ — Na stole pred ňou leží pištoľ, ktorú našla. | ← 04/30: Kôš položí na posteľ a otvorí šuplík, vloží doň oblečenie, potom otvorí druhý a nájde tam zbraň. | TU: Na stole pred ňou leží pištoľ, ktorú našla. | → ďalší potvrdený obraz neurčený | KARTA: https://trello.com/c/AhXdJRMS",
+      "original_name_sha256": "5331e32b17ca08c5536be454d9adcfb26d33556abf34e6b85439a6574c566b64",
+      "stable_name": "Olasovej pištoľ",
+      "categories": [
+        "Nadväzná rekvizita",
+        "Osobná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/AhXdJRMS",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/31",
+      "scene_url": "https://trello.com/c/gc1577EV",
+      "item_id": "6a6b951b06cfdf103270226e",
+      "checklist_id": "6a67b0e8ab7627fa7480f778",
+      "original_name": "<n> Pištoľ / zbraň — Na stole pred ňou leží pištoľ, ktorú našla. | ← 04/30: Kôš položí na posteľ a otvorí šuplík, vloží doň oblečenie, potom otvorí druhý a nájde tam zbraň. | TU: Na stole pred ňou leží pištoľ, ktorú našla. | → ďalší potvrdený obraz neurčený | KARTA: https://trello.com/c/AhXdJRMS",
+      "original_name_sha256": "38753d8bc05a16daf2172bed4dc1b4d2ffb4311b73d1a5397f9510c2cca89ebe",
+      "stable_name": "Olasovej pištoľ",
+      "categories": [
+        "Nadväzná rekvizita",
+        "Osobná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/AhXdJRMS",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/35",
+      "scene_url": "https://trello.com/c/4h93WZtS",
+      "item_id": "6a6bb59c076e6ce65fa17ff8",
+      "checklist_id": "6a67b0f5330a9a8352b8b3c5",
+      "original_name": "Laurin osobný mobil — Laura prikývne a vtom jej zapípa mobil – príde jej správa (od Andyho – Vlka – nevidíme to, zistíme to, keď sa s ním stretne).",
+      "original_name_sha256": "46f059a1746a6c4257d0f647e97d3a39354b399f51e4c57d0f3f583eb68ef754",
+      "stable_name": "Laurin osobný mobil",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:04/35#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/37",
+      "scene_url": "https://trello.com/c/0ctkBS6K",
+      "item_id": "6a6bb59d384ff8b89ddc1cb9",
+      "checklist_id": "6a67b0f92003957c6770bab8",
+      "original_name": "Kikove vysypané mince — Ako ich drží v otvorenej dlani, do ruky mu drgne Noel a peniaze sa mu vysypú.",
+      "original_name_sha256": "eec343ce446600c9219757c6e91dada6463a6b8615690cddf6a652988fce0e63",
+      "stable_name": "Kikove vysypané mince",
+      "categories": [],
+      "evidence": "source_record:04/37#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/38",
+      "scene_url": "https://trello.com/c/347qYPSF",
+      "item_id": "6a6bb59fb92b6080b2acb0e8",
+      "checklist_id": "6a67b0fbca33211eb05547df",
+      "original_name": "Obálka s Andyho odmenou od Laury — Laura podá Andymu obálku s peniazmi.",
+      "original_name_sha256": "303e34f7383e8aa5a6bb379fa4c8860155f8fc37cfe7390ac036d20a8751c66c",
+      "stable_name": "Obálka s Andyho odmenou od Laury",
+      "categories": [],
+      "evidence": "source_record:04/38#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/38",
+      "scene_url": "https://trello.com/c/347qYPSF",
+      "item_id": "6a6bb59e0f88e66eee96640b",
+      "checklist_id": "6a67b0fbca33211eb05547df",
+      "original_name": "Andyho hotovostná odmena od Laury — Laura podá Andymu obálku s peniazmi.",
+      "original_name_sha256": "0b324629b91a96801e507020e677df930837488343a12691d48a79f39d15f095",
+      "stable_name": "Andyho hotovostná odmena od Laury",
+      "categories": [],
+      "evidence": "source_record:04/38#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/39",
+      "scene_url": "https://trello.com/c/6dlwicEa",
+      "item_id": "6a6bb5a1eaeaff0d933e19da",
+      "checklist_id": "6a67b0fe91e9e6bc7d9c4ba7",
+      "original_name": "Mobil odovzdávaný Kikovi — KIKO Daj mi mobil.",
+      "original_name_sha256": "a408cb3bef50edafc133528e3df203cc99cf26c9befb9f90b2271291519ea312",
+      "stable_name": "Mobil odovzdávaný Kikovi",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:04/39#1",
+      "existing_registry_url": null,
+      "ambiguity_question": "04/39: potvrdiť vlastníka alebo fyzickú totožnosť rekvizity „Mobil odovzdávaný Kikovi“; dovtedy je bez nadväznosti.",
+      "conflict": null
+    },
+    {
+      "scene_id": "04/41",
+      "scene_url": "https://trello.com/c/XTUROah6",
+      "item_id": "6a6bb5a2acddc9cfc350f579",
+      "checklist_id": "6a67b100ed371bed22fbbf95",
+      "original_name": "Kelerovo auto — Vyšetrovateľ Keler vystúpi z auta pred domom, kde žije so synom Kikom.",
+      "original_name_sha256": "b1ef1d1913129bd39846746afda8d412298f42251fbc8c4ff10b36d98030c656",
+      "stable_name": "Kelerovo auto",
+      "categories": [
+        "Auto"
+      ],
+      "evidence": "source_record:04/41#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/42",
+      "scene_url": "https://trello.com/c/h6mriTr4",
+      "item_id": "6a6bb5a4713562135bd41ace",
+      "checklist_id": "6a67b1035076913370de3943",
+      "original_name": "Prázdny spis k vražde Jakuba — Niekto z nej fotky a informácie vzal, taktiež je rozhádzaný pracovný stôl, na ktorom je prázdny spis k vražde Jakuba.",
+      "original_name_sha256": "3bf4078cac211a90aa135366f1b6a2c7c6ce91252538faa490e36b855ddf6900",
+      "stable_name": "Prázdny spis k vražde Jakuba",
+      "categories": [
+        "Dokument"
+      ],
+      "evidence": "source_record:04/42#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/44",
+      "scene_url": "https://trello.com/c/J8ytzm9Y",
+      "item_id": "6a6bb5a57552c6a13ecd1bc9",
+      "checklist_id": "6a67b108e22b4417dc85b9bd",
+      "original_name": "<n> Alexova gitara od Lukáša — Díva sa na opretú gitaru a má slzy na krajíčku. | ← 03/45: Lukáš vtedy spoza stola vytiahne gitaru v puzdre. | TU: Díva sa na opretú gitaru a má slzy na krajíčku. | → 05/15: Alex má snímač na gitare a klopák na tričku a hrá a spieva svoju pesničku. | KARTA: https://trello.com/c/LSIdt0l0",
+      "original_name_sha256": "0759dcad0c99943c2bfcfea1fc7e0a851abc2babb31378de01b3ee7affe36c75",
+      "stable_name": "Alexova gitara od Lukáša",
+      "categories": [
+        "Nadväzná rekvizita",
+        "Osobná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/LSIdt0l0",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/47LP",
+      "scene_url": "https://trello.com/c/ax5v3HXl",
+      "item_id": "6a6bb5a9642c972dd225308e",
+      "checklist_id": "6a67b129b544ed87d1909c32",
+      "original_name": "<n> Betin nový denník — Bety už sa upokojila a zakladá si nový denník, otvára ho, ale rozhodne sa, že musí napísať Alexovi, chce vedieť, či sa na ňu hnevá, vezme mobil a napíše mu správu: prepáč. | ← prvý výskyt | TU: Bety už sa upokojila a zakladá si nový denník, otvára ho, ale rozhodne sa, že musí napísať Alexovi, chce vedieť, či sa na ňu hnevá, vezme mobil a napíše mu správu: prepáč. | → 06/03: Z lampičky prejde kamera už na dospelú Bety, ktorá sedí na posteli a píše si denník. | KARTA: https://trello.com/c/zX1mXWnU",
+      "original_name_sha256": "900765befb9769a58bd76257f6e3b353580b9ab888ed0c2d827dbcaee7a34b9e",
+      "stable_name": "Betin nový denník",
+      "categories": [
+        "Dokument",
+        "Nadväzná rekvizita",
+        "Osobná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/zX1mXWnU",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/47LP",
+      "scene_url": "https://trello.com/c/ax5v3HXl",
+      "item_id": "6a6bb5a990752a9de15ad6fe",
+      "checklist_id": "6a67b129b544ed87d1909c32",
+      "original_name": "Betin osobný mobil — Bety už sa upokojila a zakladá si nový denník, otvára ho, ale rozhodne sa, že musí napísať Alexovi, chce vedieť, či sa na ňu hnevá, vezme mobil a napíše mu správu: prepáč. | KARTA: https://trello.com/c/5PcusQA3",
+      "original_name_sha256": "1eae9c2eb9dec982dee1f5e421ff149c918fba9b38de1d08e84b4c27eca34165",
+      "stable_name": "Betin osobný mobil",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/5PcusQA3",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/48",
+      "scene_url": "https://trello.com/c/arBDjoZu",
+      "item_id": "6a6bb5aa2eb8af2adc7789f6",
+      "checklist_id": "6a67b12cf2a6704c203730e0",
+      "original_name": "<n> Olasovej auto — Olasová už má naložené svoje autom vecami, prichádza k autu a do toho počujeme doznievať VO Bety ako o nej hovorí. | ← 04/23: Pred školou stojí staršie, jazdené Olasovej auto bez centrálneho uzamykania. | TU: Olasová už má naložené svoje autom vecami, prichádza k autu a do toho počujeme doznievať VO Bety ako o nej hovorí. | → ďalší potvrdený obraz neurčený | KARTA: https://trello.com/c/jTy06JAh",
+      "original_name_sha256": "be37520beeeb5f33c0e41994e182b953689d73ba884b06f501652a5b5ca8865b",
+      "stable_name": "Olasovej auto",
+      "categories": [
+        "Auto",
+        "Nadväzná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/jTy06JAh",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "04/50",
+      "scene_url": "https://trello.com/c/sOh1Boex",
+      "item_id": "6a6bb5acd482056e8c5da0a9",
+      "checklist_id": "6a67b13011766d88513e5327",
+      "original_name": "Andyho kožená bunda — V koženej bunde, ruky vo vreckách.",
+      "original_name_sha256": "5074b1160aa8b5dd8dade39fe6e423486b626eecd4e01c787cbc3d6f246d3c4d",
+      "stable_name": "Andyho kožená bunda",
+      "categories": [],
+      "evidence": "source_record:04/50#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "05/05",
+      "scene_url": "https://trello.com/c/ezpSLiIj",
+      "item_id": "6a6bb5ae159a2011f33965d9",
+      "checklist_id": "6a67b1390cb6914ee306fb84",
+      "original_name": "Fotografie podozrivých na Kelerovej vyšetrovacej nástenke — Sú tam fotky podozrivých (Olasová, Matej), Jakuba, jeho rodičov, Sáry, Alexa… skrátka všetkých, o ktorých do tejto chvíle vieme, že s vraždou nejako súvisia.",
+      "original_name_sha256": "ea76440cccee691da3199d27fb4cbfab855b639c6712eb68663a976a17ed4fd6",
+      "stable_name": "Fotografie podozrivých na Kelerovej vyšetrovacej nástenke",
+      "categories": [
+        "Dokument"
+      ],
+      "evidence": "source_record:05/05#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "05/05",
+      "scene_url": "https://trello.com/c/ezpSLiIj",
+      "item_id": "6a6bb5ae984e1cbb9571653f",
+      "checklist_id": "6a67b1390cb6914ee306fb84",
+      "original_name": "Jakubov vyšetrovací spis — Aj Jakubov spis.",
+      "original_name_sha256": "7b344d21008fa6b7ec90a047720541743c6a51c698e95044393864181a6d7341",
+      "stable_name": "Jakubov vyšetrovací spis",
+      "categories": [
+        "Dokument"
+      ],
+      "evidence": "source_record:05/05#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "05/08",
+      "scene_url": "https://trello.com/c/ofikufZ9",
+      "item_id": "6a6bb5b0d4dcc6edd70ccd2b",
+      "checklist_id": "6a67b14494a72ae01b85f02d",
+      "original_name": "Laurina platba za objednávku — Hodí bankovky na pult.",
+      "original_name_sha256": "792cde4cd14b5ea2f4d2aff54ba48c19436408043d59deb8eb2779726fc1f2b0",
+      "stable_name": "Laurina platba za objednávku",
+      "categories": [],
+      "evidence": "source_record:05/08#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "05/08",
+      "scene_url": "https://trello.com/c/ofikufZ9",
+      "item_id": "6a6bb5b080b5f7efc0bc49db",
+      "checklist_id": "6a67b14494a72ae01b85f02d",
+      "original_name": "Lukášova objednávka jedla od Fefeho — Lukáš prichádza po objednávku jedla.",
+      "original_name_sha256": "650f7e218fc094816f4678251ebc8bf89a0b23a955149d66de662d45821886b2",
+      "stable_name": "Lukášova objednávka jedla od Fefeho",
+      "categories": [],
+      "evidence": "source_record:05/08#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "05/09",
+      "scene_url": "https://trello.com/c/jKw9e1wp",
+      "item_id": "6a6bb5b195957375c6516c55",
+      "checklist_id": "6a67b147fe1ff4caffa4b02f",
+      "original_name": "Lein osobný mobil — Lea prikývne, hľadá v mobile kontakt.",
+      "original_name_sha256": "eb16ae21e6f31f034184b9801179e2726729f4c5a121dde6c3cd51f943f80425",
+      "stable_name": "Lein osobný mobil",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:05/09#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "05/11",
+      "scene_url": "https://trello.com/c/OBFnR1pH",
+      "item_id": "6a6bb5b850641e761134d80b",
+      "checklist_id": "6a67b14bb904dd9526a27ed5",
+      "original_name": "Alexov osobný mobil — V druhej ruke drží telefón so správou od Lei “Gonzo… 091858612“.",
+      "original_name_sha256": "518d77512ff27c282c7a6782023a907585dfbcd02fa7ef2722814d84a32ca6e3",
+      "stable_name": "Alexov osobný mobil",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:05/11#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "05/13",
+      "scene_url": "https://trello.com/c/dTy5XajL",
+      "item_id": "6a6bb5ba6d784d8542479471",
+      "checklist_id": "6a67b150287599a910ff0a76",
+      "original_name": "Smútočný portrét Jakuba vo vile Révayovcov — V otvorenom priestranstve vily Révayovcov Klaudia dolaďuje kvetinovú výzdobu okolo fotografie nebohého Jakuba.",
+      "original_name_sha256": "66e486f5e1f47e1292b0f17c09146e2a458be8deb2607a19eca07564f595d612",
+      "stable_name": "Smútočný portrét Jakuba vo vile Révayovcov",
+      "categories": [
+        "Dokument"
+      ],
+      "evidence": "source_record:05/13#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "05/13",
+      "scene_url": "https://trello.com/c/dTy5XajL",
+      "item_id": "6a6bb5ba5d1fd6b866cf0e38",
+      "checklist_id": "6a67b150287599a910ff0a76",
+      "original_name": "Smútočná kvetinová výzdoba okolo Jakubovej fotografie — V otvorenom priestranstve vily Révayovcov Klaudia dolaďuje kvetinovú výzdobu okolo fotografie nebohého Jakuba.",
+      "original_name_sha256": "6da04e10ba587b77b0163b8f892ef98564c3004338c53889852aa0f753d6e3c4",
+      "stable_name": "Smútočná kvetinová výzdoba okolo Jakubovej fotografie",
+      "categories": [],
+      "evidence": "source_record:05/13#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "05/14",
+      "scene_url": "https://trello.com/c/AB8Ivx3S",
+      "item_id": "6a6bb5bcd3e5d5c65f8d8407",
+      "checklist_id": "6a67b153e8383eca6856d932",
+      "original_name": "Tomiho výkonný laptop — Nadupaný laptop, mikinu Pleina, nové nike-air, čo stáli skoro tri kilá.",
+      "original_name_sha256": "7cf697f9119f3555c7e65618c766248f58c4aa81f791b57c8c9838a330313215",
+      "stable_name": "Tomiho výkonný laptop",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:05/14#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "05/14",
+      "scene_url": "https://trello.com/c/AB8Ivx3S",
+      "item_id": "6a6bb5bb415eb248546e6d7e",
+      "checklist_id": "6a67b153e8383eca6856d932",
+      "original_name": "Fotografia Jakuba a Sofie — Len nechápem, prečo tam bola aj fotka Jakuba so Sofi?",
+      "original_name_sha256": "fc7e3b60bb21bd2f478e658e73cf4d46c37f11f86bb86526040444172f073415",
+      "stable_name": "Fotografia Jakuba a Sofie",
+      "categories": [
+        "Dokument"
+      ],
+      "evidence": "source_record:05/14#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "05/15",
+      "scene_url": "https://trello.com/c/DOoo83kF",
+      "item_id": "6a6bb5bd5dc2ac26334017e4",
+      "checklist_id": "6a67b1551ee8bc2b970ccb55",
+      "original_name": "<n> Alexova gitara od Lukáša — Alex má snímač na gitare a klopák na tričku a hrá a spieva svoju pesničku. | ← 04/44: Díva sa na opretú gitaru a má slzy na krajíčku. | TU: Alex má snímač na gitare a klopák na tričku a hrá a spieva svoju pesničku. | → 05/44LP: Alex si hrá na gitare v hudobnej miestnosti. | KARTA: https://trello.com/c/LSIdt0l0",
+      "original_name_sha256": "ed726cc881350a09e62ebb3c0661326fcc661c9b745156aa0a91feecbcffa53c",
+      "stable_name": "Alexova gitara od Lukáša",
+      "categories": [
+        "Nadväzná rekvizita",
+        "Osobná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/LSIdt0l0",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "05/16",
+      "scene_url": "https://trello.com/c/lWRDw8Ho",
+      "item_id": "6a6bb5be2947637d9e15e333",
+      "checklist_id": "6a67b18e2e5e4e37c669d0ba",
+      "original_name": "Ivanovo auto — Bety príde domov a nájde Ivana, ako opravuje auto.",
+      "original_name_sha256": "ccebb6cb74da43085deb5f55ea502540c6f47e3950cee1e762c83c1d0938b354",
+      "stable_name": "Ivanovo auto",
+      "categories": [
+        "Auto"
+      ],
+      "evidence": "source_record:05/16#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "05/21",
+      "scene_url": "https://trello.com/c/ArmEivT3",
+      "item_id": "6a6bb5c14d7c7476024bda67",
+      "checklist_id": "6a67b19a1fed5bd74bd2235a",
+      "original_name": "Gonzov osobný mobil — Pozrie na hodinky na mobile.",
+      "original_name_sha256": "65e996cc8ac342c7ec0611e8d55b5694ded770fd7464b72c70b8acdd80ae8777",
+      "stable_name": "Gonzov osobný mobil",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:05/21#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "05/23",
+      "scene_url": "https://trello.com/c/oygRGunO",
+      "item_id": "6a6bb5c3c952243e3adbf1b0",
+      "checklist_id": "6a67b19e338db3756ff710fb",
+      "original_name": "Laurin osobný mobil — Namiesto toho jej zvoní telefón – neznáme číslo.",
+      "original_name_sha256": "ce9bc19999ae5f2577741c6fa16ee5640fddc4346909c95327401d9bce6c7d4b",
+      "stable_name": "Laurin osobný mobil",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:05/23#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "05/25",
+      "scene_url": "https://trello.com/c/gV1Gmvvm",
+      "item_id": "6a6bb5c4227f88fae799d1e6",
+      "checklist_id": "6a67b1a2971fad5a12d9844f",
+      "original_name": "Ivanov osobný laptop — Keď príde bližšie, uvidí v kuchyni Ivana, ako dojato pozerá na svojom laptope video z minulosti, keď ešte Sofia mala asi desať rokov.",
+      "original_name_sha256": "810c762945a54ee22b63f80592229e261e37dc9949119e6f0148d013762f02b4",
+      "stable_name": "Ivanov osobný laptop",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:05/25#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "05/26",
+      "scene_url": "https://trello.com/c/RWlaUCWz",
+      "item_id": "6a6bb5c62e467066066950ab",
+      "checklist_id": "6a67b1a8cfe3b647f94d4c41",
+      "original_name": "Ivanov osobný laptop — Video z Ivanovho laptopu.",
+      "original_name_sha256": "8227bb87bee353ed9a547e1545188e3fa1ecefda791cffec5a8242ec2251bb0b",
+      "stable_name": "Ivanov osobný laptop",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:05/26#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "05/26",
+      "scene_url": "https://trello.com/c/RWlaUCWz",
+      "item_id": "6a6bb5c6f1a9a9c25d62bdf5",
+      "checklist_id": "6a67b1a8cfe3b647f94d4c41",
+      "original_name": "Ivanov mobil s videom malej Sofie — Ivan ju s mobilom prenasleduje na trávniku pred domom.",
+      "original_name_sha256": "f12b051aec0b4ce2e8c18394838dd80ad9e0cd852fe2568f83cec966ad59027a",
+      "stable_name": "Ivanov mobil s videom malej Sofie",
+      "categories": [
+        "Osobná rekvizita",
+        "Screen"
+      ],
+      "evidence": "source_record:05/26#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "05/27",
+      "scene_url": "https://trello.com/c/MxiTX0qY",
+      "item_id": "6a6bb5ca87c61ab56c6c5cdf",
+      "checklist_id": "6a67b1ab4101ee42897c0ce2",
+      "original_name": "Sárin laptop s Jakubovými fotografiami — (Sára dala Veronike laptop, aby jej ukázala, aký jej brat bol, teraz čaká na jej reakciu.",
+      "original_name_sha256": "69febfde8546948edf771ab73c172ed86e1ac72e337c1b18ae1bed506d15307d",
+      "stable_name": "Sárin laptop s Jakubovými fotografiami",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:05/27#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "05/27",
+      "scene_url": "https://trello.com/c/MxiTX0qY",
+      "item_id": "6a6bb5c7134d8a4f22f66d0c",
+      "checklist_id": "6a67b1ab4101ee42897c0ce2",
+      "original_name": "Rodinné fotografie Révayovcov na Sárinom tablete — Sára a Veronika sú v Sárinej izbe na posteli a Veronika si scrolluje na Sárinom tablete rodinné fotky.",
+      "original_name_sha256": "18d091cf7272a276dbd52f6300aee5808aa6a0f55e9a64ec148fc3bad463e2fe",
+      "stable_name": "Rodinné fotografie Révayovcov na Sárinom tablete",
+      "categories": [
+        "Dokument",
+        "Screen"
+      ],
+      "evidence": "source_record:05/27#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "05/36",
+      "scene_url": "https://trello.com/c/kEU1TLm8",
+      "item_id": "6a6bb5cd00e0bbc5692dc132",
+      "checklist_id": "6a67b1bd2f3bb47fec4c8a18",
+      "original_name": "Bundy a kabáty hostí na kare — Prichádzajú vchodom, odovzdajú bundy a kabáty hosteske, ktorá ich vešia na vešiak.",
+      "original_name_sha256": "d9d28bed1f9657e6871778bf8a65d97c1f93606dc89bb71f9556b3a62967b15e",
+      "stable_name": "Bundy a kabáty hostí na kare",
+      "categories": [],
+      "evidence": "source_record:05/36#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "05/37",
+      "scene_url": "https://trello.com/c/9Bbel9nZ",
+      "item_id": "6a6bb5d2f62202ccde5d82fc",
+      "checklist_id": "6a67b1ecbeec7c6aafd58d32",
+      "original_name": "Ivanov pohár tvrdého alkoholu — Pomedzi nejakých smútiacich si všimne, ako si jej otec Ivan nalieva pri stole s alkoholom pohár nejakého tvrdého chľastu.",
+      "original_name_sha256": "f41bcda9ffc950f5423ff7319b5080434a23deb0495278c276c7d1503bed3580",
+      "stable_name": "Ivanov pohár tvrdého alkoholu",
+      "categories": [],
+      "evidence": "source_record:05/37#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "05/44LP",
+      "scene_url": "https://trello.com/c/slveyXFC",
+      "item_id": "6a6bb5d519dcc9f90166ee15",
+      "checklist_id": "6a67b1fb6b2ef9704d183b80",
+      "original_name": "<n> Alexova gitara od Lukáša — Alex si hrá na gitare v hudobnej miestnosti. | ← 05/15: Alex má snímač na gitare a klopák na tričku a hrá a spieva svoju pesničku. | TU: Alex si hrá na gitare v hudobnej miestnosti. | → 06/13: Alex si v izbe brnká na gitare. | KARTA: https://trello.com/c/LSIdt0l0",
+      "original_name_sha256": "b22c38424e6045b9c75210c5c4e79663bfda5e4aaedb8afefd6ecd34fde13f36",
+      "stable_name": "Alexova gitara od Lukáša",
+      "categories": [
+        "Nadväzná rekvizita",
+        "Osobná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/LSIdt0l0",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "05/45LP",
+      "scene_url": "https://trello.com/c/222MCsZx",
+      "item_id": "6a6bb5d6850a0ce335648844",
+      "checklist_id": "6a67b1fef1202042769a0406",
+      "original_name": "Smútočný portrét Jakuba pri urne — Klaudia ju ukladá na čestné miesto v obývačke hneď vedľa Jakubovej fotky.",
+      "original_name_sha256": "81bf488de83a507fda2206bc5d485ebbbc4ea0a1fd1bad2f13769cecf4704613",
+      "stable_name": "Smútočný portrét Jakuba pri urne",
+      "categories": [
+        "Dokument"
+      ],
+      "evidence": "source_record:05/45LP#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "05/47LP",
+      "scene_url": "https://trello.com/c/54DxXLe1",
+      "item_id": "6a6bb5d7c5f3bcafb57632ae",
+      "checklist_id": "6a67b20574ace77cf0cb25f1",
+      "original_name": "Ukradnuté fotografie z Jakubovej pitvy — Sú tam aj fotky z pitvy, ktoré si v detaile letmo prezrie.",
+      "original_name_sha256": "6d27492ceb503a272cb028d8a3fc725a33c1f28b97e444076474c43541ae29a2",
+      "stable_name": "Ukradnuté fotografie z Jakubovej pitvy",
+      "categories": [
+        "Dokument"
+      ],
+      "evidence": "source_record:05/47LP#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "06/01FLASH",
+      "scene_url": "https://trello.com/c/wZWHOCLl",
+      "item_id": "6a6bb5d84de08883889a88d6",
+      "checklist_id": "6a6b95c57b60a8c05824e138",
+      "original_name": "<n> Betina medvedia lampička od Sofie — Sofia lampičku rozsvieti, aby chránila malú Bety pred tmou | ← prvý výskyt | TU: Sofia lampičku rozsvieti, aby chránila malú Bety pred tmou | → 06/03: lampička zostáva v zásuvke aj v súčasnosti | KARTA: https://trello.com/c/zw78tGbA",
+      "original_name_sha256": "ca2f073416d45834b6daf57ae17c00ae883c078995e3f205448b75cc803ceb06",
+      "stable_name": "Betina medvedia lampička od Sofie",
+      "categories": [
+        "Nadväzná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/zw78tGbA",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "06/01FLASH",
+      "scene_url": "https://trello.com/c/wZWHOCLl",
+      "item_id": "6a6b95c58f781e971243174d",
+      "checklist_id": "6a6b95c57b60a8c05824e138",
+      "original_name": "<n> Medvedia lampička — Sofia lampičku rozsvieti, aby chránila malú Bety pred tmou | ← prvý výskyt | TU: Sofia lampičku rozsvieti, aby chránila malú Bety pred tmou | → 06/03: lampička zostáva v zásuvke aj v súčasnosti | KARTA: https://trello.com/c/zw78tGbA",
+      "original_name_sha256": "fb4732aa2cfaaf9e8b34194990840f56241727e027944efa3e156696cbc2f187",
+      "stable_name": "Betina medvedia lampička od Sofie",
+      "categories": [
+        "Nadväzná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/zw78tGbA",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "06/02",
+      "scene_url": "https://trello.com/c/WfurPnkF",
+      "item_id": "6a6bb5dafcb866abfa01207d",
+      "checklist_id": "6a6b95c8fca31b0b1b8282f7",
+      "original_name": "Dogyho spisovateľský notebook — (prestrih) Dogy sedí v tme, so zasvietenou stolovou lampičkou, za stolom v redakcii a mlčky píše na notebooku.",
+      "original_name_sha256": "668f33497c66ee8b745d2f4d58c3c03b738fe93bfcd6fa23a1fe6c650bde72fe",
+      "stable_name": "Dogyho spisovateľský notebook",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:06/02#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "06/03",
+      "scene_url": "https://trello.com/c/i6qiuY1T",
+      "item_id": "6a6bb5dc4317909095e12f3c",
+      "checklist_id": "6a6b95cc33ccc5370d7d67d0",
+      "original_name": "<n> Betin nový denník — Z lampičky prejde kamera už na dospelú Bety, ktorá sedí na posteli a píše si denník. | ← 04/47LP: Bety už sa upokojila a zakladá si nový denník, otvára ho, ale rozhodne sa, že musí napísať Alexovi, chce vedieť, či sa na ňu hnevá, vezme mobil a napíše mu správu: prepáč. | TU: Z lampičky prejde kamera už na dospelú Bety, ktorá sedí na posteli a píše si denník. | → 06/36: Bety je doma v izbe, sedí pri stole, píše si denník. | KARTA: https://trello.com/c/zX1mXWnU",
+      "original_name_sha256": "a49fd201d216cd0d85efe4d94045814c73f38b28c421b859c743ddfbf03fcaf7",
+      "stable_name": "Betin nový denník",
+      "categories": [
+        "Dokument",
+        "Nadväzná rekvizita",
+        "Osobná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/zX1mXWnU",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "06/03",
+      "scene_url": "https://trello.com/c/i6qiuY1T",
+      "item_id": "6a6bb5dcabd625630d3387e0",
+      "checklist_id": "6a6b95cc33ccc5370d7d67d0",
+      "original_name": "Betin osobný mobil — Po doznení VO zvoní Bety mobil, volá jej Dogy, že už je pred domom, pozvala ho na raňajky. | KARTA: https://trello.com/c/5PcusQA3",
+      "original_name_sha256": "8c8ca6128654b5fddc94a0f3536923bdab6a0d44d0a7db3db51a9d6aabce5aab",
+      "stable_name": "Betin osobný mobil",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/5PcusQA3",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "06/03",
+      "scene_url": "https://trello.com/c/i6qiuY1T",
+      "item_id": "6a6bb5dc09cc9d7fc598c8cb",
+      "checklist_id": "6a6b95cc33ccc5370d7d67d0",
+      "original_name": "<n> Betina medvedia lampička od Sofie — lampička zostáva v zásuvke aj v súčasnosti | ← 06/01FLASH: Sofia lampičku rozsvieti, aby chránila malú Bety pred tmou | TU: lampička zostáva v zásuvke aj v súčasnosti | → ďalší potvrdený obraz neurčený | KARTA: https://trello.com/c/zw78tGbA",
+      "original_name_sha256": "d0f15355f39d52a421062afd0ab22004cae417346119f6bb5420b0ca0abcda4b",
+      "stable_name": "Betina medvedia lampička od Sofie",
+      "categories": [
+        "Nadväzná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/zw78tGbA",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "06/03",
+      "scene_url": "https://trello.com/c/i6qiuY1T",
+      "item_id": "6a6b95ceeb4b6938ea607f89",
+      "checklist_id": "6a6b95cc33ccc5370d7d67d0",
+      "original_name": "<n> Medvedia lampička — lampička zostáva v zásuvke aj v súčasnosti | ← 06/01FLASH: Sofia lampičku rozsvieti, aby chránila malú Bety pred tmou | TU: lampička zostáva v zásuvke aj v súčasnosti | → ďalší potvrdený obraz neurčený | KARTA: https://trello.com/c/zw78tGbA",
+      "original_name_sha256": "4832105662bc6f8afa5c19aecf88ef6f1c10a0c12b5c9c697ef53bcc541462c4",
+      "stable_name": "Betina medvedia lampička od Sofie",
+      "categories": [
+        "Nadväzná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/zw78tGbA",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "06/04",
+      "scene_url": "https://trello.com/c/leJ8LrRi",
+      "item_id": "6a6bb5dfba1c7497d644d288",
+      "checklist_id": "6a6b95d06cf26990d7d4a18a",
+      "original_name": "Alicin MacBook s internet bankingom — Je to macbook, takže ho len odklopí a je hneď zapnutý☺, naťuká len štyri medzerníky ako heslo na odomknutie (mama je trochu IT analfabet, nerieši bezpečnosť).",
+      "original_name_sha256": "5544874b11141555df2cd80a686c663ee9b05641dac91405327a415a05eb9527",
+      "stable_name": "Alicin MacBook s internet bankingom",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:06/04#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "06/04",
+      "scene_url": "https://trello.com/c/leJ8LrRi",
+      "item_id": "6a6bb5df945e26d4061510a1",
+      "checklist_id": "6a6b95d06cf26990d7d4a18a",
+      "original_name": "Dogyho mobil na fotografovanie Alicinho účtu — Otvorí IB, skáče po svoj mobil a kým sa mama vráti, rýchlo scrolluje a fotí záznamy z obrazovky.",
+      "original_name_sha256": "c72924f9a89134bd4fc516bfcc0e5c2a7eb72fbc6b0a187e6ee0554edf961e67",
+      "stable_name": "Dogyho mobil na fotografovanie Alicinho účtu",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:06/04#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "06/04",
+      "scene_url": "https://trello.com/c/leJ8LrRi",
+      "item_id": "6a6bb5de8290aa05780e80c4",
+      "checklist_id": "6a6b95d06cf26990d7d4a18a",
+      "original_name": "Raňajkový čaj a lievance u Bety — Bety a Alica si ticho miešajú čaj, Dogy je tiež ticho, ale len preto lebo má plné ústa lievancov.",
+      "original_name_sha256": "e141fb7e49f439964a152327f457e7a6edc75cf979b25f932637569e52ba0de6",
+      "stable_name": "Raňajkový čaj a lievance u Bety",
+      "categories": [],
+      "evidence": "source_record:06/04#2",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "06/08",
+      "scene_url": "https://trello.com/c/9Z0VO9Y2",
+      "item_id": "6a6bb5e1651ae9f65fa8db0e",
+      "checklist_id": "6a6b95dd4f7a9141e9e30ec1",
+      "original_name": "Betin mobil s fotografiami Alicinho účtu — Bety si v mobile prezerá fotky, čo nafotila z maminho internet bankingu. | KARTA: https://trello.com/c/5PcusQA3",
+      "original_name_sha256": "19043c20b4d2f4ee916b199a0b6a54855af627476ddfb7e510424fe8be310219",
+      "stable_name": "Betin osobný mobil",
+      "categories": [],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/5PcusQA3",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "06/08",
+      "scene_url": "https://trello.com/c/9Z0VO9Y2",
+      "item_id": "6a6bb5e15b3bb98ae9bf4522",
+      "checklist_id": "6a6b95dd4f7a9141e9e30ec1",
+      "original_name": "Fotografie z Alicinho internet bankingu — Bety si v mobile prezerá fotky, čo nafotila z maminho internet bankingu.",
+      "original_name_sha256": "4b4a2e814f926765edaeead90ce1782cfb93c6d1eb5d70d7b6ebbb5b03b083a2",
+      "stable_name": "Fotografie z Alicinho internet bankingu",
+      "categories": [
+        "Dokument",
+        "Screen"
+      ],
+      "evidence": "source_record:06/08#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "06/12",
+      "scene_url": "https://trello.com/c/IqoCQtnd",
+      "item_id": "6a6bb5e3bdfc5ca706976391",
+      "checklist_id": "6a6ba54b181938987c496c8c",
+      "original_name": "Veronikina papierová taška s jedlom — (prestrih) Veronika prichádza k firme po zablatenom chodníku, obchádza stroje, v rukách nesie papierovú tašku s prekríženými japonskými paličkami.",
+      "original_name_sha256": "69af2ce495a3a56c8ee020866e8aefe6d9d14828ba1825ea12bc1a6244f1f01d",
+      "stable_name": "Veronikina papierová taška s jedlom",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:06/12#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "06/13",
+      "scene_url": "https://trello.com/c/2EQ0SNmR",
+      "item_id": "6a6bb5e400bafae8190b7f5b",
+      "checklist_id": "6a6ba54fd8f82f5dc2cc1af3",
+      "original_name": "<n> Alexova gitara od Lukáša — Alex si v izbe brnká na gitare. | ← 05/44LP: Alex si hrá na gitare v hudobnej miestnosti. | TU: Alex si v izbe brnká na gitare. | → 06/16: Lea hrá na klávesy a Alex na gitare. | KARTA: https://trello.com/c/LSIdt0l0",
+      "original_name_sha256": "e59bb16bf8f15c139d37c1d14c7ec4c1b0fb6d51815125a6a84bef048e85a703",
+      "stable_name": "Alexova gitara od Lukáša",
+      "categories": [
+        "Nadväzná rekvizita",
+        "Osobná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/LSIdt0l0",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "06/15",
+      "scene_url": "https://trello.com/c/QhYzyEzZ",
+      "item_id": "6a6bb5ea124faa35d8709419",
+      "checklist_id": "6a6ba555079969ab2775f92a",
+      "original_name": "Laurina osobná taška — Odloží si tašku a pomaly pristúpi k Veronike, ktorá stojí pri gauči.",
+      "original_name_sha256": "f97763658472b398b30226674b1de14778125506972f3b142f50fba246ac4d54",
+      "stable_name": "Laurina osobná taška",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:06/15#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "06/16",
+      "scene_url": "https://trello.com/c/gSjaYZqB",
+      "item_id": "6a6bb5eb0ec2cc106214e344",
+      "checklist_id": "6a6ba559511b6bbbc86dd6b7",
+      "original_name": "<n> Alexova gitara od Lukáša — Lea hrá na klávesy a Alex na gitare. | ← 06/13: Alex si v izbe brnká na gitare. | TU: Lea hrá na klávesy a Alex na gitare. | → 06/27: Alex a Lea skúšajú u Alexa v izbe SONG, Lea hrá na klávesoch, Alex na gitare, spievajú spolu. | KARTA: https://trello.com/c/LSIdt0l0",
+      "original_name_sha256": "ab387d23247df46f617bdc97c6893006e6cab568dd9e8c2e811e70806dde8cfd",
+      "stable_name": "Alexova gitara od Lukáša",
+      "categories": [
+        "Nadväzná rekvizita",
+        "Osobná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/LSIdt0l0",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "06/17",
+      "scene_url": "https://trello.com/c/aUh3MZbg",
+      "item_id": "6a6bb5ec2c2f38407b6961e8",
+      "checklist_id": "6a6ba55cdb019c93a231e744",
+      "original_name": "Mobily Beky a Mery so sociálnymi sieťami — Beka a Mery na telefónoch sledujú reakcie na rôznych sociálnych sieťach, kde zavesili oznam o konkurze do Bekinej kapely.",
+      "original_name_sha256": "ce72e5235fbed5ff2161d550c2facf95667ee79d28fea62d82c290b9a2836262",
+      "stable_name": "Mobily Beky a Mery so sociálnymi sieťami",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:06/17#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "06/24LP",
+      "scene_url": "https://trello.com/c/TE2bkE5S",
+      "item_id": "6a6bb5eec14cf40247fc8cb6",
+      "checklist_id": "6a6ba57415ee8e89533d9d84",
+      "original_name": "Sofiin cestovný kufor — Sofia si berie kufor z izby",
+      "original_name_sha256": "129c138578aa8d81682faddc9efd6a995a28d5ae015d6aad2178962d55ab3254",
+      "stable_name": "Sofiin cestovný kufor",
+      "categories": [],
+      "evidence": "source_record:06/24LP#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "06/25LP",
+      "scene_url": "https://trello.com/c/n9BQABMB",
+      "item_id": "6a6bb5f021de44efe0bcb076",
+      "checklist_id": "6a6ba577f509c0aedaadb9b6",
+      "original_name": "Sofiin cestovný kufor — Pri tom vidíme, ako Sofia zatvára kufor a odchádza zo svojej izby.",
+      "original_name_sha256": "552a11b281976c1095e27d9037b24f3323949cfb4b6c0eed6cebd88150583afb",
+      "stable_name": "Sofiin cestovný kufor",
+      "categories": [],
+      "evidence": "source_record:06/25LP#1",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "06/26",
+      "scene_url": "https://trello.com/c/QMvF82ZH",
+      "item_id": "6a6bb5f161582283b74801d3",
+      "checklist_id": "6a6ba57b28a332bface26181",
+      "original_name": "Veronikin osobný mobil — Veronika je pripravená a sústredená, zvýrazňuje si niečo do textu, ale vyruší ju zvoniaci telefón, pozrie naňho, potom ospravedlňujúco na Beku.",
+      "original_name_sha256": "9f53e6308048485bdaac4fb3eca32f4b8be9dfd2573329412cb96dee735dac1d",
+      "stable_name": "Veronikin osobný mobil",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:06/26#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "06/27",
+      "scene_url": "https://trello.com/c/oZgk8pze",
+      "item_id": "6a6bb5f3ff05186acc71ba72",
+      "checklist_id": "6a6ba57e604156e9c17efa52",
+      "original_name": "<n> Alexova gitara od Lukáša — Alex a Lea skúšajú u Alexa v izbe SONG, Lea hrá na klávesoch, Alex na gitare, spievajú spolu. | ← 06/16: Lea hrá na klávesy a Alex na gitare. | TU: Alex a Lea skúšajú u Alexa v izbe SONG, Lea hrá na klávesoch, Alex na gitare, spievajú spolu. | → 06/47: Alex, ešte so zavesenou gitarou, prechádza pomedzi spolužiakov, všetci mu dávajú high five a gratulujú. | KARTA: https://trello.com/c/LSIdt0l0",
+      "original_name_sha256": "831eb50a3a375fd0026ecd4cf681a2ac895af37eab9f0c29101073ef081a490f",
+      "stable_name": "Alexova gitara od Lukáša",
+      "categories": [
+        "Nadväzná rekvizita",
+        "Osobná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/LSIdt0l0",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "06/28",
+      "scene_url": "https://trello.com/c/Fpv2qyaV",
+      "item_id": "6a6bb5f44333fd36746a677d",
+      "checklist_id": "6a6ba581e4a0f9e4131aaf22",
+      "original_name": "Betin osobný mobil — Bety je zavretá v prázdnej kancelárii, skúša sa dovolať Dogymu, ale telefón ukazuje, že nemá signál, napriek tomu, že ho Bety zúfalo rôzne dvíha do výšky a nastavuje k oknu. | KARTA: https://trello.com/c/5PcusQA3",
+      "original_name_sha256": "9e15cf8845920a95ef80c88d37266c0d6676cb2cb5626bc3356085f994223812",
+      "stable_name": "Betin osobný mobil",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/5PcusQA3",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "06/33",
+      "scene_url": "https://trello.com/c/yoe3O950",
+      "item_id": "6a6bb5f5ec490fb56c43860c",
+      "checklist_id": "6a6ba5935a7a5fb386e7bc2e",
+      "original_name": "Projektové dokumenty s Veronikiným sfalšovaným podpisom — Keďže Laura drží dosky s dokumentmi, Veronika sa zľakne: VERONIKA To sú rozvodové papiere!?",
+      "original_name_sha256": "97dd970a9a5dc90ce700aac07903256098eb15053d3258fe82dd659b4f8488a8",
+      "stable_name": "Projektové dokumenty s Veronikiným sfalšovaným podpisom",
+      "categories": [
+        "Dokument"
+      ],
+      "evidence": "source_record:06/33#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "06/36",
+      "scene_url": "https://trello.com/c/GmVtM7D6",
+      "item_id": "6a6bb5f91872ed6aa94f990c",
+      "checklist_id": "6a6ba59ce3fa9309a7bb2de6",
+      "original_name": "<n> Betin nový denník — Bety je doma v izbe, sedí pri stole, píše si denník. | ← 06/03: Z lampičky prejde kamera už na dospelú Bety, ktorá sedí na posteli a píše si denník. | TU: Bety je doma v izbe, sedí pri stole, píše si denník. | → ďalší potvrdený obraz neurčený | KARTA: https://trello.com/c/zX1mXWnU",
+      "original_name_sha256": "655a91860df75f36fd777c70e133866d0f254b2c51fbc57b87c363dcd149100e",
+      "stable_name": "Betin nový denník",
+      "categories": [
+        "Dokument",
+        "Nadväzná rekvizita",
+        "Osobná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/zX1mXWnU",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "06/41LP",
+      "scene_url": "https://trello.com/c/Z6FmM2cx",
+      "item_id": "6a6bb5ffe24ce15b17899586",
+      "checklist_id": "6a6ba5b028a332bface2d711",
+      "original_name": "<n> Jakubova klubová bunda s číslom 9 — Bety a Dogy nájdu Sofiine auto s bundou a kradnutým tovarom | ← 02/02FLASH: Jakub má na sebe klubovú bundu s číslom 9, ktorá sa neskôr vyskytne v aute dôkaz. | TU: Bety a Dogy nájdu Sofiine auto s bundou a kradnutým tovarom | → 06/42LP: Nájde tímovú basketbalovú bundu s číslom 9 a nájde rôzny kradnutý tovar (voňavky, tenisky, kabelky, všetko so štítkami). | KARTA: https://trello.com/c/56ELOe0C",
+      "original_name_sha256": "70a77b286cbd9bf4e6be309fa0f86d89bc49e0a8316b0ea2112645aea1474d62",
+      "stable_name": "Jakubova klubová bunda s číslom 9",
+      "categories": [
+        "Nadväzná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/56ELOe0C",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "06/41LP",
+      "scene_url": "https://trello.com/c/Z6FmM2cx",
+      "item_id": "6a6bb5ff5d4e2940267e2ef5",
+      "checklist_id": "6a6ba5b028a332bface2d711",
+      "original_name": "<n> Sofiino auto — Bety a Dogy ho nájdu s bundou a kradnutým tovarom | ← prvý výskyt | TU: Bety a Dogy ho nájdu s bundou a kradnutým tovarom | → 06/42LP: to isté nájdené auto sleduje neznámy pozorovateľ | KARTA: https://trello.com/c/Cu1ceju6",
+      "original_name_sha256": "75c60c6042aaec0e280b3bb55aedbecdea108422493d66f54c031cd6a2694baa",
+      "stable_name": "Sofiino auto",
+      "categories": [
+        "Auto",
+        "Nadväzná rekvizita",
+        "Osobná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/Cu1ceju6",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "06/42LP",
+      "scene_url": "https://trello.com/c/8lzL1nLw",
+      "item_id": "6a6bb6030525af1fda7058ca",
+      "checklist_id": "6a6ba5b316fa6a39f4d7305a",
+      "original_name": "Dogyho mobil s fotografiami obsahu Sofiinho auta — Všetko pustí z rúk späť do kufra, vytiahne telefón a všetko nafotí.",
+      "original_name_sha256": "c728d6c96710e27298dcffa5e7ac54821757648feed2cc94ce811dc09ef4a36f",
+      "stable_name": "Dogyho mobil s fotografiami obsahu Sofiinho auta",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:06/42LP#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "06/42LP",
+      "scene_url": "https://trello.com/c/8lzL1nLw",
+      "item_id": "6a6bb603dbded6ac825a756d",
+      "checklist_id": "6a6ba5b316fa6a39f4d7305a",
+      "original_name": "Sofiino auto — Pod plachtou pokrytou konármi a lístím nájdu odstavené auto, zodpovedajúce Sofiinmu popisu.",
+      "original_name_sha256": "2b33014383ecfa9ad112b24f54f7b1e848d3c456119d8ea1b780c59f5d4174b4",
+      "stable_name": "Sofiino auto",
+      "categories": [
+        "Auto"
+      ],
+      "evidence": "source_records:06/42LP#1,06/42LP#4",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "06/42LP",
+      "scene_url": "https://trello.com/c/8lzL1nLw",
+      "item_id": "6a6bb602afcbddd2d92ef9c4",
+      "checklist_id": "6a6ba5b316fa6a39f4d7305a",
+      "original_name": "Batožinový priestor Sofiinho auta — Odokryjú plachtu, otvoria kufor a Dogy sa hrabe vo veciach.",
+      "original_name_sha256": "42395fa42983d38788e2885a18027704109f370342eb7b3addca949f2bdfefda",
+      "stable_name": "Batožinový priestor Sofiinho auta",
+      "categories": [],
+      "evidence": "source_record:06/42LP#2",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "06/42LP",
+      "scene_url": "https://trello.com/c/8lzL1nLw",
+      "item_id": "6a6bb602606cd16c9c8b7617",
+      "checklist_id": "6a6ba5b316fa6a39f4d7305a",
+      "original_name": "<n> Jakubova klubová bunda s číslom 9 — Nájde tímovú basketbalovú bundu s číslom 9 a nájde rôzny kradnutý tovar (voňavky, tenisky, kabelky, všetko so štítkami). | ← 06/41LP: Bety a Dogy nájdu Sofiine auto s bundou a kradnutým tovarom | TU: Nájde tímovú basketbalovú bundu s číslom 9 a nájde rôzny kradnutý tovar (voňavky, tenisky, kabelky, všetko so štítkami). | → ďalší potvrdený obraz neurčený | KARTA: https://trello.com/c/56ELOe0C",
+      "original_name_sha256": "191c4b42735f9b05e91bb190f8620cd3969663c0a0b44730af503db77d13f6e1",
+      "stable_name": "Jakubova klubová bunda s číslom 9",
+      "categories": [
+        "Nadväzná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/56ELOe0C",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "06/42LP",
+      "scene_url": "https://trello.com/c/8lzL1nLw",
+      "item_id": "6a6bb602642c972dd22644c1",
+      "checklist_id": "6a6ba5b316fa6a39f4d7305a",
+      "original_name": "<n> Sofiino auto — to isté nájdené auto sleduje neznámy pozorovateľ | ← 06/41LP: Bety a Dogy ho nájdu s bundou a kradnutým tovarom | TU: to isté nájdené auto sleduje neznámy pozorovateľ | → 06/50: Keler nájde to isté auto horiace | KARTA: https://trello.com/c/Cu1ceju6",
+      "original_name_sha256": "f003a3b0129d46fece8cab50efff5e1732cb228e9615f7dff3f5e7534fb34413",
+      "stable_name": "Sofiino auto",
+      "categories": [
+        "Auto",
+        "Nadväzná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/Cu1ceju6",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "06/46",
+      "scene_url": "https://trello.com/c/66UWqHa2",
+      "item_id": "6a6bb609b406cf4d61ae482d",
+      "checklist_id": "6a6ba5c05a3b09045fbd2fb3",
+      "original_name": "Mobily basketbalistov v hľadisku — (prestrih do hľadiska) Basketbalisti v publiku puberťákujú – chichúňajú sa, kukajú do mobilov, niečo si navzájom ukazujú.",
+      "original_name_sha256": "40040bf70821e3a16f5e1608e7c0b31f9f72552d795cb46199b57d850a1c588a",
+      "stable_name": "Mobily basketbalistov v hľadisku",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "evidence": "source_record:06/46#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "06/46",
+      "scene_url": "https://trello.com/c/66UWqHa2",
+      "item_id": "6a6bb608b15878b2421fe877",
+      "checklist_id": "6a6ba5c05a3b09045fbd2fb3",
+      "original_name": "Dogyho fotografie dôkazov zo Sofiinho auta — Dogy mu hneď ukazuje fotky v mobile, bundu s číslom 9.",
+      "original_name_sha256": "0c34c90cd9341e718cccd652ec9ad9c386988e833074c740902542708aa61a1a",
+      "stable_name": "Dogyho fotografie dôkazov zo Sofiinho auta",
+      "categories": [
+        "Dokument",
+        "Screen"
+      ],
+      "evidence": "source_record:06/46#3",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "06/46",
+      "scene_url": "https://trello.com/c/66UWqHa2",
+      "item_id": "6a6bb60839a842716b00e87b",
+      "checklist_id": "6a6ba5c05a3b09045fbd2fb3",
+      "original_name": "Fotografia Jakubovej klubovej bundy s číslom 9 — Dogy mu hneď ukazuje fotky v mobile, bundu s číslom 9.",
+      "original_name_sha256": "fedd24f4af2cd53010c872f2dd38967770dbbf9d74014c3dfa2d444e7437b073",
+      "stable_name": "Fotografia Jakubovej klubovej bundy s číslom 9",
+      "categories": [
+        "Screen"
+      ],
+      "evidence": "source_record:06/46#4",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "06/47",
+      "scene_url": "https://trello.com/c/2SclkQqN",
+      "item_id": "6a6bb60aaa51027bc33c0ef1",
+      "checklist_id": "6a6ba5c47447eb0700ab4683",
+      "original_name": "<n> Alexova gitara od Lukáša — Alex, ešte so zavesenou gitarou, prechádza pomedzi spolužiakov, všetci mu dávajú high five a gratulujú. | ← 06/27: Alex a Lea skúšajú u Alexa v izbe SONG, Lea hrá na klávesoch, Alex na gitare, spievajú spolu. | TU: Alex, ešte so zavesenou gitarou, prechádza pomedzi spolužiakov, všetci mu dávajú high five a gratulujú. | → ďalší potvrdený obraz neurčený | KARTA: https://trello.com/c/LSIdt0l0",
+      "original_name_sha256": "a7916167c7fead22115038106e5c129f6750e26c057301a69392a020b967f9d8",
+      "stable_name": "Alexova gitara od Lukáša",
+      "categories": [
+        "Nadväzná rekvizita",
+        "Osobná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/LSIdt0l0",
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "06/50",
+      "scene_url": "https://trello.com/c/3IyAT3ME",
+      "item_id": "6a6bb60c5f05c97cbc955cda",
+      "checklist_id": "6a6ba5d36c25aebd782092d7",
+      "original_name": "Kelerovo civilné auto — Keler vystupuje z civilného auta na mieste, ktoré mu označila Bety a Dogy.",
+      "original_name_sha256": "d76468738cd6e4f040fcf754b626efb7d3421605c95a84dee663523d10018229",
+      "stable_name": "Kelerovo civilné auto",
+      "categories": [
+        "Auto"
+      ],
+      "evidence": "source_record:06/50#0",
+      "existing_registry_url": null,
+      "ambiguity_question": null,
+      "conflict": null
+    },
+    {
+      "scene_id": "06/50",
+      "scene_url": "https://trello.com/c/3IyAT3ME",
+      "item_id": "6a6bb60c3c299facdf5b4e92",
+      "checklist_id": "6a6ba5d36c25aebd782092d7",
+      "original_name": "<n> Sofiino auto — Keler nájde to isté auto horiace | ← 06/42LP: to isté nájdené auto sleduje neznámy pozorovateľ | TU: Keler nájde to isté auto horiace | → ďalší potvrdený obraz neurčený | KARTA: https://trello.com/c/Cu1ceju6",
+      "original_name_sha256": "9e773a8581802d9fcced7f49a940b39efcbdd0b07b3688abaf46b0c2e11ee415",
+      "stable_name": "Sofiino auto",
+      "categories": [
+        "Auto",
+        "Nadväzná rekvizita",
+        "Osobná rekvizita"
+      ],
+      "evidence": "existing_registry_url",
+      "existing_registry_url": "https://trello.com/c/Cu1ceju6",
+      "ambiguity_question": null,
+      "conflict": null
+    }
+  ],
+  "stats": {
+    "records": 236,
+    "unique_identities": 151,
+    "unmatched_safe_fallbacks": 0,
+    "ambiguities": 12,
+    "conflicts": 1
+  },
+  "unmatched": []
+}
