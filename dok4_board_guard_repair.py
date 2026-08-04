@@ -393,18 +393,41 @@ def register_routes(flask_app, api):
             ]
             if due_values:
                 payload["due"] = min(due_values)
-            api["trello_put_body"](f"/cards/{primary['id']}", payload)
+            try:
+                api["trello_put_body"](f"/cards/{primary['id']}", payload)
+            except Exception as exc:
+                return jsonify({
+                    **response, "status": "error", "stage": "trello-merge",
+                    "error": str(exc),
+                }), 502
             writes.append("merged_dok4_card")
-            api["trello_put_body"](
-                f"/cards/{wrong['id']}", {"closed": "true"}
-            )
+            try:
+                api["trello_put_body"](
+                    f"/cards/{wrong['id']}", {"closed": "true"}
+                )
+            except Exception as exc:
+                return jsonify({
+                    **response, "status": "partial", "stage": "trello-archive",
+                    "writes": len(writes), "write_actions": writes,
+                    "error": str(exc),
+                }), 502
             writes.append("archived_wrong_riverdale_card")
         else:
             primary = wrong
             dok4_todo_id = plan["boards"]["dok4"]["todo"][0]["id"]
-            api["trello_put_body"](
-                f"/cards/{wrong['id']}", {"idList": dok4_todo_id}
-            )
+            dok4_board_id = plan["boards"]["dok4"]["board"]["id"]
+            try:
+                api["trello_put_body"](
+                    f"/cards/{wrong['id']}", {
+                        "idBoard": dok4_board_id,
+                        "idList": dok4_todo_id,
+                    },
+                )
+            except Exception as exc:
+                return jsonify({
+                    **response, "status": "error", "stage": "trello-move",
+                    "error": str(exc),
+                }), 502
             writes.append("moved_card_to_dok4")
 
         microsoft = plan["microsoft"]
@@ -424,10 +447,17 @@ def register_routes(flask_app, api):
             graph_payload["dueDateTime"] = api["todo_due_payload"](
                 primary["due"]
             )
-        api["graph_patch"](
-            f"/me/todo/lists/{api['TODO_LIST_ID']}/tasks/{task['id']}",
-            microsoft["token"], graph_payload,
-        )
+        try:
+            api["graph_patch"](
+                f"/me/todo/lists/{api['TODO_LIST_ID']}/tasks/{task['id']}",
+                microsoft["token"], graph_payload,
+            )
+        except Exception as exc:
+            return jsonify({
+                **response, "status": "partial", "stage": "microsoft-update",
+                "writes": len(writes), "write_actions": writes,
+                "primary_card": compact_card(primary), "error": str(exc),
+            }), 502
         writes.append("updated_existing_microsoft_task")
         response["status"] = "applied"
         response["writes"] = len(writes)
