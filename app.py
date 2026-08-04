@@ -7990,6 +7990,10 @@ from cierny_kamen_set_registry_audit import register_routes as register_set_audi
 
 register_set_audit_routes(app, globals())
 
+from cierny_kamen_reference_0116 import register_routes as register_reference_0116_routes
+
+register_reference_0116_routes(app, globals())
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
