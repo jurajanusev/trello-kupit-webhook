@@ -528,6 +528,8 @@ def register_routes(flask_app, api):
 
     @flask_app.route("/api/audit-cierny-kamen-spaces-props", methods=["POST"])
     def audit_cierny_kamen_spaces_props():
+        return jsonify({"error": "completed spaces/props endpoint disabled"}), 410
+
         if request.headers.get("X-Spaces-Props-Key") != KEY:
             return jsonify({"error": "forbidden"}), 403
         mode = request.args.get("mode", "dry-run").strip().casefold()
