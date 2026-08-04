@@ -15,6 +15,7 @@ from cierny_kamen_reference_all import board_support_data
 KEY = "cierny-kamen-all-props-registry-5aug-1f7c3b92"
 PROP_LIST_NAME = "REGISTER REKVIZÍT"
 SET_LIST_NAME = "NADVÄZNÉ SETY"
+QUESTION_LIST_NAME = "OTÁZKY NA PORADU"
 CATEGORY_LABELS = (
     "Auto", "Osobná rekvizita", "Dokument", "Screen",
     "Nadväzná rekvizita", "Nadväzný priestor",
@@ -305,7 +306,7 @@ def register_routes(flask_app, api):
         for scene_id, card in scene_cards.items():
             for checklist in exact_named(
                 support["checklists"].get(card["id"], []),
-                "OTĂZKY NA PORADU",
+                QUESTION_LIST_NAME,
             ):
                 existing_questions.update(
                     folded(item.get("name"))
@@ -327,7 +328,7 @@ def register_routes(flask_app, api):
             name: len(matches) for name, matches in label_matches.items()
             if len(matches) > 1
         }
-        set_label_matches = label_matches["NadvĂ¤znĂ˝ priestor"]
+        set_label_matches = label_matches[CATEGORY_LABELS[-1]]
         set_cards_to_label = []
         if len(set_label_matches) == 1:
             set_label_id = set_label_matches[0]["id"]
