@@ -12,6 +12,8 @@ if "flask" not in sys.modules:
 from cierny_kamen_set_links_dedup import (
     desired_karta_suffix,
     duplicate_groups,
+    find_continuity_set_item,
+    find_plain_set_item,
 )
 
 
@@ -46,6 +48,27 @@ class SetLinksDedupTests(unittest.TestCase):
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0]["keep_id"], "01")
         self.assertEqual(result[0]["delete_ids"], ["02"])
+
+    def test_environment_item_is_found_among_other_set_items(self):
+        scene = {"scene_id": "01/04LP"}
+        checklist = {"checkItems": [
+            {"id": "car", "name": "Auto — stojí pri rieke"},
+            {"id": "space", "name": "PRI RIEKE — prostredie obrazu 01/04LP"},
+        ]}
+        item, error = find_plain_set_item(scene, checklist)
+        self.assertIsNone(error)
+        self.assertEqual(item["id"], "space")
+
+    def test_continuity_item_is_matched_by_stable_identity(self):
+        scene = {"scene_id": "02/41"}
+        source = {"stable_name": "Rozbité sklo automatu"}
+        checklist = {"checkItems": [
+            {"id": "space", "name": "KLUBOVŇA — prostredie obrazu 02/41"},
+            {"id": "state", "name": "<n> Rozbité sklo automatu — stav"},
+        ]}
+        item, error = find_continuity_set_item(scene, source, checklist)
+        self.assertIsNone(error)
+        self.assertEqual(item["id"], "state")
 
 
 if __name__ == "__main__":
