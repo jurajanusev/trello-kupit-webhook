@@ -406,6 +406,8 @@ def mobile_audit(api, payload, state, scene_cards, support):
 def register_routes(flask_app, api):
     @flask_app.route("/api/reference-cierny-kamen-all-scenes", methods=["POST"])
     def reference_all_scenes():
+        return jsonify({"error": "gone", "status": "completed"}), 410
+
         if request.headers.get("X-Reference-All-Key") != KEY:
             return jsonify({"error": "forbidden"}), 403
         mode = request.args.get("mode", "audit").strip().casefold()
