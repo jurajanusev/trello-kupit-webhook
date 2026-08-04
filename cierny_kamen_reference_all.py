@@ -579,7 +579,7 @@ def register_routes(flask_app, api):
             proposed = {
                 "name": MOBILE_MASTER_NAME,
                 "idList": mobile["prop_lists"][0]["id"],
-                "desc": mobile_master_description(mobile["items"]),
+                "desc": mobile_master_description(mobile["missing_link_items"]),
             }
             if mode == "mobile-master-dry-run":
                 return jsonify({
