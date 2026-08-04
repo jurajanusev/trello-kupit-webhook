@@ -11,6 +11,7 @@ if "flask" not in sys.modules:
 
 from cierny_kamen_reference_all import (
     build_reference_description,
+    mobile_master_description,
     parse_reference_layout,
     same_story_space,
     story_space_key,
@@ -21,6 +22,15 @@ from cierny_kamen_reference_0116 import (
 
 
 class AllReferenceTests(unittest.TestCase):
+    def test_mobile_master_description_is_deterministic_and_linked(self):
+        result = mobile_master_description([
+            {"scene_id": "03/07", "card_url": "https://trello.com/c/b"},
+            {"scene_id": "01/16", "card_url": "https://trello.com/c/a"},
+        ])
+        self.assertIn("KANONICKÝ NÁZOV: Betin osobný mobil", result)
+        self.assertLess(result.index("[01/16]"), result.index("[03/07]"))
+        self.assertEqual(result.count("https://trello.com/c/"), 2)
+
     def test_registry_url_is_primary_story_space_identity(self):
         metadata = (
             METADATA_START + "\nLOKÁCIA: [IZBA](https://trello.com/c/space)\n"

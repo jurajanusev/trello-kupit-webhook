@@ -31,6 +31,26 @@ LEGACY_RELATED_HEADINGS = (
 TRELLO_LINK_TITLE = "‌"
 
 
+MOBILE_MASTER_NAME = "Betin osobný mobil"
+MOBILE_MASTER_START = "<!-- CIERNY-KAMEN-PROP-REGISTRY:START -->"
+MOBILE_MASTER_END = "<!-- CIERNY-KAMEN-PROP-REGISTRY:END -->"
+
+
+def mobile_master_description(items):
+    links = "\n".join(
+        f"- [{item['scene_id']}]({item['card_url']})"
+        for item in sorted(items, key=lambda value: value["scene_id"])
+    )
+    return (
+        f"{MOBILE_MASTER_START}\n"
+        f"KANONICKÝ NÁZOV: {MOBILE_MASTER_NAME}\n"
+        "ALIASY: Betin mobil\n\n"
+        "### ODKAZY NA OBRAZY\n"
+        f"{links}\n"
+        f"{MOBILE_MASTER_END}"
+    )
+
+
 def board_support_data(api, board_id):
     checklists = api["trello_get"](f"/boards/{board_id}/checklists", {
         "checkItems": "all", "fields": "id,name,idCard,pos", "filter": "all",
@@ -392,6 +412,7 @@ def register_routes(flask_app, api):
         allowed = {
             "reference-audit", "audit", "dry-run",
             "descriptions-dry-run", "descriptions-apply",
+            "mobile-master-dry-run", "mobile-master-apply",
             "mobile-dry-run", "mobile-apply", "final-audit",
         }
         if mode not in allowed:
@@ -536,6 +557,54 @@ def register_routes(flask_app, api):
                 "remaining_source": max(0, len(scenes) - start - len(selected)),
                 "pending_before_batch": len(pending_ids),
             }), 200 if not errors else 409
+
+        if mode in {"mobile-master-dry-run", "mobile-master-apply"}:
+            if len(mobile["prop_lists"]) != 1:
+                return jsonify({
+                    "status": "blocked", "writes": 0,
+                    "error": "expected one exact REGISTER REKVIZÍT list",
+                    **base,
+                }), 409
+            if len(mobile["masters"]) > 1:
+                return jsonify({
+                    "status": "blocked", "writes": 0,
+                    "error": "multiple active Betin mobile masters",
+                    **base,
+                }), 409
+            if mobile["masters"]:
+                return jsonify({
+                    "status": mode, "writes": 0, "created": None,
+                    "existing": mobile["masters"][0], **base,
+                }), 200
+            proposed = {
+                "name": MOBILE_MASTER_NAME,
+                "idList": mobile["prop_lists"][0]["id"],
+                "desc": mobile_master_description(mobile["items"]),
+            }
+            if mode == "mobile-master-dry-run":
+                return jsonify({
+                    "status": mode, "writes": 0, "proposed": proposed,
+                    **base,
+                }), 200
+            created = api["trello_post_body"]("/cards", proposed)
+            readback = api["trello_get"](f"/cards/{created['id']}", {
+                "fields": "id,name,desc,idList,shortUrl,closed",
+            })
+            if (readback.get("name") != proposed["name"]
+                    or readback.get("desc") != proposed["desc"]
+                    or readback.get("idList") != proposed["idList"]
+                    or readback.get("closed")):
+                return jsonify({
+                    "status": "blocked", "writes": 1,
+                    "error": "mobile master read-back mismatch",
+                    "created": readback,
+                }), 409
+            return jsonify({
+                "status": mode, "writes": 1,
+                "created": {"id": readback["id"],
+                            "name": readback["name"],
+                            "url": readback["shortUrl"]},
+            }), 200
 
         if len(mobile["masters"]) != 1:
             return jsonify({
