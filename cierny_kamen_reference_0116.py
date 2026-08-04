@@ -305,6 +305,8 @@ def desired_set_item(original, location_urls):
 def register_routes(flask_app, api):
     @flask_app.route("/api/reference-cierny-kamen-0116", methods=["POST"])
     def reference_cierny_kamen_0116():
+        return jsonify({"error": "completed 01/16 reference endpoint disabled"}), 410
+
         if request.headers.get("X-Reference-Key") != KEY:
             return jsonify({"error": "forbidden"}), 403
         mode = request.args.get("mode", "audit").strip().casefold()
