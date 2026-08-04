@@ -138,6 +138,8 @@ def verify_add_only(before, after, operations):
 def register_routes(flask_app, api):
     @flask_app.route("/api/cierny-kamen-props-0101-0115", methods=["POST"])
     def cierny_kamen_props_0101_0115():
+        return jsonify({"error": "gone", "status": "completed"}), 410
+
         if request.headers.get("X-Props-0101-0115-Key") != KEY:
             return jsonify({"error": "forbidden"}), 403
         mode = request.args.get("mode", "audit").strip().casefold()
