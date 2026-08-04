@@ -309,6 +309,8 @@ def build_plan(api, payload, state, support):
 def register_routes(flask_app, api):
     @flask_app.route("/api/cierny-kamen-set-links-dedup", methods=["POST"])
     def cierny_kamen_set_links_dedup():
+        return jsonify({"error": "gone", "status": "completed"}), 410
+
         if request.headers.get("X-Set-Link-Key") != KEY:
             return jsonify({"error": "forbidden"}), 403
         mode = request.args.get("mode", "audit").strip().casefold()
