@@ -7994,6 +7994,10 @@ from cierny_kamen_reference_0116 import register_routes as register_reference_01
 
 register_reference_0116_routes(app, globals())
 
+from cierny_kamen_reference_all import register_routes as register_reference_all_routes
+
+register_reference_all_routes(app, globals())
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
