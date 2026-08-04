@@ -11,6 +11,8 @@ if "flask" not in sys.modules:
     sys.modules["flask"] = flask_stub
 
 from cierny_kamen_spaces_props import (
+    CURATED_PROP_ACTIONS,
+    POLICE_BOAT_NAME,
     build_space_catalog,
     canonical_locations,
     description_without_location,
@@ -117,6 +119,23 @@ class SpaceMappingTests(unittest.TestCase):
         created = trello_object_created_at("6a71945fbc40caec67ceb03a")
         self.assertEqual(created.tzinfo, timezone.utc)
         self.assertEqual(created.isoformat(), "2026-08-04T07:27:27+00:00")
+
+    def test_all_new_manual_prop_items_have_explicit_curation(self):
+        self.assertEqual(len(CURATED_PROP_ACTIONS), 17)
+        self.assertTrue(all(len(item_id) == 24 for item_id in CURATED_PROP_ACTIONS))
+        self.assertTrue(all(
+            set(action).intersection({"companion", "question", "continuity"})
+            for action in CURATED_PROP_ACTIONS.values()
+        ))
+
+    def test_only_reviewed_police_boat_creates_continuity(self):
+        continuity = [
+            action["continuity"]
+            for action in CURATED_PROP_ACTIONS.values()
+            if action.get("continuity")
+        ]
+        self.assertEqual(continuity, ["police_boat"])
+        self.assertNotIn("<n>", POLICE_BOAT_NAME)
 
 
 if __name__ == "__main__":

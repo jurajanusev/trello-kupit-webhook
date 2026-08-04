@@ -28,6 +28,63 @@ SAMPLE_PROP_COMPANION = (
     "suvenír z Barcelony; infantilný vzhľad podľa scenára."
 )
 
+# Explicitly reviewed against the six authoritative PDFs.  Keys are Trello
+# check-item IDs, so no keyword classifier can silently reinterpret a new item.
+CURATED_PROP_ACTIONS = {
+    "6a71945fbc40caec67ceb03a": {
+        "companion": "↳ Čln Jakuba a Sáry — Jakub vesluje a Sára sedí v člne počas plavby po rieke.",
+    },
+    "6a7194669299d97a3395d3f4": {
+        "companion": "↳ Veslá v člne Jakuba a Sáry — Jakub nimi vesluje počas plavby po rieke.",
+    },
+    "6a719625fdc7c5f40f736f11": {
+        "companion": "↳ Výbava Matejovej skupiny na kurz prežitia — vybavenie skupiny pri výprave do lesa.",
+    },
+    "6a71965dfaec94d790c9ceae": {"continuity": "police_boat"},
+    "6a719865853d630a4b816323": {
+        "companion": "↳ Policajné pásky na brehu rieky — ohraničujú priestor pátrania po Jakubovi.",
+    },
+    "6a719875a0129510eedba095": {
+        "companion": "↳ Výbava Alice a Ivana ako miestnych novinárov — používajú ju pri sledovaní diania na brehu rieky.",
+    },
+    "6a7198bef4efd47a99107f28": {
+        "question": "01/09 — Upresniť konkrétny typ a vzhľad notesu pre Kelera; scenár ho explicitne neuvádza.",
+    },
+    "6a719943ae45a59dca37e89d": {
+        "question": "01/09 — Upresniť, či má byť samostatný maják na policajné auto alebo na čln; scenár uvádza blikajúce policajné auto a policajný čln, nie samostatný maják.",
+    },
+    "6a71998e8737ac1319f5f5d8": {
+        "companion": "↳ Dogyho spisovateľský notebook — Dogy pri ňom vo Fefe Beef píše román; rovnaký konkrétny kus v ďalších obrazoch nie je potvrdený.",
+    },
+    "6a719b1394c726c5945694fd": {
+        "companion": "↳ Sárina šatka — pláva vo vode v paralelnom prestrihu k Sárinej verzii udalostí.",
+        "question": "01/11FLASH — Potvrdiť, v ktorých obrazoch 01/02LP–01/06LP je Sárina šatka fyzicky viditeľná ako rovnaký konkrétny kus; scenár ju tam priamo neopisuje.",
+    },
+    "6a71b12dd19c73c066b975de": {
+        "question": "01/13 — Potvrdiť, či Veronika a Laura pri príchode fyzicky vykladajú kufre a či majú priamo pokračovať do 01/14.",
+    },
+    "6a71b14b3bb3ecb82450baa3": {
+        "question": "01/14 — Potvrdiť počet, vzhľad a fyzickú prítomnosť kufrov nadväzujúcich z 01/13.",
+    },
+    "6a71b4e68238aa681a30a4f7": {"companion": SAMPLE_PROP_COMPANION},
+    "6a71b6331158d41e172d4a08": {
+        "companion": "↳ Fefeho farebné limonády pre Bety a Alexa — obaja ich popíjajú počas stretnutia vo Fefe Beef.",
+    },
+    "6a71b6b07593f469c6b731b4": {
+        "companion": "↳ Dva burgre v objednávke Veroniky — Fefe ich pripraví a zabalí na odnesenie.",
+    },
+    "6a71b6f7a303c93c2f504ce4": {
+        "companion": "↳ Taška na objednávku Veroniky — Fefe do nej zabalí dva burgre a cibuľové krúžky na odnesenie.",
+    },
+    "6a71b7642006c9e606a0ad71": {
+        "question": "01/17 — Upresniť konkrétne pitie, jedlo a počet kusov určených pre komparz; scenár ich explicitne neuvádza.",
+    },
+}
+
+POLICE_BOAT_KEY = "policajny-cln-patracieho-timu"
+POLICE_BOAT_NAME = "Policajný čln pátracieho tímu"
+POLICE_BOAT_SCENES = ("01/08LP", "01/09")
+
 # These are source-specific, reviewed equivalences.  This is intentionally not
 # a fuzzy matcher: an unlisted spelling remains a separate dry-run candidate.
 EXPLICIT_ALIASES = {
@@ -348,6 +405,18 @@ def projection_is_preserved(before, after):
     return True
 
 
+def ensure_attachment(api, card, url, name):
+    attachments = api["trello_get"](
+        f"/cards/{card['id']}/attachments", {"fields": "id,name,url"}
+    )
+    if any(item.get("url") == url for item in attachments):
+        return False
+    api["trello_post_body"](
+        f"/cards/{card['id']}/attachments", {"url": url, "name": name}
+    )
+    return True
+
+
 def expected_prop_names(api, payload, state):
     prop_cards, prop_duplicates = api["cierny_kamen_registry_cards"](
         state, "PROP", payload
@@ -453,11 +522,22 @@ def register_routes(flask_app, api):
         mode = request.args.get("mode", "dry-run").strip().casefold()
         if mode not in {
             "audit", "dry-run", "sample-dry-run", "sample-apply",
-            "sample-audit",
+            "sample-audit", "registry-create-dry-run",
+            "registry-create-apply", "registry-update-dry-run",
+            "registry-update-apply", "scene-links-dry-run",
+            "scene-links-apply", "props-dry-run", "props-apply",
+            "ambiguity-dry-run", "ambiguity-apply", "final-audit",
         }:
             return jsonify({
                 "error": "unsupported mode"
             }), 400
+        try:
+            start = int(request.args.get("start", "0"))
+            limit = int(request.args.get("limit", "10"))
+        except ValueError:
+            return jsonify({"error": "start and limit must be integers"}), 400
+        if start < 0 or limit < 1 or limit > 10:
+            return jsonify({"error": "invalid start/limit"}), 400
 
         payload = api["cierny_kamen_import_payload"]()
         state = api["cierny_kamen_import_state"](payload)
@@ -737,6 +817,640 @@ def register_routes(flask_app, api):
         if blockers:
             return jsonify({**result, "status": "blocked"}), 409
 
+        ordered_entries = sorted(
+            catalog["entries"].values(), key=lambda item: item["name"]
+        )
+        if mode in {"registry-create-dry-run", "registry-create-apply"}:
+            if len(space_lists) != 1:
+                return jsonify({
+                    "status": "blocked", "writes": 0,
+                    "errors": ["expected existing REGISTER PRIESTOROV list"],
+                }), 409
+            selected = ordered_entries[start:start + limit]
+            operations = []
+            errors = []
+            writes = 0
+            for entry in selected:
+                matches = marker_cards.get(entry["key"], [])
+                if len(matches) == 1:
+                    operations.append({"name": entry["name"], "action": "unchanged"})
+                    continue
+                exact_unmarked = [
+                    card for card in space_cards
+                    if folded(card.get("name")) == folded(entry["name"])
+                    and SPACE_MARKER_PREFIX not in (card.get("desc") or "")
+                ]
+                if exact_unmarked:
+                    errors.append({
+                        "name": entry["name"], "error": "unmarked exact-name card exists",
+                    })
+                    continue
+                operations.append({"name": entry["name"], "action": "create"})
+                if mode == "registry-create-apply":
+                    api["trello_post_body"]("/cards", {
+                        "idList": space_lists[0]["id"],
+                        "name": entry["name"],
+                        "desc": space_marker(entry["key"]), "pos": "bottom",
+                    })
+                    writes += 1
+            return jsonify({
+                "status": mode, "writes": writes, "start": start,
+                "selected": len(selected), "operations": operations,
+                "errors": errors,
+                "remaining": max(0, len(ordered_entries) - start - len(selected)),
+            }), 200 if not errors else 409
+
+        all_space_cards = {}
+        for entry in ordered_entries:
+            matches = marker_cards.get(entry["key"], [])
+            if len(matches) == 1:
+                all_space_cards[entry["name"]] = matches[0]
+        if mode in {
+            "registry-update-dry-run", "registry-update-apply",
+            "scene-links-dry-run", "scene-links-apply",
+            "ambiguity-dry-run", "ambiguity-apply", "final-audit",
+        } and len(all_space_cards) != len(ordered_entries):
+            return jsonify({
+                "status": "blocked", "writes": 0,
+                "errors": [
+                    f"expected {len(ordered_entries)} unique space cards, found "
+                    f"{len(all_space_cards)}"
+                ],
+            }), 409
+        all_space_urls = {
+            name: card.get("shortUrl") for name, card in all_space_cards.items()
+        }
+
+        if mode in {"registry-update-dry-run", "registry-update-apply"}:
+            selected = ordered_entries[start:start + limit]
+            operations = []
+            writes = 0
+            for entry in selected:
+                card = all_space_cards[entry["name"]]
+                desired = space_description(
+                    entry, scene_cards, all_space_urls, catalog, payload
+                )
+                desired = replace_space_auto_block(card.get("desc") or "", desired)
+                changed = card.get("name") != entry["name"] or card.get("desc") != desired
+                operations.append({"name": entry["name"], "changed": changed})
+                if mode == "registry-update-apply" and changed:
+                    api["trello_put_body"](
+                        f"/cards/{card['id']}",
+                        {"name": entry["name"], "desc": desired},
+                    )
+                    writes += 1
+                if mode == "registry-update-apply" and entry.get("parent"):
+                    parent_card = all_space_cards[entry["parent"]]
+                    if ensure_attachment(
+                        api, parent_card, card.get("shortUrl"), entry["name"]
+                    ):
+                        writes += 1
+                    if ensure_attachment(
+                        api, card, parent_card.get("shortUrl"), entry["parent"]
+                    ):
+                        writes += 1
+            return jsonify({
+                "status": mode, "writes": writes, "start": start,
+                "selected": len(selected), "operations": operations,
+                "remaining": max(0, len(ordered_entries) - start - len(selected)),
+            }), 200
+
+        ordered_scenes = [
+            scene for scene in payload["scenes"]
+            if catalog["scene_locations"].get(scene["scene_id"])
+        ]
+        if mode in {"scene-links-dry-run", "scene-links-apply"}:
+            selected = ordered_scenes[start:start + limit]
+            operations = []
+            errors = []
+            writes = 0
+            for scene in selected:
+                scene_id = scene["scene_id"]
+                card = scene_cards[scene_id]
+                names = catalog["scene_locations"][scene_id]
+                markdown = ", ".join(
+                    f"[{name}]({all_space_urls[name]})" for name in names
+                )
+                desired = replace_location_value(card.get("desc") or "", markdown)
+                changed = desired != card.get("desc")
+                operations.append({
+                    "scene_id": scene_id, "changed": changed,
+                    "spaces": names, "url": card.get("shortUrl"),
+                })
+                if mode != "scene-links-apply":
+                    continue
+                before_desc = description_without_location(card.get("desc") or "")
+                before_labels = sorted(card.get("idLabels", []))
+                before_checklists = original_checklist_projection(
+                    checklists_by_card.get(card["id"], [])
+                )
+                before_attachments = {
+                    item.get("id"): item
+                    for item in attachments_by_card.get(card["id"], [])
+                }
+                before_comments = sorted(
+                    comments_by_card.get(card["id"], []),
+                    key=lambda item: item.get("id", ""),
+                )
+                if changed:
+                    api["trello_put_body"](
+                        f"/cards/{card['id']}", {"desc": desired}
+                    )
+                    writes += 1
+                for name in names:
+                    space_card = all_space_cards[name]
+                    if ensure_attachment(
+                        api, card, space_card.get("shortUrl"), name
+                    ):
+                        writes += 1
+                    if ensure_attachment(
+                        api, space_card, card.get("shortUrl"), scene_id
+                    ):
+                        writes += 1
+                after_card = api["trello_get"](
+                    f"/cards/{card['id']}",
+                    {"fields": "id,desc,idLabels,shortUrl"},
+                )
+                after_checklists = api["trello_get"](
+                    f"/cards/{card['id']}/checklists",
+                    {"checkItems": "all", "fields": "id,name,pos"},
+                )
+                after_attachments_list = api["trello_get"](
+                    f"/cards/{card['id']}/attachments",
+                    {"fields": "id,name,url,bytes,date"},
+                )
+                after_attachments = {
+                    item.get("id"): {
+                        "id": item.get("id"), "name": item.get("name"),
+                        "url": item.get("url"), "bytes": item.get("bytes"),
+                        "date": item.get("date"),
+                    }
+                    for item in after_attachments_list
+                }
+                actions = api["trello_get"](
+                    f"/cards/{card['id']}/actions",
+                    {"filter": "commentCard", "limit": 1000},
+                )
+                after_comments = sorted([
+                    {
+                        "id": action.get("id"),
+                        "text": (action.get("data") or {}).get("text"),
+                        "date": action.get("date"),
+                        "member": action.get("idMemberCreator"),
+                    }
+                    for action in actions
+                ], key=lambda item: item.get("id", ""))
+                protected = (
+                    before_desc == description_without_location(after_card.get("desc") or "")
+                    and before_labels == sorted(after_card.get("idLabels", []))
+                    and projection_is_preserved(before_checklists, after_checklists)
+                    and all(after_attachments.get(key) == value
+                            for key, value in before_attachments.items())
+                    and before_comments == after_comments
+                )
+                if not protected:
+                    errors.append({"scene_id": scene_id, "error": "protected data changed"})
+                    break
+            return jsonify({
+                "status": mode, "writes": writes, "start": start,
+                "selected": len(selected), "operations": operations,
+                "errors": errors,
+                "remaining": max(0, len(ordered_scenes) - start - len(selected)),
+            }), 200 if not errors else 409
+
+        if mode in {"ambiguity-dry-run", "ambiguity-apply"}:
+            selected = catalog["ambiguous"][start:start + limit]
+            operations = []
+            errors = []
+            writes = 0
+            for ambiguous in selected:
+                scene_id = ambiguous["scene_id"]
+                card = scene_cards[scene_id]
+                question = (
+                    f"{scene_id} — Nejednoznačná identita priestoru „"
+                    f"{ambiguous['source']}“: {ambiguous['question']}"
+                )
+                checklists = checklists_by_card.get(card["id"], [])
+                question_checklist = next(
+                    item for item in checklists
+                    if folded(item.get("name")) == folded("OTÁZKY NA PORADU")
+                )
+                existing = {
+                    item.get("name")
+                    for item in question_checklist.get("checkItems", [])
+                }
+                operations.append({
+                    "scene_id": scene_id, "source": ambiguous["source"],
+                    "question": question, "already_present": question in existing,
+                })
+                if mode != "ambiguity-apply" or question in existing:
+                    continue
+                before = original_checklist_projection(checklists)
+                api["trello_post_body"](
+                    f"/checklists/{question_checklist['id']}/checkItems",
+                    {"name": question, "pos": "bottom"},
+                )
+                writes += 1
+                after = api["trello_get"](
+                    f"/cards/{card['id']}/checklists",
+                    {"checkItems": "all", "fields": "id,name,pos"},
+                )
+                if not projection_is_preserved(before, after):
+                    errors.append({
+                        "scene_id": scene_id,
+                        "error": "pre-existing checklist data changed",
+                    })
+                    break
+            return jsonify({
+                "status": mode, "writes": writes, "start": start,
+                "selected": len(selected), "operations": operations,
+                "errors": errors,
+                "remaining": max(
+                    0, len(catalog["ambiguous"]) - start - len(selected)
+                ),
+            }), 200 if not errors else 409
+
+        eligible_props = sorted(
+            [
+                item for item in manual_prop_candidates
+                if item["eligible_new_since_last_sync"]
+            ],
+            key=lambda item: (item["created_at"] or "", item["item_id"]),
+        )
+        missing_curation = [
+            item for item in eligible_props
+            if item["item_id"] not in CURATED_PROP_ACTIONS
+        ]
+        if mode in {"props-dry-run", "props-apply"}:
+            if missing_curation:
+                return jsonify({
+                    "status": "blocked", "writes": 0,
+                    "errors": [{"item": item["name"], "id": item["item_id"]}
+                               for item in missing_curation],
+                }), 409
+            selected = eligible_props[start:start + limit]
+            operations = []
+            writes = 0
+            errors = []
+            protected_before = {}
+            if mode == "props-apply":
+                touched_scene_ids = {item["scene_id"] for item in selected}
+                if any(
+                    CURATED_PROP_ACTIONS[item["item_id"]].get("continuity")
+                    == "police_boat" for item in selected
+                ):
+                    touched_scene_ids.update(POLICE_BOAT_SCENES)
+                for scene_id in touched_scene_ids:
+                    protected_card = scene_cards[scene_id]
+                    protected_before[protected_card["id"]] = {
+                        "scene_id": scene_id,
+                        "desc": protected_card.get("desc") or "",
+                        "labels": set(protected_card.get("idLabels", [])),
+                        "checklists": original_checklist_projection(
+                            checklists_by_card.get(protected_card["id"], [])
+                        ),
+                        "attachments": {
+                            item.get("id"): item
+                            for item in attachments_by_card.get(
+                                protected_card["id"], []
+                            )
+                        },
+                        "comments": sorted(
+                            comments_by_card.get(protected_card["id"], []),
+                            key=lambda item: item.get("id", ""),
+                        ),
+                    }
+
+            police_master = None
+            police_url = None
+            if any(
+                CURATED_PROP_ACTIONS[item["item_id"]].get("continuity")
+                == "police_boat" for item in selected
+            ):
+                prop_lists = api["cierny_kamen_exact_named"](
+                    state["lists"], payload["prop_registry_list_name"]
+                )
+                if len(prop_lists) != 1:
+                    return jsonify({"status": "blocked", "writes": 0,
+                                    "errors": ["prop registry list mismatch"]}), 409
+                prop_cards = [
+                    card for card in state["cards"]
+                    if card.get("idList") == prop_lists[0]["id"]
+                    and not card.get("closed")
+                    and (
+                        f"<!-- CIERNY-KAMEN-NATURAL-PROP:{POLICE_BOAT_KEY} -->"
+                        in (card.get("desc") or "")
+                        or folded(card.get("name")) == folded(POLICE_BOAT_NAME)
+                    )
+                ]
+                if len(prop_cards) > 1:
+                    return jsonify({"status": "blocked", "writes": 0,
+                                    "errors": ["duplicate police boat registry"]}), 409
+                if prop_cards:
+                    police_master = prop_cards[0]
+                elif mode == "props-apply":
+                    police_master = api["trello_post_body"]("/cards", {
+                        "idList": prop_lists[0]["id"], "name": POLICE_BOAT_NAME,
+                        "desc": f"<!-- CIERNY-KAMEN-NATURAL-PROP:{POLICE_BOAT_KEY} -->",
+                        "pos": "bottom",
+                    })
+                    writes += 1
+                if police_master:
+                    police_url = police_master.get("shortUrl")
+                    desired_master = (
+                        f"<!-- CIERNY-KAMEN-NATURAL-PROP:{POLICE_BOAT_KEY} -->\n"
+                        "<!-- CIERNY-KAMEN-NATURAL-PROP-AUTO:START -->\n"
+                        "# HLAVNÁ KARTA NADVÄZNEJ REKVIZITY\n\n"
+                        f"**STABILNÁ IDENTITA:** {POLICE_BOAT_NAME}\n\n"
+                        "**ALIASY:** policajny čln, policajný čln\n\n"
+                        "**FIXNÉ VLASTNOSTI:** Policajný čln používaný pátracím tímom "
+                        "pri hľadaní Jakubovho tela.\n\n"
+                        "## ČASOVÁ OS A ODKAZY\n"
+                        f"- [01/08LP]({scene_cards['01/08LP'].get('shortUrl')}) — "
+                        "policajt z člna koordinuje potápačov.\n"
+                        f"- [01/09]({scene_cards['01/09'].get('shortUrl')}) — "
+                        "ten istý policajný čln stále pláva na hladine.\n"
+                        "<!-- CIERNY-KAMEN-NATURAL-PROP-AUTO:END -->\n\n"
+                        "## RUČNÉ POZNÁMKY\n"
+                    )
+                    actual = police_master.get("desc") or ""
+                    auto_start = "<!-- CIERNY-KAMEN-NATURAL-PROP-AUTO:START -->"
+                    auto_end = "<!-- CIERNY-KAMEN-NATURAL-PROP-AUTO:END -->"
+                    if auto_start in actual and auto_end in actual:
+                        old = actual[actual.index(auto_start):actual.index(auto_end) + len(auto_end)]
+                        new = desired_master[desired_master.index(auto_start):desired_master.index(auto_end) + len(auto_end)]
+                        desired_master = actual.replace(old, new, 1)
+                    if mode == "props-apply" and (
+                        police_master.get("name") != POLICE_BOAT_NAME
+                        or actual != desired_master
+                    ):
+                        api["trello_put_body"](
+                            f"/cards/{police_master['id']}",
+                            {"name": POLICE_BOAT_NAME, "desc": desired_master},
+                        )
+                        writes += 1
+
+            for candidate in selected:
+                action = CURATED_PROP_ACTIONS[candidate["item_id"]]
+                card = scene_cards[candidate["scene_id"]]
+                lists_for_card = checklists_by_card[card["id"]]
+                prop_checklist = next(
+                    item for item in lists_for_card
+                    if folded(item.get("name")) == folded("REKVIZITY")
+                )
+                question_checklist = next(
+                    item for item in lists_for_card
+                    if folded(item.get("name")) == folded("OTÁZKY NA PORADU")
+                )
+                companion = action.get("companion")
+                if action.get("continuity") == "police_boat":
+                    if not police_url:
+                        companion = "<n> " + POLICE_BOAT_NAME + " — pending registry URL"
+                    else:
+                        companion = (
+                            f"<n> {POLICE_BOAT_NAME} — policajt z člna koordinuje "
+                            "potápačov pri hľadaní Jakubovho tela | ← prvý výskyt | "
+                            "TU: čln je na hladine a koordinuje pátranie | → 01/09: "
+                            f"stále pláva na hladine | KARTA: {police_url}"
+                        )
+                operations.append({
+                    "scene_id": candidate["scene_id"],
+                    "original": candidate["name"], "companion": companion,
+                    "question": action.get("question"),
+                    "continuity": action.get("continuity"),
+                })
+                if mode != "props-apply":
+                    continue
+                existing_prop_names = {
+                    item.get("name") for item in prop_checklist.get("checkItems", [])
+                }
+                if companion and companion not in existing_prop_names:
+                    api["trello_post_body"](
+                        f"/checklists/{prop_checklist['id']}/checkItems",
+                        {"name": companion, "pos": "bottom"},
+                    )
+                    writes += 1
+                question = action.get("question")
+                existing_questions = {
+                    item.get("name") for item in question_checklist.get("checkItems", [])
+                }
+                if question and question not in existing_questions:
+                    api["trello_post_body"](
+                        f"/checklists/{question_checklist['id']}/checkItems",
+                        {"name": question, "pos": "bottom"},
+                    )
+                    writes += 1
+                if action.get("continuity") == "police_boat" and police_master:
+                    for scene_id in POLICE_BOAT_SCENES:
+                        target_card = scene_cards[scene_id]
+                        target_checklists = checklists_by_card[target_card["id"]]
+                        target_props = next(
+                            item for item in target_checklists
+                            if folded(item.get("name")) == folded("REKVIZITY")
+                        )
+                        if scene_id == "01/08LP":
+                            text = companion
+                        else:
+                            text = (
+                                f"<n> {POLICE_BOAT_NAME} — policajný čln stále "
+                                "pláva na hladine počas pátrania | ← 01/08LP: policajt "
+                                "z člna koordinuje potápačov | TU: čln pokračuje v "
+                                "pátraní na hladine | → ďalší potvrdený obraz neurčený | "
+                                f"KARTA: {police_url}"
+                            )
+                        if text not in {
+                            item.get("name") for item in target_props.get("checkItems", [])
+                        }:
+                            api["trello_post_body"](
+                                f"/checklists/{target_props['id']}/checkItems",
+                                {"name": text, "pos": "bottom"},
+                            )
+                            writes += 1
+                        label_matches = api["cierny_kamen_exact_named"](
+                            state["labels"], "Nadväzná rekvizita", True
+                        )
+                        if len(label_matches) == 1:
+                            desired_labels = sorted(
+                                set(target_card.get("idLabels", []))
+                                | {label_matches[0]["id"]}
+                            )
+                            if desired_labels != sorted(target_card.get("idLabels", [])):
+                                api["trello_put_body"](
+                                    f"/cards/{target_card['id']}",
+                                    {"idLabels": ",".join(desired_labels)},
+                                )
+                                writes += 1
+                        if ensure_attachment(
+                            api, target_card, police_master.get("shortUrl"),
+                            POLICE_BOAT_NAME,
+                        ):
+                            writes += 1
+                        if ensure_attachment(
+                            api, police_master, target_card.get("shortUrl"), scene_id
+                        ):
+                            writes += 1
+
+            if mode == "props-apply":
+                refreshed = checklist_map(api, state["board"]["id"])
+                for candidate in selected:
+                    card = scene_cards[candidate["scene_id"]]
+                    items = [
+                        item
+                        for checklist in refreshed.get(card["id"], [])
+                        for item in checklist.get("checkItems", [])
+                    ]
+                    if not any(
+                        item.get("id") == candidate["item_id"]
+                        and item.get("name") == candidate["name"]
+                        and item.get("state") == candidate["state"]
+                        for item in items
+                    ):
+                        errors.append({
+                            "scene_id": candidate["scene_id"],
+                            "error": "original manual item changed",
+                        })
+                for card_id, before in protected_before.items():
+                    after_card = api["trello_get"](
+                        f"/cards/{card_id}",
+                        {"fields": "id,desc,idLabels"},
+                    )
+                    after_attachments_list = api["trello_get"](
+                        f"/cards/{card_id}/attachments",
+                        {"fields": "id,name,url,bytes,date"},
+                    )
+                    after_attachments = {
+                        item.get("id"): {
+                            "id": item.get("id"), "name": item.get("name"),
+                            "url": item.get("url"), "bytes": item.get("bytes"),
+                            "date": item.get("date"),
+                        }
+                        for item in after_attachments_list
+                    }
+                    actions = api["trello_get"](
+                        f"/cards/{card_id}/actions",
+                        {"filter": "commentCard", "limit": 1000},
+                    )
+                    after_comments = sorted([{
+                        "id": action.get("id"),
+                        "text": (action.get("data") or {}).get("text"),
+                        "date": action.get("date"),
+                        "member": action.get("idMemberCreator"),
+                    } for action in actions], key=lambda item: item.get("id", ""))
+                    protected = (
+                        (after_card.get("desc") or "") == before["desc"]
+                        and before["labels"].issubset(
+                            set(after_card.get("idLabels", []))
+                        )
+                        and projection_is_preserved(
+                            before["checklists"], refreshed.get(card_id, [])
+                        )
+                        and all(
+                            after_attachments.get(key) == value
+                            for key, value in before["attachments"].items()
+                        )
+                        and before["comments"] == after_comments
+                    )
+                    if not protected:
+                        errors.append({
+                            "scene_id": before["scene_id"],
+                            "error": "protected card data changed",
+                        })
+            return jsonify({
+                "status": mode, "writes": writes, "start": start,
+                "selected": len(selected), "operations": operations,
+                "errors": errors,
+                "remaining": max(0, len(eligible_props) - start - len(selected)),
+            }), 200 if not errors else 409
+
+        if mode == "final-audit":
+            linked_scenes = 0
+            ambiguous_untouched = 0
+            ambiguity_questions = 0
+            for scene in payload["scenes"]:
+                card = scene_cards[scene["scene_id"]]
+                names = catalog["scene_locations"].get(scene["scene_id"])
+                if names:
+                    expected = all(
+                        f"[{name}]({all_space_urls[name]})" in (card.get("desc") or "")
+                        for name in names
+                    )
+                    linked_scenes += bool(expected)
+                elif scene["scene_id"] in {
+                    item["scene_id"] for item in catalog["ambiguous"]
+                }:
+                    ambiguous_untouched += not bool(re.search(
+                        r"LOKÁCI(?:A|E):\s*\[", card.get("desc") or ""
+                    ))
+                    ambiguous = next(
+                        item for item in catalog["ambiguous"]
+                        if item["scene_id"] == scene["scene_id"]
+                    )
+                    expected_question = (
+                        f"{scene['scene_id']} — Nejednoznačná identita priestoru „"
+                        f"{ambiguous['source']}“: {ambiguous['question']}"
+                    )
+                    ambiguity_questions += any(
+                        item.get("name") == expected_question
+                        for checklist in checklists_by_card.get(card["id"], [])
+                        if folded(checklist.get("name"))
+                        == folded("OTÁZKY NA PORADU")
+                        for item in checklist.get("checkItems", [])
+                    )
+            refreshed_checklists = checklist_map(api, state["board"]["id"])
+            original_items_preserved = 0
+            curated_results = []
+            for candidate in eligible_props:
+                card = scene_cards[candidate["scene_id"]]
+                all_items = [
+                    item for checklist in refreshed_checklists.get(card["id"], [])
+                    for item in checklist.get("checkItems", [])
+                ]
+                original_ok = any(
+                    item.get("id") == candidate["item_id"]
+                    and item.get("name") == candidate["name"]
+                    and item.get("state") == candidate["state"]
+                    for item in all_items
+                )
+                original_items_preserved += original_ok
+                action = CURATED_PROP_ACTIONS[candidate["item_id"]]
+                expected_texts = [
+                    value for value in (action.get("companion"), action.get("question"))
+                    if value
+                ]
+                if action.get("continuity") == "police_boat":
+                    expected_texts = [POLICE_BOAT_NAME]
+                curated_results.append({
+                    "item_id": candidate["item_id"],
+                    "original_preserved": original_ok,
+                    "automatic_output_present": all(
+                        any(text in (item.get("name") or "") for item in all_items)
+                        for text in expected_texts
+                    ),
+                })
+            valid = (
+                len(all_space_cards) == len(ordered_entries)
+                and linked_scenes == len(ordered_scenes)
+                and ambiguous_untouched == len(catalog["ambiguous"])
+                and ambiguity_questions == len(catalog["ambiguous"])
+                and original_items_preserved == len(eligible_props)
+                and all(item["automatic_output_present"] for item in curated_results)
+            )
+            return jsonify({
+                "status": "final-audit", "writes": 0, "valid": valid,
+                "scene_cards": len(scene_cards),
+                "space_cards": len(all_space_cards),
+                "linked_scenes": linked_scenes,
+                "ambiguous_untouched": ambiguous_untouched,
+                "ambiguity_questions": ambiguity_questions,
+                "new_prop_items": len(eligible_props),
+                "original_prop_items_preserved": original_items_preserved,
+                "curated_results": curated_results,
+                "legacy_conflicts_untouched": sum(
+                    not item["eligible_new_since_last_sync"]
+                    for item in manual_prop_candidates
+                ),
+            }), 200 if valid else 409
+
         sample_scene = scene_cards[SAMPLE_SCENE_ID]
         sample_entry_map = {
             name: catalog["entries"][name] for name in SAMPLE_SPACE_NAMES
@@ -874,19 +1588,6 @@ def register_routes(flask_app, api):
                 )
                 writes.append("added_sample_prop_companion")
 
-            def ensure_attachment(card, url, name):
-                attachments = api["trello_get"](
-                    f"/cards/{card['id']}/attachments",
-                    {"fields": "id,name,url"},
-                )
-                if any(item.get("url") == url for item in attachments):
-                    return False
-                api["trello_post_body"](
-                    f"/cards/{card['id']}/attachments",
-                    {"url": url, "name": name},
-                )
-                return True
-
             parent = sample_cards[SAMPLE_SPACE_NAMES[0]]
             attachment_pairs = (
                 (sample_scene, leaf.get("shortUrl"), SAMPLE_SPACE_NAMES[-1]),
@@ -895,7 +1596,7 @@ def register_routes(flask_app, api):
                 (leaf, parent.get("shortUrl"), SAMPLE_SPACE_NAMES[0]),
             )
             for card, url, name in attachment_pairs:
-                if ensure_attachment(card, url, name):
+                if ensure_attachment(api, card, url, name):
                     writes.append(f"attachment:{card['id']}:{name}")
 
         # Read-back is used both after apply and by the standalone sample audit.
