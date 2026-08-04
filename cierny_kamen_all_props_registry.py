@@ -456,6 +456,81 @@ def register_routes(flask_app, api):
         category_identity_counts = Counter(
             category for plan in identity_plans for category in plan["categories"]
         )
+        final_errors = []
+        duplicate_attachment_urls = []
+        for stable_name, rows in rows_by_identity.items():
+            target = target_by_identity.get(stable_name)
+            safe_rows = [row for row in rows if not row.get("conflict")]
+            if not target or target.get("closed"):
+                final_errors.append(f"{stable_name}: active master missing")
+                continue
+            expected_block = master_auto_block(stable_name, safe_rows)
+            actual_desc = target.get("desc") or ""
+            if expected_block not in actual_desc:
+                final_errors.append(f"{stable_name}: master auto block differs")
+            expected_label_ids = {
+                label_matches[category][0]["id"]
+                for category in {
+                    value for row in rows for value in row["categories"]
+                }
+                if len(label_matches.get(category, [])) == 1
+            }
+            if not expected_label_ids.issubset(
+                set(target.get("idLabels", []))
+            ):
+                final_errors.append(f"{stable_name}: category label missing")
+            target_attachments = support["attachments"].get(target["id"], [])
+            target_urls = [item.get("url") for item in target_attachments]
+            repeated = sorted(
+                url for url, count in Counter(target_urls).items()
+                if url and count > 1
+            )
+            if repeated:
+                duplicate_attachment_urls.append({
+                    "card": target.get("shortUrl"), "urls": repeated,
+                })
+            for row in safe_rows:
+                current = current_rows.get(row["item_id"])
+                if not current or current["urls"] != [target.get("shortUrl")]:
+                    final_errors.append(
+                        f"{row['scene_id']}:{row['item_id']}: checklist URL differs"
+                    )
+                scene_card = scene_cards.get(row["scene_id"])
+                if not scene_card:
+                    continue
+                scene_urls = [
+                    item.get("url") for item in
+                    support["attachments"].get(scene_card["id"], [])
+                ]
+                if target.get("shortUrl") not in scene_urls:
+                    final_errors.append(
+                        f"{row['scene_id']}:{stable_name}: scene backlink missing"
+                    )
+                if scene_card.get("shortUrl") not in target_urls:
+                    final_errors.append(
+                        f"{row['scene_id']}:{stable_name}: master backlink missing"
+                    )
+                repeated_scene = sorted(
+                    url for url, count in Counter(scene_urls).items()
+                    if url and count > 1
+                )
+                if repeated_scene:
+                    duplicate_attachment_urls.append({
+                        "card": scene_card.get("shortUrl"),
+                        "urls": repeated_scene,
+                    })
+        if duplicate_attachment_urls:
+            final_errors.append("duplicate attachment URLs exist")
+        set_label_ids = [
+            item["id"] for item in label_matches[CATEGORY_LABELS[-1]]
+        ]
+        set_cards_missing_label = [
+            card.get("shortUrl") for card in set_cards
+            if len(set_label_ids) != 1
+            or set_label_ids[0] not in card.get("idLabels", [])
+        ]
+        if set_cards_missing_label:
+            final_errors.append("continuity set cards missing category label")
         result.update({
             "status": "dry-run",
             "valid": not dry_blockers,
@@ -482,6 +557,28 @@ def register_routes(flask_app, api):
                 "identity_actions": dict(action_counts),
                 "item_actions": dict(item_action_counts),
                 "master_auto_blocks_to_refresh": len(identity_plans),
+            },
+            "final_audit": {
+                "valid": not final_errors,
+                "errors": final_errors,
+                "active_master_cards": sum(
+                    plan["action"] == "reuse_open"
+                    for plan in identity_plans
+                ),
+                "items_with_expected_registry_url": sum(
+                    plan["action"] in {"unchanged", "manual_conflict_no_write"}
+                    for plan in item_plans
+                ),
+                "master_blocks_exact": len(identity_plans) - sum(
+                    error.endswith("master auto block differs")
+                    for error in final_errors
+                ),
+                "bidirectional_links_checked": sum(
+                    1 for row in identity_map["records"]
+                    if not row.get("conflict")
+                ),
+                "duplicate_attachment_urls": duplicate_attachment_urls,
+                "continuity_set_cards_missing_label": set_cards_missing_label,
             },
         })
         if mode == "dry-run" or dry_blockers:
