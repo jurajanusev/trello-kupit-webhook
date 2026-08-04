@@ -251,7 +251,6 @@ class Migration:
         required_props = {
             item["registry_key"]
             for item in scene["props"]
-            if item.get("continuity")
         }
         required_sets = {
             item["registry_key"]

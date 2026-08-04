@@ -6470,12 +6470,12 @@ def cierny_kamen_scene_description(scene, prop_urls, set_urls):
     continuity = []
     links = []
     for item in scene["props"]:
+        links.append(
+            f"- {item['stable_name']}: {prop_urls[item['registry_key']]}"
+        )
         if item.get("continuity"):
             continuity.append(
                 f"- {item['stable_name']}: kontinuálna rekvizita."
-            )
-            links.append(
-                f"- {item['stable_name']}: {prop_urls[item['registry_key']]}"
             )
     for item in scene["set_items"]:
         if item.get("continuity"):
@@ -6524,7 +6524,10 @@ def cierny_kamen_scene_checklists(scene, prop_urls, set_urls):
                 item, prop_urls[item["registry_key"]]
             )
             if item.get("continuity")
-            else cierny_kamen_plain_item(item)
+            else (
+                f"{cierny_kamen_plain_item(item)} | "
+                f"KARTA: {prop_urls[item['registry_key']]}"
+            )
         )
         for item in scene["props"]
     ]
@@ -6550,7 +6553,10 @@ def cierny_kamen_scene_checklists(scene, prop_urls, set_urls):
 def cierny_kamen_registry_description(kind, key, entry, scene_urls):
     marker = cierny_kamen_registry_marker(kind, key)
     title = (
-        "HLAVNÁ KARTA KONTINUÁLNEJ REKVIZITY"
+        (
+            "HLAVNÁ KARTA NADVÄZNEJ REKVIZITY"
+            if entry.get("continuity") else "HLAVNÁ KARTA REKVIZITY"
+        )
         if kind == "PROP" else "HLAVNÁ KARTA KONTINUÁLNEHO SETU"
     )
     aliases = ", ".join(entry.get("aliases") or [entry["identity"]])
@@ -6578,11 +6584,13 @@ def cierny_kamen_registry_description(kind, key, entry, scene_urls):
         f"\n\n**DÔVOD PRIAMEJ NADVÄZNOSTI:** {entry['reason']}"
         if entry.get("reason") else ""
     )
+    categories = ", ".join(entry.get("categories") or []) or "—"
     return (
         f"{marker}\n"
         f"# {title}\n\n"
         f"**IDENTITA:** `{entry['identity']}`\n\n"
         f"**ALIASY:** {aliases}\n\n"
+        f"**KATEGÓRIE:** {categories}\n\n"
         f"**FIXNÉ VLASTNOSTI:** {fixed}{reason}\n\n"
         "## ČASOVÁ OS A ODKAZY NA OBRAZY\n"
         f"{chr(10).join(timeline)}\n\n"
@@ -6839,7 +6847,6 @@ def import_cierny_kamen():
     )
     sample_prop_keys = sorted({
         item["registry_key"] for item in sample_scene["props"]
-        if item.get("continuity")
     })
     sample_set_keys = sorted({
         item["registry_key"] for item in sample_scene["set_items"]

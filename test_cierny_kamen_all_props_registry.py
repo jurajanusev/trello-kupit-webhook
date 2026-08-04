@@ -1,6 +1,8 @@
 import sys
 import types
 import unittest
+import json
+from pathlib import Path
 
 
 if "flask" not in sys.modules:
@@ -26,6 +28,7 @@ from build_cierny_kamen_all_props_registry_map import (
     categories_for_source,
     identity_core,
 )
+from cierny_kamen_prop_identities import apply_identity_map
 
 
 class AllPropsRegistryTests(unittest.TestCase):
@@ -86,6 +89,20 @@ class AllPropsRegistryTests(unittest.TestCase):
 
     def test_sample_covers_five_explicit_identities(self):
         self.assertEqual(len(SAMPLE_IDENTITIES), 5)
+
+    def test_future_payload_registers_every_included_prop(self):
+        raw = json.loads(
+            Path("cierny_kamen_pdf_payload.json").read_text(encoding="utf-8")
+        )
+        mapped = apply_identity_map(raw)
+        props = [item for scene in mapped["scenes"] for item in scene["props"]]
+        self.assertEqual(len(props), 195)
+        self.assertTrue(all(item.get("registry_key") for item in props))
+        self.assertEqual(len(mapped["prop_registry"]), 137)
+        self.assertTrue(all(
+            "categories" in entry and "continuity" in entry
+            for entry in mapped["prop_registry"].values()
+        ))
 
 
 if __name__ == "__main__":

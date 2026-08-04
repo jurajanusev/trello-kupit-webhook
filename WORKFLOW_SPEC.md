@@ -1,5 +1,45 @@
 # Riverdale Trello workflow
 
+## Čierny Kameň – autoritatívne pravidlá obrazov a registrov
+
+Táto časť nahrádza staršie pravidlá Riverdale pre board `CzuD55PR`. Projekt sa
+volá **Čierny Kameň**; názov boardu sa bez osobitného pokynu nemení.
+
+- Zdrojom scenára je šesť schválených finálnych PDF. Aktívny rozsah je 313
+  unikátnych obrazov. Staré JSON/extracted-script súbory nie sú produkčný vstup.
+- Popis obrazovej karty zachováva referenčnú štruktúru 01/16: názov obrazu,
+  `REKVIZITY V KONTEXTE`, `KONTINUITA`, `ODKAZY`, nadväzné obrazy,
+  `RUČNÉ DOPLNENIA`, kompletná `AKCIA A DIALÓGY` a metadata na konci.
+- Checklisty sú v poradí `REKVIZITY`, `SET`, `INFO Z PORADY`,
+  `INFO Z NATÁČANIA`, `OTÁZKY NA PORADU`.
+- Používateľ môže do `REKVIZITY` zapísať prirodzený názov. Automatizácia
+  zachová jeho text doslova a smie iba pripojiť alebo opraviť strojový suffix
+  ` | KARTA: https://trello.com/c/...`.
+- **Každá položka v checkliste `REKVIZITY`, vrátane jednorazovej rekvizity,
+  musí mať presne jednu master kartu v `REGISTRI REKVIZÍT`.** Staršie pravidlo,
+  podľa ktorého sa jednorazové rekvizity do registra nedávali, je zrušené.
+- Stabilná identita sa určuje z konkrétneho predmetu, vlastníka/dejovej väzby
+  a trvalého rozlíšenia. Všeobecné slovo ako mobil, auto alebo taška nie je
+  dôkazom totožnosti. Nejasná položka dostane bezpečne oddelenú kontextovú
+  identitu a konkrétnu otázku v `OTÁZKY NA PORADU`.
+- `<n>` znamená iba potvrdený rovnaký fyzický kus v kontinuite. Dialógová
+  zmienka ani opakovaný názov nestačia.
+- Master karta obsahuje ohraničený automatický blok s kanonickým názvom,
+  aliasmi, kategóriami a úplným zoznamom pomenovaných odkazov na obrazy.
+  Manuálny obsah mimo bloku sa nikdy neprepisuje.
+- Odkazy sú obojsmerné cez checklist URL a Trello attachments; existujúca
+  príloha s rovnakým URL sa nepridáva znova.
+- Registry karty môžu kombinovať labely `Auto`, `Osobná rekvizita`,
+  `Dokument`, `Screen`, `Nadväzná rekvizita`. Hardware a konkrétny obsah
+  zobrazený na displeji sú samostatné identity.
+- Karty v `NADVÄZNÝCH SETOCH` majú label `Nadväzný priestor`. Bežná karta v
+  `REGISTRI PRIESTOROV` ani obrazová karta ho nedostane iba kvôli lokácii.
+- Pred každou dávkou sa načíta aktuálny stav. Hash jadra položky a snapshot
+  popisov, checklistov/stavov, príloh, komentárov a existujúcich labelov chránia
+  súbežné ručné úpravy. Pri konflikte sa karta preskočí a nič sa nemaže.
+- Každá migrácia ide cez audit, dry-run, malú vzorku, idempotentné dávky a
+  read-back audit. Jednorazový endpoint sa po overení vypne.
+
 Schvalene nastavenie pre dalsi vyvoj:
 
 - Zo scenara sa vytvori presne jedna karta na obraz so stabilnym ID `diel/obraz`.

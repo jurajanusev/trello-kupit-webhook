@@ -2,10 +2,65 @@ from __future__ import annotations
 
 import copy
 import json
+import re
+import unicodedata
 from pathlib import Path
 
 
 MAP_PATH = Path(__file__).with_name("cierny_kamen_prop_identity_map.json")
+
+
+SOURCE_CATEGORY_BY_TYPE = {
+    "Auto / vozidlo": ("Auto",),
+    "Sofiino auto": ("Auto", "Osobná rekvizita"),
+    "Mobilný telefón": ("Osobná rekvizita",),
+    "Notebook / laptop": ("Osobná rekvizita",),
+    "Taška / batoh": ("Osobná rekvizita",),
+    "Kľúče": ("Osobná rekvizita",),
+    "Pištoľ / zbraň": ("Osobná rekvizita",),
+    "Slúchadlá": ("Osobná rekvizita",),
+    "Alexova gitara": ("Osobná rekvizita",),
+    "Betin denník": ("Osobná rekvizita", "Dokument"),
+    "Denník": ("Osobná rekvizita", "Dokument"),
+    "Dokumenty / zmluva / spis": ("Dokument",),
+    "Fotografie / fotoalbum": ("Dokument",),
+}
+
+
+SCREEN_IDENTITIES = {
+    "Diktafón v Alicinom mobile",
+    "Dogyho fotografie dôkazov zo Sofiinho auta",
+    "Dogyho mobil s oznámením mesta",
+    "Fotografia Jakubovej klubovej bundy s číslom 9",
+    "Fotografia Olasovej na falošnom občianskom preukaze",
+    "Fotografie z Alicinho internet bankingu",
+    "Ivanov mobil s videom malej Sofie",
+    "Rodinné fotografie Révayovcov na Sárinom tablete",
+    "Slutshamingová fotografia Veroniky",
+    "Slutshamingové fotografie obetí",
+    "Sárina fotografia Laury a Andyho",
+    "Tímová selfie tanečnej skupiny",
+}
+
+
+def registry_key(value):
+    value = unicodedata.normalize("NFKD", value or "")
+    value = "".join(ch for ch in value if not unicodedata.combining(ch))
+    value = re.sub(r"[^a-z0-9]+", "-", value.casefold()).strip("-")
+    if not value:
+        raise ValueError("empty prop registry key")
+    return value
+
+
+def record_categories(record):
+    result = set(SOURCE_CATEGORY_BY_TYPE.get(
+        record["original_stable_name"], (),
+    ))
+    if record["stable_name"] in SCREEN_IDENTITIES:
+        result.add("Screen")
+    if record.get("continuity_group"):
+        result.add("Nadväzná rekvizita")
+    return sorted(result)
 
 
 def load_identity_map():
@@ -29,34 +84,40 @@ def apply_identity_map(payload):
                 questions.append(record["ambiguity_question"])
             if not record["include"]:
                 continue
+            group = record["continuity_group"]
+            key = group or registry_key(record["stable_name"])
             prop = {
                 "stable_name": record["stable_name"],
                 "action": record["action"],
                 "source_text": f"{record['stable_name']} — {record['action']}",
-                "continuity": bool(record["continuity_group"]),
+                "registry_key": key,
+                "continuity": bool(group),
             }
-            group = record["continuity_group"]
             if group:
                 prop.update({
-                    "registry_key": group,
                     "current_state": record["current_state"],
                     "previous": None,
                     "next": None,
                 })
-                entry = registries.setdefault(group, {
-                    "identity": record["stable_name"],
-                    "aliases": [record["stable_name"]],
-                    "occurrences": [],
-                })
-                if entry["identity"] != record["stable_name"]:
-                    raise ValueError(
-                        f"{group}: inconsistent stable names "
-                        f"{entry['identity']!r} and {record['stable_name']!r}"
-                    )
-                entry["occurrences"].append({
-                    "scene_id": scene["scene_id"],
-                    "action": record["action"],
-                })
+            entry = registries.setdefault(key, {
+                "identity": record["stable_name"],
+                "aliases": [record["stable_name"]],
+                "categories": record_categories(record),
+                "continuity": bool(group),
+                "occurrences": [],
+            })
+            if entry["identity"] != record["stable_name"]:
+                raise ValueError(
+                    f"{key}: inconsistent stable names "
+                    f"{entry['identity']!r} and {record['stable_name']!r}"
+                )
+            entry["categories"] = sorted(
+                set(entry["categories"]) | set(record_categories(record))
+            )
+            entry["occurrences"].append({
+                "scene_id": scene["scene_id"],
+                "action": record["action"],
+            })
             props.append(prop)
         scene["props"] = props
         scene["questions"] = questions
