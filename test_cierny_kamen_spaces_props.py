@@ -15,8 +15,11 @@ from cierny_kamen_spaces_props import (
     canonical_locations,
     description_without_location,
     normalize_source_location,
+    original_checklist_projection,
     parent_space,
+    projection_is_preserved,
     read_catalog_for_tests,
+    replace_location_value,
     trello_object_created_at,
 )
 
@@ -65,6 +68,43 @@ class SpaceMappingTests(unittest.TestCase):
             description_without_location(before),
             description_without_location(after),
         )
+
+    def test_replace_location_changes_only_location_value(self):
+        before = (
+            "<!-- CIERNY-KAMEN-SCHEDULE-METADATA:START -->\n"
+            "ČÍSLO OBRAZU: 01/16\nLOKÁCIA: DOM BETY – IZBA BETY\n"
+            "POSTAVY: BETY, KIKO\n"
+            "<!-- CIERNY-KAMEN-SCHEDULE-METADATA:END -->\nmanual"
+        )
+        after = replace_location_value(
+            before,
+            "[DOM BETY – IZBA BETY](https://trello.com/c/space)",
+        )
+        self.assertIn("LOKÁCIA: [DOM BETY", after)
+        self.assertEqual(
+            description_without_location(before),
+            description_without_location(after),
+        )
+
+    def test_original_checklist_items_may_only_be_extended(self):
+        before_lists = [{
+            "id": "check", "name": "REKVIZITY", "pos": 1,
+            "checkItems": [{
+                "id": "manual", "name": "Alicin mobil",
+                "state": "incomplete", "pos": 1,
+            }],
+        }]
+        before = original_checklist_projection(before_lists)
+        after = [{
+            **before_lists[0],
+            "checkItems": before_lists[0]["checkItems"] + [{
+                "id": "auto", "name": "↳ kontext", "state": "incomplete",
+                "pos": 2,
+            }],
+        }]
+        self.assertTrue(projection_is_preserved(before, after))
+        after[0]["checkItems"][0]["name"] = "renamed"
+        self.assertFalse(projection_is_preserved(before, after))
 
     def test_authoritative_payload_has_313_scenes(self):
         catalog = read_catalog_for_tests()
