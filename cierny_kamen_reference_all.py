@@ -8,21 +8,27 @@ from flask import jsonify, request
 
 from cierny_kamen_reference_0116 import (
     CARD_URL,
-    RELATED_HEADING,
-    desired_description,
     desired_set_item,
     metadata_characters,
     metadata_location_urls,
     normalize_name,
-    parse_description,
-    related_section,
     stable_hash,
+    METADATA_END,
+    METADATA_START,
 )
 
 
 KEY = "cierny-kamen-reference-all-4aug-5cf2187b"
 BOARD_REF = "CzuD55PR"
 REFERENCE_SCENE_ID = "01/16"
+REFERENCE_CONTINUITY_HEADING = "### NADVAZNOSŤ"
+REFERENCE_SPACE_HEADING = "### KONTINUITA PRIESTORU"
+REFERENCE_CHARACTERS_HEADING = "### KONTINUITA POSTÁV"
+LEGACY_RELATED_HEADINGS = (
+    "### NADVÄZNÉ OBRAZY", "### Rovnaký priestor", "### Rovnaké postavy",
+    REFERENCE_SPACE_HEADING, REFERENCE_CHARACTERS_HEADING,
+)
+TRELLO_LINK_TITLE = "‌"
 
 
 def board_support_data(api, board_id):
@@ -98,6 +104,118 @@ def same_story_space(left, right):
     return left == right
 
 
+def one_heading(text, heading):
+    matches = list(re.finditer(rf"(?m)^{re.escape(heading)}\s*$", text))
+    if len(matches) != 1:
+        raise ValueError(f"expected one heading {heading}; found {len(matches)}")
+    return matches[0]
+
+
+def parse_reference_layout(desc, expected_title):
+    if desc.count(METADATA_START) != 1 or desc.count(METADATA_END) != 1:
+        raise ValueError("metadata markers are not unique")
+    start = desc.index(METADATA_START)
+    end = desc.index(METADATA_END) + len(METADATA_END)
+    metadata = desc[start:end]
+    text = (desc[:start] + desc[end:]).strip("\r\n")
+
+    props = one_heading(text, "### REKVIZITY V KONTEXTE")
+    links = one_heading(text, "### ODKAZY")
+    manual = one_heading(text, "### RUČNÉ DOPLNENIA")
+    action = one_heading(text, "### AKCIA A DIALÓGY")
+    continuity_matches = []
+    for heading in ("### KONTINUITA", REFERENCE_CONTINUITY_HEADING):
+        continuity_matches.extend(
+            (heading, match) for match in re.finditer(
+                rf"(?m)^{re.escape(heading)}\s*$", text
+            )
+        )
+    if len(continuity_matches) != 1:
+        raise ValueError(
+            f"expected one continuity/nadvaznost heading; found "
+            f"{len(continuity_matches)}"
+        )
+    continuity_heading, continuity = continuity_matches[0]
+    if not (props.start() < continuity.start() < links.start()
+            < manual.start() < action.start()):
+        raise ValueError("protected section order is ambiguous")
+
+    related_positions = [
+        match.start()
+        for heading in LEGACY_RELATED_HEADINGS
+        for match in re.finditer(rf"(?m)^{re.escape(heading)}\s*$", text)
+        if links.start() < match.start() < manual.start()
+    ]
+    links_end = min(related_positions) if related_positions else manual.start()
+    title_raw = text[:props.start()].strip("\r\n")
+    cleaned_title = re.sub(r"^#+\s*", "", title_raw.strip())
+    cleaned_title = cleaned_title.strip("*").strip()
+    if normalize_name(cleaned_title) != normalize_name(expected_title):
+        raise ValueError(
+            f"title mismatch: actual={cleaned_title!r}, expected={expected_title!r}"
+        )
+    continuity_line_end = text.find("\n", continuity.end())
+    if continuity_line_end == -1:
+        continuity_line_end = continuity.end()
+    continuity_body = text[continuity_line_end:links.start()].strip("\r\n")
+    return {
+        "metadata": metadata,
+        "title_text": cleaned_title,
+        "props": text[props.start():continuity.start()].strip("\r\n"),
+        "continuity_body": continuity_body,
+        "continuity_heading": continuity_heading,
+        "links": text[links.start():links_end].strip("\r\n"),
+        "manual": text[manual.start():action.start()].strip("\r\n"),
+        "action": text[action.start():].strip("\r\n"),
+    }
+
+
+def link_or_dash(scene, scene_cards):
+    if not scene:
+        return "—"
+    title = scene.get("prepis")
+    if not title:
+        raise ValueError(f"{scene['scene_id']} has no PREPIS title")
+    card = scene_cards[scene["scene_id"]]
+    return (
+        f"[{scene['scene_id']} – {title}]({card['shortUrl']} "
+        f"\"{TRELLO_LINK_TITLE}\")"
+    )
+
+
+def reference_continuity_sections(neighbors, scene_cards):
+    space = "\n".join([
+        REFERENCE_SPACE_HEADING,
+        "",
+        f"- Predchádzajúci: {link_or_dash(neighbors['space_previous'], scene_cards)}",
+        f"- Nasledujúci: {link_or_dash(neighbors['space_next'], scene_cards)}",
+    ])
+    characters = [REFERENCE_CHARACTERS_HEADING, ""]
+    for item in neighbors["character_neighbors"]:
+        characters.append(
+            f"- {item['character']}: ← {link_or_dash(item['previous'], scene_cards)}"
+            f" | → {link_or_dash(item['next'], scene_cards)}"
+        )
+    if neighbors["same_cast_previous"] or neighbors["same_cast_next"]:
+        characters.append(
+            "- Rovnaká zostava postáv: ← "
+            f"{link_or_dash(neighbors['same_cast_previous'], scene_cards)} | → "
+            f"{link_or_dash(neighbors['same_cast_next'], scene_cards)}"
+        )
+    return space, "\n".join(characters)
+
+
+def build_reference_description(parsed, title, space_section, character_section):
+    continuity = REFERENCE_CONTINUITY_HEADING
+    if parsed["continuity_body"]:
+        continuity += "\n\n" + parsed["continuity_body"]
+    return "\n\n".join([
+        f"## {title}", parsed["props"], continuity, parsed["links"],
+        space_section, character_section, parsed["manual"], parsed["action"],
+        parsed["metadata"],
+    ])
+
+
 def prepare_descriptions(payload, scene_cards):
     scenes = payload["scenes"]
     if len(scene_cards) != len(scenes):
@@ -111,8 +229,13 @@ def prepare_descriptions(payload, scene_cards):
         card = scene_cards.get(scene["scene_id"])
         if not card:
             raise ValueError(f"missing card {scene['scene_id']}")
+        title = scene.get("prepis")
+        if not title:
+            raise ValueError(f"{scene['scene_id']} has no PREPIS title")
         try:
-            parsed[scene["scene_id"]] = parse_description(card.get("desc") or "")
+            parsed[scene["scene_id"]] = parse_reference_layout(
+                card.get("desc") or "", title
+            )
         except ValueError as exc:
             headings = re.findall(r"(?m)^### .*?$", card.get("desc") or "")
             raise ValueError(
@@ -169,16 +292,18 @@ def prepare_descriptions(payload, scene_cards):
             "character_neighbors": char_neighbors,
             "same_cast_previous": previous_cast, "same_cast_next": next_cast,
         }
-        related = related_section(neighbors, scene_cards)
-        new_desc = desired_description(scene_cards[scene_id].get("desc") or "", related)
-        reparsed = parse_description(new_desc)
+        space_section, character_section = reference_continuity_sections(
+            neighbors, scene_cards
+        )
+        new_desc = build_reference_description(
+            parsed[scene_id], scene.get("prepis"),
+            space_section, character_section,
+        )
+        reparsed = parse_reference_layout(new_desc, scene.get("prepis"))
         original = parsed[scene_id]
-        for key in (
-            "title", "### REKVIZITY V KONTEXTE", "### KONTINUITA",
-            "### ODKAZY", "### RUČNÉ DOPLNENIA", "### AKCIA A DIALÓGY",
-        ):
-            before = original[key] if key == "title" else original["chunks"][key]
-            after = reparsed[key] if key == "title" else reparsed["chunks"][key]
+        for key in ("title_text", "props", "continuity_body", "links", "manual", "action"):
+            before = original[key]
+            after = reparsed[key]
             if before.strip("\r\n") != after.strip("\r\n"):
                 raise ValueError(f"{scene_id} protected section changed: {key}")
         if reparsed["metadata"] != original["metadata"]:
@@ -349,7 +474,8 @@ def register_routes(flask_app, api):
                 operations.append({
                     "scene_id": scene_id, "url": card.get("shortUrl"),
                     "changed": changed,
-                    "has_related_section": RELATED_HEADING in desired,
+                    "has_space_continuity": REFERENCE_SPACE_HEADING in desired,
+                    "has_character_continuity": REFERENCE_CHARACTERS_HEADING in desired,
                     "metadata_at_end": desired.endswith(
                         prepared["parsed"][scene_id]["metadata"]
                     ),
