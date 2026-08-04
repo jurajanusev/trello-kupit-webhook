@@ -7982,6 +7982,10 @@ from dok4_board_guard_repair import register_routes as register_dok4_board_guard
 
 register_dok4_board_guard_routes(app, globals())
 
+from cierny_kamen_spaces_props import register_routes as register_spaces_props_routes
+
+register_spaces_props_routes(app, globals())
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
