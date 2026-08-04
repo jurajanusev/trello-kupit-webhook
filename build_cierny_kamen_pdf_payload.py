@@ -764,7 +764,7 @@ def build_payload(pdf_root: Path) -> dict:
         "board_ref": "CzuD55PR",
         "scene_list_name": "SCENÁRE",
         "prop_registry_list_name": "REGISTER REKVIZÍT",
-        "set_registry_list_name": "REGISTER SETOV",
+        "set_registry_list_name": "NADVÄZNÉ SETY",
         "source_kind": "six_final_pdfs",
         "source_pdfs": source_pdfs,
         "episode_counts": {
