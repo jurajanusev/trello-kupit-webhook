@@ -279,6 +279,10 @@ def register_routes(flask_app, api):
 
     @flask_app.route("/api/repair-dok4-board-routing", methods=["POST"])
     def repair_dok4_board_routing():
+        return jsonify({
+            "error": "completed DOK4 board routing repair endpoint disabled"
+        }), 410
+
         if request.headers.get("X-Board-Guard-Key") != KEY:
             return jsonify({"error": "forbidden"}), 403
         mode = request.args.get("mode", "dry-run").strip().casefold()
