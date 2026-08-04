@@ -285,7 +285,8 @@ def find_target_set_item(checklists):
     if len(candidates) != 1:
         raise ValueError(
             "expected one 'Set — prostredie obrazu 01/16' item; "
-            f"found {len(candidates)}"
+            f"found {len(candidates)}; actual SET items: "
+            f"{[item.get('name') for item in set_lists[0].get('checkItems', [])]}"
         )
     return set_lists[0], candidates[0]
 
@@ -455,4 +456,3 @@ def register_routes(flask_app, api):
             ),
         })
         return jsonify(result), 200 if protected_equal else 409
-
