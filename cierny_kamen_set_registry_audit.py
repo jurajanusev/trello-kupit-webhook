@@ -299,6 +299,8 @@ def build_audit(api, payload, state, checklists):
 def register_routes(flask_app, api):
     @flask_app.route("/api/audit-cierny-kamen-set-registry", methods=["POST"])
     def audit_cierny_kamen_set_registry():
+        return jsonify({"error": "completed SET audit endpoint disabled"}), 410
+
         if request.headers.get("X-Set-Audit-Key") != KEY:
             return jsonify({"error": "forbidden"}), 403
         mode = request.args.get("mode", "audit").strip().casefold()
