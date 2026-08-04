@@ -197,20 +197,23 @@ class Diagnostic:
             card for card in riverdale_cards
             if card.get("idList") == riverdale_todo_id
         ]
-        dok4_urls = {
-            item["card"].get("shortUrl")
-            for values in occurrences.values() for item in values
-        }
         candidates = []
         for wrong in riverdale_todos:
             marker = automatic_marker(wrong.get("desc") or "")
-            if not marker or not any(url and url in marker for url in dok4_urls):
+            if not marker:
                 continue
             key = self.prop_key_from_todo(wrong)
             source = [
                 item for item in occurrences.get(key, [])
-                if item["card"].get("shortUrl") in marker
+                if (
+                    item["card"].get("shortUrl") in marker
+                    or wrong.get("name", "").endswith(
+                        item["card"].get("name", "")
+                    )
+                )
             ]
+            if not source:
+                continue
             existing = [
                 card for card in dok4_todos
                 if self.prop_key_from_todo(card) == key

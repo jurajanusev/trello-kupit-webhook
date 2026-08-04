@@ -84,16 +84,17 @@ DEFAULT_BOARD_CONFIG = {
         "target_list_id": "69e53446a823be00f2e5e837"
     },
 
+    # DOK4: VSETKY EPIZODY -> ToDo
     "69f74077554ff079f9472308": {
         "target_list_id": "6a057f30a60d4ab5aee502b6"
     },
 
-    # DOK4: VSETKY EPIZODY -> ToDo
+    # Riverdale: VSETKY EPIZODY -> ToDo
     "6a3d776cbd0488b47076d8e6": {
         "target_list_id": "6a4776f530468dee7ea5fbfc"
     },
 
-    # DOK4: SCENARE -> ToDo
+    # Riverdale: SCENARE -> ToDo
     "6a4524898cb771a99433699b": {
         "target_list_id": "6a4776f530468dee7ea5fbfc"
     }
@@ -137,8 +138,8 @@ BOARD_CONFIG = load_board_config()
 
 BOARD_TARGET_LISTS = {
     "qCPeWA3e": "69e53446a823be00f2e5e837",  # Dunaj
-    "CzuD55PR": "6a057f30a60d4ab5aee502b6",  # Riverdale
-    "lzNy4AtY": "6a4776f530468dee7ea5fbfc",  # DOK4
+    "CzuD55PR": "6a4776f530468dee7ea5fbfc",  # Riverdale
+    "lzNy4AtY": "6a057f30a60d4ab5aee502b6",  # DOK4
 }
 
 CHECKLIST_TAG = os.environ.get("CHECKLIST_TAG", "[Z]")

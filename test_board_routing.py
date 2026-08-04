@@ -45,6 +45,17 @@ class BoardOwnershipRoutingTests(unittest.TestCase):
     def test_dok4_never_routes_to_riverdale(self):
         self.assertEqual(self.resolve(RIVERDALE_TODO), DOK4_TODO)
 
+    def test_unmapped_dok4_date_list_uses_dok4_fallback(self):
+        owners = {DOK4_TODO: DOK4_BOARD_ID}
+        result = resolve_target_list_id(
+            {"idBoard": DOK4_BOARD_ID, "idList": "unmapped-date-list"},
+            {},
+            {"lzNy4AtY": DOK4_TODO},
+            lambda _board_id: "lzNy4AtY",
+            owners.get,
+        )
+        self.assertEqual(result, DOK4_TODO)
+
     def test_unsupported_board_is_ignored(self):
         result = resolve_target_list_id(
             {"idBoard": "unknown", "idList": "source"},
