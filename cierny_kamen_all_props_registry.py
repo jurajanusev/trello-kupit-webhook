@@ -375,3 +375,21 @@ def register_routes(flask_app, api):
             },
         })
         return jsonify(result), 200 if not dry_blockers else 409
+
+    original_view = flask_app.view_functions[
+        "cierny_kamen_all_props_registry"
+    ]
+
+    def guarded_all_props_registry(*args, **kwargs):
+        try:
+            return original_view(*args, **kwargs)
+        except Exception as error:
+            return jsonify({
+                "status": "error", "writes": 0,
+                "error_type": type(error).__name__,
+                "error": str(error),
+            }), 500
+
+    flask_app.view_functions[
+        "cierny_kamen_all_props_registry"
+    ] = guarded_all_props_registry
