@@ -146,6 +146,10 @@ def ensure_attachment(api, card, url, name):
 def register_routes(flask_app, api):
     @flask_app.route("/api/cierny-kamen-all-props-registry", methods=["POST"])
     def cierny_kamen_all_props_registry():
+        return jsonify({
+            "status": "disabled",
+            "message": "complete prop registry migration is finished",
+        }), 410
         if request.headers.get("X-All-Props-Key") != KEY:
             return jsonify({"error": "forbidden"}), 403
         mode = request.args.get("mode", "audit").strip().casefold()
