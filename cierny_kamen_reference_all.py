@@ -321,6 +321,15 @@ def mobile_audit(api, payload, state, scene_cards, support):
     prop_lists = api["cierny_kamen_exact_named"](
         state["lists"], payload["prop_registry_list_name"]
     )
+    broad_candidates = [
+        card for card in state["cards"]
+        if "mobil" in normalize_name(
+            (card.get("name") or "") + " " + (card.get("desc") or "")[:500]
+        )
+        and any(token in normalize_name(
+            (card.get("name") or "") + " " + (card.get("desc") or "")[:500]
+        ) for token in ("betin", "bety"))
+    ]
     master_candidates = []
     if len(prop_lists) == 1:
         master_candidates = [
@@ -352,6 +361,14 @@ def mobile_audit(api, payload, state, scene_cards, support):
         "masters": [{"id": card["id"], "name": card.get("name"),
                      "url": card.get("shortUrl")}
                     for card in master_candidates],
+        "broad_card_candidates": [{
+            "id": card["id"], "name": card.get("name"),
+            "url": card.get("shortUrl"), "closed": card.get("closed"),
+            "list": state["lists_by_id"].get(card.get("idList"), {}).get("name"),
+            "list_closed": state["lists_by_id"].get(
+                card.get("idList"), {}
+            ).get("closed"),
+        } for card in broad_candidates],
         "items": items,
         "missing_link_items": [item for item in items if not item["has_card_url"]],
     }
