@@ -342,10 +342,17 @@ def register_routes(flask_app, api):
             try:
                 parsed_new = parse_description(new_desc)
             except ValueError as exc:
+                end_positions = [
+                    match.start() for match in re.finditer(
+                        re.escape(METADATA_END), new_desc
+                    )
+                ]
                 raise ValueError(
                     f"{exc}; proposed marker counts: "
                     f"START={new_desc.count(METADATA_START)}, "
-                    f"END={new_desc.count(METADATA_END)}"
+                    f"END={new_desc.count(METADATA_END)}; "
+                    f"END positions={end_positions}; contexts="
+                    f"{[new_desc[max(0, pos - 80):pos + len(METADATA_END) + 80] for pos in end_positions]}"
                 ) from exc
             set_checklist, set_item = find_target_set_item(before["checklists"])
             location_urls = metadata_location_urls(parsed["metadata"])
