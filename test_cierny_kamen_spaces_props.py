@@ -16,6 +16,7 @@ from cierny_kamen_spaces_props import (
     build_space_catalog,
     canonical_locations,
     description_without_location,
+    is_automatic_natural_prop_item,
     normalize_source_location,
     original_checklist_projection,
     parent_space,
@@ -136,6 +137,14 @@ class SpaceMappingTests(unittest.TestCase):
         ]
         self.assertEqual(continuity, ["police_boat"])
         self.assertNotIn("<n>", POLICE_BOAT_NAME)
+
+    def test_only_exact_automatic_items_are_excluded_from_manual_scan(self):
+        self.assertTrue(is_automatic_natural_prop_item("↳ automatic context"))
+        self.assertTrue(is_automatic_natural_prop_item(
+            f"<n> {POLICE_BOAT_NAME} — action | KARTA: https://trello.com/c/abc"
+        ))
+        self.assertFalse(is_automatic_natural_prop_item("<n> Sarina šatka"))
+        self.assertFalse(is_automatic_natural_prop_item("Alicin mobil"))
 
 
 if __name__ == "__main__":

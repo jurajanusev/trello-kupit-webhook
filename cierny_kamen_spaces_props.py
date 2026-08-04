@@ -85,6 +85,17 @@ POLICE_BOAT_KEY = "policajny-cln-patracieho-timu"
 POLICE_BOAT_NAME = "Policajný čln pátracieho tímu"
 POLICE_BOAT_SCENES = ("01/08LP", "01/09")
 
+
+def is_automatic_natural_prop_item(name):
+    value = name or ""
+    return (
+        value.startswith("↳ ")
+        or (
+            value.startswith(f"<n> {POLICE_BOAT_NAME} —")
+            and " | KARTA: https://trello.com/c/" in value
+        )
+    )
+
 # These are source-specific, reviewed equivalences.  This is intentionally not
 # a fuzzy matcher: an unlisted spelling remains a separate dry-run candidate.
 EXPLICIT_ALIASES = {
@@ -671,7 +682,7 @@ def register_routes(flask_app, api):
                 key=lambda value: value.get("pos", 0),
             ):
                 name = item.get("name") or ""
-                if name in known or name.startswith("↳ "):
+                if name in known or is_automatic_natural_prop_item(name):
                     continue
                 manual_prop_candidates.append({
                     "scene_id": scene_id,
