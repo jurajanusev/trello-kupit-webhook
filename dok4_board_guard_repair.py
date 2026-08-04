@@ -110,15 +110,23 @@ class Diagnostic:
             })
         return rows
 
-    def board_cards(self, board_id):
-        return self.api["trello_get"](f"/boards/{board_id}/cards", {
-            "fields": (
-                "id,name,desc,idList,idBoard,shortUrl,due,closed,pos,"
-                "dateLastActivity,badges"
-            ),
-            "filter": "open", "limit": 1000,
-            "checklists": "all", "checklist_fields": "name",
-        })
+    def list_cards(self, lists):
+        result = []
+        for board_list in lists:
+            cards = self.api["trello_get"](
+                f"/lists/{board_list['id']}/cards", {
+                    "fields": (
+                        "id,name,desc,idList,idBoard,shortUrl,due,closed,pos,"
+                        "dateLastActivity,badges"
+                    ),
+                    "filter": "open", "limit": 1000,
+                    "checklists": "all", "checklist_fields": "name",
+                },
+            )
+            for card in cards:
+                card.setdefault("idBoard", board_list.get("idBoard"))
+            result.extend(cards)
+        return result
 
     def prop_key_from_todo(self, card):
         desc = card.get("desc") or ""
@@ -181,10 +189,10 @@ class Diagnostic:
             if len(data["todo"]) != 1:
                 blockers.append(f"{project}: expected exactly one open ToDo list")
 
-        dok4_cards = self.board_cards(boards["dok4"]["board"]["id"])
-        riverdale_cards = self.board_cards(
-            boards["riverdale"]["board"]["id"]
-        )
+        # Trello caps a board-wide cards response.  Per-list reads are required
+        # here so a recent item in a later DOK4 shooting list is not omitted.
+        dok4_cards = self.list_cards(boards["dok4"]["lists"])
+        riverdale_cards = self.list_cards(boards["riverdale"]["lists"])
         occurrences = self.occurrences(dok4_cards)
         dok4_todo_id = boards["dok4"]["todo"][0]["id"] if len(
             boards["dok4"]["todo"]
