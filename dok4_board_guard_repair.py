@@ -304,6 +304,31 @@ def register_routes(flask_app, api):
             ),
             "dok4_todo_cards": len(plan["dok4_todos"]),
             "riverdale_todo_cards": len(plan["riverdale_todos"]),
+            "riverdale_todo_diagnostics": [
+                {
+                    **compact_card(card),
+                    "desc": card.get("desc"),
+                    "auto_marker": bool(automatic_marker(card.get("desc") or "")),
+                    "canonical_key": diagnostic.prop_key_from_todo(card),
+                    "badges": card.get("badges"),
+                }
+                for card in plan["riverdale_todos"]
+            ],
+            "dok4_occurrence_diagnostics": [
+                {
+                    "key": key,
+                    "items": [
+                        {
+                            "display": item["display"],
+                            "item": item["item"],
+                            "card": compact_card(item["card"]),
+                        }
+                        for item in items
+                    ],
+                }
+                for key, items in sorted(plan["occurrences"].items())
+            ],
+            "board_target_fallbacks": api["BOARD_TARGET_LISTS"],
             "repair_candidates": [
                 {
                     "key": item["key"],
