@@ -1,6 +1,7 @@
 import unittest
 import sys
 import types
+from datetime import timezone
 
 
 if "flask" not in sys.modules:
@@ -16,6 +17,7 @@ from cierny_kamen_spaces_props import (
     normalize_source_location,
     parent_space,
     read_catalog_for_tests,
+    trello_object_created_at,
 )
 
 
@@ -70,6 +72,11 @@ class SpaceMappingTests(unittest.TestCase):
         self.assertEqual(len(catalog["scene_locations"]), 313)
         self.assertEqual(matched + len(catalog["ambiguous"]), 313)
         self.assertFalse(catalog["key_collisions"])
+
+    def test_trello_object_id_timestamp_is_deterministic(self):
+        created = trello_object_created_at("6a71945fbc40caec67ceb03a")
+        self.assertEqual(created.tzinfo, timezone.utc)
+        self.assertEqual(created.isoformat(), "2026-08-04T07:27:27+00:00")
 
 
 if __name__ == "__main__":

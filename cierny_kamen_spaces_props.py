@@ -5,6 +5,7 @@ import json
 import re
 import unicodedata
 from collections import defaultdict
+from datetime import datetime, timezone
 from pathlib import Path
 
 from flask import jsonify, request
@@ -16,6 +17,7 @@ SPACE_LIST_NAME = "REGISTER PRIESTOROV"
 SPACE_MARKER_PREFIX = "<!-- CIERNY-KAMEN-SPACE:"
 METADATA_START = "<!-- CIERNY-KAMEN-SCHEDULE-METADATA:START -->"
 METADATA_END = "<!-- CIERNY-KAMEN-SCHEDULE-METADATA:END -->"
+LAST_PROP_SYNC_UTC = datetime(2026, 7, 30, 20, 42, 43, tzinfo=timezone.utc)
 
 # These are source-specific, reviewed equivalences.  This is intentionally not
 # a fuzzy matcher: an unlisted spelling remains a separate dry-run candidate.
@@ -197,6 +199,12 @@ def stable_json_hash(value):
     return hashlib.sha256(raw).hexdigest()
 
 
+def trello_object_created_at(object_id):
+    if not re.fullmatch(r"[0-9a-fA-F]{24}", object_id or ""):
+        return None
+    return datetime.fromtimestamp(int(object_id[:8], 16), timezone.utc)
+
+
 def description_without_location(desc):
     if METADATA_START not in (desc or "") or METADATA_END not in desc:
         return None
@@ -248,7 +256,9 @@ def checklist_map(api, board_id):
     return result
 
 
-def protected_snapshot(scene_cards, checklists_by_card):
+def protected_snapshot(
+    scene_cards, checklists_by_card, attachments_by_card, comments_by_card
+):
     cards = []
     invalid_metadata = []
     for scene_id, card in sorted(scene_cards.items()):
@@ -264,6 +274,14 @@ def protected_snapshot(scene_cards, checklists_by_card):
             "card_id": card["id"],
             "protected_description": protected_desc,
             "labels": sorted(card.get("idLabels", [])),
+            "attachments": sorted(
+                attachments_by_card.get(card["id"], []),
+                key=lambda item: item.get("id", ""),
+            ),
+            "comments": sorted(
+                comments_by_card.get(card["id"], []),
+                key=lambda item: item.get("id", ""),
+            ),
             "checklists": [
                 {
                     "id": checklist.get("id"),
@@ -293,6 +311,8 @@ def protected_snapshot(scene_cards, checklists_by_card):
             len(checklist["items"])
             for card in cards for checklist in card["checklists"]
         ),
+        "attachments": sum(len(card["attachments"]) for card in cards),
+        "comments": sum(len(card["comments"]) for card in cards),
         "invalid_metadata": invalid_metadata,
     }
 
@@ -369,6 +389,47 @@ def register_routes(flask_app, api):
                 "blockers": [f"board checklist read failed: {exc}"],
             }), 409
 
+        try:
+            attachment_cards = api["trello_get"](
+                f"/boards/{state['board']['id']}/cards", {
+                    "fields": "id", "filter": "open", "limit": 1000,
+                    "attachments": "true",
+                    "attachment_fields": "id,name,url,bytes,date",
+                },
+            )
+            attachments_by_card = {
+                card["id"]: [
+                    {
+                        "id": item.get("id"), "name": item.get("name"),
+                        "url": item.get("url"), "bytes": item.get("bytes"),
+                        "date": item.get("date"),
+                    }
+                    for item in card.get("attachments", [])
+                ]
+                for card in attachment_cards
+            }
+            comment_actions = api["trello_get"](
+                f"/boards/{state['board']['id']}/actions", {
+                    "filter": "commentCard", "limit": 1000,
+                    "fields": "id,data,date,idMemberCreator",
+                },
+            )
+            comments_by_card = defaultdict(list)
+            for action in comment_actions:
+                card_id = (action.get("data") or {}).get("card", {}).get("id")
+                if card_id:
+                    comments_by_card[card_id].append({
+                        "id": action.get("id"),
+                        "text": (action.get("data") or {}).get("text"),
+                        "date": action.get("date"),
+                        "member": action.get("idMemberCreator"),
+                    })
+        except Exception as exc:
+            return jsonify({
+                "status": "blocked", "writes": 0,
+                "blockers": [f"protected attachments/comments read failed: {exc}"],
+            }), 409
+
         expected_props, registry_duplicates = expected_prop_names(
             api, payload, state
         )
@@ -411,9 +472,21 @@ def register_routes(flask_app, api):
                     "item_id": item.get("id"),
                     "name": name,
                     "state": item.get("state"),
+                    "created_at": (
+                        trello_object_created_at(item.get("id")).isoformat()
+                        if trello_object_created_at(item.get("id")) else None
+                    ),
+                    "eligible_new_since_last_sync": bool(
+                        trello_object_created_at(item.get("id"))
+                        and trello_object_created_at(item.get("id"))
+                        > LAST_PROP_SYNC_UTC
+                    ),
                 })
 
-        snapshot = protected_snapshot(scene_cards, checklists_by_card)
+        snapshot = protected_snapshot(
+            scene_cards, checklists_by_card,
+            attachments_by_card, comments_by_card,
+        )
         planned_location_updates = sum(
             bool(catalog["scene_locations"].get(scene_id))
             for scene_id in scene_cards
@@ -437,6 +510,8 @@ def register_routes(flask_app, api):
             blockers.append("existing prop/set registry marker duplicates")
         if checklist_order_conflicts:
             blockers.append("scene checklist order/name conflicts")
+        if len(comment_actions) >= 1000:
+            blockers.append("comment snapshot reached Trello limit")
 
         return jsonify({
             "status": "read-only-dry-run",
@@ -497,6 +572,15 @@ def register_routes(flask_app, api):
             },
             "props": {
                 "manual_or_changed_candidates": len(manual_prop_candidates),
+                "new_since_last_sync": sum(
+                    item["eligible_new_since_last_sync"]
+                    for item in manual_prop_candidates
+                ),
+                "legacy_conflicts_not_eligible": sum(
+                    not item["eligible_new_since_last_sync"]
+                    for item in manual_prop_candidates
+                ),
+                "last_sync_utc": LAST_PROP_SYNC_UTC.isoformat(),
                 "candidates": manual_prop_candidates,
                 "automatic_action_planned": 0,
                 "reason": (
