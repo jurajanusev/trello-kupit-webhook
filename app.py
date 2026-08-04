@@ -8002,6 +8002,10 @@ from cierny_kamen_props_0101_0115 import register_routes as register_props_0101_
 
 register_props_0101_0115_routes(app, globals())
 
+from cierny_kamen_set_links_dedup import register_routes as register_set_links_dedup_routes
+
+register_set_links_dedup_routes(app, globals())
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
