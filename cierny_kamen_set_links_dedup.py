@@ -189,58 +189,69 @@ def build_plan(api, payload, state, support):
             continue
         scene = by_scene[scene_id]
 
-        # The ordinary story-space link belongs only to the generated
-        # "prostredie obrazu" item, never to other dressing/SET items.
-        ordinary_item, ordinary_issue = find_plain_set_item(
-            scene, set_checklists[0]
-        )
-        names = catalog["scene_locations"].get(scene_id, [])
-        missing = [name for name in names
-                   if catalog["entries"][name]["key"] not in spaces_by_key]
-        ordinary_urls = [
-            spaces_by_key[catalog["entries"][name]["key"]].get("shortUrl")
-            for name in names if name not in missing
+        continuity_sources = [
+            item for item in scene.get("set_items", [])
+            if item.get("continuity")
         ]
-        if missing:
-            ordinary_issue = ordinary_issue or {
-                "scene_id": scene_id, "type": "missing_space_master",
-                "spaces": missing,
-            }
-        if not names:
-            ordinary_issue = ordinary_issue or {
-                "scene_id": scene_id, "type": "ambiguous_space_mapping",
-            }
-        if ordinary_issue:
-            issues.append(ordinary_issue)
-        else:
-            desired = desired_karta_suffix(
-                ordinary_item.get("name") or "", ordinary_urls
+
+        # A scene with a continuity SET uses its <n> master instead of a
+        # parallel ordinary-space checklist link.
+        if not continuity_sources:
+            ordinary_item, ordinary_issue = find_plain_set_item(
+                scene, set_checklists[0]
             )
-            detail = {
-                "scene_id": scene_id, "card_url": card.get("shortUrl"),
-                "kind": "ordinary", "item_id": ordinary_item["id"],
-                "before": ordinary_item.get("name"), "after": desired,
-                "current_urls": CARD_URL.findall(
-                    ordinary_item.get("name") or ""
-                ),
-                "desired_urls": ordinary_urls,
-                "changed": desired != ordinary_item.get("name"),
-            }
-            link_details.append(detail)
-            if detail["changed"]:
-                operations.append({
-                    "type": "set_link", "scene_id": scene_id,
-                    "card_id": card["id"], "card_url": card.get("shortUrl"),
-                    "checklist_id": set_checklists[0]["id"],
-                    "item_id": ordinary_item["id"],
+            names = catalog["scene_locations"].get(scene_id, [])
+            missing = [name for name in names
+                       if catalog["entries"][name]["key"] not in spaces_by_key]
+            ordinary_urls = [
+                spaces_by_key[catalog["entries"][name]["key"]].get("shortUrl")
+                for name in names if name not in missing
+            ]
+            if missing:
+                ordinary_issue = ordinary_issue or {
+                    "scene_id": scene_id, "type": "missing_space_master",
+                    "spaces": missing,
+                }
+            if not names:
+                ambiguous = next(
+                    (item for item in catalog["ambiguous"]
+                     if item["scene_id"] == scene_id), None
+                )
+                ordinary_issue = ordinary_issue or {
+                    "scene_id": scene_id, "type": "ambiguous_space_mapping",
+                    "source": ambiguous.get("source") if ambiguous else None,
+                    "question": ambiguous.get("question") if ambiguous else None,
+                }
+            if ordinary_issue:
+                issues.append(ordinary_issue)
+            else:
+                desired = desired_karta_suffix(
+                    ordinary_item.get("name") or "", ordinary_urls
+                )
+                detail = {
+                    "scene_id": scene_id, "card_url": card.get("shortUrl"),
+                    "kind": "ordinary", "item_id": ordinary_item["id"],
                     "before": ordinary_item.get("name"), "after": desired,
-                    "kind": "ordinary",
-                })
+                    "current_urls": CARD_URL.findall(
+                        ordinary_item.get("name") or ""
+                    ),
+                    "desired_urls": ordinary_urls,
+                    "changed": desired != ordinary_item.get("name"),
+                }
+                link_details.append(detail)
+                if detail["changed"]:
+                    operations.append({
+                        "type": "set_link", "scene_id": scene_id,
+                        "card_id": card["id"],
+                        "card_url": card.get("shortUrl"),
+                        "checklist_id": set_checklists[0]["id"],
+                        "item_id": ordinary_item["id"],
+                        "before": ordinary_item.get("name"), "after": desired,
+                        "kind": "ordinary",
+                    })
 
         # Every continuity SET item gets only its NADVÄZNÉ SETY master URL.
-        for source_item in scene.get("set_items", []):
-            if not source_item.get("continuity"):
-                continue
+        for source_item in continuity_sources:
             item, issue = find_continuity_set_item(
                 scene, source_item, set_checklists[0]
             )
