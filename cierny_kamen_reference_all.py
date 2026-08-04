@@ -239,7 +239,8 @@ def register_routes(flask_app, api):
             return jsonify({"error": "forbidden"}), 403
         mode = request.args.get("mode", "audit").strip().casefold()
         allowed = {
-            "audit", "dry-run", "descriptions-dry-run", "descriptions-apply",
+            "reference-audit", "audit", "dry-run",
+            "descriptions-dry-run", "descriptions-apply",
             "mobile-dry-run", "mobile-apply", "final-audit",
         }
         if mode not in allowed:
@@ -262,6 +263,22 @@ def register_routes(flask_app, api):
         scene_cards = {
             key: value[0] for key, value in groups.items() if len(value) == 1
         }
+        if mode == "reference-audit":
+            reference = scene_cards.get(REFERENCE_SCENE_ID)
+            if not reference:
+                return jsonify({"status": "blocked", "writes": 0,
+                                "error": "01/16 missing"}), 409
+            support = board_support_data(api, state["board"]["id"])
+            return jsonify({
+                "status": mode, "writes": 0,
+                "card": {"id": reference["id"], "name": reference.get("name"),
+                         "url": reference.get("shortUrl"),
+                         "description": reference.get("desc")},
+                "checklists": support["checklists"].get(reference["id"], []),
+                "labels": reference.get("idLabels", []),
+                "attachments": support["attachments"].get(reference["id"], []),
+                "comments": support["comments"].get(reference["id"], []),
+            }), 200
         try:
             support = board_support_data(api, state["board"]["id"])
             if support["comment_limit_reached"]:
