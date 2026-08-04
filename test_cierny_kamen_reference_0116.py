@@ -59,7 +59,7 @@ class ReferenceCardTests(unittest.TestCase):
         self.assertLess(result.index(related), result.index("### RUČNÉ DOPLNENIA"))
 
     def test_set_item_only_appends_missing_real_url(self):
-        original = "Set — prostredie obrazu 01/16: DOM BETY – IZBA BETY"
+        original = "DOM BETY – IZBA BETY — prostredie obrazu 01/16"
         url = "https://trello.com/c/space"
         desired = desired_set_item(original, [url])
         self.assertEqual(desired, original + " | KARTA: " + url)
@@ -72,4 +72,3 @@ class ReferenceCardTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

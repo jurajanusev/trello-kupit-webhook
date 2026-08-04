@@ -280,7 +280,7 @@ def find_target_set_item(checklists):
     candidates = []
     for item in set_lists[0].get("checkItems", []):
         folded = normalize_name(item.get("name")).replace("–", "-").replace("—", "-")
-        if "set - prostredie obrazu 01/16" in folded:
+        if "prostredie obrazu 01/16" in folded:
             candidates.append(item)
     if len(candidates) != 1:
         raise ValueError(
