@@ -9,7 +9,17 @@ if "flask" not in sys.modules:
     flask_stub.request = None
     sys.modules["flask"] = flask_stub
 
-from cierny_kamen_all_props_registry import CATEGORY_LABELS, exact_named
+from cierny_kamen_all_props_registry import (
+    CATEGORY_LABELS,
+    PROP_AUTO_END,
+    PROP_AUTO_START,
+    SAMPLE_IDENTITIES,
+    alias_core,
+    exact_named,
+    outside_auto_block,
+    replace_auto_block,
+    with_card_suffix,
+)
 from build_cierny_kamen_all_props_registry_map import (
     COMPANION_TO_RAW,
     MANUAL_ITEMS,
@@ -50,6 +60,32 @@ class AllPropsRegistryTests(unittest.TestCase):
             categories_for_source(record),
             ("Nadväzná rekvizita", "Osobná rekvizita"),
         )
+
+    def test_suffix_update_preserves_manual_core(self):
+        original = "Alicin mobil — ručný kontext | TU: nepoškodený"
+        linked = with_card_suffix(original, "https://trello.com/c/AbCd1234")
+        updated = with_card_suffix(linked, "https://trello.com/c/ZyXw9876")
+        self.assertEqual(
+            updated,
+            original + " | KARTA: https://trello.com/c/ZyXw9876",
+        )
+
+    def test_auto_block_replacement_preserves_manual_text(self):
+        old = f"ručný úvod\n\n{PROP_AUTO_START}\nold\n{PROP_AUTO_END}\nručný koniec"
+        new_block = f"{PROP_AUTO_START}\nnew\n{PROP_AUTO_END}"
+        updated = replace_auto_block(old, new_block)
+        self.assertEqual(outside_auto_block(old), outside_auto_block(updated))
+        self.assertIn("new", updated)
+        self.assertNotIn("\nold\n", updated)
+
+    def test_alias_core_drops_formatting_not_identity(self):
+        self.assertEqual(
+            alias_core("<n> Betin mobil — ručný stav | KARTA: https://trello.com/c/Ab1"),
+            "Betin mobil",
+        )
+
+    def test_sample_covers_five_explicit_identities(self):
+        self.assertEqual(len(SAMPLE_IDENTITIES), 5)
 
 
 if __name__ == "__main__":

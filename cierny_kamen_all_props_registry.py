@@ -22,6 +22,20 @@ CATEGORY_LABELS = (
 )
 CARD_URL = re.compile(r"https://trello\.com/c/[A-Za-z0-9]+")
 MAP_PATH = Path(__file__).with_name("cierny_kamen_all_props_registry_map.json")
+PROP_AUTO_START = "<!-- CIERNY-KAMEN-PROP-REGISTRY-AUTO:START -->"
+PROP_AUTO_END = "<!-- CIERNY-KAMEN-PROP-REGISTRY-AUTO:END -->"
+SAMPLE_IDENTITIES = (
+    "Magnetka „I love Barcelona“ pre Kika",
+    "Policajný čln pátracieho tímu",
+    "Policajné auto pri rieke",
+    "Sárin fotoalbum s Jakubovými fotografiami",
+    "Fotografie z Alicinho internet bankingu",
+)
+LABEL_COLORS = {
+    "Osobná rekvizita": "purple",
+    "Dokument": "yellow",
+    "Nadväzný priestor": "lime",
+}
 
 
 def folded(value):
@@ -38,13 +52,104 @@ def exact_named(items, name):
     return [item for item in items if folded(item.get("name")) == target]
 
 
+def without_card_suffix(value):
+    return re.sub(
+        r"\s*\|\s*KARTA:\s*https://trello\.com/c/[A-Za-z0-9]+\s*$",
+        "", value or "", flags=re.IGNORECASE,
+    ).rstrip()
+
+
+def with_card_suffix(value, url):
+    return f"{without_card_suffix(value)} | KARTA: {url}"
+
+
+def alias_core(value):
+    value = without_card_suffix(value).strip()
+    value = re.sub(r"^(?:<[^>]+>\s*|↳\s*)", "", value).strip()
+    return re.split(r"\s+—\s+", value, maxsplit=1)[0].strip()
+
+
+def replace_auto_block(value, block):
+    value = value or ""
+    if value.count(PROP_AUTO_START) != value.count(PROP_AUTO_END):
+        raise ValueError("unbalanced prop registry auto markers")
+    if value.count(PROP_AUTO_START) > 1:
+        raise ValueError("duplicate prop registry auto markers")
+    if PROP_AUTO_START in value:
+        start = value.index(PROP_AUTO_START)
+        end = value.index(PROP_AUTO_END, start) + len(PROP_AUTO_END)
+        return value[:start] + block + value[end:]
+    return (value.rstrip() + "\n\n" + block).lstrip("\n")
+
+
+def outside_auto_block(value):
+    value = value or ""
+    if PROP_AUTO_START not in value:
+        return value.rstrip()
+    start = value.index(PROP_AUTO_START)
+    end = value.index(PROP_AUTO_END, start) + len(PROP_AUTO_END)
+    return (value[:start] + value[end:]).rstrip()
+
+
+def master_auto_block(stable_name, rows):
+    aliases = sorted({
+        alias_core(row["original_name"])
+        for row in rows
+        if folded(alias_core(row["original_name"])) != folded(stable_name)
+    }, key=folded)
+    categories = sorted({
+        category for row in rows for category in row["categories"]
+    }, key=folded)
+    occurrences = []
+    seen = set()
+    for row in sorted(rows, key=lambda item: (item["scene_id"], item["item_id"])):
+        if row.get("conflict") or row["scene_id"] in seen:
+            continue
+        seen.add(row["scene_id"])
+        occurrences.append(
+            f"- [{row['scene_id']}]({row['scene_url']})"
+        )
+    return (
+        f"{PROP_AUTO_START}\n"
+        f"KANONICKÝ NÁZOV: {stable_name}\n"
+        f"ALIASY: {', '.join(aliases) if aliases else '—'}\n"
+        f"KATEGÓRIE: {', '.join(categories) if categories else '—'}\n\n"
+        "### VÝSKYTY V OBRAZOCH\n"
+        + ("\n".join(occurrences) if occurrences else "- —") + "\n"
+        f"{PROP_AUTO_END}"
+    )
+
+
+def attachment_projection(items):
+    return {
+        item.get("id"): {
+            "id": item.get("id"), "name": item.get("name"),
+            "url": item.get("url"), "bytes": item.get("bytes"),
+            "date": item.get("date"),
+        }
+        for item in items
+    }
+
+
+def ensure_attachment(api, card, url, name):
+    attachments = api["trello_get"](
+        f"/cards/{card['id']}/attachments", {"fields": "id,name,url,bytes,date"}
+    )
+    if any(item.get("url") == url for item in attachments):
+        return False
+    api["trello_post_body"](
+        f"/cards/{card['id']}/attachments", {"url": url, "name": name}
+    )
+    return True
+
+
 def register_routes(flask_app, api):
     @flask_app.route("/api/cierny-kamen-all-props-registry", methods=["POST"])
     def cierny_kamen_all_props_registry():
         if request.headers.get("X-All-Props-Key") != KEY:
             return jsonify({"error": "forbidden"}), 403
         mode = request.args.get("mode", "audit").strip().casefold()
-        if mode not in {"audit", "dry-run"}:
+        if mode not in {"audit", "dry-run", "sample", "apply"}:
             return jsonify({"error": "unsupported mode"}), 400
 
         payload = api["cierny_kamen_import_payload"]()
@@ -196,10 +301,14 @@ def register_routes(flask_app, api):
         for item_id in sorted(set(current_rows) - set(map_rows)):
             map_errors.append({"item_id": item_id, "error": "new item"})
         for item_id in sorted(set(map_rows) & set(current_rows)):
-            digest = hashlib.sha256(
-                (current_rows[item_id]["name"] or "").encode("utf-8")
-            ).hexdigest()
-            if digest != map_rows[item_id]["original_name_sha256"]:
+            current_name = current_rows[item_id]["name"] or ""
+            digest = hashlib.sha256(current_name.encode("utf-8")).hexdigest()
+            original_name = map_rows[item_id]["original_name"]
+            if (
+                digest != map_rows[item_id]["original_name_sha256"]
+                and without_card_suffix(current_name)
+                != without_card_suffix(original_name)
+            ):
                 map_errors.append({
                     "item_id": item_id,
                     "scene_id": current_rows[item_id]["scene_id"],
@@ -375,7 +484,355 @@ def register_routes(flask_app, api):
                 "master_auto_blocks_to_refresh": len(identity_plans),
             },
         })
-        return jsonify(result), 200 if not dry_blockers else 409
+        if mode == "dry-run" or dry_blockers:
+            return jsonify(result), 200 if not dry_blockers else 409
+
+        start = max(0, request.args.get("start", 0, type=int))
+        limit = min(20, max(1, request.args.get("limit", 10, type=int)))
+        plan_by_name = {plan["stable_name"]: plan for plan in identity_plans}
+        if mode == "sample":
+            selected_names = list(SAMPLE_IDENTITIES)
+            missing_sample = [
+                name for name in selected_names if name not in plan_by_name
+            ]
+            if missing_sample:
+                return jsonify({
+                    "status": "blocked", "writes": 0,
+                    "error": "sample identity missing",
+                    "missing": missing_sample,
+                }), 409
+        else:
+            selected_names = [
+                plan["stable_name"] for plan in identity_plans
+                if not plan["conflict"]
+            ][start:start + limit]
+        selected_set_cards = []
+        if mode == "sample":
+            selected_set_cards = [
+                card for card in set_cards if not card.get("closed")
+            ][:1]
+        elif request.args.get("sets", "0") == "1":
+            set_start = max(0, request.args.get("set_start", 0, type=int))
+            set_limit = min(20, max(
+                1, request.args.get("set_limit", 10, type=int)
+            ))
+            selected_set_cards = set_cards[set_start:set_start + set_limit]
+
+        selected_rows = [
+            row for row in identity_map["records"]
+            if row["stable_name"] in selected_names and not row.get("conflict")
+        ]
+        rows_for_identity = defaultdict(list)
+        for row in selected_rows:
+            rows_for_identity[row["stable_name"]].append(row)
+        selected_scene_ids = sorted({row["scene_id"] for row in selected_rows})
+        selected_scene_cards = {
+            scene_id: scene_cards[scene_id] for scene_id in selected_scene_ids
+        }
+
+        before_scene = {
+            scene_id: {
+                "card": dict(card),
+                "checklists": support["checklists"].get(card["id"], []),
+                "attachments": attachment_projection(
+                    support["attachments"].get(card["id"], [])
+                ),
+                "comments": support["comments"].get(card["id"], []),
+            }
+            for scene_id, card in selected_scene_cards.items()
+        }
+        existing_targets = {}
+        for stable_name in selected_names:
+            target = target_by_identity.get(stable_name)
+            if target:
+                existing_targets[stable_name] = {
+                    "card": dict(target),
+                    "checklists": support["checklists"].get(target["id"], []),
+                    "attachments": attachment_projection(api["trello_get"](
+                        f"/cards/{target['id']}/attachments",
+                        {"fields": "id,name,url,bytes,date"},
+                    )),
+                    "comments": support["comments"].get(target["id"], []),
+                }
+        before_sets = {
+            card["id"]: dict(card) for card in selected_set_cards
+        }
+
+        label_by_name = {}
+        writes = 0
+        operations = []
+        for name in CATEGORY_LABELS:
+            matches = exact_named(state["labels"], name)
+            if len(matches) > 1:
+                return jsonify({
+                    "status": "blocked", "writes": writes,
+                    "error": f"duplicate label {name}",
+                }), 409
+            if matches:
+                label_by_name[name] = matches[0]
+            elif name in LABEL_COLORS:
+                created = api["trello_post_body"]("/labels", {
+                    "idBoard": state["board"]["id"], "name": name,
+                    "color": LABEL_COLORS[name],
+                })
+                label_by_name[name] = created
+                writes += 1
+                operations.append({"type": "create_label", "name": name})
+
+        targets = {}
+        prop_list_id = prop_lists[0]["id"]
+        for stable_name in selected_names:
+            plan = plan_by_name[stable_name]
+            rows = rows_for_identity[stable_name]
+            target = target_by_identity.get(stable_name)
+            block = master_auto_block(stable_name, rows)
+            category_ids = {
+                label_by_name[name]["id"]
+                for name in plan["categories"] if name in label_by_name
+            }
+            if not target:
+                target = api["trello_post_body"]("/cards", {
+                    "idList": prop_list_id, "name": stable_name,
+                    "desc": block, "pos": "bottom",
+                    "idLabels": ",".join(sorted(category_ids)),
+                })
+                writes += 1
+                operations.append({
+                    "type": "create_master", "name": stable_name,
+                    "url": target.get("shortUrl"),
+                })
+            else:
+                body = {}
+                if target.get("closed"):
+                    body["closed"] = "false"
+                desired_desc = replace_auto_block(target.get("desc") or "", block)
+                if desired_desc != (target.get("desc") or ""):
+                    body["desc"] = desired_desc
+                desired_labels = sorted(
+                    set(target.get("idLabels", [])) | category_ids
+                )
+                if desired_labels != sorted(target.get("idLabels", [])):
+                    body["idLabels"] = ",".join(desired_labels)
+                if body:
+                    target = api["trello_put_body"](
+                        f"/cards/{target['id']}", body,
+                    )
+                    writes += 1
+                    operations.append({
+                        "type": "update_master", "name": stable_name,
+                        "fields": sorted(body), "url": target.get("shortUrl"),
+                    })
+            targets[stable_name] = target
+
+        expected_item_names = {}
+        for row in selected_rows:
+            current = current_rows[row["item_id"]]
+            target = targets[row["stable_name"]]
+            desired = with_card_suffix(current["name"], target["shortUrl"])
+            expected_item_names[row["item_id"]] = desired
+            if desired != current["name"]:
+                card = selected_scene_cards[row["scene_id"]]
+                api["trello_put_body"](
+                    f"/cards/{card['id']}/checkItem/{row['item_id']}",
+                    {"name": desired},
+                )
+                writes += 1
+                operations.append({
+                    "type": "link_item", "scene_id": row["scene_id"],
+                    "item_id": row["item_id"],
+                    "master": row["stable_name"],
+                })
+
+        questions_added = []
+        question_names_by_scene = {}
+        for row in selected_rows:
+            question = row.get("ambiguity_question")
+            if not question:
+                continue
+            card = selected_scene_cards[row["scene_id"]]
+            question_lists = exact_named(
+                support["checklists"].get(card["id"], []),
+                QUESTION_LIST_NAME,
+            )
+            if len(question_lists) != 1:
+                continue
+            existing = question_names_by_scene.setdefault(
+                row["scene_id"], {
+                    folded(item.get("name"))
+                    for item in question_lists[0].get("checkItems", [])
+                },
+            )
+            if folded(question) not in existing:
+                api["trello_post_body"](
+                    f"/checklists/{question_lists[0]['id']}/checkItems",
+                    {"name": question, "pos": "bottom"},
+                )
+                existing.add(folded(question))
+                questions_added.append({
+                    "scene_id": row["scene_id"], "question": question,
+                })
+                writes += 1
+
+        for stable_name, target in targets.items():
+            rows = rows_for_identity[stable_name]
+            for scene_id in sorted({row["scene_id"] for row in rows}):
+                scene_card = selected_scene_cards[scene_id]
+                if ensure_attachment(
+                    api, scene_card, target["shortUrl"], stable_name,
+                ):
+                    writes += 1
+                    operations.append({
+                        "type": "attach_master_to_scene",
+                        "scene_id": scene_id, "master": stable_name,
+                    })
+                if ensure_attachment(
+                    api, target, scene_card["shortUrl"], scene_id,
+                ):
+                    writes += 1
+                    operations.append({
+                        "type": "attach_scene_to_master",
+                        "scene_id": scene_id, "master": stable_name,
+                    })
+
+        set_label = label_by_name.get("Nadväzný priestor")
+        if set_label:
+            for card in selected_set_cards:
+                desired = sorted(
+                    set(card.get("idLabels", [])) | {set_label["id"]}
+                )
+                if desired != sorted(card.get("idLabels", [])):
+                    api["trello_put_body"](
+                        f"/cards/{card['id']}",
+                        {"idLabels": ",".join(desired)},
+                    )
+                    writes += 1
+                    operations.append({
+                        "type": "label_continuity_set",
+                        "name": card.get("name"), "url": card.get("shortUrl"),
+                    })
+
+        after_state = api["cierny_kamen_import_state"](payload)
+        after_support = board_support_data(api, state["board"]["id"])
+        after_cards = {card["id"]: card for card in after_state["cards"]}
+        protection_errors = []
+
+        def verify_checklists(before_lists, after_lists, allowed_names):
+            after_by_id = {item["id"]: item for item in after_lists}
+            for before_list in before_lists:
+                after_list = after_by_id.get(before_list["id"])
+                if not after_list or (
+                    before_list.get("name"), before_list.get("pos")
+                ) != (after_list.get("name"), after_list.get("pos")):
+                    return False
+                after_items = {
+                    item["id"]: item for item in after_list.get("checkItems", [])
+                }
+                for before_item in before_list.get("checkItems", []):
+                    after_item = after_items.get(before_item["id"])
+                    if not after_item:
+                        return False
+                    if (
+                        before_item.get("state"), before_item.get("pos")
+                    ) != (after_item.get("state"), after_item.get("pos")):
+                        return False
+                    expected = allowed_names.get(
+                        before_item["id"], before_item.get("name")
+                    )
+                    if after_item.get("name") != expected:
+                        return False
+            return True
+
+        for scene_id, before in before_scene.items():
+            card_id = before["card"]["id"]
+            after = after_cards.get(card_id)
+            if not after:
+                protection_errors.append(f"{scene_id}: card missing")
+                continue
+            invariant = (
+                before["card"].get("name") == after.get("name")
+                and before["card"].get("desc") == after.get("desc")
+                and before["card"].get("idList") == after.get("idList")
+                and before["card"].get("closed") == after.get("closed")
+                and sorted(before["card"].get("idLabels", []))
+                == sorted(after.get("idLabels", []))
+                and before["comments"]
+                == after_support["comments"].get(card_id, [])
+                and verify_checklists(
+                    before["checklists"],
+                    after_support["checklists"].get(card_id, []),
+                    expected_item_names,
+                )
+            )
+            after_attachments = attachment_projection(
+                after_support["attachments"].get(card_id, [])
+            )
+            attachments_preserved = all(
+                after_attachments.get(key) == value
+                for key, value in before["attachments"].items()
+            )
+            if not invariant or not attachments_preserved:
+                protection_errors.append(
+                    f"{scene_id}: protected scene data changed"
+                )
+
+        for stable_name, before in existing_targets.items():
+            card_id = before["card"]["id"]
+            after = after_cards.get(card_id)
+            after_attachments = attachment_projection(api["trello_get"](
+                f"/cards/{card_id}/attachments",
+                {"fields": "id,name,url,bytes,date"},
+            ))
+            invariant = bool(after) and (
+                before["card"].get("name") == after.get("name")
+                and before["card"].get("idList") == after.get("idList")
+                and outside_auto_block(before["card"].get("desc") or "")
+                == outside_auto_block(after.get("desc") or "")
+                and set(before["card"].get("idLabels", []))
+                .issubset(set(after.get("idLabels", [])))
+                and before["comments"]
+                == after_support["comments"].get(card_id, [])
+                and verify_checklists(
+                    before["checklists"],
+                    after_support["checklists"].get(card_id, []), {},
+                )
+                and all(
+                    after_attachments.get(key) == value
+                    for key, value in before["attachments"].items()
+                )
+            )
+            if not invariant:
+                protection_errors.append(
+                    f"{stable_name}: protected registry data changed"
+                )
+
+        for card_id, before in before_sets.items():
+            after = after_cards.get(card_id)
+            if not after or not (
+                before.get("name") == after.get("name")
+                and before.get("desc") == after.get("desc")
+                and before.get("idList") == after.get("idList")
+                and before.get("closed") == after.get("closed")
+                and set(before.get("idLabels", []))
+                .issubset(set(after.get("idLabels", [])))
+            ):
+                protection_errors.append(
+                    f"set {before.get('name')}: protected data changed"
+                )
+
+        return jsonify({
+            "status": mode,
+            "writes": writes,
+            "selected_identities": selected_names,
+            "selected_scenes": selected_scene_ids,
+            "selected_set_cards": len(selected_set_cards),
+            "operations": operations,
+            "questions_added": questions_added,
+            "protected_preserved": not protection_errors,
+            "protection_errors": protection_errors,
+            "remaining_identities": max(
+                0, len(identity_plans) - start - len(selected_names)
+            ) if mode == "apply" else len(identity_plans) - len(selected_names),
+        }), 200 if not protection_errors else 500
 
     original_view = flask_app.view_functions[
         "cierny_kamen_all_props_registry"
