@@ -339,6 +339,7 @@ def register_routes(flask_app, api):
             )
             related = related_section(neighbors, scene_cards)
             new_desc = desired_description(before["card"].get("desc") or "", related)
+            parsed_new = parse_description(new_desc)
             set_checklist, set_item = find_target_set_item(before["checklists"])
             location_urls = metadata_location_urls(parsed["metadata"])
             new_set_item = desired_set_item(set_item.get("name") or "", location_urls)
@@ -409,7 +410,7 @@ def register_routes(flask_app, api):
             },
             "diff": {
                 "metadata_content_unchanged": (
-                    parse_description(new_desc)["metadata"] == parsed["metadata"]
+                    parsed_new["metadata"] == parsed["metadata"]
                 ),
                 "metadata_moved_to_end": new_desc.endswith(parsed["metadata"]),
                 "related_section_inserted": related in new_desc,
