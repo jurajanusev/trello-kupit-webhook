@@ -111,7 +111,13 @@ def prepare_descriptions(payload, scene_cards):
         card = scene_cards.get(scene["scene_id"])
         if not card:
             raise ValueError(f"missing card {scene['scene_id']}")
-        parsed[scene["scene_id"]] = parse_description(card.get("desc") or "")
+        try:
+            parsed[scene["scene_id"]] = parse_description(card.get("desc") or "")
+        except ValueError as exc:
+            headings = re.findall(r"(?m)^### .*?$", card.get("desc") or "")
+            raise ValueError(
+                f"{scene['scene_id']}: {exc}; actual H3 headings={headings}"
+            ) from exc
         spaces[scene["scene_id"]] = story_space_key(
             parsed[scene["scene_id"]], scene
         )
