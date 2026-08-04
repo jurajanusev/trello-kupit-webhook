@@ -84,9 +84,12 @@ def parse_description(desc):
 
 
 def metadata_fields(metadata):
+    if not metadata.startswith(METADATA_START) or not metadata.endswith(METADATA_END):
+        raise ValueError("metadata block boundaries invalid")
+    body = metadata[len(METADATA_START):-len(METADATA_END)]
     fields = {}
-    for line in metadata.splitlines():
-        if ":" not in line or line.startswith("<!--"):
+    for line in body.splitlines():
+        if ":" not in line:
             continue
         key, value = line.split(":", 1)
         fields[key.strip().casefold()] = value.strip()

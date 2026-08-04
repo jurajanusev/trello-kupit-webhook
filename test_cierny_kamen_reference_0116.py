@@ -51,6 +51,10 @@ class ReferenceCardTests(unittest.TestCase):
             "https://trello.com/c/space"
         ])
 
+    def test_metadata_end_marker_may_follow_characters_on_same_line(self):
+        metadata = METADATA_START + "\nPOSTAVY: BETY, KIKO" + METADATA_END
+        self.assertEqual(metadata_characters(metadata), ["BETY", "KIKO"])
+
     def test_reorder_preserves_section_text_and_moves_metadata(self):
         related = "### NADVÄZNÉ OBRAZY\n\n### Rovnaký priestor\n- Predchádzajúci: —"
         result = desired_description(DESC, related)
