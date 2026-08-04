@@ -7998,6 +7998,10 @@ from cierny_kamen_reference_all import register_routes as register_reference_all
 
 register_reference_all_routes(app, globals())
 
+from cierny_kamen_props_0101_0115 import register_routes as register_props_0101_0115_routes
+
+register_props_0101_0115_routes(app, globals())
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
