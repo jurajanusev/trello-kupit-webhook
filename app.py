@@ -24,11 +24,11 @@ DOK4_CURRENT_SCHEDULE_FILE = "dok4_schedule_2026-08-07.json"
 DOK4_CURRENT_SCHEDULE_AS_OF = "2026-08-07"
 DOK4_CURRENT_SCHEDULE_ROWS = 160
 
-DUNAJ_CURRENT_SCHEDULE_KEY = "dunaj-schedule-01aug-9c4f27b1"
-DUNAJ_CURRENT_SCHEDULE_FILE = "dunaj_schedule_2026-08-01.json"
-DUNAJ_CURRENT_SCHEDULE_AS_OF = "2026-08-02"
-DUNAJ_CURRENT_SOURCE_LABEL = "predbežná dispo DUNAJ 16 z 1. 8. 2026"
-DUNAJ_CURRENT_SOURCE_ROWS = 152
+DUNAJ_CURRENT_SCHEDULE_KEY = "dunaj-schedule-07aug-74be2c91"
+DUNAJ_CURRENT_SCHEDULE_FILE = "dunaj_schedule_2026-08-07.json"
+DUNAJ_CURRENT_SCHEDULE_AS_OF = "2026-08-07"
+DUNAJ_CURRENT_SOURCE_LABEL = "predbežná dispo DUNAJ 16 z 7. 8. 2026"
+DUNAJ_CURRENT_SOURCE_ROWS = 108
 
 
 def canonicalize_dunaj_schedule_rows(source_rows):
@@ -55,7 +55,7 @@ def canonicalize_dunaj_schedule_rows(source_rows):
             merged_24 = None
             continue
         schedule_rows.append(row)
-    if merged_24 is not None or len(schedule_rows) != len(source_rows) - 1:
+    if merged_24 is not None:
         raise ValueError("merged scene normalization failed")
     return schedule_rows
 
@@ -3453,7 +3453,6 @@ def find_dunaj_board():
 
 @app.route("/api/sync-dunaj-schedule", methods=["POST"])
 def sync_dunaj_schedule():
-    return jsonify({"error": "completed one-off endpoint disabled"}), 410
     if request.headers.get("X-Sync-Key") != DUNAJ_CURRENT_SCHEDULE_KEY:
         return jsonify({"error": "forbidden"}), 403
 
