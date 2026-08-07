@@ -75,6 +75,23 @@ def normalize_scene(episode, scene):
     return f"{int(episode):02d}/{str(scene).upper().lstrip('0') or '0'}"
 
 
+def fallback_scene_ids(scene_id):
+    """Return safe card variants from most specific to the numeric base.
+
+    A leading R marks a retake in supplied plans, while a following letter
+    (for example L in RL) can still identify the existing Trello card.
+    """
+    match = re.fullmatch(r"(\d{2}/\d+)([A-Z]+)", scene_id, flags=re.I)
+    if not match:
+        return []
+    base, suffix = match.groups()
+    candidates = []
+    if len(suffix) > 1 and suffix.upper().startswith("R"):
+        candidates.append(base + suffix[1:].upper())
+    candidates.append(base)
+    return list(dict.fromkeys(candidates))
+
+
 def date_list_name(date_text):
     _, month, day = (int(value) for value in date_text.split("-"))
     return f"{day}.{month}."
@@ -154,10 +171,14 @@ def build_state(trello, schedule, source_date, as_of):
         matched_id = planned_id
         candidates = cards_by_scene.get(planned_id, [])
         fallback = False
-        if not candidates and re.search(r"[A-Z]$", planned_id):
-            matched_id = re.sub(r"[A-Z]+$", "", planned_id)
-            candidates = cards_by_scene.get(matched_id, [])
-            fallback = bool(candidates)
+        if not candidates:
+            for fallback_id in fallback_scene_ids(planned_id):
+                fallback_candidates = cards_by_scene.get(fallback_id, [])
+                if fallback_candidates:
+                    matched_id = fallback_id
+                    candidates = fallback_candidates
+                    fallback = True
+                    break
         if not candidates:
             missing.append({"scene_id": planned_id, "base_id": matched_id, "date": row["shooting_date"]})
             continue

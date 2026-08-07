@@ -8,7 +8,7 @@ os.environ.setdefault("TRELLO_KEY", "test-key")
 os.environ.setdefault("TRELLO_TOKEN", "test-token")
 
 import app
-from update_dok4_plan_local import build_state, summary
+from update_dok4_plan_local import build_state, fallback_scene_ids, summary
 
 
 ROOT = Path(__file__).parent
@@ -41,6 +41,10 @@ class FakeTrello:
 
 
 class Dok4August7ScheduleTests(unittest.TestCase):
+    def test_retakes_preserve_the_following_letter_variant(self):
+        self.assertEqual(fallback_scene_ids("06/4RL"), ["06/4L", "06/4"])
+        self.assertEqual(fallback_scene_ids("06/24R"), ["06/24"])
+
     def test_authoritative_json_and_next_seven_shooting_days(self):
         self.assertEqual(DOCUMENT["source"]["dated"], "2026-08-07")
         self.assertTrue(DOCUMENT["source"]["file"].endswith("plan update 7.8.pdf"))
