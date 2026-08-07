@@ -60,12 +60,12 @@ class Dok4August7ScheduleTests(unittest.TestCase):
             "2026-08-14", "2026-08-16", "2026-08-18",
         ])
 
-    def test_endpoint_rejects_a_different_as_of_date(self):
+    def test_completed_endpoint_is_disabled(self):
         response = app.app.test_client().post(
-            "/api/sync-dok4-current-schedule?mode=dry-run&as_of=2026-08-08",
+            "/api/sync-dok4-current-schedule?mode=dry-run&as_of=2026-08-07",
             headers={"X-Sync-Key": app.DOK4_CURRENT_SCHEDULE_KEY},
         )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 410)
 
     def test_prop_dry_run_reports_only_real_date_changes(self):
         scene = {
