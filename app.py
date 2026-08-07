@@ -19,10 +19,10 @@ from update_dok4_plan_local import (
 
 app = Flask(__name__)
 
-DOK4_CURRENT_SCHEDULE_KEY = "dok4-schedule-01aug-4e82c7d1"
-DOK4_CURRENT_SCHEDULE_FILE = "dok4_schedule_2026-08-01.json"
-DOK4_CURRENT_SCHEDULE_AS_OF = "2026-08-01"
-DOK4_CURRENT_SCHEDULE_ROWS = 179
+DOK4_CURRENT_SCHEDULE_KEY = "dok4-schedule-07aug-8fd319c2"
+DOK4_CURRENT_SCHEDULE_FILE = "dok4_schedule_2026-08-07.json"
+DOK4_CURRENT_SCHEDULE_AS_OF = "2026-08-07"
+DOK4_CURRENT_SCHEDULE_ROWS = 160
 
 DUNAJ_CURRENT_SCHEDULE_KEY = "dunaj-schedule-01aug-9c4f27b1"
 DUNAJ_CURRENT_SCHEDULE_FILE = "dunaj_schedule_2026-08-01.json"
@@ -4467,12 +4467,53 @@ def sync_project_prop_cards(project):
         })
     plans.sort(key=lambda item: item["display"].lower())
 
+    marker_start = "<!-- DUNAJ-PROP-SYNC:START -->"
+    marker_end = "<!-- DUNAJ-PROP-SYNC:END -->"
+    for plan in plans:
+        earliest_scene = plan["earliest_scene"] or "bez dátumu"
+        earliest_card = plan["earliest_card"]
+        desired_due = earliest_card.get("due") if earliest_card else None
+        lines = [
+            marker_start,
+            "Vytvorené a synchronizované automaticky z obrazových kariet.", "",
+            f"**REKVIZITA:** {plan['display']}",
+            f"**NAJSKORŠÍ OBRAZ:** {earliest_scene}",
+            f"**DUE DATE:** {(desired_due or 'nenastavený')[:10]}", "",
+            "**OBRAZY, ODKAZY A KONTEXT:**",
+        ]
+        for scene_id, scene_card in plan["linked"]:
+            date_text = (scene_card.get("due") or "")[:10] or "bez dátumu"
+            lines.append(f"- [{scene_id} — {scene_card['name']}]({scene_card['shortUrl']}) — {date_text}")
+            for context in sorted(plan["contexts"].get(scene_id, set())):
+                lines.append(f"  - Akcia/kontext: {context}")
+        lines.extend(["", "**NÁJDENÁ KONTINUITA V ĎALŠÍCH OBRAZOCH:**",
+                      ", ".join(scene_id for scene_id, _ in plan["linked"]) or "nenájdená", marker_end])
+        synced = "\n".join(lines)
+        primary = plan["existing"][0] if plan["existing"] else None
+        changes = {}
+        desired_desc = synced
+        if primary:
+            old_desc = primary.get("desc", "")
+            if marker_start in old_desc and marker_end in old_desc:
+                pattern = re.escape(marker_start) + r".*?" + re.escape(marker_end)
+                desired_desc = re.sub(pattern, lambda _: synced, old_desc, count=1, flags=re.S)
+            elif old_desc:
+                desired_desc = synced + "\n\n---\n\n**PÔVODNÝ ZÁZNAM / RUČNÉ POZNÁMKY:**\n\n" + old_desc
+            if desired_desc != old_desc:
+                changes["desc"] = desired_desc
+            current_due = primary.get("due") or None
+            if (current_due or "")[:10] != (desired_due or "")[:10]:
+                changes["due"] = desired_due or ""
+        plan.update({"desired_desc": desired_desc, "desired_due": desired_due,
+                     "changes": changes})
+
     summary = {
         "board": board["name"], "scene_cards_scanned": scanned_scene_cards,
         "tagged_occurrences": tagged_occurrences, "unique_props": len(plans),
         "todo_cards_before": len(todo_cards),
         "to_create": sum(1 for item in plans if not item["existing"]),
-        "to_update": sum(1 for item in plans if item["existing"]),
+        "to_update": sum(1 for item in plans if item["existing"] and item["changes"]),
+        "unchanged": sum(1 for item in plans if item["existing"] and not item["changes"]),
         "duplicates_to_archive": sum(max(0, len(item["existing"]) - 1) for item in plans),
         "without_due": sum(1 for item in plans if not item["earliest_card"] or not item["earliest_card"].get("due")),
     }
@@ -4490,7 +4531,10 @@ def sync_project_prop_cards(project):
                         "sample": [{
             "prop": item["display"], "scenes": [scene_id for scene_id, _ in item["linked"]],
             "earliest_scene": item["earliest_scene"],
-            "due": item["earliest_card"].get("due") if item["earliest_card"] else None,
+            "current_due": item["existing"][0].get("due") if item["existing"] else None,
+            "desired_due": item["desired_due"],
+            "action": "create" if not item["existing"] else ("update" if item["changes"] else "unchanged"),
+            "fields": sorted(item["changes"]),
             "existing_cards": [card["name"] for card in item["existing"]],
         } for item in plans[:40]]}), 200
 
@@ -4510,44 +4554,20 @@ def sync_project_prop_cards(project):
         return jsonify({"error": "invalid mode"}), 400
     start = max(0, int(request.args.get("start", "0")))
     limit = min(25, max(1, int(request.args.get("limit", "15"))))
-    apply_plans = [item for item in plans if not item["existing"]] if request.args.get("only_missing") == "1" else plans
+    apply_plans = ([item for item in plans if not item["existing"]]
+                   if request.args.get("only_missing") == "1"
+                   else [item for item in plans
+                         if not item["existing"] or item["changes"] or len(item["existing"]) > 1])
     batch = apply_plans[start:start + limit]
-    marker_start = "<!-- DUNAJ-PROP-SYNC:START -->"
-    marker_end = "<!-- DUNAJ-PROP-SYNC:END -->"
     created = []; updated = []; archived = []; errors = []
     for plan in batch:
-        earliest_scene = plan["earliest_scene"] or "bez dátumu"
         earliest_card = plan["earliest_card"]
-        lines = [
-            marker_start,
-            "Vytvorené a synchronizované automaticky z obrazových kariet.", "",
-            f"**REKVIZITA:** {plan['display']}",
-            f"**NAJSKORŠÍ OBRAZ:** {earliest_scene}",
-            f"**DUE DATE:** {(earliest_card.get('due') or 'nenastavený')[:10] if earliest_card else 'nenastavený'}", "",
-            "**OBRAZY, ODKAZY A KONTEXT:**",
-        ]
-        for scene_id, scene_card in plan["linked"]:
-            date_text = (scene_card.get("due") or "")[:10] or "bez dátumu"
-            lines.append(f"- [{scene_id} — {scene_card['name']}]({scene_card['shortUrl']}) — {date_text}")
-            for context in sorted(plan["contexts"].get(scene_id, set())):
-                lines.append(f"  - Akcia/kontext: {context}")
-        lines.extend(["", "**NÁJDENÁ KONTINUITA V ĎALŠÍCH OBRAZOCH:**",
-                      ", ".join(scene_id for scene_id, _ in plan["linked"]) or "nenájdená", marker_end])
-        synced = "\n".join(lines)
         primary = plan["existing"][0] if plan["existing"] else None
         if primary:
-            old_desc = primary.get("desc", "")
-            if marker_start in old_desc and marker_end in old_desc:
-                pattern = re.escape(marker_start) + r".*?" + re.escape(marker_end)
-                new_desc = re.sub(pattern, lambda _: synced, old_desc, count=1, flags=re.S)
-            else:
-                new_desc = synced + ("\n\n---\n\n**PÔVODNÝ ZÁZNAM / RUČNÉ POZNÁMKY:**\n\n" + old_desc if old_desc else "")
-            payload = {"desc": new_desc}
-            if earliest_card and earliest_card.get("due"):
-                payload["due"] = earliest_card["due"]
             try:
-                trello_put_body(f"/cards/{primary['id']}", payload)
-                updated.append(primary["id"])
+                if plan["changes"]:
+                    trello_put_body(f"/cards/{primary['id']}", plan["changes"])
+                    updated.append(primary["id"])
             except Exception as exc:
                 errors.append({"prop": plan["display"], "error": str(exc)})
                 continue
@@ -4558,7 +4578,7 @@ def sync_project_prop_cards(project):
             payload = {
                 "idList": todo_list["id"],
                 "name": f"{plan['display']} - {earliest_card['name']}",
-                "desc": synced, "pos": "bottom",
+                "desc": plan["desired_desc"], "pos": "bottom",
             }
             if earliest_card.get("due"):
                 payload["due"] = earliest_card["due"]
@@ -4876,7 +4896,6 @@ def sync_dok4_current_schedule():
     The active window is the next seven shooting dates on or after ``as_of``.
     Calendar days without shooting never consume a slot.
     """
-    return jsonify({"error": "completed one-off endpoint disabled"}), 410
     if request.headers.get("X-Sync-Key") != DOK4_CURRENT_SCHEDULE_KEY:
         return jsonify({"error": "forbidden"}), 403
 
@@ -4902,7 +4921,7 @@ def sync_dok4_current_schedule():
     schedule = schedule_document["rows"]
     unique_scene_ids = {row.get("scene_id") for row in schedule}
     if (
-        source_date != "2026-08-01"
+        source_date != "2026-08-07"
         or len(schedule) != DOK4_CURRENT_SCHEDULE_ROWS
         or len(unique_scene_ids) != DOK4_CURRENT_SCHEDULE_ROWS
         or None in unique_scene_ids
