@@ -44,12 +44,12 @@ class DunajAugust7ScheduleTests(unittest.TestCase):
         self.assertEqual(by_id["24/8"]["order_display"], "8-9")
         self.assertEqual(by_id["24/8"]["characters"], "René, Lena, Gita")
 
-    def test_endpoint_rejects_a_different_as_of_date(self):
+    def test_completed_endpoint_is_disabled(self):
         response = app.app.test_client().post(
-            "/api/sync-dunaj-schedule?mode=dry-run&as_of=2026-08-08",
+            "/api/sync-dunaj-schedule?mode=dry-run&as_of=2026-08-07",
             headers={"X-Sync-Key": app.DUNAJ_CURRENT_SCHEDULE_KEY},
         )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 410)
 
 
 if __name__ == "__main__":
