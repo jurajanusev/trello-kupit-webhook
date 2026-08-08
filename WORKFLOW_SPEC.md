@@ -32,6 +32,11 @@ volá **Čierny Kameň**; názov boardu sa bez osobitného pokynu nemení.
 - Registry karty môžu kombinovať labely `Auto`, `Osobná rekvizita`,
   `Dokument`, `Screen`, `Nadväzná rekvizita`. Hardware a konkrétny obsah
   zobrazený na displeji sú samostatné identity.
+- Ak kanonický názov rekvizity jednoznačne určuje vlastníka, jej jediná master
+  karta patrí do zoznamu `MENO – OS. REKVIZITY`. Zoznam sa vytvorí pre každého
+  takto identifikovaného vlastníka; nerozhoduje frekvencia ani zoznam hlavných
+  postáv. Spoločné, odovzdávané a nejednoznačné predmety zostávajú v
+  `REGISTRI REKVIZÍT`. Presun zachováva card ID/URL a nikdy nevytvára kópiu.
 - Karty v `NADVÄZNÝCH SETOCH` majú label `Nadväzný priestor`. Bežná karta v
   `REGISTRI PRIESTOROV` ani obrazová karta ho nedostane iba kvôli lokácii.
 - Pred každou dávkou sa načíta aktuálny stav. Hash jadra položky a snapshot

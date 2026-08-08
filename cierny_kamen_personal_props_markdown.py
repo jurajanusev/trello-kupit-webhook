@@ -162,8 +162,17 @@ def register_routes(flask_app, api):
         if request.headers.get("X-Personal-Props-Key") != KEY:
             return jsonify({"error": "forbidden"}), 403
         mode = request.args.get("mode", "audit").strip().casefold()
-        if mode not in {"audit", "dry-run"}:
-            return jsonify({"error": "read-only endpoint"}), 400
+        if mode not in {"audit", "dry-run", "sample", "apply"}:
+            return jsonify({
+                "error": "mode must be audit, dry-run, sample, or apply"
+            }), 400
+        try:
+            start = int(request.args.get("start", "0"))
+            limit = int(request.args.get("limit", "10"))
+        except ValueError:
+            return jsonify({"error": "start and limit must be integers"}), 400
+        if start < 0 or limit < 1 or limit > 10:
+            return jsonify({"error": "invalid start/limit"}), 400
 
         payload = api["cierny_kamen_import_payload"]()
         state = api["cierny_kamen_import_state"](payload)
@@ -195,8 +204,13 @@ def register_routes(flask_app, api):
             "WORKFLOW_SPEC.md"
         ).read_text(encoding="utf-8")
         main_characters = explicit_main_characters(payload, workflow_text)
-        if not main_characters:
-            blockers.append("main characters are not explicitly defined")
+        owner_rule = {
+            "source": "explicitly reviewed ownership by canonical prop identity",
+            "behavior": (
+                "every unambiguous owner gets an OS. REKVIZITY list; "
+                "shared and ambiguous identities stay in the global register"
+            ),
+        }
 
         active_cards = [card for card in state["cards"] if not card.get("closed")]
         cards_by_url = {
@@ -316,6 +330,21 @@ def register_routes(flask_app, api):
         unassigned = [
             item for item in ownership if not item["owner_candidate"]
         ]
+        explicit_ownership = sorted(
+            (item for item in ownership if item["owner_candidate"]),
+            key=lambda item: (item["owner_candidate"], folded(item["name"])),
+        )
+        existing_personal_names = {
+            folded(item.get("name")) for item in personal_lists
+        }
+        planned_list_names = sorted({
+            item["proposed_list"] for item in explicit_ownership
+            if folded(item["proposed_list"]) not in existing_personal_names
+        })
+        planned_moves = [
+            item for item in explicit_ownership
+            if item["current_list"] != item["proposed_list"]
+        ]
         response = {
             "status": mode, "writes": 0,
             "board": {
@@ -323,13 +352,11 @@ def register_routes(flask_app, api):
                 "name": state["board"].get("name"),
                 "url": state["board"].get("url"),
             },
-            "valid_for_format_sample": not any(
-                blocker != "main characters are not explicitly defined"
-                for blocker in blockers
-            ),
+            "valid_for_format_sample": not blockers,
             "valid_for_personal_lists": not blockers,
             "blockers": blockers,
             "main_characters": main_characters,
+            "owner_rule": owner_rule,
             "main_character_sources_checked": [
                 "payload.main_characters", "WORKFLOW_SPEC.md",
                 "repository configuration (explicit constants)",
@@ -344,6 +371,8 @@ def register_routes(flask_app, api):
                 "format_actions": dict(action_counts),
                 "explicit_owner_cards": sum(owner_counts.values()),
                 "unassigned_or_shared_personal_cards": len(unassigned),
+                "planned_personal_lists": len(planned_list_names),
+                "planned_card_moves": len(planned_moves),
             },
             "owner_candidate_counts": dict(sorted(owner_counts.items())),
             "ownership": ownership,
@@ -353,6 +382,7 @@ def register_routes(flask_app, api):
                  "closed": item.get("closed")}
                 for item in personal_lists
             ],
+            "planned_list_names": planned_list_names,
             "format_items": items,
             "samples": samples,
             "markdown_render_verification": {
@@ -363,4 +393,113 @@ def register_routes(flask_app, api):
                 ),
             },
         }
-        return jsonify(response), 200 if response["valid_for_format_sample"] else 409
+        if mode in {"audit", "dry-run"}:
+            return jsonify(response), 200 if response["valid_for_format_sample"] else 409
+        if blockers:
+            return jsonify(response), 409
+
+        selected = (
+            [item for item in explicit_ownership
+             if item["name"] == "Betin osobn\u00fd mobil"]
+            if mode == "sample"
+            else explicit_ownership[start:start + limit]
+        )
+        if mode == "sample" and len(selected) != 1:
+            return jsonify({
+                **response, "status": "blocked", "writes": 0,
+                "error": "expected exactly one Betin osobn\u00fd mobil card",
+            }), 409
+
+        cards_by_name = {card.get("name"): card for card in personal_cards}
+        writes = 0
+        operations = []
+        protection_errors = []
+        created_lists = {}
+        for plan in selected:
+            card = cards_by_name[plan["name"]]
+            list_name = plan["proposed_list"]
+            list_matches = exact_named(state["lists"], list_name)
+            if list_name in created_lists:
+                target_list = created_lists[list_name]
+            elif len(list_matches) == 1:
+                target_list = list_matches[0]
+            elif len(list_matches) > 1:
+                protection_errors.append(f"duplicate personal list {list_name}")
+                continue
+            else:
+                target_list = api["trello_post_body"]("/lists", {
+                    "idBoard": state["board"]["id"],
+                    "name": list_name, "pos": "bottom",
+                })
+                created_lists[list_name] = target_list
+                writes += 1
+                operations.append({"type": "create_list", "name": list_name})
+
+            fields = (
+                "id,name,desc,idList,shortUrl,closed,idLabels,due,"
+                "dueComplete,pos"
+            )
+            before_card = api["trello_get"](
+                f"/cards/{card['id']}", {"fields": fields}
+            )
+            before_checklists = api["trello_get"](
+                f"/cards/{card['id']}/checklists",
+                {"checkItems": "all", "fields": "id,name,pos"},
+            )
+            before_attachments = api["trello_get"](
+                f"/cards/{card['id']}/attachments",
+                {"fields": "id,name,url,bytes,date"},
+            )
+            before_comments = api["trello_get"](
+                f"/cards/{card['id']}/actions",
+                {"filter": "commentCard", "limit": "1000", "fields": "data,date"},
+            )
+
+            if before_card.get("idList") != target_list["id"]:
+                api["trello_put_body"](
+                    f"/cards/{card['id']}", {"idList": target_list["id"]},
+                )
+                writes += 1
+                operations.append({
+                    "type": "move_master", "name": card.get("name"),
+                    "url": card.get("shortUrl"), "list": list_name,
+                })
+
+            after_card = api["trello_get"](
+                f"/cards/{card['id']}", {"fields": fields}
+            )
+            expected_card = dict(before_card)
+            expected_card["idList"] = target_list["id"]
+            unchanged_related = (
+                api["trello_get"](
+                    f"/cards/{card['id']}/checklists",
+                    {"checkItems": "all", "fields": "id,name,pos"},
+                ) == before_checklists
+                and api["trello_get"](
+                    f"/cards/{card['id']}/attachments",
+                    {"fields": "id,name,url,bytes,date"},
+                ) == before_attachments
+                and api["trello_get"](
+                    f"/cards/{card['id']}/actions",
+                    {"filter": "commentCard", "limit": "1000", "fields": "data,date"},
+                ) == before_comments
+            )
+            if after_card != expected_card or not unchanged_related:
+                protection_errors.append(
+                    f"{card.get('name')}: changed beyond idList"
+                )
+
+        return jsonify({
+            "status": (
+                "sample_applied" if mode == "sample" else "batch_applied"
+            ) if not protection_errors else "error",
+            "writes": writes, "operations": operations,
+            "selected": len(selected),
+            "start": start, "limit": limit,
+            "remaining": (
+                max(0, len(explicit_ownership) - start - len(selected))
+                if mode == "apply" else len(explicit_ownership) - len(selected)
+            ),
+            "protected_preserved": not protection_errors,
+            "protection_errors": protection_errors,
+        }), 200 if not protection_errors else 500
