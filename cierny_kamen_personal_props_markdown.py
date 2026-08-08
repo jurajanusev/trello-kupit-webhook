@@ -159,6 +159,10 @@ def register_routes(flask_app, api):
         "/api/cierny-kamen-personal-props-markdown", methods=["POST"]
     )
     def cierny_kamen_personal_props_markdown():
+        return jsonify({
+            "error": "completed personal prop move endpoint disabled"
+        }), 410
+
         if request.headers.get("X-Personal-Props-Key") != KEY:
             return jsonify({"error": "forbidden"}), 403
         mode = request.args.get("mode", "audit").strip().casefold()
