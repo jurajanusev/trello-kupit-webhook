@@ -8041,6 +8041,10 @@ from cierny_kamen_personal_props_markdown import register_routes as register_per
 
 register_personal_props_markdown_routes(app, globals())
 
+from cierny_kamen_prop_markdown_format import register_routes as register_prop_markdown_format_routes
+
+register_prop_markdown_format_routes(app, globals())
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
