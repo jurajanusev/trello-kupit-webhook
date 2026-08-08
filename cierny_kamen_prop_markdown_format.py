@@ -121,6 +121,10 @@ def _card_projection(card):
 def register_routes(flask_app, api):
     @flask_app.route("/api/cierny-kamen-prop-markdown-format", methods=["POST"])
     def cierny_kamen_prop_markdown_format():
+        return jsonify({
+            "error": "completed prop Markdown endpoint disabled"
+        }), 410
+
         if request.headers.get("X-Prop-Markdown-Key") != KEY:
             return jsonify({"error": "forbidden"}), 403
         mode = request.args.get("mode", "audit").strip().casefold()
