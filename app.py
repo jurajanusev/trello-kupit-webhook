@@ -8037,6 +8037,10 @@ from cierny_kamen_all_props_registry import register_routes as register_all_prop
 
 register_all_props_registry_routes(app, globals())
 
+from cierny_kamen_personal_props_markdown import register_routes as register_personal_props_markdown_routes
+
+register_personal_props_markdown_routes(app, globals())
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
