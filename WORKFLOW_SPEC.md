@@ -24,6 +24,13 @@ volá **Čierny Kameň**; názov boardu sa bez osobitného pokynu nemení.
   identitu a konkrétnu otázku v `OTÁZKY NA PORADU`.
 - `<n>` znamená iba potvrdený rovnaký fyzický kus v kontinuite. Dialógová
   zmienka ani opakovaný názov nestačia.
+- Registry-linked položka `REKVIZITY` používa Markdown tvar
+  `<n> **Kanonický názov** — *kontext | TU: stav | → obraz* | KARTA: URL`.
+  `<n>` a technický suffix zostávajú mimo zvýraznenia; bez kontextu sa použije
+  `**Kanonický názov** | KARTA: URL`. Automatizácia smie vložiť iba Markdown
+  hviezdičky, nesmie meniť pôvodné znaky, stav ani poradie položky. Hranica
+  identity sa overuje podľa skutočnej master karty, nie podľa prvej pomlčky.
+  Companion a nejednoznačné ručné položky sa neformátujú naslepo.
 - Master karta obsahuje ohraničený automatický blok s kanonickým názvom,
   aliasmi, kategóriami a úplným zoznamom pomenovaných odkazov na obrazy.
   Manuálny obsah mimo bloku sa nikdy neprepisuje.

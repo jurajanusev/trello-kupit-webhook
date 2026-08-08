@@ -21,6 +21,7 @@ from cierny_kamen_all_props_registry import (
     outside_auto_block,
     replace_auto_block,
     with_card_suffix,
+    with_formatted_card_suffix,
 )
 from build_cierny_kamen_all_props_registry_map import (
     COMPANION_TO_RAW,
@@ -32,6 +33,23 @@ from cierny_kamen_prop_identities import apply_identity_map
 
 
 class AllPropsRegistryTests(unittest.TestCase):
+    def test_generated_prop_is_linked_in_agreed_markdown_format(self):
+        value = "<n> Betin osobn\u00fd mobil \u2014 \u010d\u00edta spr\u00e1vu | TU: zapnut\u00fd"
+        url = "https://trello.com/c/AbCd1234"
+        self.assertEqual(
+            with_formatted_card_suffix(value, "Betin osobn\u00fd mobil", url),
+            "<n> **Betin osobn\u00fd mobil** \u2014 *\u010d\u00edta spr\u00e1vu | "
+            f"TU: zapnut\u00fd* | KARTA: {url}",
+        )
+
+    def test_manual_alias_is_linked_but_not_rewritten(self):
+        value = "Betin mobil \u2014 ru\u010dn\u00fd text"
+        url = "https://trello.com/c/AbCd1234"
+        self.assertEqual(
+            with_formatted_card_suffix(value, "Betin osobn\u00fd mobil", url),
+            f"{value} | KARTA: {url}",
+        )
+
     def test_required_labels_are_explicit(self):
         self.assertEqual(len(CATEGORY_LABELS), 6)
         self.assertIn("Nadväzný priestor", CATEGORY_LABELS)

@@ -10,6 +10,7 @@ from pathlib import Path
 from flask import jsonify, request
 
 from cierny_kamen_reference_all import board_support_data
+from cierny_kamen_prop_markdown_format import format_registry_item
 
 
 KEY = "cierny-kamen-all-props-registry-5aug-1f7c3b92"
@@ -61,6 +62,16 @@ def without_card_suffix(value):
 
 def with_card_suffix(value, url):
     return f"{without_card_suffix(value)} | KARTA: {url}"
+
+
+def with_formatted_card_suffix(value, canonical_name, url):
+    """Link a verified generated identity and emit the agreed Markdown form."""
+    linked = with_card_suffix(value, url)
+    try:
+        return format_registry_item(linked, canonical_name, url)
+    except ValueError:
+        # Preserve manual aliases and ambiguous text instead of guessing.
+        return linked
 
 
 def alias_core(value):
@@ -729,7 +740,9 @@ def register_routes(flask_app, api):
         for row in selected_rows:
             current = current_rows[row["item_id"]]
             target = targets[row["stable_name"]]
-            desired = with_card_suffix(current["name"], target["shortUrl"])
+            desired = with_formatted_card_suffix(
+                current["name"], row["stable_name"], target["shortUrl"]
+            )
             expected_item_names[row["item_id"]] = desired
             if desired != current["name"]:
                 card = selected_scene_cards[row["scene_id"]]
