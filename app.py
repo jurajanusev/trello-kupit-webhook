@@ -4941,6 +4941,7 @@ def repair_dok4_returned_card_date():
 
 @app.route("/api/repair-main-list-due-dates", methods=["POST"])
 def repair_main_list_due_dates():
+    return jsonify({"error": "completed one-off endpoint disabled"}), 410
     if request.headers.get("X-Repair-Key") != "main-list-due-audit-09aug-3db186f4":
         return jsonify({"error": "forbidden"}), 403
     project = request.args.get("project", "").strip().casefold()
