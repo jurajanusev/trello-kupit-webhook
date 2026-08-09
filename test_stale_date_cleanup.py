@@ -6,7 +6,7 @@ os.environ.setdefault("TRELLO_KEY", "test-key")
 os.environ.setdefault("TRELLO_TOKEN", "test-token")
 
 import app
-from update_dok4_plan_local import cleanup_stale
+from update_dok4_plan_local import apply, cleanup_stale
 
 
 class FakeDok4Trello:
@@ -32,6 +32,41 @@ class StaleDateCleanupTests(unittest.TestCase):
             "idList": "series", "pos": "bottom", "due": "", "dueComplete": False,
         })
         self.assertTrue(result[0]["due_cleared"])
+
+    def test_dok4_metadata_keeps_due_only_inside_active_window(self):
+        class CapturingTrello:
+            def __init__(self):
+                self.payloads = {}
+
+            def put(self, path, payload):
+                self.payloads[path] = payload
+                return {"shortUrl": "https://trello.com/c/test"}
+
+        def row(scene_id, date):
+            return {
+                "scene_id": scene_id, "shooting_day": 1, "shooting_date": date,
+                "order": 1, "unit": "1st unit", "location": "LOKÁCIA", "characters": "POSTAVA",
+            }
+
+        active_row = row("01/1", "2026-08-10")
+        future_row = row("01/2", "2026-08-20")
+        state = {
+            "board": {"shortLink": "lzNy4AtY"}, "duplicates": [], "reused_cards": [],
+            "duplicate_target_lists": {}, "anchor": {"id": "series"}, "lists_by_name": {},
+            "matches": [
+                {"row": active_row, "card": {"id": "active", "desc": "", "due": None,
+                                              "shortUrl": "https://trello.com/c/active"}},
+                {"row": future_row, "card": {"id": "future", "desc": "",
+                                              "due": "2026-08-20T10:00:00.000Z",
+                                              "shortUrl": "https://trello.com/c/future"}},
+            ],
+            "shooting_dates": ["2026-08-10"], "source_date": "2026-08-09",
+        }
+        trello = CapturingTrello()
+        result = apply(trello, state, metadata_only=True)
+        self.assertEqual(result["metadata_errors_count"], 0)
+        self.assertEqual(trello.payloads["/cards/active"]["due"], "2026-08-10T10:00:00.000Z")
+        self.assertEqual(trello.payloads["/cards/future"]["due"], "")
 
     def test_microsoft_sync_clears_due_when_trello_todo_has_none(self):
         todo_card = {

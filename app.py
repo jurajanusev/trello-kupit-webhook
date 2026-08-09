@@ -3640,7 +3640,10 @@ def sync_dunaj_schedule():
         fields = []
         if open_lists.get(card.get("idList"), {}).get("name") != expected_list:
             fields.append("list")
-        if (card.get("due") or "")[:10] != row["shooting_date"]:
+        expected_due_date = (
+            row["shooting_date"] if row["shooting_date"] in shooting_date_set else ""
+        )
+        if (card.get("due") or "")[:10] != expected_due_date:
             fields.append("due")
         if any(fragment not in card.get("desc", "") for fragment in expected_fragments):
             fields.append("metadata")
@@ -3982,8 +3985,13 @@ def sync_dunaj_schedule():
                 new_desc = re.sub(pattern, lambda _: metadata, old_desc, count=1, flags=re.S)
             else:
                 new_desc = metadata + ("\n\n" + old_desc if old_desc else "")
-            expected_due = f"{row['shooting_date']}T10:00:00.000Z"
-            if new_desc == old_desc and card.get("due", "")[:10] == row["shooting_date"]:
+            expected_due_date = (
+                row["shooting_date"] if row["shooting_date"] in shooting_date_set else ""
+            )
+            expected_due = (
+                f"{expected_due_date}T10:00:00.000Z" if expected_due_date else ""
+            )
+            if new_desc == old_desc and (card.get("due") or "")[:10] == expected_due_date:
                 unchanged += 1; continue
             try:
                 result = trello_put_body(f"/cards/{card['id']}", {"desc": new_desc, "due": expected_due})
@@ -4929,6 +4937,61 @@ def repair_dok4_returned_card_date():
         "current_due_complete": updated.get("dueComplete"),
     })
     return jsonify(result)
+
+
+@app.route("/api/repair-main-list-due-dates", methods=["POST"])
+def repair_main_list_due_dates():
+    if request.headers.get("X-Repair-Key") != "main-list-due-audit-09aug-3db186f4":
+        return jsonify({"error": "forbidden"}), 403
+    project = request.args.get("project", "").strip().casefold()
+    configs = {
+        "dok4": {"board": "lzNy4AtY", "main_list": "VŠETKY EPIZÓDY"},
+        "dunaj": {"board": "qCPeWA3e", "main_list": "SERIA 15,16"},
+    }
+    config = configs.get(project)
+    if not config:
+        return jsonify({"error": "project must be dok4 or dunaj"}), 400
+    board = trello_get(f"/boards/{config['board']}", {"fields": "id,name,url"})
+    lists = trello_get(f"/boards/{board['id']}/lists", {
+        "fields": "id,name,closed", "filter": "open",
+    })
+    main_list = next((item for item in lists if item["name"] == config["main_list"]), None)
+    if not main_list:
+        return jsonify({"error": "main series list not found"}), 404
+    cards = trello_get(f"/lists/{main_list['id']}/cards", {
+        "fields": "id,name,due,dueComplete,shortUrl,closed", "filter": "open", "limit": 1000,
+    })
+    stale = [card for card in cards if card.get("due") or card.get("dueComplete")]
+    mode = request.args.get("mode", "dry-run")
+    summary = {
+        "board": board["name"], "main_list": main_list["name"],
+        "cards_scanned": len(cards), "stale_due_count": len(stale),
+        "sample": [{
+            "name": card["name"], "due": card.get("due"),
+            "due_complete": card.get("dueComplete"), "url": card["shortUrl"],
+        } for card in stale[:50]],
+    }
+    if mode == "dry-run":
+        return jsonify({"status": "dry-run", **summary})
+    if mode != "apply":
+        return jsonify({"error": "mode must be dry-run or apply"}), 400
+    start = max(0, int(request.args.get("start", "0")))
+    limit = min(50, max(1, int(request.args.get("limit", "25"))))
+    batch = stale[start:start + limit]
+    updated = []; errors = []
+    for card in batch:
+        try:
+            result = trello_put_body(f"/cards/{card['id']}", {
+                "due": "", "dueComplete": "false",
+            })
+            updated.append({"name": result["name"], "url": result["shortUrl"]})
+        except Exception as exc:
+            errors.append({"name": card["name"], "error": str(exc)})
+    return jsonify({
+        "status": "applied", **summary, "start": start, "batch": len(batch),
+        "updated": len(updated), "errors_count": len(errors), "errors": errors,
+        "remaining": max(0, len(stale) - start - len(batch)),
+    })
 
 
 @app.route("/api/sync-dok4-current-schedule", methods=["POST"])

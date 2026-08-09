@@ -253,7 +253,10 @@ def build_state(trello, schedule, source_date, as_of):
     update_count = 0
     for item in matches:
         expected_desc = merged_description(item["card"].get("desc", ""), item["row"], source_date)
-        expected_date = item["row"]["shooting_date"]
+        expected_date = (
+            item["row"]["shooting_date"]
+            if item["row"]["shooting_date"] in shooting_date_set else ""
+        )
         if expected_desc != item["card"].get("desc", "") or (item["card"].get("due") or "")[:10] != expected_date:
             update_count += 1
 
@@ -355,8 +358,13 @@ def apply(trello, state, metadata_only=False, skip_metadata=False, metadata_limi
         new_desc = merged_description(card.get("desc", ""), row, state["source_date"])
         if new_desc != card.get("desc", ""):
             payload["desc"] = new_desc
-        if (card.get("due") or "")[:10] != row["shooting_date"]:
-            payload["due"] = f"{row['shooting_date']}T10:00:00.000Z"
+        expected_due_date = (
+            row["shooting_date"] if row["shooting_date"] in state["shooting_dates"] else ""
+        )
+        if (card.get("due") or "")[:10] != expected_due_date:
+            payload["due"] = (
+                f"{expected_due_date}T10:00:00.000Z" if expected_due_date else ""
+            )
         if payload:
             if metadata_limit is not None and metadata_processed >= metadata_limit:
                 continue
