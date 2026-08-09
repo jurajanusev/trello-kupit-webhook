@@ -4895,6 +4895,7 @@ def trello_webhook():
 
 @app.route("/api/repair-dok4-returned-card-date", methods=["POST"])
 def repair_dok4_returned_card_date():
+    return jsonify({"error": "completed one-off endpoint disabled"}), 410
     if request.headers.get("X-Repair-Key") != "dok4-returned-date-08aug-61c2a7f9":
         return jsonify({"error": "forbidden"}), 403
     board = trello_get("/boards/lzNy4AtY", {"fields": "id,name,url"})
