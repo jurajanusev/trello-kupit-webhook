@@ -483,15 +483,17 @@ def sync_project_microsoft_todo(project):
         changes = {}
         if primary:
             current_body = (primary.get("body") or {}).get("content", "")
-            due_marker_present = bool(desired_date and re.search(
-                r"(?:\*\*DUE DATE:\*\*|SYNC DUE DATE:)\s*" + re.escape(desired_date), current_body, flags=re.I
+            desired_due_marker = desired_date or "NONE"
+            due_marker_present = bool(re.search(
+                r"SYNC DUE DATE:\s*" + re.escape(desired_due_marker) + r"(?:\s|$)",
+                current_body, flags=re.I,
             ))
             # Graph may normalize text bodies on write. The Trello URL is the
             # stable sync identity, so do not rewrite an already linked body.
-            if card["shortUrl"] not in current_body or (desired_date and not due_marker_present):
+            if card["shortUrl"] not in current_body or not due_marker_present:
                 changes["body"] = {"content": desired_body, "contentType": "text"}
-            if desired_date and not due_marker_present:
-                changes["dueDateTime"] = desired_due
+            if not due_marker_present:
+                changes["dueDateTime"] = desired_due if desired_date else None
         plans.append({
             "card": card, "task": primary, "changes": changes,
             "duplicate_tasks": matches[1:], "desired_due": desired_due,
@@ -3936,10 +3938,12 @@ def sync_dunaj_schedule():
             try:
                 result = trello_put_body(f"/cards/{item['id']}", {
                     "idList": series_list["id"], "pos": "bottom",
+                    "due": "", "dueComplete": "false",
                 })
                 moved.append({
                     "scene_id": item["scene_id"], "from": item["from"],
                     "to": "SERIA 15,16", "url": result["shortUrl"],
+                    "due_cleared": True,
                 })
             except Exception as exc:
                 errors.append({"scene_id": item["scene_id"], "error": str(exc)})
@@ -4887,6 +4891,43 @@ def trello_webhook():
 
     processed_actions.add(action_id)
     return jsonify({"status": "ok", "mode": "card_and_todo", "todo": todo_status}), 200
+
+
+@app.route("/api/repair-dok4-returned-card-date", methods=["POST"])
+def repair_dok4_returned_card_date():
+    if request.headers.get("X-Repair-Key") != "dok4-returned-date-08aug-61c2a7f9":
+        return jsonify({"error": "forbidden"}), 403
+    board = trello_get("/boards/lzNy4AtY", {"fields": "id,name,url"})
+    card = trello_get("/cards/ZISdOP56", {
+        "fields": "id,name,idBoard,idList,due,dueComplete,shortUrl,closed",
+    })
+    board_list = trello_get(f"/lists/{card['idList']}", {"fields": "id,name,closed"})
+    if (
+        card.get("idBoard") != board["id"]
+        or not card.get("name", "").startswith("07/15")
+        or board_list.get("name") != "VŠETKY EPIZÓDY"
+        or card.get("closed")
+    ):
+        return jsonify({"error": "repair target validation failed"}), 409
+    mode = request.args.get("mode", "dry-run")
+    result = {
+        "status": "dry-run", "board": board["name"], "list": board_list["name"],
+        "card": card["name"], "url": card["shortUrl"],
+        "current_due": card.get("due"), "current_due_complete": card.get("dueComplete"),
+        "desired_due": None, "desired_due_complete": False,
+    }
+    if mode == "dry-run":
+        return jsonify(result)
+    if mode != "apply":
+        return jsonify({"error": "mode must be dry-run or apply"}), 400
+    updated = trello_put_body(f"/cards/{card['id']}", {
+        "due": "", "dueComplete": "false",
+    })
+    result.update({
+        "status": "applied", "current_due": updated.get("due"),
+        "current_due_complete": updated.get("dueComplete"),
+    })
+    return jsonify(result)
 
 
 @app.route("/api/sync-dok4-current-schedule", methods=["POST"])

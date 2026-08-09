@@ -491,12 +491,13 @@ def cleanup_stale(trello, state):
     returned = []
     for card in state["stale_window_cards"]:
         result = trello.put(f"/cards/{card['id']}", {
-            "idList": state["anchor"]["id"], "pos": "bottom"
+            "idList": state["anchor"]["id"], "pos": "bottom",
+            "due": "", "dueComplete": False,
         })
         returned.append({
             "name": result["name"], "url": result["shortUrl"],
             "from": state["lists_by_id"][card["idList"]]["name"],
-            "to": state["anchor"]["name"],
+            "to": state["anchor"]["name"], "due_cleared": True,
         })
     return returned
 
