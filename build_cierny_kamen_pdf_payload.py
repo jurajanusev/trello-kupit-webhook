@@ -56,7 +56,7 @@ def is_upper_line(value: str) -> bool:
 
 
 def normalized_scene_id(episode: str, number: str, suffix: str) -> str:
-    return f"{int(episode):02d}/{int(number):02d}{suffix.upper()}"
+    return f"{int(episode):02d}/{int(number):02d}{(suffix or '').upper()}"
 
 
 def line_groups(page, page_index: int) -> list[PdfLine]:
