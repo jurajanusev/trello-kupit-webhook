@@ -215,6 +215,8 @@ def split_desc_0439(value):
 def register_routes(app, api):
     @app.route("/api/cierny-kamen-split-0440", methods=["POST"])
     def split_0440():
+        return jsonify({"error": "completed 04/40 split endpoint disabled"}), 410
+
         if request.headers.get("X-Split-0440-Key") != KEY:
             return jsonify({"error": "forbidden"}), 403
         mode = request.args.get("mode", "audit").casefold().strip()
