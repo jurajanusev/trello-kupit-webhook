@@ -50,12 +50,27 @@ def build_audit(api):
             or scene_pattern.search(card.get("desc") or "")
             or matching_items
         ):
+            description = card.get("desc") or ""
+            description_match = scene_pattern.search(description)
             discovery_candidates.append({
                 "id": card["id"], "name": card.get("name"),
                 "url": card.get("shortUrl"), "closed": card.get("closed"),
                 "list": state["lists_by_id"].get(card.get("idList"), {}).get("name"),
                 "name_match": bool(scene_pattern.search(card.get("name") or "")),
-                "description_match": bool(scene_pattern.search(card.get("desc") or "")),
+                "description_match": bool(description_match),
+                "description_excerpt": (
+                    description[max(0, description_match.start() - 500):
+                                description_match.end() + 500]
+                    if description_match else None
+                ),
+                "checklists": [{
+                    "id": checklist.get("id"), "name": checklist.get("name"),
+                    "pos": checklist.get("pos"),
+                    "items": [{
+                        "id": item.get("id"), "name": item.get("name"),
+                        "state": item.get("state"), "pos": item.get("pos"),
+                    } for item in checklist.get("checkItems", [])],
+                } for checklist in card_checklists],
                 "matching_checklist_items": matching_items,
             })
     if len(target_cards) != 1:
