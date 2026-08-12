@@ -1,4 +1,5 @@
 from collections import Counter
+import re
 
 from flask import jsonify, request
 
@@ -31,6 +32,32 @@ def build_audit(api):
     if len(scene_cards) != 313:
         blockers.append(f"expected 313 scenes, found {len(scene_cards)}")
     target_cards = groups.get(SCENE_ID, [])
+    scene_pattern = re.compile(r"(?<!\d)0?4\s*/\s*0?40(?!\d)", re.I)
+    discovery_candidates = []
+    for card in state["cards"]:
+        card_checklists = support["checklists"].get(card["id"], [])
+        matching_items = [
+            {
+                "checklist": checklist.get("name"),
+                "item_id": item.get("id"), "text": item.get("name"),
+            }
+            for checklist in card_checklists
+            for item in checklist.get("checkItems", [])
+            if scene_pattern.search(item.get("name") or "")
+        ]
+        if (
+            scene_pattern.search(card.get("name") or "")
+            or scene_pattern.search(card.get("desc") or "")
+            or matching_items
+        ):
+            discovery_candidates.append({
+                "id": card["id"], "name": card.get("name"),
+                "url": card.get("shortUrl"), "closed": card.get("closed"),
+                "list": state["lists_by_id"].get(card.get("idList"), {}).get("name"),
+                "name_match": bool(scene_pattern.search(card.get("name") or "")),
+                "description_match": bool(scene_pattern.search(card.get("desc") or "")),
+                "matching_checklist_items": matching_items,
+            })
     if len(target_cards) != 1:
         blockers.append(f"expected one {SCENE_ID} card, found {len(target_cards)}")
 
@@ -80,6 +107,7 @@ def build_audit(api):
                     "url": target_cards[0].get("shortUrl"),
                 } if len(target_cards) == 1 else None),
                 "counts": dict(target_counts), "items": target_plans,
+                "discovery_candidates": discovery_candidates,
             },
             "all_scenes": {
                 "scene_cards": len(scene_cards), "prop_items": len(plans),
