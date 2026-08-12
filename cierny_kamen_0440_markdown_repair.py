@@ -139,6 +139,10 @@ def load_audit(api):
 def register_routes(flask_app, api):
     @flask_app.route("/api/cierny-kamen-0440-markdown-repair", methods=["POST"])
     def repair_0440():
+        return jsonify({
+            "error": "completed 04/40 Markdown repair endpoint disabled"
+        }), 410
+
         if request.headers.get("X-0440-Repair-Key") != KEY:
             return jsonify({"error": "forbidden"}), 403
         mode = request.args.get("mode", "audit").casefold().strip()
