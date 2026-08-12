@@ -227,8 +227,8 @@ def register_routes(app, api):
         blockers = []
         if len(groups.get("04/39", [])) != 1 or groups.get("04/39", [None])[0]["id"] != CARD_0439:
             blockers.append("04/39 card mismatch")
-        if groups.get("04/40"):
-            blockers.append("04/40 already exists")
+        if len(groups.get("04/40", [])) > 1:
+            blockers.append("duplicate 04/40 cards")
         if len(groups.get("02/13", [])) != 1 or len(groups.get("02/14", [])) != 1:
             blockers.append("02/13 or 02/14 card mismatch")
         scene_list = exact_named(state["lists"], "SCENÁRE")
@@ -259,9 +259,12 @@ def register_routes(app, api):
                        "split_end": "Noel sa usmeje. Ešte raz sa pobozkajú."},
             "card_0439": {"url": card39.get("shortUrl") if card39 else None,
                           "desc_before": card39.get("desc") if card39 else None,
-                          "desc_after": split_desc_0439(card39.get("desc")) if card39 and not blockers else None},
+                          "desc_after": (
+                              card39.get("desc") if groups.get("04/40")
+                              else split_desc_0439(card39.get("desc"))
+                          ) if card39 and not blockers else None},
             "alex_bag": {"02/13": item13, "02/14": item14},
-            "planned": {"create_scene": "04/40", "create_mobile_master": not mobile_cards,
+            "planned": {"create_scene": not groups.get("04/40"), "create_mobile_master": not mobile_cards,
                         "create_personal_list": len(exact_named(state["lists"], "NOEL – OS. REKVIZITY")) == 0,
                         "update_0439_desc": True, "update_bag_items": 2},
         }
@@ -269,6 +272,8 @@ def register_routes(app, api):
             return jsonify(audit), 200 if not blockers else 409
         if blockers:
             return jsonify(audit), 409
+        if groups.get("04/40"):
+            return jsonify({**audit, "status": "unchanged", "writes": 0}), 200
 
         writes = 0
         operations = []
