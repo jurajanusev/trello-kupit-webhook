@@ -62,16 +62,14 @@ def format_registry_item(value, canonical_name, expected_url=None):
     if not tail:
         formatted_body = f"{prefix}{bold_name}"
     else:
-        context_match = re.fullmatch(r"(?P<dash>\s+—\s+)(?P<context>.*)", tail)
-        if not context_match:
-            raise ValueError("identity/context boundary is ambiguous")
-        dash = context_match.group("dash")
-        context = context_match.group("context")
+        dash_match = re.fullmatch(r"(?P<dash>\s+—\s+)(?P<context>.*)", tail)
+        separator = dash_match.group("dash") if dash_match else ""
+        context = dash_match.group("context") if dash_match else tail
         if context.startswith("*") and context.endswith("*") and len(context) >= 2:
             context = context[1:-1]
         if "*" in context:
             raise ValueError("ambiguous existing Markdown delimiters")
-        formatted_body = f"{prefix}{bold_name}{dash}*{context}*"
+        formatted_body = f"{prefix}{bold_name}{separator}*{context}*"
 
     result = (
         formatted_body + suffix.group("separator") + suffix.group("url")

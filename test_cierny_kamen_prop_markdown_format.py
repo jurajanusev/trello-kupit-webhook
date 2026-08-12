@@ -66,6 +66,13 @@ class PropMarkdownFormatTests(unittest.TestCase):
         after = format_registry_item(before, "Mobil", URL)
         self.assertTrue(after.endswith("  |  KARTA:  " + URL))
 
+    def test_verified_identity_allows_verbatim_comma_context(self):
+        before = "papiere s notami, ktor\u00e9 uklad\u00e1 Olasov\u00e1 | KARTA: " + URL
+        self.assertEqual(
+            format_registry_item(before, "papiere s notami", URL),
+            "**papiere s notami***, ktor\u00e9 uklad\u00e1 Olasov\u00e1* | KARTA: " + URL,
+        )
+
     def test_rejects_alias_instead_of_canonical_name(self):
         with self.assertRaisesRegex(ValueError, "canonical"):
             format_registry_item(
