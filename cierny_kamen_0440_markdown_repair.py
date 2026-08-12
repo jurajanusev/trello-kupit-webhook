@@ -73,6 +73,25 @@ def build_audit(api):
                 } for checklist in card_checklists],
                 "matching_checklist_items": matching_items,
             })
+    registry_terms = re.compile(
+        r"not(?:y|ami)|sláčik|violončel|darčekov[áú]\s+škatu",
+        re.I,
+    )
+    registry_candidates = []
+    for card in state["cards"]:
+        if (
+            "CIERNY-KAMEN-PROP-REGISTRY-AUTO:START" not in (card.get("desc") or "")
+            and not registry_terms.search(card.get("name") or "")
+        ):
+            continue
+        haystack = f"{card.get('name') or ''}\n{card.get('desc') or ''}"
+        if registry_terms.search(haystack):
+            registry_candidates.append({
+                "id": card["id"], "name": card.get("name"),
+                "url": card.get("shortUrl"), "closed": card.get("closed"),
+                "list": state["lists_by_id"].get(card.get("idList"), {}).get("name"),
+                "description": card.get("desc"),
+            })
     if len(target_cards) != 1:
         blockers.append(f"expected one {SCENE_ID} card, found {len(target_cards)}")
 
@@ -123,6 +142,7 @@ def build_audit(api):
                 } if len(target_cards) == 1 else None),
                 "counts": dict(target_counts), "items": target_plans,
                 "discovery_candidates": discovery_candidates,
+                "registry_candidates": registry_candidates,
             },
             "all_scenes": {
                 "scene_cards": len(scene_cards), "prop_items": len(plans),
