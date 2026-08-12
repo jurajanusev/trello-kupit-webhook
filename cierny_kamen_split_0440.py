@@ -254,6 +254,12 @@ def register_routes(app, api):
             "counts": {"scene_cards_before": len([k for k,v in groups.items() if len(v)==1]),
                        "04_40_cards": len(groups.get("04/40", [])),
                        "mobile_master_matches": len(mobile_cards)},
+            "card_0440": ({
+                "card": groups["04/40"][0],
+                "checklists": support["checklists"].get(groups["04/40"][0]["id"], []),
+                "attachments": support["attachments"].get(groups["04/40"][0]["id"], []),
+                "comments": support["comments"].get(groups["04/40"][0]["id"], []),
+            } if len(groups.get("04/40", [])) == 1 else None),
             "source": {"pdf": "SC_01_04_ČK_1.7_MK_FINAL.pdf", "pages": [68,69,70],
                        "split_start": "Noel zatiahol Kika...",
                        "split_end": "Noel sa usmeje. Ešte raz sa pobozkajú."},
