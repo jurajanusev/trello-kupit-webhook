@@ -8155,6 +8155,10 @@ from cierny_kamen_0440_markdown_repair import register_routes as register_0440_m
 
 register_0440_markdown_repair_routes(app, globals())
 
+from cierny_kamen_split_0440 import register_routes as register_split_0440_routes
+
+register_split_0440_routes(app, globals())
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
