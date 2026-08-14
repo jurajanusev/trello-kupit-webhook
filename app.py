@@ -4145,7 +4145,7 @@ def sync_dunaj_schedule():
                     moved.append(row["scene_id"])
                 updated.append(row["scene_id"])
             except Exception as exc:
-                errors.append({"scene_id": item["scene_id"], "error": str(exc)})
+                errors.append({"scene_id": row["scene_id"], "error": str(exc)})
         return jsonify({
             "status": "metadata-applied",
             "matched_card_copies": len(matched_for_updates),
