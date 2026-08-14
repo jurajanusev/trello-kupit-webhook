@@ -450,6 +450,11 @@ def apply_scene(api, state, scene, desired, label_ids, scene_list_id):
             updates["idLabels"] = ",".join(expected_labels)
         if updates:
             api["trello_put_body"](f"/cards/{card['id']}", updates)
+            card.update(updates)
+            if isinstance(card.get("idLabels"), str):
+                card["idLabels"] = [
+                    value for value in card["idLabels"].split(",") if value
+                ]
             writes += 1
     actual = read_checklists(api, card["id"])
     if actual:
