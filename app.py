@@ -3507,7 +3507,10 @@ def sync_dunaj_schedule():
     open_lists = {item["id"]: item for item in board_lists if not item.get("closed")}
     lists_by_name = {item["name"]: item for item in open_lists.values()}
     series_list = lists_by_name.get("SERIA 15,16")
-    shot_list = lists_by_name.get("NATOČENÉ OBRAZY")
+    shot_list = next((item for item in open_lists.values() if "NATOC" in "".join(
+        char for char in unicodedata.normalize("NFKD", item["name"])
+        if not unicodedata.combining(char)
+    ).upper()), None)
     cards = []
     for list_id in open_lists:
         cards.extend(trello_get(f"/lists/{list_id}/cards", {
@@ -3615,21 +3618,43 @@ def sync_dunaj_schedule():
     target_names = {date_text: date_list_name(date_text) for date_text in shooting_dates}
     missing_target_lists = [name for name in target_names.values() if name not in lists_by_name]
 
+    nonwindow_groups = {}
+    for item in matched:
+        bucket = dunaj_schedule_bucket(item["row"]["shooting_date"], as_of, shooting_dates)
+        if bucket != "active":
+            nonwindow_groups.setdefault(item["card"]["id"], []).append({**item, "bucket": bucket})
+
     historical_actions = []
     future_actions = []
-    for item in matched_for_updates:
-        row = item["row"]
+    history_target_collisions = []
+    for card_id, items in nonwindow_groups.items():
+        buckets = {item["bucket"] for item in items}
+        if len(buckets) != 1:
+            history_target_collisions.append({
+                "card_id": card_id,
+                "scene_ids": [item["row"]["scene_id"] for item in items],
+                "buckets": sorted(buckets),
+            })
+            continue
+        # One physical card can intentionally represent letter variants shot
+        # on different dates. If every occurrence has the same destination,
+        # reconcile the card once using the latest occurrence for reporting.
+        item = sorted(items, key=lambda value: (
+            value["row"]["shooting_date"], value["row"]["order"]
+        ))[-1]
         card = item["card"]
         current_list = open_lists.get(card.get("idList"), {}).get("name")
-        bucket = dunaj_schedule_bucket(row["shooting_date"], as_of, shooting_dates)
-        if bucket == "shot" and (
-            current_list != "NATOČENÉ OBRAZY" or card.get("due") or card.get("dueComplete")
+        scene_ids = [value["row"]["scene_id"] for value in items]
+        if item["bucket"] == "shot" and (
+            not shot_list or card.get("idList") != shot_list["id"]
+            or card.get("due") or card.get("dueComplete")
         ):
-            historical_actions.append({**item, "current_list": current_list})
-        elif bucket == "series" and (
-            current_list != "SERIA 15,16" or card.get("due") or card.get("dueComplete")
+            historical_actions.append({**item, "current_list": current_list, "scene_ids": scene_ids})
+        elif item["bucket"] == "series" and (
+            not series_list or card.get("idList") != series_list["id"]
+            or card.get("due") or card.get("dueComplete")
         ):
-            future_actions.append({**item, "current_list": current_list})
+            future_actions.append({**item, "current_list": current_list, "scene_ids": scene_ids})
 
     expected_target_by_card_id = {
         item["card"]["id"]: target_names[item["row"]["shooting_date"]]
@@ -3799,6 +3824,9 @@ def sync_dunaj_schedule():
                 "url": item["card"]["shortUrl"],
             } for item in future_actions[:50]],
             "shot_list_found": bool(shot_list), "series_list_found": bool(series_list),
+            "shot_list_name": shot_list["name"] if shot_list else None,
+            "history_target_collisions_count": len(history_target_collisions),
+            "history_target_collisions": history_target_collisions,
             "window_sample": [{
                 "scene_id": item["row"]["scene_id"], "date": item["row"]["shooting_date"],
                 "matched_scene_id": item["matched_scene_id"], "fallback_match": item["fallback_match"],
@@ -3809,18 +3837,17 @@ def sync_dunaj_schedule():
         })
 
     if mode == "reconcile-history":
-        if duplicate_ids or fallback_card_collisions:
+        if history_target_collisions:
             return jsonify({
-                "error": "history reconciliation blocked by duplicate or collision matches",
-                "duplicates": duplicate_ids,
-                "fallback_collisions": fallback_card_collisions,
+                "error": "history reconciliation blocked by conflicting destinations",
+                "history_target_collisions": history_target_collisions,
             }), 409
         if historical_actions and not shot_list:
             return jsonify({"error": "NATOČENÉ OBRAZY list not found"}), 404
         if future_actions and not series_list:
             return jsonify({"error": "SERIA 15,16 list not found"}), 404
         actions = [
-            {**item, "target": shot_list, "target_name": "NATOČENÉ OBRAZY"}
+            {**item, "target": shot_list, "target_name": shot_list["name"]}
             for item in historical_actions
         ] + [
             {**item, "target": series_list, "target_name": "SERIA 15,16"}
@@ -3841,7 +3868,7 @@ def sync_dunaj_schedule():
                     "due": "", "dueComplete": "false",
                 })
                 updated.append({
-                    "scene_id": item["row"]["scene_id"],
+                    "scene_id": item["row"]["scene_id"], "scene_ids": item["scene_ids"],
                     "date": item["row"]["shooting_date"],
                     "from": item["current_list"], "to": item["target_name"],
                     "url": result["shortUrl"],
