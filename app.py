@@ -4142,8 +4142,8 @@ def sync_dunaj_schedule():
             try:
                 result = trello_put_body(f"/cards/{card['id']}", {"desc": new_desc, "due": expected_due})
                 if result.get("idList") != card.get("idList"):
-                    moved.append(item["scene_id"])
-                updated.append(item["scene_id"])
+                    moved.append(row["scene_id"])
+                updated.append(row["scene_id"])
             except Exception as exc:
                 errors.append({"scene_id": item["scene_id"], "error": str(exc)})
         return jsonify({
