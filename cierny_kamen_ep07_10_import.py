@@ -60,9 +60,25 @@ def runtime_state(api):
     labels = api["trello_get"](f"/boards/{board['id']}/labels", {
         "fields": "id,name,color", "limit": 1000,
     })
-    cards_by_id = {}
+    cards_by_id = {
+        card["id"]: card for card in api["trello_get"](
+            f"/boards/{board['id']}/cards", {
+                "fields": "id,name,desc,idList,shortUrl,closed,idLabels",
+                "filter": "open", "limit": 1000,
+            }
+        )
+    }
+    # Supplement the capped board page with complete lists that contain the
+    # source scenes and the one old master known to fall outside that page.
+    # This keeps the request below Render's timeout while preserving coverage.
+    supplement_names = {
+        "SCENÁRE", PROP_LIST, SPACE_LIST, "ALEX – OS. REKVIZITY",
+    }
     for item in lists:
-        if item.get("closed"):
+        if item.get("closed") or not any(
+            folded(item.get("name")) == folded(name)
+            for name in supplement_names
+        ):
             continue
         for card in api["trello_get"](f"/lists/{item['id']}/cards", {
             "fields": "id,name,desc,idList,shortUrl,closed,idLabels",

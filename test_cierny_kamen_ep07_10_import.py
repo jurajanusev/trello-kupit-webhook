@@ -108,7 +108,10 @@ class Ep0710ImportTest(unittest.TestCase):
             if path.startswith("/boards/CzuD55PR") and path.count("/") == 2:
                 return {"id": "board", "name": "Čierny Kameň"}
             if path == "/boards/board/lists":
-                return [{"id": "open-list", "closed": False}, {"id": "archived-list", "closed": True}]
+                return [
+                    {"id": "open-list", "name": "SCENÁRE", "closed": False},
+                    {"id": "archived-list", "name": "SCENÁRE", "closed": True},
+                ]
             if path == "/lists/open-list/cards":
                 return [{"id": "card", "idList": "open-list"}]
             return []
