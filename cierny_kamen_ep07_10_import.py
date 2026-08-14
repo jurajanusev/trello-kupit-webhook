@@ -60,10 +60,16 @@ def runtime_state(api):
     labels = api["trello_get"](f"/boards/{board['id']}/labels", {
         "fields": "id,name,color", "limit": 1000,
     })
-    cards = api["trello_get"](f"/boards/{board['id']}/cards", {
-        "fields": "id,name,desc,idList,shortUrl,closed,idLabels",
-        "filter": "open", "limit": 1000,
-    })
+    cards_by_id = {}
+    for item in lists:
+        if item.get("closed"):
+            continue
+        for card in api["trello_get"](f"/lists/{item['id']}/cards", {
+            "fields": "id,name,desc,idList,shortUrl,closed,idLabels",
+            "filter": "open", "limit": 1000,
+        }):
+            cards_by_id[card["id"]] = card
+    cards = list(cards_by_id.values())
     return {
         "board": board, "lists": lists, "labels": labels, "cards": cards,
         "lists_by_id": {item["id"]: item for item in lists},
@@ -520,22 +526,15 @@ def scene_summary(scene):
     }
 
 
-def build_audit(api):
+def build_audit(api, state=None):
     payload = json.loads(PAYLOAD_PATH.read_text(encoding="utf-8"))
     identity_map = json.loads(IDENTITY_PATH.read_text(encoding="utf-8"))
     space_map = json.loads(SPACE_MAP_PATH.read_text(encoding="utf-8"))
-    board = api["trello_get"](f"/boards/{BOARD_REF}", {"fields": "id,name,url,closed"})
-    lists = api["trello_get"](f"/boards/{board['id']}/lists", {
-        "fields": "id,name,pos,closed", "filter": "all",
-    })
-    labels = api["trello_get"](f"/boards/{board['id']}/labels", {
-        "fields": "id,name,color", "limit": 1000,
-    })
-    cards = api["trello_get"](f"/boards/{board['id']}/cards", {
-        "fields": "id,name,desc,idList,shortUrl,closed,idLabels,dateLastActivity",
-        "filter": "open", "limit": 1000,
-    })
-    state = {"board": board, "lists": lists, "labels": labels, "cards": cards}
+    state = state or runtime_state(api)
+    board = state["board"]
+    lists = state["lists"]
+    labels = state["labels"]
+    cards = state["cards"]
     prop_plan = registry_plan(state, identity_map)
     spaces_plan = space_plan(state, payload, space_map)
     groups = defaultdict(list)
@@ -679,7 +678,8 @@ def register_routes(app, api):
         }
         if mode not in allowed:
             return jsonify({"error": "unsupported mode"}), 409
-        audit = build_audit(api)
+        state = runtime_state(api)
+        audit = build_audit(api, state)
         if mode in {"audit", "dry-run"}:
             return jsonify(audit), 200 if not audit["blockers"] else 409
         if audit["blockers"]:
@@ -687,7 +687,6 @@ def register_routes(app, api):
         payload = json.loads(PAYLOAD_PATH.read_text(encoding="utf-8"))
         identity_map = json.loads(IDENTITY_PATH.read_text(encoding="utf-8"))
         space_map = json.loads(SPACE_MAP_PATH.read_text(encoding="utf-8"))
-        state = runtime_state(api)
         try:
             start = int(request.args.get("start", "0"))
             limit = int(request.args.get("limit", "5"))

@@ -107,11 +107,17 @@ class Ep0710ImportTest(unittest.TestCase):
             calls.append((path, dict(params)))
             if path.startswith("/boards/CzuD55PR") and path.count("/") == 2:
                 return {"id": "board", "name": "Čierny Kameň"}
+            if path == "/boards/board/lists":
+                return [{"id": "open-list", "closed": False}, {"id": "archived-list", "closed": True}]
+            if path == "/lists/open-list/cards":
+                return [{"id": "card", "idList": "open-list"}]
             return []
         state = runtime_state({"trello_get": trello_get})
         self.assertEqual("board", state["board"]["id"])
-        card_call = next(item for item in calls if item[0] == "/boards/board/cards")
+        self.assertEqual(["card"], [item["id"] for item in state["cards"]])
+        card_call = next(item for item in calls if item[0] == "/lists/open-list/cards")
         self.assertEqual("open", card_call[1]["filter"])
+        self.assertFalse(any(item[0] == "/lists/archived-list/cards" for item in calls))
 
 
 if __name__ == "__main__":
