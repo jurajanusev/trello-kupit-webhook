@@ -927,18 +927,38 @@ def register_routes(app, api):
                 rows = registry_plan(state, identity_map)
                 selected = rows[start:start + limit]
                 for row in selected:
-                    changed, added = sync_prop_master(
-                        api, state, row, scenes_by_id, source_cards, label_ids
-                    )
+                    try:
+                        changed, added = sync_prop_master(
+                            api, state, row, scenes_by_id, source_cards, label_ids
+                        )
+                    except Exception as error:
+                        return jsonify({
+                            "status": "blocked", "mode": mode,
+                            "failed_master": row["name"],
+                            "error": f"{type(error).__name__}: {error}",
+                            "completed": selected[:selected.index(row)],
+                            "updated_before_failure": updated,
+                            "attachments_before_failure": attachments,
+                        }), 409
                     updated += int(changed)
                     attachments += added
             else:
                 rows = space_plan(state, payload, space_map)
                 selected = rows[start:start + limit]
                 for row in selected:
-                    changed, added = sync_space_master(
-                        api, state, row, scenes, source_cards, space_map
-                    )
+                    try:
+                        changed, added = sync_space_master(
+                            api, state, row, scenes, source_cards, space_map
+                        )
+                    except Exception as error:
+                        return jsonify({
+                            "status": "blocked", "mode": mode,
+                            "failed_master": row["name"],
+                            "error": f"{type(error).__name__}: {error}",
+                            "completed": selected[:selected.index(row)],
+                            "updated_before_failure": updated,
+                            "attachments_before_failure": attachments,
+                        }), 409
                     updated += int(changed)
                     attachments += added
             return jsonify({
