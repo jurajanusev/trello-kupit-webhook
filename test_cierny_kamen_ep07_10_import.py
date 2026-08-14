@@ -12,7 +12,8 @@ if "flask" not in sys.modules:
     sys.modules["flask"] = flask_stub
 
 from cierny_kamen_ep07_10_import import (
-    CHECKLIST_NAMES, folded, prop_item_text, registry_aliases, runtime_state,
+    CHECKLIST_NAMES, folded, prop_item_text, registry_aliases, registry_plan,
+    runtime_state,
 )
 
 
@@ -125,6 +126,29 @@ class Ep0710ImportTest(unittest.TestCase):
         self.assertFalse(any(item[0] == "/lists/archived-list/cards" for item in calls))
         search_call = next(item for item in calls if item[0] == "/search")
         self.assertEqual("Alexova gitara", search_call[1]["query"])
+
+    def test_existing_master_in_legacy_prop_list_is_reused(self):
+        state = {
+            "lists": [
+                {"id": "legacy", "name": "NADVÄZNÉ REKVIZITY", "closed": False},
+                {"id": "alex", "name": "ALEX – OS. REKVIZITY", "closed": False},
+                {"id": "global", "name": "REGISTER REKVIZÍT", "closed": False},
+            ],
+            "cards": [{
+                "id": "guitar", "name": "Alexova gitara", "desc": "",
+                "idList": "legacy", "shortUrl": "https://trello.com/c/guitar",
+                "closed": False,
+            }],
+        }
+        identity = {"records": [{
+            "stable_name": "Alexova gitara", "scene_id": "07/01LP",
+            "physical_presence": True, "owner": "ALEX",
+            "categories": ["Osobná rekvizita", "Nadväzná rekvizita"],
+        }]}
+        row = registry_plan(state, identity)[0]
+        self.assertEqual("reuse", row["status"])
+        self.assertEqual("ALEX – OS. REKVIZITY", row["target_list"])
+        self.assertEqual("guitar", row["matches"][0]["id"])
 
 
 if __name__ == "__main__":

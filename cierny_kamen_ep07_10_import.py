@@ -190,7 +190,10 @@ def registry_plan(state, identity_map, scene_filter=None):
         item for item in state["lists"]
         if not item.get("closed") and folded(item.get("name")).endswith(" - os. rekvizity")
     ]
-    allowed_ids = {item["id"] for item in [*prop_lists, *personal_lists]}
+    allowed_ids = {
+        item["id"] for item in state["lists"]
+        if not item.get("closed") and "rekvizit" in folded(item.get("name"))
+    }
     rows = []
     for name, records in sorted(groups.items(), key=lambda item: folded(item[0])):
         owners = {record.get("owner") for record in records if record.get("owner")}
@@ -504,6 +507,11 @@ def sync_prop_master(api, state, row, scenes_by_id, cards_by_id, label_ids):
         label_ids[name] for name in row["categories"]
     })
     updates = {}
+    target_lists = exact_named(state["lists"], row["target_list"])
+    if len(target_lists) != 1:
+        raise ValueError(f"prop target list conflict: {row['target_list']}")
+    if master.get("idList") != target_lists[0]["id"]:
+        updates["idList"] = target_lists[0]["id"]
     if master.get("desc") != desired_desc:
         updates["desc"] = desired_desc
     if sorted(master.get("idLabels", [])) != desired_labels:
