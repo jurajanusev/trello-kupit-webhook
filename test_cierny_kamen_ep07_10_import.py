@@ -13,6 +13,7 @@ if "flask" not in sys.modules:
 
 from cierny_kamen_ep07_10_import import (
     CHECKLIST_NAMES, compatible_sample_checklists, folded,
+    generated_checklist_prefix,
     merged_occurrence_links, prop_item_text,
     registry_aliases, registry_plan, runtime_state,
 )
@@ -167,6 +168,13 @@ class Ep0710ImportTest(unittest.TestCase):
         self.assertTrue(compatible_sample_checklists("09/35", actual, desired))
         self.assertFalse(compatible_sample_checklists("09/36", actual, desired))
         self.assertFalse(compatible_sample_checklists("09/35", actual[:-1], desired))
+
+    def test_only_exact_generated_prefix_can_resume(self):
+        desired = [(name, ["one", "two"] if name == "REKVIZITY" else []) for name in CHECKLIST_NAMES]
+        self.assertTrue(generated_checklist_prefix([("REKVIZITY", ["one"])], desired))
+        self.assertTrue(generated_checklist_prefix(desired[:3], desired))
+        self.assertFalse(generated_checklist_prefix([("SET", [])], desired))
+        self.assertFalse(generated_checklist_prefix([("REKVIZITY", ["manual"])], desired))
 
 
 if __name__ == "__main__":

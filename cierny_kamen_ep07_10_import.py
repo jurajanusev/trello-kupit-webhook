@@ -408,6 +408,15 @@ def compatible_sample_checklists(scene_id, actual, desired):
     )
 
 
+def generated_checklist_prefix(actual, desired):
+    if [item[0] for item in actual] != list(CHECKLIST_NAMES[:len(actual)]):
+        return False
+    for (name, actual_items), (_, desired_items) in zip(actual, desired):
+        if actual_items != desired_items[:len(actual_items)]:
+            return False
+    return True
+
+
 def apply_scene(api, state, scene, desired, label_ids, scene_list_id):
     desc, checklists, label_names = desired
     cards, collisions = card_map(api, state)
@@ -447,6 +456,32 @@ def apply_scene(api, state, scene, desired, label_ids, scene_list_id):
         actual_projection = [(item["name"], [entry["name"] for entry in sorted(item.get("checkItems", []), key=lambda value: value.get("pos", 0))]) for item in actual]
         desired_projection = [(name, checklists[name]) for name in CHECKLIST_NAMES]
         if actual_projection != desired_projection:
+            resumable = (
+                card.get("desc") == desc
+                and generated_checklist_prefix(actual_projection, desired_projection)
+            )
+            if resumable:
+                for checklist in actual:
+                    items = sorted(checklist.get("checkItems", []), key=lambda value: value.get("pos", 0))
+                    for desired_name in checklists[checklist["name"]][len(items):]:
+                        api["trello_post_body"](
+                            f"/checklists/{checklist['id']}/checkItems",
+                            {"name": desired_name, "pos": "bottom"},
+                        )
+                        writes += 1
+                for position, name in enumerate(CHECKLIST_NAMES[len(actual):], len(actual) + 1):
+                    checklist = api["trello_post_body"](
+                        f"/cards/{card['id']}/checklists",
+                        {"name": name, "pos": position * 16384},
+                    )
+                    writes += 1
+                    for item in checklists[name]:
+                        api["trello_post_body"](
+                            f"/checklists/{checklist['id']}/checkItems",
+                            {"name": item, "pos": "bottom"},
+                        )
+                        writes += 1
+                return card, writes, created
             compatible_sample = compatible_sample_checklists(
                 scene["scene_id"], actual_projection, desired_projection
             )
