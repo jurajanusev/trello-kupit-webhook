@@ -49,6 +49,27 @@ def exact_named(items, name):
     return [item for item in items if folded(item.get("name")) == target and not item.get("closed")]
 
 
+def runtime_state(api):
+    """Load every active card even when archived board history exceeds 1000 cards."""
+    board = api["trello_get"](f"/boards/{BOARD_REF}", {
+        "fields": "id,name,url,closed,shortLink",
+    })
+    lists = api["trello_get"](f"/boards/{board['id']}/lists", {
+        "fields": "id,name,pos,closed", "filter": "all",
+    })
+    labels = api["trello_get"](f"/boards/{board['id']}/labels", {
+        "fields": "id,name,color", "limit": 1000,
+    })
+    cards = api["trello_get"](f"/boards/{board['id']}/cards", {
+        "fields": "id,name,desc,idList,shortUrl,closed,idLabels",
+        "filter": "open", "limit": 1000,
+    })
+    return {
+        "board": board, "lists": lists, "labels": labels, "cards": cards,
+        "lists_by_id": {item["id"]: item for item in lists},
+    }
+
+
 def registry_aliases(card):
     values = {card.get("name", "")}
     desc = card.get("desc") or ""
@@ -512,7 +533,7 @@ def build_audit(api):
     })
     cards = api["trello_get"](f"/boards/{board['id']}/cards", {
         "fields": "id,name,desc,idList,shortUrl,closed,idLabels,dateLastActivity",
-        "filter": "all", "limit": 1000,
+        "filter": "open", "limit": 1000,
     })
     state = {"board": board, "lists": lists, "labels": labels, "cards": cards}
     prop_plan = registry_plan(state, identity_map)
@@ -666,9 +687,7 @@ def register_routes(app, api):
         payload = json.loads(PAYLOAD_PATH.read_text(encoding="utf-8"))
         identity_map = json.loads(IDENTITY_PATH.read_text(encoding="utf-8"))
         space_map = json.loads(SPACE_MAP_PATH.read_text(encoding="utf-8"))
-        state = api["cierny_kamen_import_state"]({
-            "board_ref": BOARD_REF,
-        })
+        state = runtime_state(api)
         try:
             start = int(request.args.get("start", "0"))
             limit = int(request.args.get("limit", "5"))

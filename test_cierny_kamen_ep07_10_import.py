@@ -12,7 +12,7 @@ if "flask" not in sys.modules:
     sys.modules["flask"] = flask_stub
 
 from cierny_kamen_ep07_10_import import (
-    CHECKLIST_NAMES, folded, prop_item_text, registry_aliases,
+    CHECKLIST_NAMES, folded, prop_item_text, registry_aliases, runtime_state,
 )
 
 
@@ -100,6 +100,18 @@ class Ep0710ImportTest(unittest.TestCase):
             ("REKVIZITY", "SET", "INFO Z PORADY", "INFO Z NATÁČANIA", "OTÁZKY NA PORADU"),
             CHECKLIST_NAMES,
         )
+
+    def test_runtime_state_excludes_archived_history_from_card_limit(self):
+        calls = []
+        def trello_get(path, params):
+            calls.append((path, dict(params)))
+            if path.startswith("/boards/CzuD55PR") and path.count("/") == 2:
+                return {"id": "board", "name": "Čierny Kameň"}
+            return []
+        state = runtime_state({"trello_get": trello_get})
+        self.assertEqual("board", state["board"]["id"])
+        card_call = next(item for item in calls if item[0] == "/boards/board/cards")
+        self.assertEqual("open", card_call[1]["filter"])
 
 
 if __name__ == "__main__":
