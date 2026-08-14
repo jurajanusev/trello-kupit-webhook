@@ -56,12 +56,13 @@ class DunajAugust14ScheduleTests(unittest.TestCase):
         self.assertNotIn("24/8A", by_id)
         self.assertNotIn("24/8B", by_id)
 
-    def test_endpoint_rejects_a_different_as_of_date(self):
+    def test_endpoint_is_disabled_after_apply(self):
         response = app.app.test_client().post(
             "/api/sync-dunaj-schedule?mode=dry-run&as_of=2026-08-15",
             headers={"X-Sync-Key": app.DUNAJ_CURRENT_SCHEDULE_KEY},
         )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 410)
+        self.assertEqual(response.get_json()["error"], "endpoint disabled")
 
 
 if __name__ == "__main__":
