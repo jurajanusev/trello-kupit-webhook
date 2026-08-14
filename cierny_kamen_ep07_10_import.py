@@ -26,6 +26,11 @@ SPACE_LIST = "REGISTER PRIESTOROV"
 SET_LIST = "NADVÄZNÉ SETY"
 PROP_LIST = "REGISTER REKVIZÍT"
 SAMPLE_SCENES = ("07/01LP", "08/07FLASH", "09/35", "10/11")
+CHECKLIST_NAMES = (
+    "REKVIZITY", "SET", "INFO Z PORADY", "INFO Z NATÁČANIA",
+    "OTÁZKY NA PORADU",
+)
+BOOTSTRAP_MARKER = "<!-- CIERNY-KAMEN-EP07-10-BOOTSTRAP -->"
 CATEGORY_LABELS = (
     "Auto", "Osobná rekvizita", "Dokument", "Screen",
     "Nadväzná rekvizita", "Nadväzný priestor", "Nadväzný set",
@@ -172,6 +177,317 @@ def space_plan(state, payload, space_map, scene_filter=None):
             "status": "reuse" if len(matches) == 1 else "create" if not matches else "conflict",
         })
     return rows
+
+
+def combined_scenes(api, new_payload):
+    existing = api["cierny_kamen_import_payload"]()["scenes"]
+    result = []
+    seen = set()
+    for scene in [*existing, *new_payload["scenes"]]:
+        if scene["scene_id"] in seen:
+            continue
+        seen.add(scene["scene_id"])
+        result.append(scene)
+    return result
+
+
+def card_map(api, state):
+    groups = api["cierny_kamen_scene_cards_by_id"](state)
+    return {
+        scene_id: cards[0] for scene_id, cards in groups.items()
+        if len(cards) == 1 and not cards[0].get("closed")
+    }, {scene_id: cards for scene_id, cards in groups.items() if len(cards) > 1}
+
+
+def location_names(scene, space_map):
+    return space_map.get(scene.get("location", ""), [scene.get("location", "")])
+
+
+def character_identity(value):
+    value = re.sub(r"\s+(?:M\.?O\.?|V\.?O\.?)$", "", value or "", flags=re.I)
+    return folded(value)
+
+
+def display_link(scene, cards):
+    card = cards.get(scene["scene_id"]) if scene else None
+    if not scene or not card or not card.get("shortUrl"):
+        return "—"
+    return f"[{scene['scene_id']} – {scene['prepis']}]({card['shortUrl']})"
+
+
+def continuity_sections(scene, all_scenes, cards, space_map):
+    index = next(i for i, item in enumerate(all_scenes) if item["scene_id"] == scene["scene_id"])
+    target_spaces = {folded(name) for name in location_names(scene, space_map)}
+    def same_space(item):
+        return bool(target_spaces & {folded(name) for name in location_names(item, space_map)})
+    previous_space = next((item for item in reversed(all_scenes[:index]) if same_space(item)), None)
+    next_space = next((item for item in all_scenes[index + 1:] if same_space(item)), None)
+    space = (
+        "### KONTINUITA PRIESTORU\n\n"
+        f"- Predchádzajúci: {display_link(previous_space, cards)}\n"
+        f"- Nasledujúci: {display_link(next_space, cards)}"
+    )
+    rows = ["### KONTINUITA POSTÁV", ""]
+    characters = []
+    for character in scene.get("characters", []):
+        key = character_identity(character)
+        if key and key not in {character_identity(item) for item in characters}:
+            characters.append(character)
+    for character in characters:
+        key = character_identity(character)
+        def has_character(item):
+            return key in {character_identity(value) for value in item.get("characters", [])}
+        previous = next((item for item in reversed(all_scenes[:index]) if has_character(item)), None)
+        following = next((item for item in all_scenes[index + 1:] if has_character(item)), None)
+        rows.append(f"- {character}: ← {display_link(previous, cards)} | → {display_link(following, cards)}")
+    return space, "\n".join(rows)
+
+
+def master_maps(state, identity_map, payload, space_map, scene_filter=None):
+    prop_rows = registry_plan(state, identity_map)
+    prop_cards = {}
+    conflicts = []
+    required_props = {
+        record["stable_name"] for record in identity_map["records"]
+        if record.get("physical_presence", True)
+        and (not scene_filter or record["scene_id"] in scene_filter)
+    }
+    for row in prop_rows:
+        if row["name"] not in required_props:
+            continue
+        if len(row["matches"]) == 1:
+            prop_cards[row["name"]] = row["matches"][0]
+        else:
+            conflicts.append({"type": "prop", **row})
+    spaces = space_plan(state, payload, space_map, scene_filter)
+    space_cards = {}
+    for row in spaces:
+        if len(row["matches"]) == 1:
+            space_cards[row["name"]] = row["matches"][0]
+        else:
+            conflicts.append({"type": "space", **row})
+    return prop_cards, space_cards, conflicts
+
+
+def records_by_scene(identity_map):
+    result = defaultdict(list)
+    for record in identity_map["records"]:
+        if record.get("physical_presence", True):
+            result[record["scene_id"]].append(record)
+    return result
+
+
+def prop_item_text(record, master_url):
+    name = record["stable_name"]
+    action = record["action"]
+    if record.get("continuity_group") and (record.get("previous") or record.get("next") or "Nadväzná rekvizita" in record.get("categories", [])):
+        previous = f"{record['previous']}" if record.get("previous") else "prvý výskyt"
+        following = record.get("next") or "ďalší potvrdený obraz neurčený"
+        return (
+            f"<n> **{name}** — *{action} | ← {previous} | TU: {record['current_state']} | → {following}* "
+            f"| KARTA: {master_url}"
+        )
+    return f"**{name}** — *{action}* | KARTA: {master_url}"
+
+
+def desired_scene(scene, all_scenes, cards, prop_cards, space_cards, space_map, identity_map):
+    records = records_by_scene(identity_map).get(scene["scene_id"], [])
+    missing_props = [record["stable_name"] for record in records if record["stable_name"] not in prop_cards]
+    missing_spaces = [name for name in location_names(scene, space_map) if name not in space_cards]
+    if missing_props or missing_spaces:
+        raise ValueError(f"missing registry cards props={missing_props} spaces={missing_spaces}")
+    prop_context = [f"- **{record['stable_name']}** — {record['action']}" for record in records]
+    if not prop_context:
+        prop_context = ["- Bez samostatnej rekvizity určenej v zdroji."]
+    continuity_records = [record for record in records if record.get("continuity_group") and (record.get("previous") or record.get("next") or "Nadväzná rekvizita" in record.get("categories", []))]
+    continuity = [f"- <n> {record['stable_name']}" for record in continuity_records] or ["- Bez potvrdenej nadväznosti."]
+    links = [f"- [{record['stable_name']}]({prop_cards[record['stable_name']]['url']})" for record in records]
+    links.extend(f"- [{name}]({space_cards[name]['url']})" for name in location_names(scene, space_map))
+    if not links:
+        links = ["- Bez samostatného odkazu."]
+    space_section, characters_section = continuity_sections(scene, all_scenes, cards, space_map)
+    locations = location_names(scene, space_map)
+    location_value = ", ".join(f"[{name}]({space_cards[name]['url']})" for name in locations)
+    location_label = "LOKÁCIE" if len(locations) > 1 else "LOKÁCIA"
+    characters = scene.get("characters_raw") or ", ".join(scene.get("characters", [])) or "neuvedené"
+    questions = [item["question"] for item in identity_map["questions"] if item["scene_id"] == scene["scene_id"]]
+    desc = (
+        f"## {scene['prepis']}\n\n"
+        "### REKVIZITY V KONTEXTE\n" + "\n".join(prop_context) + "\n\n"
+        "### NADVAZNOSŤ\n\n" + "\n".join(continuity) + "\n\n"
+        "### ODKAZY\n" + "\n".join(links) + "\n\n"
+        f"{space_section}\n\n{characters_section}\n\n"
+        "### RUČNÉ DOPLNENIA\n\n"
+        "### AKCIA A DIALÓGY\n" + scene["action_markdown"] + "\n\n"
+        "<!-- CIERNY-KAMEN-SCHEDULE-METADATA:START -->\n"
+        f"ČÍSLO OBRAZU: {scene['scene_id']}\n"
+        f"ZDROJ: {scene['source_pdf']}\n"
+        "NATÁČACÍ DEŇ: nenaplánované\nDÁTUM: nenaplánované\nPORADIE: nenaplánované\nUNIT: nenaplánované\n"
+        f"{location_label}: {location_value}\nPOSTAVY: {characters}\n"
+        "<!-- CIERNY-KAMEN-SCHEDULE-METADATA:END -->"
+    )
+    checklists = {
+        "REKVIZITY": [prop_item_text(record, prop_cards[record["stable_name"]]["url"]) for record in records],
+        "SET": [f"{name} — prostredie obrazu {scene['scene_id']} | KARTA: {space_cards[name]['url']}" for name in locations],
+        "INFO Z PORADY": [], "INFO Z NATÁČANIA": [],
+        "OTÁZKY NA PORADU": questions,
+    }
+    labels = set()
+    if continuity_records:
+        labels.add("Nadväzná rekvizita")
+    if any("Auto" in record.get("categories", []) for record in records):
+        labels.add("Auto")
+    return desc, checklists, labels
+
+
+def read_checklists(api, card_id):
+    return sorted(api["trello_get"](f"/cards/{card_id}/checklists", {
+        "checkItems": "all", "fields": "id,name,pos",
+    }), key=lambda item: item.get("pos", 0))
+
+
+def apply_scene(api, state, scene, desired, label_ids, scene_list_id):
+    desc, checklists, label_names = desired
+    cards, collisions = card_map(api, state)
+    if collisions.get(scene["scene_id"]):
+        raise ValueError("scene collision")
+    card = cards.get(scene["scene_id"])
+    writes = 0
+    created = False
+    if not card:
+        card = api["trello_post_body"]("/cards", {
+            "idList": scene_list_id, "name": scene["name"], "desc": desc,
+            "pos": "bottom", "idLabels": ",".join(label_ids[name] for name in label_names),
+        })
+        state["cards"].append(card)
+        writes += 1
+        created = True
+    else:
+        updates = {}
+        if card.get("name") != scene["name"]:
+            updates["name"] = scene["name"]
+        if card.get("desc") != desc:
+            if (
+                card.get("desc")
+                and "CIERNY-KAMEN-EP07-10-BOOTSTRAP" not in card.get("desc", "")
+                and scene["scene_id"] not in SAMPLE_SCENES
+            ):
+                raise ValueError("existing non-bootstrap description conflict")
+            updates["desc"] = desc
+        expected_labels = sorted(label_ids[name] for name in label_names)
+        if sorted(card.get("idLabels", [])) != expected_labels:
+            updates["idLabels"] = ",".join(expected_labels)
+        if updates:
+            api["trello_put_body"](f"/cards/{card['id']}", updates)
+            writes += 1
+    actual = read_checklists(api, card["id"])
+    if actual:
+        actual_projection = [(item["name"], [entry["name"] for entry in sorted(item.get("checkItems", []), key=lambda value: value.get("pos", 0))]) for item in actual]
+        desired_projection = [(name, checklists[name]) for name in CHECKLIST_NAMES]
+        if actual_projection != desired_projection:
+            raise ValueError("existing checklist conflict")
+    else:
+        for position, name in enumerate(CHECKLIST_NAMES, 1):
+            checklist = api["trello_post_body"](f"/cards/{card['id']}/checklists", {"name": name, "pos": position * 16384})
+            writes += 1
+            for item in checklists[name]:
+                api["trello_post_body"](f"/checklists/{checklist['id']}/checkItems", {"name": item, "pos": "bottom"})
+                writes += 1
+    return card, writes, created
+
+
+def bootstrap_scene(api, state, scene, scene_list_id):
+    cards, collisions = card_map(api, state)
+    if collisions.get(scene["scene_id"]):
+        raise ValueError("scene collision")
+    card = cards.get(scene["scene_id"])
+    if card:
+        return card, False
+    card = api["trello_post_body"]("/cards", {
+        "idList": scene_list_id, "name": scene["name"],
+        "desc": f"{BOOTSTRAP_MARKER}\n{scene['scene_id']}", "pos": "bottom",
+    })
+    state["cards"].append(card)
+    return card, True
+
+
+def scene_readback(api, card, desired):
+    desc, checklists, label_names = desired
+    actual_card = api["trello_get"](f"/cards/{card['id']}", {
+        "fields": "id,name,desc,idList,shortUrl,closed,idLabels",
+    })
+    actual_lists = read_checklists(api, card["id"])
+    projection = [
+        (item["name"], [entry["name"] for entry in sorted(
+            item.get("checkItems", []), key=lambda value: value.get("pos", 0)
+        )]) for item in actual_lists
+    ]
+    expected = [(name, checklists[name]) for name in CHECKLIST_NAMES]
+    return {
+        "id": actual_card["id"], "url": actual_card.get("shortUrl"),
+        "name_ok": actual_card.get("name") == card.get("name"),
+        "description_ok": actual_card.get("desc") == desc,
+        "description_sha256": hashlib.sha256(
+            (actual_card.get("desc") or "").encode("utf-8")
+        ).hexdigest(),
+        "checklists_ok": projection == expected,
+        "checklist_names": [item[0] for item in projection],
+        "checklist_item_counts": {item[0]: len(item[1]) for item in projection},
+        "expected_label_names": sorted(label_names, key=folded),
+    }
+
+
+def occurrence_link(scene, card):
+    return f"- [{scene['scene_id']} – {scene['prepis']}]({card['shortUrl']})"
+
+
+def sync_prop_master(api, state, row, scenes_by_id, cards_by_id, label_ids):
+    if len(row["matches"]) != 1:
+        raise ValueError(f"prop master conflict: {row['name']}")
+    master = next(card for card in state["cards"] if card["id"] == row["matches"][0]["id"])
+    occurrence_ids = [scene_id for scene_id in row["scene_ids"] if scene_id in cards_by_id]
+    occurrences = [occurrence_link(scenes_by_id[sid], cards_by_id[sid]) for sid in occurrence_ids]
+    block = prop_registry_block(row["name"], row["categories"], occurrences)
+    desired_desc = replace_auto_block(master.get("desc"), PROP_AUTO_START, PROP_AUTO_END, block)
+    desired_labels = sorted(set(master.get("idLabels", [])) | {
+        label_ids[name] for name in row["categories"]
+    })
+    updates = {}
+    if master.get("desc") != desired_desc:
+        updates["desc"] = desired_desc
+    if sorted(master.get("idLabels", [])) != desired_labels:
+        updates["idLabels"] = ",".join(desired_labels)
+    if updates:
+        api["trello_put_body"](f"/cards/{master['id']}", updates)
+    attachments = 0
+    for sid in occurrence_ids:
+        scene_card = cards_by_id[sid]
+        attachments += int(ensure_attachment(api, master, scene_card["shortUrl"], scenes_by_id[sid]["name"]))
+        attachments += int(ensure_attachment(api, scene_card, master["shortUrl"], row["name"]))
+    return bool(updates), attachments
+
+
+def sync_space_master(api, state, row, scenes, cards_by_id, space_map):
+    if len(row["matches"]) != 1:
+        raise ValueError(f"space master conflict: {row['name']}")
+    master = next(card for card in state["cards"] if card["id"] == row["matches"][0]["id"])
+    related = [scene for scene in scenes if row["name"] in location_names(scene, space_map) and scene["scene_id"] in cards_by_id]
+    links = [occurrence_link(scene, cards_by_id[scene["scene_id"]]) for scene in related]
+    desired = space_registry_description(row["name"])
+    desired = desired.replace(
+        "- Odkazy sa doplnia po vytvorení obrazových kariet.",
+        "\n".join(links) if links else "- Bez obrazového výskytu.",
+    )
+    desired_desc = replace_space_auto_block(master.get("desc"), desired)
+    updated = master.get("desc") != desired_desc
+    if updated:
+        api["trello_put_body"](f"/cards/{master['id']}", {"desc": desired_desc})
+    attachments = 0
+    for scene in related:
+        scene_card = cards_by_id[scene["scene_id"]]
+        attachments += int(ensure_attachment(api, master, scene_card["shortUrl"], scene["name"]))
+        attachments += int(ensure_attachment(api, scene_card, master["shortUrl"], row["name"]))
+    return updated, attachments
 
 
 def scene_summary(scene):
@@ -336,7 +652,9 @@ def register_routes(app, api):
         mode = request.args.get("mode", "dry-run").casefold().strip()
         allowed = {
             "audit", "dry-run", "sample-registry-init", "sample-space-init",
-            "registry-init", "space-init",
+            "registry-init", "space-init", "sample-scenes-dry-run",
+            "sample-scenes", "bootstrap", "finalize", "registry-sync",
+            "space-sync", "final-audit",
         }
         if mode not in allowed:
             return jsonify({"error": "unsupported mode"}), 409
@@ -360,6 +678,161 @@ def register_routes(app, api):
             return jsonify({"error": "invalid start/limit"}), 400
         sample_only = mode.startswith("sample-")
         scene_filter = set(SAMPLE_SCENES) if sample_only else None
+        scenes = payload["scenes"]
+        scenes_by_id = {scene["scene_id"]: scene for scene in scenes}
+        selected_scenes = (
+            [scenes_by_id[scene_id] for scene_id in SAMPLE_SCENES]
+            if sample_only else scenes[start:start + limit]
+        )
+        label_ids = {
+            name: exact_named(state["labels"], name)[0]["id"]
+            for name in CATEGORY_LABELS
+        }
+
+        if mode == "sample-scenes-dry-run":
+            prop_cards, space_cards, conflicts = master_maps(
+                state, identity_map, payload, space_map, scene_filter
+            )
+            if conflicts:
+                return jsonify({"status": "blocked", "conflicts": conflicts}), 409
+            cards, card_collisions = card_map(api, state)
+            all_scenes = combined_scenes(api, payload)
+            planned = []
+            for scene in selected_scenes:
+                desired = desired_scene(
+                    scene, all_scenes, cards, prop_cards, space_cards,
+                    space_map, identity_map,
+                )
+                planned.append({
+                    "scene_id": scene["scene_id"], "name": scene["name"],
+                    "description_sha256": hashlib.sha256(desired[0].encode("utf-8")).hexdigest(),
+                    "description_chars": len(desired[0]),
+                    "checklist_item_counts": {name: len(desired[1][name]) for name in CHECKLIST_NAMES},
+                    "labels": sorted(desired[2], key=folded),
+                    "existing": scene["scene_id"] in cards,
+                })
+            return jsonify({
+                "status": "sample-dry-run", "writes": 0,
+                "card_collisions": list(card_collisions), "planned": planned,
+            }), 200 if not card_collisions else 409
+
+        if mode in {"sample-scenes", "finalize"}:
+            prop_cards, space_cards, conflicts = master_maps(
+                state, identity_map, payload, space_map,
+                scene_filter if sample_only else None,
+            )
+            if conflicts:
+                return jsonify({"status": "blocked", "conflicts": conflicts}), 409
+            scene_lists = exact_named(state["lists"], "SCENÁRE")
+            if len(scene_lists) != 1:
+                return jsonify({"status": "blocked", "scene_lists": len(scene_lists)}), 409
+            cards, card_collisions = card_map(api, state)
+            if card_collisions:
+                return jsonify({"status": "blocked", "card_collisions": list(card_collisions)}), 409
+            all_scenes = combined_scenes(api, payload)
+            results = []
+            total_writes = 0
+            for scene in selected_scenes:
+                desired = desired_scene(
+                    scene, all_scenes, cards, prop_cards, space_cards,
+                    space_map, identity_map,
+                )
+                card, writes, created = apply_scene(
+                    api, state, scene, desired, label_ids, scene_lists[0]["id"]
+                )
+                cards[scene["scene_id"]] = card
+                total_writes += writes
+                results.append({
+                    "scene_id": scene["scene_id"], "created": created,
+                    "writes": writes, "readback": scene_readback(api, card, desired),
+                })
+            return jsonify({
+                "status": "applied", "mode": mode, "start": start,
+                "selected": len(selected_scenes), "writes": total_writes,
+                "remaining": 0 if sample_only else max(0, len(scenes) - start - len(selected_scenes)),
+                "results": results,
+            }), 200
+
+        if mode == "bootstrap":
+            scene_lists = exact_named(state["lists"], "SCENÁRE")
+            if len(scene_lists) != 1:
+                return jsonify({"status": "blocked", "scene_lists": len(scene_lists)}), 409
+            results = []
+            for scene in selected_scenes:
+                card, created = bootstrap_scene(api, state, scene, scene_lists[0]["id"])
+                results.append({"scene_id": scene["scene_id"], "created": created, "url": card.get("shortUrl")})
+            return jsonify({
+                "status": "applied", "mode": mode, "start": start,
+                "selected": len(selected_scenes), "created": sum(item["created"] for item in results),
+                "writes": sum(item["created"] for item in results),
+                "remaining": max(0, len(scenes) - start - len(selected_scenes)),
+                "results": results,
+            }), 200
+
+        if mode in {"registry-sync", "space-sync"}:
+            cards, card_collisions = card_map(api, state)
+            source_cards = {sid: cards[sid] for sid in scenes_by_id if sid in cards}
+            if card_collisions or len(source_cards) != len(scenes):
+                return jsonify({
+                    "status": "blocked", "card_collisions": list(card_collisions),
+                    "source_cards": len(source_cards), "expected": len(scenes),
+                }), 409
+            updated = attachments = 0
+            if mode == "registry-sync":
+                rows = registry_plan(state, identity_map)
+                selected = rows[start:start + limit]
+                for row in selected:
+                    changed, added = sync_prop_master(
+                        api, state, row, scenes_by_id, source_cards, label_ids
+                    )
+                    updated += int(changed)
+                    attachments += added
+            else:
+                rows = space_plan(state, payload, space_map)
+                selected = rows[start:start + limit]
+                for row in selected:
+                    changed, added = sync_space_master(
+                        api, state, row, scenes, source_cards, space_map
+                    )
+                    updated += int(changed)
+                    attachments += added
+            return jsonify({
+                "status": "applied", "mode": mode, "start": start,
+                "selected": len(selected), "updated": updated,
+                "attachments_added": attachments, "writes": updated + attachments,
+                "remaining": max(0, len(rows) - start - len(selected)),
+            }), 200
+
+        if mode == "final-audit":
+            cards, card_collisions = card_map(api, state)
+            source_cards = {sid: cards[sid] for sid in scenes_by_id if sid in cards}
+            missing = sorted(set(scenes_by_id) - set(source_cards))
+            bootstrap = [sid for sid, card in source_cards.items() if BOOTSTRAP_MARKER in (card.get("desc") or "")]
+            checklist_errors = []
+            description_errors = []
+            for sid, card in source_cards.items():
+                actual = read_checklists(api, card["id"])
+                if [item["name"] for item in actual] != list(CHECKLIST_NAMES):
+                    checklist_errors.append(sid)
+                desc = card.get("desc") or ""
+                required = (
+                    "### REKVIZITY V KONTEXTE", "### NADVAZNOSŤ", "### ODKAZY",
+                    "### KONTINUITA PRIESTORU", "### KONTINUITA POSTÁV",
+                    "### RUČNÉ DOPLNENIA", "### AKCIA A DIALÓGY",
+                    "<!-- CIERNY-KAMEN-SCHEDULE-METADATA:START -->",
+                )
+                if not all(marker in desc for marker in required):
+                    description_errors.append(sid)
+            ok = not (missing or card_collisions or bootstrap or checklist_errors or description_errors)
+            return jsonify({
+                "status": "verified" if ok else "blocked", "writes": 0,
+                "source_count": len(scenes), "source_cards": len(source_cards),
+                "missing": missing, "duplicates": list(card_collisions),
+                "bootstrap_remaining": bootstrap,
+                "checklist_errors": checklist_errors,
+                "description_errors": description_errors,
+            }), 200 if ok else 409
+
         if mode.endswith("registry-init"):
             rows = registry_plan(state, identity_map, scene_filter)
             selected = rows[start:start + limit]

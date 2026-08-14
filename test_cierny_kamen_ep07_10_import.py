@@ -11,7 +11,9 @@ if "flask" not in sys.modules:
     flask_stub.request = None
     sys.modules["flask"] = flask_stub
 
-from cierny_kamen_ep07_10_import import folded, registry_aliases
+from cierny_kamen_ep07_10_import import (
+    CHECKLIST_NAMES, folded, prop_item_text, registry_aliases,
+)
 
 
 class Ep0710ImportTest(unittest.TestCase):
@@ -77,6 +79,27 @@ class Ep0710ImportTest(unittest.TestCase):
             spaces = json.load(stream)
         self.assertEqual(3, len(spaces["VERONIKINA VILA – VSTUP/OBÝVAČKA/JEDÁLEŇ"]))
         self.assertEqual(["ALEXOV DOM – ALEXOVA IZBA"], spaces["ALEXOV DOM – ALIXOVA IZBA"])
+
+    def test_prop_markdown_keeps_url_outside_italic(self):
+        record = {
+            "stable_name": "Betin osobný mobil", "action": "číta správu",
+            "continuity_group": "betin-mobil", "previous": None,
+            "next": "01/19", "current_state": "zapnutý displej",
+            "categories": ["Osobná rekvizita", "Nadväzná rekvizita"],
+        }
+        value = prop_item_text(record, "https://trello.com/c/example")
+        self.assertEqual(
+            "<n> **Betin osobný mobil** — *číta správu | ← prvý výskyt | "
+            "TU: zapnutý displej | → 01/19* | KARTA: https://trello.com/c/example",
+            value,
+        )
+        self.assertFalse(value.endswith("*"))
+
+    def test_checklist_order_is_permanent(self):
+        self.assertEqual(
+            ("REKVIZITY", "SET", "INFO Z PORADY", "INFO Z NATÁČANIA", "OTÁZKY NA PORADU"),
+            CHECKLIST_NAMES,
+        )
 
 
 if __name__ == "__main__":
