@@ -7,6 +7,7 @@ from pathlib import Path
 
 SOURCE = Path(__file__).with_name("cierny_kamen_ep07_10_scenes.json")
 TARGET = Path(__file__).with_name("cierny_kamen_ep07_10_identity_map.json")
+OLD_REGISTRY = Path(__file__).with_name("cierny_kamen_all_props_registry_map.json")
 
 
 # Explicit, source-reviewed records.  The evidence phrase must occur verbatim in
@@ -106,7 +107,7 @@ ROWS = [
     ("08/36", "Lukášova fľaša piva", "pije z fľašky pivo", "LUKÁŠ", ["Osobná rekvizita"], None, None),
     ("08/38", "Andyho plechovka sódy", "plechovka so sódou", "ANDY", ["Osobná rekvizita"], None, None),
     ("08/40", "Ivanov televízny ovládač", "Alica hodí ovládač", "IVAN", ["Osobná rekvizita"], None, None),
-    ("08/41", "Alexova gitara", "Alex si doma brnká na gitare", "ALEX", ["Osobná rekvizita", "Nadväzná rekvizita"], "alex-guitar", None),
+    ("08/41", "Alexova gitara od Lukáša", "Alex si doma brnká na gitare", "ALEX", ["Osobná rekvizita", "Nadväzná rekvizita"], "alex-guitar", None),
     ("08/42", "Jakubova basketbalová bunda s číslom 9", "Andy roluje Jakubovu bundu", "JAKUB", ["Osobná rekvizita", "Nadväzná rekvizita"], "jakub-jersey-9", None),
     ("08/42", "Taška na ukrytie Jakubovej bundy", "balí ju do tašky", None, [], None, None),
     ("08/42", "Andyho kola", "otvorí si kolu", "ANDY", ["Osobná rekvizita"], None, None),
@@ -140,7 +141,7 @@ ROWS = [
     ("09/32", "Alicin pohár vína po vyhadzove", "Alica plače a pije víno", "ALICA", ["Osobná rekvizita"], None, None),
     ("09/34", "Lein osobný mobil", "Lea sedí v klubovni a scrolluje na mobile", "LEA", ["Osobná rekvizita"], "lea-mobile", None),
     ("09/34", "Leine slúchadlá", "Lea si zloží slúchadlá", "LEA", ["Osobná rekvizita"], "lea-headphones", None),
-    ("09/35", "Alexova gitara", "Alex práve docvičil na gitare", "ALEX", ["Osobná rekvizita", "Nadväzná rekvizita"], "alex-guitar", None),
+    ("09/35", "Alexova gitara od Lukáša", "Alex práve docvičil na gitare", "ALEX", ["Osobná rekvizita", "Nadväzná rekvizita"], "alex-guitar", None),
     ("09/35", "Puzdro na Alexovu gitaru", "odkladá ju do puzdra", "ALEX", ["Osobná rekvizita"], "alex-guitar-case", None),
     ("09/37LP", "Veronikina pôvodná retiazka s príveskom V", "retiazku so zlatým príveskom v tvare „V“", "VERONIKA", ["Osobná rekvizita"], "veronika-original-v-necklace", None),
     ("09/44", "Alicina fľaša vína", "s fľašou vína", "ALICA", ["Osobná rekvizita"], None, None),
@@ -233,10 +234,23 @@ def main():
         if record["continuity_group"] and record["physical_presence"]:
             groups.setdefault(record["continuity_group"], []).append(record)
     order = {scene["scene_id"]: scene["order"] for scene in payload["scenes"]}
+    old_records = json.loads(OLD_REGISTRY.read_text(encoding="utf-8"))["records"]
+    old_by_name = {}
+    for item in old_records:
+        old_by_name.setdefault(item.get("stable_name"), []).append(item["scene_id"])
+    def scene_key(scene_id):
+        match = re.match(r"(\d+)/(\d+)(.*)", scene_id)
+        return (int(match.group(1)), int(match.group(2)), match.group(3))
     for members in groups.values():
         members.sort(key=lambda record: order[record["scene_id"]])
         for index, record in enumerate(members):
-            record["previous"] = members[index - 1]["scene_id"] if index else None
+            previous_old = sorted(
+                old_by_name.get(record["stable_name"], []), key=scene_key
+            )
+            record["previous"] = (
+                members[index - 1]["scene_id"] if index
+                else previous_old[-1] if previous_old else None
+            )
             record["next"] = members[index + 1]["scene_id"] if index + 1 < len(members) else None
             if len(members) > 1 and "Nadväzná rekvizita" not in record["categories"]:
                 record["categories"].append("Nadväzná rekvizita")

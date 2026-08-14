@@ -17,7 +17,7 @@
       "continuity_group": "dogy-mobile",
       "action": "Zazvoní budík (na mobile), Dogy sa strhne zo spánku, chvíľu je dezorientovaný z toho, kde je.",
       "current_state": "Zazvoní budík (na mobile), Dogy sa strhne zo spánku, chvíľu je dezorientovaný z toho, kde je.",
-      "previous": null,
+      "previous": "04/16",
       "next": "08/26",
       "ambiguity_question": null
     },
@@ -174,7 +174,7 @@
       "continuity_group": "kiko-mobile",
       "action": "Kiko počas rozhovoru skroluje v mobile, občas zdvihne hlavu.",
       "current_state": "Kiko počas rozhovoru skroluje v mobile, občas zdvihne hlavu.",
-      "previous": null,
+      "previous": "03/27",
       "next": "07/10",
       "ambiguity_question": null
     },
@@ -314,7 +314,7 @@
       "continuity_group": "bety-mobile",
       "action": "Bety vytiahne mobil a ukáže ho, aby ho všetci videli.",
       "current_state": "Bety vytiahne mobil a ukáže ho, aby ho všetci videli.",
-      "previous": null,
+      "previous": "06/28",
       "next": "09/08",
       "ambiguity_question": null
     },
@@ -833,7 +833,7 @@
       "continuity_group": "laura-mobile",
       "action": "Laura a Veronika sedia pri stole a čakajú kým Laure zazvoní mobil.",
       "current_state": "Laura a Veronika sedia pri stole a čakajú kým Laure zazvoní mobil.",
-      "previous": null,
+      "previous": "05/23",
       "next": null,
       "ambiguity_question": null
     },
@@ -936,7 +936,7 @@
       "continuity_group": "dogy-writer-notebook",
       "action": "Dogy sedí pri barovom pulte v bistre a ťuká do notebooku.",
       "current_state": "Dogy sedí pri barovom pulte v bistre a ťuká do notebooku.",
-      "previous": null,
+      "previous": "06/02",
       "next": "10/01LP",
       "ambiguity_question": null
     },
@@ -1595,7 +1595,7 @@
     },
     {
       "scene_id": "08/41",
-      "stable_name": "Alexova gitara",
+      "stable_name": "Alexova gitara od Lukáša",
       "source_evidence": "Alex si doma brnká na gitare.",
       "evidence_phrase": "Alex si doma brnká na gitare",
       "physical_presence": true,
@@ -1607,7 +1607,7 @@
       "continuity_group": "alex-guitar",
       "action": "Alex si doma brnká na gitare.",
       "current_state": "Alex si doma brnká na gitare.",
-      "previous": null,
+      "previous": "06/47",
       "next": "09/35",
       "ambiguity_question": null
     },
@@ -1873,7 +1873,7 @@
       "continuity_group": "alex-mobile",
       "action": "Alex vojde do obývačky a z vrecka vytiahne telefón.",
       "current_state": "Alex vojde do obývačky a z vrecka vytiahne telefón.",
-      "previous": null,
+      "previous": "05/11",
       "next": "10/20",
       "ambiguity_question": null
     },
@@ -2141,7 +2141,7 @@
       "continuity_group": "lea-mobile",
       "action": "Lea sedí v klubovni a scrolluje na mobile.",
       "current_state": "Lea sedí v klubovni a scrolluje na mobile.",
-      "previous": null,
+      "previous": "05/09",
       "next": null,
       "ambiguity_question": null
     },
@@ -2165,7 +2165,7 @@
     },
     {
       "scene_id": "09/35",
-      "stable_name": "Alexova gitara",
+      "stable_name": "Alexova gitara od Lukáša",
       "source_evidence": "Lea vidí, že Sára manipuluje Alexom Alex práve docvičil na gitare, odkladá ju do puzdra a zatvára ho.",
       "evidence_phrase": "Alex práve docvičil na gitare",
       "physical_presence": true,

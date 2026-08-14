@@ -86,7 +86,7 @@ def runtime_state(api):
         }):
             cards_by_id[card["id"]] = card
     search = api["trello_get"]("/search", {
-        "query": "Alexova gitara", "idBoards": board["id"],
+        "query": "Alexova gitara od Lukáša", "idBoards": board["id"],
         "modelTypes": "cards", "cards_limit": 100,
         "card_fields": "id,name,desc,idList,shortUrl,closed,idLabels",
     })
@@ -495,12 +495,32 @@ def occurrence_link(scene, card):
     return f"- [{scene['scene_id']} – {scene['prepis']}]({card['shortUrl']})"
 
 
+def merged_occurrence_links(existing_desc, new_links):
+    existing = re.findall(
+        r"(?m)^- \[[^\n]+\]\(https://trello\.com/c/[^)]+\)$",
+        existing_desc or "",
+    )
+    result = []
+    seen_urls = set()
+    for line in [*existing, *new_links]:
+        match = re.search(r"https://trello\.com/c/[^)]+", line)
+        key = match.group(0) if match else line
+        if key in seen_urls:
+            continue
+        seen_urls.add(key)
+        result.append(line)
+    return result
+
+
 def sync_prop_master(api, state, row, scenes_by_id, cards_by_id, label_ids):
     if len(row["matches"]) != 1:
         raise ValueError(f"prop master conflict: {row['name']}")
     master = next(card for card in state["cards"] if card["id"] == row["matches"][0]["id"])
     occurrence_ids = [scene_id for scene_id in row["scene_ids"] if scene_id in cards_by_id]
-    occurrences = [occurrence_link(scenes_by_id[sid], cards_by_id[sid]) for sid in occurrence_ids]
+    occurrences = merged_occurrence_links(
+        master.get("desc"),
+        [occurrence_link(scenes_by_id[sid], cards_by_id[sid]) for sid in occurrence_ids],
+    )
     block = prop_registry_block(row["name"], row["categories"], occurrences)
     desired_desc = replace_auto_block(master.get("desc"), PROP_AUTO_START, PROP_AUTO_END, block)
     desired_labels = sorted(set(master.get("idLabels", [])) | {
@@ -531,7 +551,10 @@ def sync_space_master(api, state, row, scenes, cards_by_id, space_map):
         raise ValueError(f"space master conflict: {row['name']}")
     master = next(card for card in state["cards"] if card["id"] == row["matches"][0]["id"])
     related = [scene for scene in scenes if row["name"] in location_names(scene, space_map) and scene["scene_id"] in cards_by_id]
-    links = [occurrence_link(scene, cards_by_id[scene["scene_id"]]) for scene in related]
+    links = merged_occurrence_links(
+        master.get("desc"),
+        [occurrence_link(scene, cards_by_id[scene["scene_id"]]) for scene in related],
+    )
     desired = space_registry_description(row["name"])
     desired = desired.replace(
         "- Odkazy sa doplnia po vytvorení obrazových kariet.",

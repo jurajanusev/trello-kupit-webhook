@@ -12,8 +12,8 @@ if "flask" not in sys.modules:
     sys.modules["flask"] = flask_stub
 
 from cierny_kamen_ep07_10_import import (
-    CHECKLIST_NAMES, folded, prop_item_text, registry_aliases, registry_plan,
-    runtime_state,
+    CHECKLIST_NAMES, folded, merged_occurrence_links, prop_item_text,
+    registry_aliases, registry_plan, runtime_state,
 )
 
 
@@ -125,7 +125,7 @@ class Ep0710ImportTest(unittest.TestCase):
         self.assertEqual("open", card_call[1]["filter"])
         self.assertFalse(any(item[0] == "/lists/archived-list/cards" for item in calls))
         search_call = next(item for item in calls if item[0] == "/search")
-        self.assertEqual("Alexova gitara", search_call[1]["query"])
+        self.assertEqual("Alexova gitara od Lukáša", search_call[1]["query"])
 
     def test_existing_master_in_legacy_prop_list_is_reused(self):
         state = {
@@ -149,6 +149,16 @@ class Ep0710ImportTest(unittest.TestCase):
         self.assertEqual("reuse", row["status"])
         self.assertEqual("ALEX – OS. REKVIZITY", row["target_list"])
         self.assertEqual("guitar", row["matches"][0]["id"])
+
+    def test_backlink_merge_preserves_old_occurrences(self):
+        old = "### VÝSKYTY\n- [06/47 – Starý výskyt](https://trello.com/c/old)"
+        merged = merged_occurrence_links(old, [
+            "- [06/47 – Starý výskyt](https://trello.com/c/old)",
+            "- [08/41 – Nový výskyt](https://trello.com/c/new)",
+        ])
+        self.assertEqual(2, len(merged))
+        self.assertIn("https://trello.com/c/old", merged[0])
+        self.assertIn("https://trello.com/c/new", merged[1])
 
 
 if __name__ == "__main__":
