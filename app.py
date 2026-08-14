@@ -3532,6 +3532,9 @@ def sync_dunaj_schedule():
                 return jsonify({"error": "Trello card pagination did not advance"}), 502
             seen_page_ends.add(page_end)
             before = page_end
+    # Trello's `before` pages can overlap around list-position changes. Keep
+    # one current copy of each physical card before matching scene numbers.
+    cards = list({card["id"]: card for card in cards}.values())
 
     cards_by_scene = {}
     for card in cards:
