@@ -1,0 +1,3186 @@
+{
+  "source": "cierny_kamen_ep07_10_scenes.json",
+  "record_count": 184,
+  "scene_count_with_props": 114,
+  "records": [
+    {
+      "scene_id": "07/01LP",
+      "stable_name": "Dogyho osobný mobil",
+      "source_evidence": "Zazvoní budík (na mobile), Dogy sa strhne zo spánku, chvíľu je dezorientovaný z toho, kde je.",
+      "evidence_phrase": "Zazvoní budík (na mobile)",
+      "physical_presence": true,
+      "owner": "DOGY",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "dogy-mobile",
+      "action": "Zazvoní budík (na mobile), Dogy sa strhne zo spánku, chvíľu je dezorientovaný z toho, kde je.",
+      "current_state": "Zazvoní budík (na mobile), Dogy sa strhne zo spánku, chvíľu je dezorientovaný z toho, kde je.",
+      "previous": null,
+      "next": "08/26",
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/02LP",
+      "stable_name": "Dogyho uterák",
+      "source_evidence": "Dogy ide po chodbe v pyžame s uterákom a kefkou.",
+      "evidence_phrase": "v pyžame s uterákom",
+      "physical_presence": true,
+      "owner": "DOGY",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Dogy ide po chodbe v pyžame s uterákom a kefkou.",
+      "current_state": "Dogy ide po chodbe v pyžame s uterákom a kefkou.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/02LP",
+      "stable_name": "Dogyho zubná kefka",
+      "source_evidence": "Dogy ide po chodbe v pyžame s uterákom a kefkou.",
+      "evidence_phrase": "s uterákom a kefkou",
+      "physical_presence": true,
+      "owner": "DOGY",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Dogy ide po chodbe v pyžame s uterákom a kefkou.",
+      "current_state": "Dogy ide po chodbe v pyžame s uterákom a kefkou.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/03",
+      "stable_name": "Dogyho uterák",
+      "source_evidence": "Dogy stojí v uteráku pred zrkadlom a češe si vlasy.",
+      "evidence_phrase": "Dogy stojí v uteráku",
+      "physical_presence": true,
+      "owner": "DOGY",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Dogy stojí v uteráku pred zrkadlom a češe si vlasy.",
+      "current_state": "Dogy stojí v uteráku pred zrkadlom a češe si vlasy.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/03",
+      "stable_name": "Dogyho hrebeň",
+      "source_evidence": "Dogy stojí v uteráku pred zrkadlom a češe si vlasy.",
+      "evidence_phrase": "češe si vlasy",
+      "physical_presence": true,
+      "owner": "DOGY",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Dogy stojí v uteráku pred zrkadlom a češe si vlasy.",
+      "current_state": "Dogy stojí v uteráku pred zrkadlom a češe si vlasy.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/04",
+      "stable_name": "Dogyho spacák",
+      "source_evidence": "Medzi čistiacimi prostriedkami, gumenými rukavicami, metlami, mopmi a vedrami leží Dogyho spacák, viaceré tašky s vecami na oblečenie, knihy.",
+      "evidence_phrase": "Dogyho spacák",
+      "physical_presence": true,
+      "owner": "DOGY",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": "dogy-spacak",
+      "action": "Medzi čistiacimi prostriedkami, gumenými rukavicami, metlami, mopmi a vedrami leží Dogyho spacák, viaceré tašky s vecami na oblečenie, knihy.",
+      "current_state": "Medzi čistiacimi prostriedkami, gumenými rukavicami, metlami, mopmi a vedrami leží Dogyho spacák, viaceré tašky s vecami na oblečenie, knihy.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/04",
+      "stable_name": "Dogyho tašky s oblečením",
+      "source_evidence": "Medzi čistiacimi prostriedkami, gumenými rukavicami, metlami, mopmi a vedrami leží Dogyho spacák, viaceré tašky s vecami na oblečenie, knihy.",
+      "evidence_phrase": "viaceré tašky s vecami na oblečenie",
+      "physical_presence": true,
+      "owner": "DOGY",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Medzi čistiacimi prostriedkami, gumenými rukavicami, metlami, mopmi a vedrami leží Dogyho spacák, viaceré tašky s vecami na oblečenie, knihy.",
+      "current_state": "Medzi čistiacimi prostriedkami, gumenými rukavicami, metlami, mopmi a vedrami leží Dogyho spacák, viaceré tašky s vecami na oblečenie, knihy.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/04",
+      "stable_name": "Dogyho knihy v kumbále",
+      "source_evidence": "Medzi čistiacimi prostriedkami, gumenými rukavicami, metlami, mopmi a vedrami leží Dogyho spacák, viaceré tašky s vecami na oblečenie, knihy.",
+      "evidence_phrase": "knihy",
+      "physical_presence": true,
+      "owner": "DOGY",
+      "categories": [
+        "Osobná rekvizita",
+        "Dokument"
+      ],
+      "continuity_group": null,
+      "action": "Medzi čistiacimi prostriedkami, gumenými rukavicami, metlami, mopmi a vedrami leží Dogyho spacák, viaceré tašky s vecami na oblečenie, knihy.",
+      "current_state": "Medzi čistiacimi prostriedkami, gumenými rukavicami, metlami, mopmi a vedrami leží Dogyho spacák, viaceré tašky s vecami na oblečenie, knihy.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/05",
+      "stable_name": "Krabice s vybavením Veronikinej izby",
+      "source_evidence": "Gajdoš položí škatule na stôl.",
+      "evidence_phrase": "Gajdoš položí škatule",
+      "physical_presence": true,
+      "owner": "VERONIKA",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Gajdoš položí škatule na stôl.",
+      "current_state": "Gajdoš položí škatule na stôl.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": "Upresniť presný obsah a počet krabíc s vybavením Veronikinej izby."
+    },
+    {
+      "scene_id": "07/06",
+      "stable_name": "Kikov osobný mobil",
+      "source_evidence": "Kiko počas rozhovoru skroluje v mobile, občas zdvihne hlavu.",
+      "evidence_phrase": "Kiko počas rozhovoru skroluje v mobile",
+      "physical_presence": true,
+      "owner": "KIKO",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "kiko-mobile",
+      "action": "Kiko počas rozhovoru skroluje v mobile, občas zdvihne hlavu.",
+      "current_state": "Kiko počas rozhovoru skroluje v mobile, občas zdvihne hlavu.",
+      "previous": null,
+      "next": "07/10",
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/06",
+      "stable_name": "Lolin osobný mobil",
+      "source_evidence": "Lola pri automate vytiahne mobil a začne písať smsku (Sáre).",
+      "evidence_phrase": "Lola pri automate vytiahne mobil",
+      "physical_presence": true,
+      "owner": "LOLA",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": "lola-mobile",
+      "action": "Lola pri automate vytiahne mobil a začne písať smsku (Sáre).",
+      "current_state": "Lola pri automate vytiahne mobil a začne písať smsku (Sáre).",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/06",
+      "stable_name": "Lolina správa Sáre o Bety a Dogym",
+      "source_evidence": "Lola pri automate vytiahne mobil a začne písať smsku (Sáre).",
+      "evidence_phrase": "začne písať smsku (Sáre)",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [
+        "Screen"
+      ],
+      "continuity_group": null,
+      "action": "Lola pri automate vytiahne mobil a začne písať smsku (Sáre).",
+      "current_state": "Lola pri automate vytiahne mobil a začne písať smsku (Sáre).",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/08",
+      "stable_name": "Betin školský zošit",
+      "source_evidence": "Bety si číta poznámky zo zošita pred hodinou.",
+      "evidence_phrase": "poznámky zo zošita",
+      "physical_presence": true,
+      "owner": "BETY",
+      "categories": [
+        "Osobná rekvizita",
+        "Dokument"
+      ],
+      "continuity_group": null,
+      "action": "Bety si číta poznámky zo zošita pred hodinou.",
+      "current_state": "Bety si číta poznámky zo zošita pred hodinou.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/10",
+      "stable_name": "Kikov osobný mobil",
+      "source_evidence": "Bety mu z ruky vytrhne mobil.",
+      "evidence_phrase": "Bety mu z ruky vytrhne mobil",
+      "physical_presence": true,
+      "owner": "KIKO",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "kiko-mobile",
+      "action": "Bety mu z ruky vytrhne mobil.",
+      "current_state": "Bety mu z ruky vytrhne mobil.",
+      "previous": "07/06",
+      "next": "07/32",
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/10",
+      "stable_name": "Sárina Instagram story o Sofii",
+      "source_evidence": "Sára práve zverejnila storku so Sofiinou fotkou.",
+      "evidence_phrase": "Sára práve zverejnila storku so Sofiinou fotkou",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [
+        "Screen",
+        "Dokument"
+      ],
+      "continuity_group": null,
+      "action": "Sára práve zverejnila storku so Sofiinou fotkou.",
+      "current_state": "Sára práve zverejnila storku so Sofiinou fotkou.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/12",
+      "stable_name": "Andyho fľaše od piva",
+      "source_evidence": "Je tam neporiadok – všade ležia rozhádzané veci, neumytý riad, na stole sú ďalšie prázdne fľaše.",
+      "evidence_phrase": "ďalšie prázdne fľaše",
+      "physical_presence": true,
+      "owner": "ANDY",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Je tam neporiadok – všade ležia rozhádzané veci, neumytý riad, na stole sú ďalšie prázdne fľaše.",
+      "current_state": "Je tam neporiadok – všade ležia rozhádzané veci, neumytý riad, na stole sú ďalšie prázdne fľaše.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/12",
+      "stable_name": "Andyho fľaša piva",
+      "source_evidence": "Kašeľ zapije pivom, fľašku ledabolo odloží.",
+      "evidence_phrase": "Kašeľ zapije pivom",
+      "physical_presence": true,
+      "owner": "ANDY",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Kašeľ zapije pivom, fľašku ledabolo odloží.",
+      "current_state": "Kašeľ zapije pivom, fľašku ledabolo odloží.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/13",
+      "stable_name": "Betin osobný mobil",
+      "source_evidence": "Bety vytiahne mobil a ukáže ho, aby ho všetci videli.",
+      "evidence_phrase": "Bety vytiahne mobil",
+      "physical_presence": true,
+      "owner": "BETY",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "bety-mobile",
+      "action": "Bety vytiahne mobil a ukáže ho, aby ho všetci videli.",
+      "current_state": "Bety vytiahne mobil a ukáže ho, aby ho všetci videli.",
+      "previous": null,
+      "next": "09/08",
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/19",
+      "stable_name": "Ivanova podcastová kamera",
+      "source_evidence": "Ivan pripravuje kameru, mikrofón, všetko skúša, vracia sa k počítaču, aby všetko nastavil a všetko fungovalo.",
+      "evidence_phrase": "Ivan pripravuje kameru",
+      "physical_presence": true,
+      "owner": "IVAN",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": "ivan-podcast-camera",
+      "action": "Ivan pripravuje kameru, mikrofón, všetko skúša, vracia sa k počítaču, aby všetko nastavil a všetko fungovalo.",
+      "current_state": "Ivan pripravuje kameru, mikrofón, všetko skúša, vracia sa k počítaču, aby všetko nastavil a všetko fungovalo.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/19",
+      "stable_name": "Ivanov podcastový mikrofón",
+      "source_evidence": "Ivan pripravuje kameru, mikrofón, všetko skúša, vracia sa k počítaču, aby všetko nastavil a všetko fungovalo.",
+      "evidence_phrase": "mikrofón",
+      "physical_presence": true,
+      "owner": "IVAN",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": "ivan-podcast-microphone",
+      "action": "Ivan pripravuje kameru, mikrofón, všetko skúša, vracia sa k počítaču, aby všetko nastavil a všetko fungovalo.",
+      "current_state": "Ivan pripravuje kameru, mikrofón, všetko skúša, vracia sa k počítaču, aby všetko nastavil a všetko fungovalo.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/19",
+      "stable_name": "Ivanov počítač na podcast",
+      "source_evidence": "Ivan pripravuje kameru, mikrofón, všetko skúša, vracia sa k počítaču, aby všetko nastavil a všetko fungovalo.",
+      "evidence_phrase": "vracia sa k počítaču",
+      "physical_presence": true,
+      "owner": "IVAN",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": "ivan-podcast-computer",
+      "action": "Ivan pripravuje kameru, mikrofón, všetko skúša, vracia sa k počítaču, aby všetko nastavil a všetko fungovalo.",
+      "current_state": "Ivan pripravuje kameru, mikrofón, všetko skúša, vracia sa k počítaču, aby všetko nastavil a všetko fungovalo.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/19",
+      "stable_name": "Alicino podcastové vyhlásenie o Sofii",
+      "source_evidence": "Na obrazovke sa rozbliká REC.",
+      "evidence_phrase": "Na obrazovke sa rozbliká REC",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [
+        "Screen",
+        "Dokument"
+      ],
+      "continuity_group": null,
+      "action": "Na obrazovke sa rozbliká REC.",
+      "current_state": "Na obrazovke sa rozbliká REC.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/20",
+      "stable_name": "Notebook Révayovcov",
+      "source_evidence": "Na jedálenskom stole má Oskar otvorený laptop.",
+      "evidence_phrase": "Oskar otvorený laptop",
+      "physical_presence": true,
+      "owner": "OSKAR",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": "revay-family-laptop",
+      "action": "Na jedálenskom stole má Oskar otvorený laptop.",
+      "current_state": "Na jedálenskom stole má Oskar otvorený laptop.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/20",
+      "stable_name": "Alicino podcastové vyhlásenie o Sofii",
+      "source_evidence": "Pozerajú Alicin LIVE podcast (časť z jej príhovoru, vidíme už cez Révayov laptop).",
+      "evidence_phrase": "Pozerajú Alicin LIVE podcast",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [
+        "Screen",
+        "Dokument"
+      ],
+      "continuity_group": null,
+      "action": "Pozerajú Alicin LIVE podcast (časť z jej príhovoru, vidíme už cez Révayov laptop).",
+      "current_state": "Pozerajú Alicin LIVE podcast (časť z jej príhovoru, vidíme už cez Révayov laptop).",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/24",
+      "stable_name": "Lukášov pracovný počítač na stavbe",
+      "source_evidence": "Lukáš sedí za počítačom vo svojej provizórnej kancelárii v unimobunke a sústredene pracuje.",
+      "evidence_phrase": "Lukáš sedí za počítačom",
+      "physical_presence": true,
+      "owner": "LUKÁŠ",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Lukáš sedí za počítačom vo svojej provizórnej kancelárii v unimobunke a sústredene pracuje.",
+      "current_state": "Lukáš sedí za počítačom vo svojej provizórnej kancelárii v unimobunke a sústredene pracuje.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/24",
+      "stable_name": "Lukášov osobný mobil",
+      "source_evidence": "Lukášovi uprostred vety začne zvoniť mobil.",
+      "evidence_phrase": "Lukášovi uprostred vety začne zvoniť mobil",
+      "physical_presence": true,
+      "owner": "LUKÁŠ",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "lukas-mobile",
+      "action": "Lukášovi uprostred vety začne zvoniť mobil.",
+      "current_state": "Lukášovi uprostred vety začne zvoniť mobil.",
+      "previous": null,
+      "next": "08/13",
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/25",
+      "stable_name": "Ivanov osobný mobil",
+      "source_evidence": "Ivan sa pozerá do mobilu.",
+      "evidence_phrase": "Ivan sa pozerá do mobilu",
+      "physical_presence": true,
+      "owner": "IVAN",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": "ivan-mobile",
+      "action": "Ivan sa pozerá do mobilu.",
+      "current_state": "Ivan sa pozerá do mobilu.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/23",
+      "stable_name": "Betina baterka na povale",
+      "source_evidence": "Pomaly kráča ďalej a vidí rôzne zaprášené škatule, boxy a svieti si na nich baterkou.",
+      "evidence_phrase": "svieti si na nich baterkou",
+      "physical_presence": true,
+      "owner": "BETY",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Pomaly kráča ďalej a vidí rôzne zaprášené škatule, boxy a svieti si na nich baterkou.",
+      "current_state": "Pomaly kráča ďalej a vidí rôzne zaprášené škatule, boxy a svieti si na nich baterkou.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/28",
+      "stable_name": "Mini basketbalová lopta v Lukášovej unimobunke",
+      "source_evidence": "Sieťkou na mini basketbalovom koši na stene v Lukášovej unimobunke prepadne malá basketbalka.",
+      "evidence_phrase": "prepadne malá basketbalka",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "Sieťkou na mini basketbalovom koši na stene v Lukášovej unimobunke prepadne malá basketbalka.",
+      "current_state": "Sieťkou na mini basketbalovom koši na stene v Lukášovej unimobunke prepadne malá basketbalka.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/29",
+      "stable_name": "Burgre, hranolky a nápoje Alexa, Dogyho a Andyho",
+      "source_evidence": "Pred nimi sú rozjedené/dojedené burgre, hranolky, nápoje.",
+      "evidence_phrase": "rozjedené/dojedené burgre",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "Pred nimi sú rozjedené/dojedené burgre, hranolky, nápoje.",
+      "current_state": "Pred nimi sú rozjedené/dojedené burgre, hranolky, nápoje.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/29",
+      "stable_name": "Andyho peňaženka",
+      "source_evidence": "Andy začne hľadať peňaženku, Dogy začne tiež vyťahovať peniaze (bojí sa, že Andy nemá peniaze).",
+      "evidence_phrase": "Andy začne hľadať peňaženku",
+      "physical_presence": true,
+      "owner": "ANDY",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Andy začne hľadať peňaženku, Dogy začne tiež vyťahovať peniaze (bojí sa, že Andy nemá peniaze).",
+      "current_state": "Andy začne hľadať peňaženku, Dogy začne tiež vyťahovať peniaze (bojí sa, že Andy nemá peniaze).",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/29",
+      "stable_name": "Dogyho peniaze od mamy",
+      "source_evidence": "To sú peniaze od mamy.",
+      "evidence_phrase": "To sú peniaze od mamy",
+      "physical_presence": true,
+      "owner": "DOGY",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "To sú peniaze od mamy.",
+      "current_state": "To sú peniaze od mamy.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/29",
+      "stable_name": "Účet za jedlo vo Fefe Beef",
+      "source_evidence": "Vráti sa Fefe s účtom a Andy mu podáva peniaze.",
+      "evidence_phrase": "Vráti sa Fefe s účtom",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [
+        "Dokument"
+      ],
+      "continuity_group": null,
+      "action": "Vráti sa Fefe s účtom a Andy mu podáva peniaze.",
+      "current_state": "Vráti sa Fefe s účtom a Andy mu podáva peniaze.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/30",
+      "stable_name": "Laurin notebook",
+      "source_evidence": "Laura sedí v obývačke s vyloženými nohami, na ktorých má notebook, niečo si číta a v ruke pohár vína.",
+      "evidence_phrase": "na ktorých má notebook",
+      "physical_presence": true,
+      "owner": "LAURA",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": "laura-notebook",
+      "action": "Laura sedí v obývačke s vyloženými nohami, na ktorých má notebook, niečo si číta a v ruke pohár vína.",
+      "current_state": "Laura sedí v obývačke s vyloženými nohami, na ktorých má notebook, niečo si číta a v ruke pohár vína.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/30",
+      "stable_name": "Laurin pohár vína",
+      "source_evidence": "Laura sedí v obývačke s vyloženými nohami, na ktorých má notebook, niečo si číta a v ruke pohár vína.",
+      "evidence_phrase": "v ruke pohár vína",
+      "physical_presence": true,
+      "owner": "LAURA",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Laura sedí v obývačke s vyloženými nohami, na ktorých má notebook, niečo si číta a v ruke pohár vína.",
+      "current_state": "Laura sedí v obývačke s vyloženými nohami, na ktorých má notebook, niečo si číta a v ruke pohár vína.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/30",
+      "stable_name": "Veronikina kabelka",
+      "source_evidence": "Z kabelky si vyberie rúž a kabelku si položí na gauč k mame.",
+      "evidence_phrase": "Z kabelky si vyberie rúž",
+      "physical_presence": true,
+      "owner": "VERONIKA",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "veronika-kabelka",
+      "action": "Z kabelky si vyberie rúž a kabelku si položí na gauč k mame.",
+      "current_state": "Z kabelky si vyberie rúž a kabelku si položí na gauč k mame.",
+      "previous": null,
+      "next": "07/39",
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/30",
+      "stable_name": "Veronikin rúž",
+      "source_evidence": "Z kabelky si vyberie rúž a kabelku si položí na gauč k mame.",
+      "evidence_phrase": "vyberie rúž",
+      "physical_presence": true,
+      "owner": "VERONIKA",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Z kabelky si vyberie rúž a kabelku si položí na gauč k mame.",
+      "current_state": "Z kabelky si vyberie rúž a kabelku si položí na gauč k mame.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/30",
+      "stable_name": "Veronikin osobný mobil",
+      "source_evidence": "Veronika sa postaví pred zrkadlo, alebo sa pozerá do mobilu (aby sa videla) a začne si maľovať pery.",
+      "evidence_phrase": "pozerá do mobilu",
+      "physical_presence": true,
+      "owner": "VERONIKA",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": "veronika-mobile",
+      "action": "Veronika sa postaví pred zrkadlo, alebo sa pozerá do mobilu (aby sa videla) a začne si maľovať pery.",
+      "current_state": "Veronika sa postaví pred zrkadlo, alebo sa pozerá do mobilu (aby sa videla) a začne si maľovať pery.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": "Potvrdiť, či sa Veronika líči podľa zrkadla alebo podľa mobilu; scenár uvádza alternatívu."
+    },
+    {
+      "scene_id": "07/32",
+      "stable_name": "Drinky Kika, Veroniky, Beky a Seba",
+      "source_evidence": "Kiko, Veronika, Beka a Sebo sa vracajú ku stolu, každý s drinkom v ruke.",
+      "evidence_phrase": "každý s drinkom v ruke",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "Kiko, Veronika, Beka a Sebo sa vracajú ku stolu, každý s drinkom v ruke.",
+      "current_state": "Kiko, Veronika, Beka a Sebo sa vracajú ku stolu, každý s drinkom v ruke.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/32",
+      "stable_name": "Kikov osobný mobil",
+      "source_evidence": "Kiko chytí mobil a ukáže jej obrazovku: 21:50.",
+      "evidence_phrase": "Kiko chytí mobil",
+      "physical_presence": true,
+      "owner": "KIKO",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "kiko-mobile",
+      "action": "Kiko chytí mobil a ukáže jej obrazovku: 21:50.",
+      "current_state": "Kiko chytí mobil a ukáže jej obrazovku: 21:50.",
+      "previous": "07/10",
+      "next": "10/25",
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/33",
+      "stable_name": "Basketbalová lopta Alexa a Andyho",
+      "source_evidence": "Alex a Andy hrajú basketbal jeden na jedného.",
+      "evidence_phrase": "Alex a Andy hrajú basketbal",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "Alex a Andy hrajú basketbal jeden na jedného.",
+      "current_state": "Alex a Andy hrajú basketbal jeden na jedného.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/36",
+      "stable_name": "Drinky Kika, Veroniky a Seba",
+      "source_evidence": "Kiko zdvihne pohár a jediný, kto si s ním cinkne je Sebo.",
+      "evidence_phrase": "Kiko zdvihne pohár",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "Kiko zdvihne pohár a jediný, kto si s ním cinkne je Sebo.",
+      "current_state": "Kiko zdvihne pohár a jediný, kto si s ním cinkne je Sebo.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/36",
+      "stable_name": "Platobný terminál diskotéky",
+      "source_evidence": "Vtom k nim príde čašník s ďalším drinkom, čo si objednali aj s terminálom.",
+      "evidence_phrase": "aj s terminálom",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "Vtom k nim príde čašník s ďalším drinkom, čo si objednali aj s terminálom.",
+      "current_state": "Vtom k nim príde čašník s ďalším drinkom, čo si objednali aj s terminálom.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/36",
+      "stable_name": "Veronikina hotovosť na zaplatenie",
+      "source_evidence": "Veronika vyberie peniaze a podá ich čašníkovi.",
+      "evidence_phrase": "Veronika vyberie peniaze",
+      "physical_presence": true,
+      "owner": "VERONIKA",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Veronika vyberie peniaze a podá ich čašníkovi.",
+      "current_state": "Veronika vyberie peniaze a podá ich čašníkovi.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/37",
+      "stable_name": "Fľaše v Dogyho chatke",
+      "source_evidence": "Po ceste zvalia zopár fliaš.",
+      "evidence_phrase": "zvalia zopár fliaš",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "Po ceste zvalia zopár fliaš.",
+      "current_state": "Po ceste zvalia zopár fliaš.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/39",
+      "stable_name": "Veronikina kabelka",
+      "source_evidence": "Odkladá kabelku, vyzlieka si kabát.",
+      "evidence_phrase": "Odkladá kabelku",
+      "physical_presence": true,
+      "owner": "VERONIKA",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "veronika-kabelka",
+      "action": "Odkladá kabelku, vyzlieka si kabát.",
+      "current_state": "Odkladá kabelku, vyzlieka si kabát.",
+      "previous": "07/30",
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/40",
+      "stable_name": "Kelerova vyšetrovacia nástenka",
+      "source_evidence": "Pri nástenke (je vernou kópiou tej, ktorú mal Keler doma a ktorú mu niekto zničil) stojí riaditeľ Čmelský a Keler.",
+      "evidence_phrase": "Pri nástenke",
+      "physical_presence": true,
+      "owner": "KELER",
+      "categories": [
+        "Osobná rekvizita",
+        "Dokument"
+      ],
+      "continuity_group": "keler-investigation-board",
+      "action": "Pri nástenke (je vernou kópiou tej, ktorú mal Keler doma a ktorú mu niekto zničil) stojí riaditeľ Čmelský a Keler.",
+      "current_state": "Pri nástenke (je vernou kópiou tej, ktorú mal Keler doma a ktorú mu niekto zničil) stojí riaditeľ Čmelský a Keler.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/42",
+      "stable_name": "Kelerov vyšetrovací spis Dogyho",
+      "source_evidence": "Keler si odkašle a otvorí spis.",
+      "evidence_phrase": "Keler si odkašle a otvorí spis",
+      "physical_presence": true,
+      "owner": "KELER",
+      "categories": [
+        "Osobná rekvizita",
+        "Dokument"
+      ],
+      "continuity_group": "keler-dogy-file",
+      "action": "Keler si odkašle a otvorí spis.",
+      "current_state": "Keler si odkašle a otvorí spis.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/47",
+      "stable_name": "Laurin osobný mobil",
+      "source_evidence": "Laura a Veronika sedia pri stole a čakajú kým Laure zazvoní mobil.",
+      "evidence_phrase": "Laure zazvoní mobil",
+      "physical_presence": true,
+      "owner": "LAURA",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": "laura-mobile",
+      "action": "Laura a Veronika sedia pri stole a čakajú kým Laure zazvoní mobil.",
+      "current_state": "Laura a Veronika sedia pri stole a čakajú kým Laure zazvoní mobil.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/43",
+      "stable_name": "Sárina podložka na jogu",
+      "source_evidence": "V izbe má rozloženú podložku a cvičí jogu – pes s tvárou nadol.",
+      "evidence_phrase": "rozloženú podložku",
+      "physical_presence": true,
+      "owner": "SÁRA",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "V izbe má rozloženú podložku a cvičí jogu – pes s tvárou nadol.",
+      "current_state": "V izbe má rozloženú podložku a cvičí jogu – pes s tvárou nadol.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/50",
+      "stable_name": "Dogyho nafukovací matrac u Alexa",
+      "source_evidence": "Alex nafukuje Dogymu posteľ, alebo mu ustiela na matraci.",
+      "evidence_phrase": "nafukuje Dogymu posteľ",
+      "physical_presence": true,
+      "owner": "DOGY",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "dogy-mattress-alex",
+      "action": "Alex nafukuje Dogymu posteľ, alebo mu ustiela na matraci.",
+      "current_state": "Alex nafukuje Dogymu posteľ, alebo mu ustiela na matraci.",
+      "previous": null,
+      "next": "10/43",
+      "ambiguity_question": "Vybrať, či bude použitá nafukovacia posteľ alebo samostatný matrac; scenár uvádza alternatívu."
+    },
+    {
+      "scene_id": "07/51",
+      "stable_name": "Andyho fľaša piva",
+      "source_evidence": "Otvára si v fľašu a tackavo prejde až ku gauču, kde sa zvalí.",
+      "evidence_phrase": "Otvára si v fľašu",
+      "physical_presence": true,
+      "owner": "ANDY",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Otvára si v fľašu a tackavo prejde až ku gauču, kde sa zvalí.",
+      "current_state": "Otvára si v fľašu a tackavo prejde až ku gauču, kde sa zvalí.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "07/51",
+      "stable_name": "Jakubova basketbalová bunda s číslom 9",
+      "source_evidence": "Potom kamera zaberie skriňu, kde visí Jakubova basketbalová bunda s číslom 9, ktorú našli Bety a Dogy v aute, ktoré potom zhorelo.",
+      "evidence_phrase": "Jakubova basketbalová bunda s číslom 9",
+      "physical_presence": true,
+      "owner": "JAKUB",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "jakub-jersey-9",
+      "action": "Potom kamera zaberie skriňu, kde visí Jakubova basketbalová bunda s číslom 9, ktorú našli Bety a Dogy v aute, ktoré potom zhorelo.",
+      "current_state": "Potom kamera zaberie skriňu, kde visí Jakubova basketbalová bunda s číslom 9, ktorú našli Bety a Dogy v aute, ktoré potom zhorelo.",
+      "previous": null,
+      "next": "08/42",
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/01LP",
+      "stable_name": "Spoločenské hry Debnárovcov",
+      "source_evidence": "KLIP: Niekoľko záberov na Debnárovcov ako šťastnú rodinu, pri rôznych činnostiach ako varenie, prestieranie stola, hranie spoločenských hier a podobne.",
+      "evidence_phrase": "hranie spoločenských hier",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "KLIP: Niekoľko záberov na Debnárovcov ako šťastnú rodinu, pri rôznych činnostiach ako varenie, prestieranie stola, hranie spoločenských hier a podobne.",
+      "current_state": "KLIP: Niekoľko záberov na Debnárovcov ako šťastnú rodinu, pri rôznych činnostiach ako varenie, prestieranie stola, hranie spoločenských hier a podobne.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": "Upresniť konkrétne spoločenské hry a počet kusov pre rodinný klip."
+    },
+    {
+      "scene_id": "08/02LP",
+      "stable_name": "Dogyho spisovateľský notebook",
+      "source_evidence": "Dogy sedí pri barovom pulte v bistre a ťuká do notebooku.",
+      "evidence_phrase": "ťuká do notebooku",
+      "physical_presence": true,
+      "owner": "DOGY",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "dogy-writer-notebook",
+      "action": "Dogy sedí pri barovom pulte v bistre a ťuká do notebooku.",
+      "current_state": "Dogy sedí pri barovom pulte v bistre a ťuká do notebooku.",
+      "previous": null,
+      "next": "10/01LP",
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/06FLASH",
+      "stable_name": "Rodinný starožitný prsteň Révayovcov",
+      "source_evidence": "Stará mama sedí na vozíčku, vyzerá neobvykle príčetne, a vkladá Jakubovi do ruky rodinný starožitný prsteň.",
+      "evidence_phrase": "rodinný starožitný prsteň",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "revay-engagement-ring",
+      "action": "Stará mama sedí na vozíčku, vyzerá neobvykle príčetne, a vkladá Jakubovi do ruky rodinný starožitný prsteň.",
+      "current_state": "Stará mama sedí na vozíčku, vyzerá neobvykle príčetne, a vkladá Jakubovi do ruky rodinný starožitný prsteň.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/07FLASH",
+      "stable_name": "Limonády Jakuba a Sofie vo Fefe Beef",
+      "source_evidence": "Jakub a Sofia sedia u Fefeho pri stole, pijú limonádu, držia sa za ruky a plánujú útek.",
+      "evidence_phrase": "pijú limonádu",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "Jakub a Sofia sedia u Fefeho pri stole, pijú limonádu, držia sa za ruky a plánujú útek.",
+      "current_state": "Jakub a Sofia sedia u Fefeho pri stole, pijú limonádu, držia sa za ruky a plánujú útek.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/09",
+      "stable_name": "Alexova herná konzola",
+      "source_evidence": "Alex a Dogy drtia v neupratanej izbe nejakú bojovú hru na playku, celkom dobre sa pri tom bavia.",
+      "evidence_phrase": "nejakú bojovú hru na playku",
+      "physical_presence": true,
+      "owner": "ALEX",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "alex-game-console",
+      "action": "Alex a Dogy drtia v neupratanej izbe nejakú bojovú hru na playku, celkom dobre sa pri tom bavia.",
+      "current_state": "Alex a Dogy drtia v neupratanej izbe nejakú bojovú hru na playku, celkom dobre sa pri tom bavia.",
+      "previous": null,
+      "next": "10/06",
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/11",
+      "stable_name": "Stavebné dokumenty Laury a Lukáša",
+      "source_evidence": "Laura a Lukáš práve preberajú niečo s papiermi v rukách a obrátia sa na prichádzajúceho Viliama.",
+      "evidence_phrase": "s papiermi v rukách",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [
+        "Dokument"
+      ],
+      "continuity_group": null,
+      "action": "Laura a Lukáš práve preberajú niečo s papiermi v rukách a obrátia sa na prichádzajúceho Viliama.",
+      "current_state": "Laura a Lukáš práve preberajú niečo s papiermi v rukách a obrátia sa na prichádzajúceho Viliama.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": "Upresniť druh a obsah papierov, ktoré Laura a Lukáš preberajú s Viliamom."
+    },
+    {
+      "scene_id": "08/13",
+      "stable_name": "Lukášov osobný mobil",
+      "source_evidence": "Lukáš nervózne pochoduje po kuchyni a po telefóne sa snaží zohnať nových robotníkov na finálne čistenie pozemku od sutín starej stavby a prvé výkopové práce.",
+      "evidence_phrase": "po telefóne sa snaží zohnať nových robotníkov",
+      "physical_presence": true,
+      "owner": "LUKÁŠ",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "lukas-mobile",
+      "action": "Lukáš nervózne pochoduje po kuchyni a po telefóne sa snaží zohnať nových robotníkov na finálne čistenie pozemku od sutín starej stavby a prvé výkopové práce.",
+      "current_state": "Lukáš nervózne pochoduje po kuchyni a po telefóne sa snaží zohnať nových robotníkov na finálne čistenie pozemku od sutín starej stavby a prvé výkopové práce.",
+      "previous": "07/24",
+      "next": "10/21",
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/16",
+      "stable_name": "Lukášov pracovný pickup",
+      "source_evidence": "Hneď ako Oskar vyrazí, Lukáš ho zablokuje na svojom pickupe (niečo ako Toyota Hilux, polo-pracovné veľké staršie auto, žiadny luxus).",
+      "evidence_phrase": "Lukáš ho zablokuje na svojom pickupe",
+      "physical_presence": true,
+      "owner": "LUKÁŠ",
+      "categories": [
+        "Auto",
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "lukas-pickup",
+      "action": "Hneď ako Oskar vyrazí, Lukáš ho zablokuje na svojom pickupe (niečo ako Toyota Hilux, polo-pracovné veľké staršie auto, žiadny luxus).",
+      "current_state": "Hneď ako Oskar vyrazí, Lukáš ho zablokuje na svojom pickupe (niečo ako Toyota Hilux, polo-pracovné veľké staršie auto, žiadny luxus).",
+      "previous": null,
+      "next": "08/21",
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/16",
+      "stable_name": "Oskarovo auto",
+      "source_evidence": "Lukáš pozerá za Oskarom, ktorý nasadne do auta a zabuchne dvere.",
+      "evidence_phrase": "Oskarom, ktorý nasadne do auta",
+      "physical_presence": true,
+      "owner": "OSKAR",
+      "categories": [
+        "Auto",
+        "Osobná rekvizita"
+      ],
+      "continuity_group": "oskar-car",
+      "action": "Lukáš pozerá za Oskarom, ktorý nasadne do auta a zabuchne dvere.",
+      "current_state": "Lukáš pozerá za Oskarom, ktorý nasadne do auta a zabuchne dvere.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/17",
+      "stable_name": "Stavebný bager na projekte Černice",
+      "source_evidence": "Laura s Lukášom kráčajú po stavenisku (bývalý amfík, v tomto štádiu je to v podstate holý rozbitý pozemok s nejakým stavebným bagrom, plus neurčité kopy stavebnej sutiny, štrková alebo panelová cesta, nejaký nakopený materiál a obrandovaný nákladiak firmy Adamovič sro.",
+      "evidence_phrase": "nejakým stavebným bagrom",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [
+        "Auto"
+      ],
+      "continuity_group": null,
+      "action": "Laura s Lukášom kráčajú po stavenisku (bývalý amfík, v tomto štádiu je to v podstate holý rozbitý pozemok s nejakým stavebným bagrom, plus neurčité kopy stavebnej sutiny, štrková alebo panelová cesta, nejaký nakopený materiál a obrandovaný nákladiak firmy Adamovič sro.",
+      "current_state": "Laura s Lukášom kráčajú po stavenisku (bývalý amfík, v tomto štádiu je to v podstate holý rozbitý pozemok s nejakým stavebným bagrom, plus neurčité kopy stavebnej sutiny, štrková alebo panelová cesta, nejaký nakopený materiál a obrandovaný nákladiak firmy Adamovič sro.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/17",
+      "stable_name": "Nákladné auto Adamovič s.r.o.",
+      "source_evidence": "Laura s Lukášom kráčajú po stavenisku (bývalý amfík, v tomto štádiu je to v podstate holý rozbitý pozemok s nejakým stavebným bagrom, plus neurčité kopy stavebnej sutiny, štrková alebo panelová cesta, nejaký nakopený materiál a obrandovaný nákladiak firmy Adamovič sro.",
+      "evidence_phrase": "obrandovaný nákladiak firmy Adamovič",
+      "physical_presence": true,
+      "owner": "LUKÁŠ",
+      "categories": [
+        "Auto",
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Laura s Lukášom kráčajú po stavenisku (bývalý amfík, v tomto štádiu je to v podstate holý rozbitý pozemok s nejakým stavebným bagrom, plus neurčité kopy stavebnej sutiny, štrková alebo panelová cesta, nejaký nakopený materiál a obrandovaný nákladiak firmy Adamovič sro.",
+      "current_state": "Laura s Lukášom kráčajú po stavenisku (bývalý amfík, v tomto štádiu je to v podstate holý rozbitý pozemok s nejakým stavebným bagrom, plus neurčité kopy stavebnej sutiny, štrková alebo panelová cesta, nejaký nakopený materiál a obrandovaný nákladiak firmy Adamovič sro.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/18",
+      "stable_name": "Rozpité kávy Alice a Laury",
+      "source_evidence": "Alica a Laura sedia u Fefeho oproti sebe za jedným stolom pri rozpitých kávach.",
+      "evidence_phrase": "pri rozpitých kávach",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "Alica a Laura sedia u Fefeho oproti sebe za jedným stolom pri rozpitých kávach.",
+      "current_state": "Alica a Laura sedia u Fefeho oproti sebe za jedným stolom pri rozpitých kávach.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/19",
+      "stable_name": "Fľaše vody Alexa a Dogyho",
+      "source_evidence": "Pijú vodu z fľašiek.",
+      "evidence_phrase": "Pijú vodu z fľašiek",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "Pijú vodu z fľašiek.",
+      "current_state": "Pijú vodu z fľašiek.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/20",
+      "stable_name": "Pracovné vesty a helmy dobrovoľníkov",
+      "source_evidence": "Vyzliekajú vesty, skladajú helmy.",
+      "evidence_phrase": "Vyzliekajú vesty, skladajú helmy",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "Vyzliekajú vesty, skladajú helmy.",
+      "current_state": "Vyzliekajú vesty, skladajú helmy.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/21",
+      "stable_name": "Patrikov osobný mobil",
+      "source_evidence": "Fuck… nechal som tam mobil…",
+      "evidence_phrase": "nechal som tam mobil",
+      "physical_presence": true,
+      "owner": "PATRIK",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": "patrik-mobile",
+      "action": "Fuck… nechal som tam mobil…",
+      "current_state": "Fuck… nechal som tam mobil…",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/21",
+      "stable_name": "Lukášov pracovný pickup",
+      "source_evidence": "(prestrih na stavenisko) Patrik beží smerom k stavebnej ploche, kde je Lukášovo auto, miešačka, nádoby, náradie a veľký stavebný agregát.",
+      "evidence_phrase": "kde je Lukášovo auto",
+      "physical_presence": true,
+      "owner": "LUKÁŠ",
+      "categories": [
+        "Auto",
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "lukas-pickup",
+      "action": "(prestrih na stavenisko) Patrik beží smerom k stavebnej ploche, kde je Lukášovo auto, miešačka, nádoby, náradie a veľký stavebný agregát.",
+      "current_state": "(prestrih na stavenisko) Patrik beží smerom k stavebnej ploche, kde je Lukášovo auto, miešačka, nádoby, náradie a veľký stavebný agregát.",
+      "previous": "08/16",
+      "next": "08/29",
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/21",
+      "stable_name": "Terénne auto útočníkov",
+      "source_evidence": "Patrik zbadá dvojicu maskovaných chlapov, majú tam aj terénne auto.",
+      "evidence_phrase": "majú tam aj terénne auto",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [
+        "Auto",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "attackers-offroad",
+      "action": "Patrik zbadá dvojicu maskovaných chlapov, majú tam aj terénne auto.",
+      "current_state": "Patrik zbadá dvojicu maskovaných chlapov, majú tam aj terénne auto.",
+      "previous": null,
+      "next": "08/22",
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/20",
+      "stable_name": "Kola a nealkoholické pivo dobrovoľníkov",
+      "source_evidence": "(prestrih do unimobunky) Chalani popíjajú kolu a nealko pivo, keď zrazu začujú zvuky a za oknom uvidia zablikanie svetla.",
+      "evidence_phrase": "popíjajú kolu a nealko pivo",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "(prestrih do unimobunky) Chalani popíjajú kolu a nealko pivo, keď zrazu začujú zvuky a za oknom uvidia zablikanie svetla.",
+      "current_state": "(prestrih do unimobunky) Chalani popíjajú kolu a nealko pivo, keď zrazu začujú zvuky a za oknom uvidia zablikanie svetla.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/22",
+      "stable_name": "Terénne auto útočníkov",
+      "source_evidence": "Auto je ihneď preč a chalani s Lukášom dobehnú ku zvíjajúcemu sa a vzdychajúcemu Patrikovi.",
+      "evidence_phrase": "Auto je ihneď preč",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [
+        "Auto",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "attackers-offroad",
+      "action": "Auto je ihneď preč a chalani s Lukášom dobehnú ku zvíjajúcemu sa a vzdychajúcemu Patrikovi.",
+      "current_state": "Auto je ihneď preč a chalani s Lukášom dobehnú ku zvíjajúcemu sa a vzdychajúcemu Patrikovi.",
+      "previous": "08/21",
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/23",
+      "stable_name": "Policajné auto pri napadnutom stavenisku",
+      "source_evidence": "Na miesto činu prichádza policajné auto, vystúpi z neho štátny policajt a s ním Keler v civile.",
+      "evidence_phrase": "prichádza policajné auto",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [
+        "Auto"
+      ],
+      "continuity_group": null,
+      "action": "Na miesto činu prichádza policajné auto, vystúpi z neho štátny policajt a s ním Keler v civile.",
+      "current_state": "Na miesto činu prichádza policajné auto, vystúpi z neho štátny policajt a s ním Keler v civile.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/23",
+      "stable_name": "Zakrvavená gáza na Patrikovo čelo",
+      "source_evidence": "Patrik je už po bitke viac v pohode, stále je však otrasený a na ranenú hlavu si pritláča kus trocha zakrvavenej gázy.",
+      "evidence_phrase": "trocha zakrvavenej gázy",
+      "physical_presence": true,
+      "owner": "PATRIK",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Patrik je už po bitke viac v pohode, stále je však otrasený a na ranenú hlavu si pritláča kus trocha zakrvavenej gázy.",
+      "current_state": "Patrik je už po bitke viac v pohode, stále je však otrasený a na ranenú hlavu si pritláča kus trocha zakrvavenej gázy.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/26",
+      "stable_name": "Dogyho osobný mobil",
+      "source_evidence": "Dogy pozrie na mobil.",
+      "evidence_phrase": "Dogy pozrie na mobil",
+      "physical_presence": true,
+      "owner": "DOGY",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "dogy-mobile",
+      "action": "Dogy pozrie na mobil.",
+      "current_state": "Dogy pozrie na mobil.",
+      "previous": "07/01LP",
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/27",
+      "stable_name": "Motorky členov Vlkov pred krčmou",
+      "source_evidence": "Vonku sú zaparkované motorky.",
+      "evidence_phrase": "Vonku sú zaparkované motorky",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [
+        "Auto"
+      ],
+      "continuity_group": null,
+      "action": "Vonku sú zaparkované motorky.",
+      "current_state": "Vonku sú zaparkované motorky.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": "Upresniť počet, typy a vlastníkov motoriek zaparkovaných pred krčmou U Vlka."
+    },
+    {
+      "scene_id": "08/28",
+      "stable_name": "Biliardový stôl v krčme U Vlka",
+      "source_evidence": "Noel a Kiko hrajú biliard.",
+      "evidence_phrase": "hrajú biliard",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "Noel a Kiko hrajú biliard.",
+      "current_state": "Noel a Kiko hrajú biliard.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/28",
+      "stable_name": "Biliardové tága a gule v krčme U Vlka",
+      "source_evidence": "Noel a Kiko hrajú biliard.",
+      "evidence_phrase": "hrajú biliard",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "Noel a Kiko hrajú biliard.",
+      "current_state": "Noel a Kiko hrajú biliard.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/29",
+      "stable_name": "Lukášov pracovný pickup",
+      "source_evidence": "Andy pozrie na cestu, kde prudko zastaví auto, z ktorého vystupuje Lukáš.",
+      "evidence_phrase": "zastaví auto, z ktorého vystupuje Lukáš",
+      "physical_presence": true,
+      "owner": "LUKÁŠ",
+      "categories": [
+        "Auto",
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "lukas-pickup",
+      "action": "Andy pozrie na cestu, kde prudko zastaví auto, z ktorého vystupuje Lukáš.",
+      "current_state": "Andy pozrie na cestu, kde prudko zastaví auto, z ktorého vystupuje Lukáš.",
+      "previous": "08/21",
+      "next": "08/31",
+      "ambiguity_question": "Potvrdiť, že Lukáš v 08/29 prichádza na tom istom pracovnom pickupe ako v 08/16 a 08/21."
+    },
+    {
+      "scene_id": "08/31",
+      "stable_name": "Lukášov pracovný pickup",
+      "source_evidence": "Alex trucovito sedí v Lukášovom aute.",
+      "evidence_phrase": "Alex trucovito sedí v Lukášovom aute",
+      "physical_presence": true,
+      "owner": "LUKÁŠ",
+      "categories": [
+        "Auto",
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "lukas-pickup",
+      "action": "Alex trucovito sedí v Lukášovom aute.",
+      "current_state": "Alex trucovito sedí v Lukášovom aute.",
+      "previous": "08/29",
+      "next": null,
+      "ambiguity_question": "Potvrdiť, že Lukášovo auto v 08/31 je ten istý pracovný pickup ako v 08/16 a 08/21."
+    },
+    {
+      "scene_id": "08/30",
+      "stable_name": "Darčeky hostí pre Sofiino bábätko",
+      "source_evidence": "Dievčatá nesú pekne zabalený darček, Mery ho odovzdá Laure, ktorá ho položí medzi ostatné darčeky, ktorých tam už je na malom stolíku kôpka.",
+      "evidence_phrase": "pekne zabalený darček",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "Dievčatá nesú pekne zabalený darček, Mery ho odovzdá Laure, ktorá ho položí medzi ostatné darčeky, ktorých tam už je na malom stolíku kôpka.",
+      "current_state": "Dievčatá nesú pekne zabalený darček, Mery ho odovzdá Laure, ktorá ho položí medzi ostatné darčeky, ktorých tam už je na malom stolíku kôpka.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/30",
+      "stable_name": "Misa s koláčmi na Sofiinu baby shower",
+      "source_evidence": "Dogy nesie misu s koláčmi pomedzi ďalších hostí celým vyzdobeným a pohostením prestretým priestorom Veronikinej vily až ju prinesie k Bety, ktorá upravuje kvetovú výzdobu v jedálni.",
+      "evidence_phrase": "Dogy nesie misu s koláčmi",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "Dogy nesie misu s koláčmi pomedzi ďalších hostí celým vyzdobeným a pohostením prestretým priestorom Veronikinej vily až ju prinesie k Bety, ktorá upravuje kvetovú výzdobu v jedálni.",
+      "current_state": "Dogy nesie misu s koláčmi pomedzi ďalších hostí celým vyzdobeným a pohostením prestretým priestorom Veronikinej vily až ju prinesie k Bety, ktorá upravuje kvetovú výzdobu v jedálni.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/30",
+      "stable_name": "Kvetová výzdoba Sofiinej baby shower",
+      "source_evidence": "Dogy nesie misu s koláčmi pomedzi ďalších hostí celým vyzdobeným a pohostením prestretým priestorom Veronikinej vily až ju prinesie k Bety, ktorá upravuje kvetovú výzdobu v jedálni.",
+      "evidence_phrase": "upravuje kvetovú výzdobu",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "Dogy nesie misu s koláčmi pomedzi ďalších hostí celým vyzdobeným a pohostením prestretým priestorom Veronikinej vily až ju prinesie k Bety, ktorá upravuje kvetovú výzdobu v jedálni.",
+      "current_state": "Dogy nesie misu s koláčmi pomedzi ďalších hostí celým vyzdobeným a pohostením prestretým priestorom Veronikinej vily až ju prinesie k Bety, ktorá upravuje kvetovú výzdobu v jedálni.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/30",
+      "stable_name": "Sárin obrovský detský kočík pre Sofiu",
+      "source_evidence": "Zrazu sa s rachotom otvoria dvere, prichádza Sára, tlačí obrovský kočík.",
+      "evidence_phrase": "Sára, tlačí obrovský kočík",
+      "physical_presence": true,
+      "owner": "SÁRA",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Zrazu sa s rachotom otvoria dvere, prichádza Sára, tlačí obrovský kočík.",
+      "current_state": "Zrazu sa s rachotom otvoria dvere, prichádza Sára, tlačí obrovský kočík.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/30",
+      "stable_name": "Vozíček babky Magdy",
+      "source_evidence": "Hneď za ňou prichádza Klaudia, na vozíku tlačí babku Magdu, ktorá má na kolenách zabalené krbice s darmi pre Sofiu.",
+      "evidence_phrase": "na vozíku tlačí babku Magdu",
+      "physical_presence": true,
+      "owner": "MAGDA",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "magda-wheelchair",
+      "action": "Hneď za ňou prichádza Klaudia, na vozíku tlačí babku Magdu, ktorá má na kolenách zabalené krbice s darmi pre Sofiu.",
+      "current_state": "Hneď za ňou prichádza Klaudia, na vozíku tlačí babku Magdu, ktorá má na kolenách zabalené krbice s darmi pre Sofiu.",
+      "previous": null,
+      "next": "08/32",
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/32",
+      "stable_name": "Vozíček babky Magdy",
+      "source_evidence": "Babka Révayová (Magda) je na vozíčku a hladká Sofi po líci.",
+      "evidence_phrase": "Magda) je na vozíčku",
+      "physical_presence": true,
+      "owner": "MAGDA",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "magda-wheelchair",
+      "action": "Babka Révayová (Magda) je na vozíčku a hladká Sofi po líci.",
+      "current_state": "Babka Révayová (Magda) je na vozíčku a hladká Sofi po líci.",
+      "previous": "08/30",
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/32",
+      "stable_name": "Alicina darčeková taštička pre Sofiu",
+      "source_evidence": "Alica nevydrží sledovať toto čudné divadlo a tak odloží kávu a príde k Sofii so svojou darčekovou taštičkou, ktorú schmatne zo stola.",
+      "evidence_phrase": "svojou darčekovou taštičkou",
+      "physical_presence": true,
+      "owner": "ALICA",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Alica nevydrží sledovať toto čudné divadlo a tak odloží kávu a príde k Sofii so svojou darčekovou taštičkou, ktorú schmatne zo stola.",
+      "current_state": "Alica nevydrží sledovať toto čudné divadlo a tak odloží kávu a príde k Sofii so svojou darčekovou taštičkou, ktorú schmatne zo stola.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/32",
+      "stable_name": "Medvedia lampička pre Sofiino bábätko",
+      "source_evidence": "Sofia z taštičky vyberie papier a rozbalí z neho medvedie svetielko do zástrčky (to z epi 6.",
+      "evidence_phrase": "medvedie svetielko do zástrčky",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "bear-nightlight",
+      "action": "Sofia z taštičky vyberie papier a rozbalí z neho medvedie svetielko do zástrčky (to z epi 6.",
+      "current_state": "Sofia z taštičky vyberie papier a rozbalí z neho medvedie svetielko do zástrčky (to z epi 6.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/34",
+      "stable_name": "Drevený maľovaný koník pre Sofiino bábätko",
+      "source_evidence": "Práve vybalí z papiera krásneho dreveného maľovaného koníka.",
+      "evidence_phrase": "krásneho dreveného maľovaného koníka",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "Práve vybalí z papiera krásneho dreveného maľovaného koníka.",
+      "current_state": "Práve vybalí z papiera krásneho dreveného maľovaného koníka.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/35",
+      "stable_name": "Darčeky pre Sofiino bábätko",
+      "source_evidence": "Všetci odišli, len Sofia sedí na gauči a pozerá si veci, ktoré podostávala pre bábätko.",
+      "evidence_phrase": "veci, ktoré podostávala pre bábätko",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "Všetci odišli, len Sofia sedí na gauči a pozerá si veci, ktoré podostávala pre bábätko.",
+      "current_state": "Všetci odišli, len Sofia sedí na gauči a pozerá si veci, ktoré podostávala pre bábätko.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/35",
+      "stable_name": "Poháre po Sofiinej baby shower",
+      "source_evidence": "Alica s Bety odpratávajú poháre a neporiadok zo stola.",
+      "evidence_phrase": "odpratávajú poháre",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "Alica s Bety odpratávajú poháre a neporiadok zo stola.",
+      "current_state": "Alica s Bety odpratávajú poháre a neporiadok zo stola.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/36",
+      "stable_name": "Lukášova fľaša piva",
+      "source_evidence": "Lukáš sedí v kuchyni, pije z fľašky pivo.",
+      "evidence_phrase": "pije z fľašky pivo",
+      "physical_presence": true,
+      "owner": "LUKÁŠ",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Lukáš sedí v kuchyni, pije z fľašky pivo.",
+      "current_state": "Lukáš sedí v kuchyni, pije z fľašky pivo.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/38",
+      "stable_name": "Andyho plechovka sódy",
+      "source_evidence": "Na stole je namiesto piva nejaká plechovka so sódou.",
+      "evidence_phrase": "plechovka so sódou",
+      "physical_presence": true,
+      "owner": "ANDY",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Na stole je namiesto piva nejaká plechovka so sódou.",
+      "current_state": "Na stole je namiesto piva nejaká plechovka so sódou.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/40",
+      "stable_name": "Ivanov televízny ovládač",
+      "source_evidence": "Alica hodí ovládač do kúta.",
+      "evidence_phrase": "Alica hodí ovládač",
+      "physical_presence": true,
+      "owner": "IVAN",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Alica hodí ovládač do kúta.",
+      "current_state": "Alica hodí ovládač do kúta.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/41",
+      "stable_name": "Alexova gitara",
+      "source_evidence": "Alex si doma brnká na gitare.",
+      "evidence_phrase": "Alex si doma brnká na gitare",
+      "physical_presence": true,
+      "owner": "ALEX",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "alex-guitar",
+      "action": "Alex si doma brnká na gitare.",
+      "current_state": "Alex si doma brnká na gitare.",
+      "previous": null,
+      "next": "09/35",
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/42",
+      "stable_name": "Jakubova basketbalová bunda s číslom 9",
+      "source_evidence": "Andy roluje Jakubovu bundu (to je tá, ktorú Dogy s Bety našli spolu s drogami v opustenom aute, a ktorá doteraz visela v skrini) a balí ju do tašky.",
+      "evidence_phrase": "Andy roluje Jakubovu bundu",
+      "physical_presence": true,
+      "owner": "JAKUB",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "jakub-jersey-9",
+      "action": "Andy roluje Jakubovu bundu (to je tá, ktorú Dogy s Bety našli spolu s drogami v opustenom aute, a ktorá doteraz visela v skrini) a balí ju do tašky.",
+      "current_state": "Andy roluje Jakubovu bundu (to je tá, ktorú Dogy s Bety našli spolu s drogami v opustenom aute, a ktorá doteraz visela v skrini) a balí ju do tašky.",
+      "previous": "07/51",
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/42",
+      "stable_name": "Taška na ukrytie Jakubovej bundy",
+      "source_evidence": "Andy roluje Jakubovu bundu (to je tá, ktorú Dogy s Bety našli spolu s drogami v opustenom aute, a ktorá doteraz visela v skrini) a balí ju do tašky.",
+      "evidence_phrase": "balí ju do tašky",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "Andy roluje Jakubovu bundu (to je tá, ktorú Dogy s Bety našli spolu s drogami v opustenom aute, a ktorá doteraz visela v skrini) a balí ju do tašky.",
+      "current_state": "Andy roluje Jakubovu bundu (to je tá, ktorú Dogy s Bety našli spolu s drogami v opustenom aute, a ktorá doteraz visela v skrini) a balí ju do tašky.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/42",
+      "stable_name": "Andyho kola",
+      "source_evidence": "Andy sa na tom zasmeje, ide si sadnúť na gauč a otvorí si kolu.",
+      "evidence_phrase": "otvorí si kolu",
+      "physical_presence": true,
+      "owner": "ANDY",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Andy sa na tom zasmeje, ide si sadnúť na gauč a otvorí si kolu.",
+      "current_state": "Andy sa na tom zasmeje, ide si sadnúť na gauč a otvorí si kolu.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/46",
+      "stable_name": "Rodinná fotografia Debnárovcov so Sofiou",
+      "source_evidence": "Alica sedí na gauči a so slzami v očiach si prezerá rodinnú fotku, na ktorej je aj Sofia.",
+      "evidence_phrase": "rodinnú fotku, na ktorej je aj Sofia",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [
+        "Dokument"
+      ],
+      "continuity_group": null,
+      "action": "Alica sedí na gauči a so slzami v očiach si prezerá rodinnú fotku, na ktorej je aj Sofia.",
+      "current_state": "Alica sedí na gauči a so slzami v očiach si prezerá rodinnú fotku, na ktorej je aj Sofia.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/45",
+      "stable_name": "Taxík privážajúci Sofiu k Révayovcom",
+      "source_evidence": "Na ceste pred vilou Révayovcov zastavuje taxík.",
+      "evidence_phrase": "zastavuje taxík",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [
+        "Auto"
+      ],
+      "continuity_group": null,
+      "action": "Na ceste pred vilou Révayovcov zastavuje taxík.",
+      "current_state": "Na ceste pred vilou Révayovcov zastavuje taxík.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "08/45",
+      "stable_name": "Sofiin kufrík k Révayovcom",
+      "source_evidence": "Vystupuje z neho Sofia, berie si kufrík a neisto vstupuje na pozemok (resp.",
+      "evidence_phrase": "berie si kufrík",
+      "physical_presence": true,
+      "owner": "SOFIA",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Vystupuje z neho Sofia, berie si kufrík a neisto vstupuje na pozemok (resp.",
+      "current_state": "Vystupuje z neho Sofia, berie si kufrík a neisto vstupuje na pozemok (resp.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "09/02LP",
+      "stable_name": "Fľaša nového ročníka sektu Révayovcov",
+      "source_evidence": "Celá rodina Révayovcov sa usmieva a Oskar otvorí fľašu sektu.",
+      "evidence_phrase": "Oskar otvorí fľašu sektu",
+      "physical_presence": true,
+      "owner": "OSKAR",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": "revay-new-vintage-bottle",
+      "action": "Celá rodina Révayovcov sa usmieva a Oskar otvorí fľašu sektu.",
+      "current_state": "Celá rodina Révayovcov sa usmieva a Oskar otvorí fľašu sektu.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "09/02LP",
+      "stable_name": "Poháre na ochutnávku sektu Révayovcov",
+      "source_evidence": "Zátka vystrelí a on nalieva do pohárikov na stopkách, všetci chutnajú víno krásnej zlatej farby.",
+      "evidence_phrase": "nalieva do pohárikov na stopkách",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "Zátka vystrelí a on nalieva do pohárikov na stopkách, všetci chutnajú víno krásnej zlatej farby.",
+      "current_state": "Zátka vystrelí a on nalieva do pohárikov na stopkách, všetci chutnajú víno krásnej zlatej farby.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "09/05LP",
+      "stable_name": "Nedopitá fľaša Onyx sektu",
+      "source_evidence": "Alica zistí, že v chladničke majú nedopitú fľašu Onyx sektu.",
+      "evidence_phrase": "nedopitú fľašu Onyx sektu",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "onyx-open-bottle",
+      "action": "Alica zistí, že v chladničke majú nedopitú fľašu Onyx sektu.",
+      "current_state": "Alica zistí, že v chladničke majú nedopitú fľašu Onyx sektu.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "09/08",
+      "stable_name": "Betin osobný mobil",
+      "source_evidence": "Bety sa nešťastne pozerá do mobilu, potom ho frustrovane položí na stôl.",
+      "evidence_phrase": "Bety sa nešťastne pozerá do mobilu",
+      "physical_presence": true,
+      "owner": "BETY",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "bety-mobile",
+      "action": "Bety sa nešťastne pozerá do mobilu, potom ho frustrovane položí na stôl.",
+      "current_state": "Bety sa nešťastne pozerá do mobilu, potom ho frustrovane položí na stôl.",
+      "previous": "07/13",
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "09/08",
+      "stable_name": "Betine správy Sofii",
+      "source_evidence": "Na displeji cítiť obstojný stĺpik správ, čo sestre naposielala.",
+      "evidence_phrase": "stĺpik správ, čo sestre naposielala",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [
+        "Screen",
+        "Dokument"
+      ],
+      "continuity_group": null,
+      "action": "Na displeji cítiť obstojný stĺpik správ, čo sestre naposielala.",
+      "current_state": "Na displeji cítiť obstojný stĺpik správ, čo sestre naposielala.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "09/17",
+      "stable_name": "Fľaša sektu na prezentácii Révayovcov",
+      "source_evidence": "Oskar vezme do rúk jednu fľašu sektu.",
+      "evidence_phrase": "Oskar vezme do rúk jednu fľašu sektu",
+      "physical_presence": true,
+      "owner": "OSKAR",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Oskar vezme do rúk jednu fľašu sektu.",
+      "current_state": "Oskar vezme do rúk jednu fľašu sektu.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "09/18",
+      "stable_name": "Mačeta na sabráž sektu",
+      "source_evidence": "Hrdlo fľaše odletí zaťatím mačety a vystrekne biela pena.",
+      "evidence_phrase": "zaťatím mačety",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "Hrdlo fľaše odletí zaťatím mačety a vystrekne biela pena.",
+      "current_state": "Hrdlo fľaše odletí zaťatím mačety a vystrekne biela pena.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "09/17",
+      "stable_name": "Poháre na prezentáciu sektu Révayovcov",
+      "source_evidence": "Oskar vezme od Sáry fľašu a nalieva všetkým ochutnávku.",
+      "evidence_phrase": "nalieva všetkým ochutnávku",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "Oskar vezme od Sáry fľašu a nalieva všetkým ochutnávku.",
+      "current_state": "Oskar vezme od Sáry fľašu a nalieva všetkým ochutnávku.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "09/20",
+      "stable_name": "Poháre sektu hostí Révayovcov",
+      "source_evidence": "Všetci stoja s pohárikmi sektu v rukách, someliér dolieva.",
+      "evidence_phrase": "s pohárikmi sektu v rukách",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "Všetci stoja s pohárikmi sektu v rukách, someliér dolieva.",
+      "current_state": "Všetci stoja s pohárikmi sektu v rukách, someliér dolieva.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "09/24",
+      "stable_name": "Alexov osobný mobil",
+      "source_evidence": "Alex vojde do obývačky a z vrecka vytiahne telefón.",
+      "evidence_phrase": "z vrecka vytiahne telefón",
+      "physical_presence": true,
+      "owner": "ALEX",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "alex-mobile",
+      "action": "Alex vojde do obývačky a z vrecka vytiahne telefón.",
+      "current_state": "Alex vojde do obývačky a z vrecka vytiahne telefón.",
+      "previous": null,
+      "next": "10/20",
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "09/24",
+      "stable_name": "Alexova správa Bety z prezentácie sektu",
+      "source_evidence": "Píše správu Bety, že k nim večer príde, hovoril so Sofiou.",
+      "evidence_phrase": "Píše správu Bety",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [
+        "Screen"
+      ],
+      "continuity_group": null,
+      "action": "Píše správu Bety, že k nim večer príde, hovoril so Sofiou.",
+      "current_state": "Píše správu Bety, že k nim večer príde, hovoril so Sofiou.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "09/24",
+      "stable_name": "Poháre vína Oskara a Alexa",
+      "source_evidence": "Príde s dvomi pohármi vína a jeden podáva Alexovi.",
+      "evidence_phrase": "Príde s dvomi pohármi vína",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "Príde s dvomi pohármi vína a jeden podáva Alexovi.",
+      "current_state": "Príde s dvomi pohármi vína a jeden podáva Alexovi.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "09/25",
+      "stable_name": "Alicin jablkový koláč",
+      "source_evidence": "Alica veľkým nožom práve krája jej jablkový koláč.",
+      "evidence_phrase": "krája jej jablkový koláč",
+      "physical_presence": true,
+      "owner": "ALICA",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Alica veľkým nožom práve krája jej jablkový koláč.",
+      "current_state": "Alica veľkým nožom práve krája jej jablkový koláč.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "09/25",
+      "stable_name": "Alicin veľký nôž na koláč",
+      "source_evidence": "Alica veľkým nožom práve krája jej jablkový koláč.",
+      "evidence_phrase": "Alica veľkým nožom",
+      "physical_presence": true,
+      "owner": "ALICA",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Alica veľkým nožom práve krája jej jablkový koláč.",
+      "current_state": "Alica veľkým nožom práve krája jej jablkový koláč.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "09/26",
+      "stable_name": "Sárin osobný mobil",
+      "source_evidence": "Sára sedí na tulivaku/kresle a okolo nej sedia jej prívesky Lola a Popy, pozerajú nejakú storku a smejú sa.",
+      "evidence_phrase": "pozerajú nejakú storku",
+      "physical_presence": true,
+      "owner": "SÁRA",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": "sara-mobile",
+      "action": "Sára sedí na tulivaku/kresle a okolo nej sedia jej prívesky Lola a Popy, pozerajú nejakú storku a smejú sa.",
+      "current_state": "Sára sedí na tulivaku/kresle a okolo nej sedia jej prívesky Lola a Popy, pozerajú nejakú storku a smejú sa.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": "Potvrdiť, na čí mobil Sára, Lola a Popy pozerajú storku; pracovná identita je zatiaľ vedená pri Sáre."
+    },
+    {
+      "scene_id": "09/28LP",
+      "stable_name": "Oblečenie a doplnky na nákupnej storke Veroniky a Evy",
+      "source_evidence": "V kabínke, pred zrkadlom, hrabú sa v štendroch ovešaných šatami, skúšajú si topánky, čelenky, klobúky.",
+      "evidence_phrase": "skúšajú si topánky, čelenky, klobúky",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "V kabínke, pred zrkadlom, hrabú sa v štendroch ovešaných šatami, skúšajú si topánky, čelenky, klobúky.",
+      "current_state": "V kabínke, pred zrkadlom, hrabú sa v štendroch ovešaných šatami, skúšajú si topánky, čelenky, klobúky.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "09/28LP",
+      "stable_name": "Nákupné tašky Veroniky a Evy",
+      "source_evidence": "Nakoniec to všetko prejde do instagramovej storky, na konci ktorej je ich fotka alebo loop ich dvoch stojacich s plnými nákupnými taškami pred obchodom s hashtagom #shoppingday #happytogether #besties",
+      "evidence_phrase": "s plnými nákupnými taškami",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "Nakoniec to všetko prejde do instagramovej storky, na konci ktorej je ich fotka alebo loop ich dvoch stojacich s plnými nákupnými taškami pred obchodom s hashtagom #shoppingday #happytogether #besties",
+      "current_state": "Nakoniec to všetko prejde do instagramovej storky, na konci ktorej je ich fotka alebo loop ich dvoch stojacich s plnými nákupnými taškami pred obchodom s hashtagom #shoppingday #happytogether #besties",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "09/28LP",
+      "stable_name": "Nákupná Instagram story Veroniky a Evy",
+      "source_evidence": "Nakoniec to všetko prejde do instagramovej storky, na konci ktorej je ich fotka alebo loop ich dvoch stojacich s plnými nákupnými taškami pred obchodom s hashtagom #shoppingday #happytogether #besties",
+      "evidence_phrase": "instagramovej storky",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [
+        "Screen",
+        "Dokument"
+      ],
+      "continuity_group": null,
+      "action": "Nakoniec to všetko prejde do instagramovej storky, na konci ktorej je ich fotka alebo loop ich dvoch stojacich s plnými nákupnými taškami pred obchodom s hashtagom #shoppingday #happytogether #besties",
+      "current_state": "Nakoniec to všetko prejde do instagramovej storky, na konci ktorej je ich fotka alebo loop ich dvoch stojacich s plnými nákupnými taškami pred obchodom s hashtagom #shoppingday #happytogether #besties",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "09/29",
+      "stable_name": "Oblek pre Alexa od Sáry",
+      "source_evidence": "Za dverami stojí Sára a v ruke drží v priehľadnom obale oblek pre Alexa.",
+      "evidence_phrase": "priehľadnom obale oblek pre Alexa",
+      "physical_presence": true,
+      "owner": "ALEX",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Za dverami stojí Sára a v ruke drží v priehľadnom obale oblek pre Alexa.",
+      "current_state": "Za dverami stojí Sára a v ruke drží v priehľadnom obale oblek pre Alexa.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": "Upresniť vzhľad a veľkosť obleku, ktorý Sára priniesla Alexovi."
+    },
+    {
+      "scene_id": "09/30",
+      "stable_name": "Alicin pracovný notebook",
+      "source_evidence": "Otvorí notebook a chce sa prihlásiť.",
+      "evidence_phrase": "Otvorí notebook",
+      "physical_presence": true,
+      "owner": "ALICA",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": "alica-notebook",
+      "action": "Otvorí notebook a chce sa prihlásiť.",
+      "current_state": "Otvorí notebook a chce sa prihlásiť.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "09/30",
+      "stable_name": "Alicin podcastový mikrofón",
+      "source_evidence": "Alica už nepovie ani slovo, vezme si veci, ktoré potrebuje k svojmu nahrávaniu (mikrofón, kameru, osvetlenie) a pochoduje preč z redakcie.",
+      "evidence_phrase": "mikrofón, kameru, osvetlenie",
+      "physical_presence": true,
+      "owner": "ALICA",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "alica-podcast-microphone",
+      "action": "Alica už nepovie ani slovo, vezme si veci, ktoré potrebuje k svojmu nahrávaniu (mikrofón, kameru, osvetlenie) a pochoduje preč z redakcie.",
+      "current_state": "Alica už nepovie ani slovo, vezme si veci, ktoré potrebuje k svojmu nahrávaniu (mikrofón, kameru, osvetlenie) a pochoduje preč z redakcie.",
+      "previous": null,
+      "next": "09/31",
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "09/30",
+      "stable_name": "Alicina podcastová kamera",
+      "source_evidence": "Alica už nepovie ani slovo, vezme si veci, ktoré potrebuje k svojmu nahrávaniu (mikrofón, kameru, osvetlenie) a pochoduje preč z redakcie.",
+      "evidence_phrase": "mikrofón, kameru, osvetlenie",
+      "physical_presence": true,
+      "owner": "ALICA",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": "alica-podcast-camera",
+      "action": "Alica už nepovie ani slovo, vezme si veci, ktoré potrebuje k svojmu nahrávaniu (mikrofón, kameru, osvetlenie) a pochoduje preč z redakcie.",
+      "current_state": "Alica už nepovie ani slovo, vezme si veci, ktoré potrebuje k svojmu nahrávaniu (mikrofón, kameru, osvetlenie) a pochoduje preč z redakcie.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "09/30",
+      "stable_name": "Alicino podcastové osvetlenie",
+      "source_evidence": "Alica už nepovie ani slovo, vezme si veci, ktoré potrebuje k svojmu nahrávaniu (mikrofón, kameru, osvetlenie) a pochoduje preč z redakcie.",
+      "evidence_phrase": "mikrofón, kameru, osvetlenie",
+      "physical_presence": true,
+      "owner": "ALICA",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": "alica-podcast-light",
+      "action": "Alica už nepovie ani slovo, vezme si veci, ktoré potrebuje k svojmu nahrávaniu (mikrofón, kameru, osvetlenie) a pochoduje preč z redakcie.",
+      "current_state": "Alica už nepovie ani slovo, vezme si veci, ktoré potrebuje k svojmu nahrávaniu (mikrofón, kameru, osvetlenie) a pochoduje preč z redakcie.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "09/31",
+      "stable_name": "Alicin podcastový mikrofón",
+      "source_evidence": "Alica vychádza z redakcie, v ruke si nesie mikrofón s držiakom.",
+      "evidence_phrase": "mikrofón s držiakom",
+      "physical_presence": true,
+      "owner": "ALICA",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "alica-podcast-microphone",
+      "action": "Alica vychádza z redakcie, v ruke si nesie mikrofón s držiakom.",
+      "current_state": "Alica vychádza z redakcie, v ruke si nesie mikrofón s držiakom.",
+      "previous": "09/30",
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "09/32",
+      "stable_name": "Alicin pohár vína po vyhadzove",
+      "source_evidence": "Ide za zvukom a príde až do jedálne, kde Alica plače a pije víno.",
+      "evidence_phrase": "Alica plače a pije víno",
+      "physical_presence": true,
+      "owner": "ALICA",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Ide za zvukom a príde až do jedálne, kde Alica plače a pije víno.",
+      "current_state": "Ide za zvukom a príde až do jedálne, kde Alica plače a pije víno.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "09/34",
+      "stable_name": "Lein osobný mobil",
+      "source_evidence": "Lea sedí v klubovni a scrolluje na mobile.",
+      "evidence_phrase": "Lea sedí v klubovni a scrolluje na mobile",
+      "physical_presence": true,
+      "owner": "LEA",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": "lea-mobile",
+      "action": "Lea sedí v klubovni a scrolluje na mobile.",
+      "current_state": "Lea sedí v klubovni a scrolluje na mobile.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "09/34",
+      "stable_name": "Leine slúchadlá",
+      "source_evidence": "Lea si zloží slúchadlá.",
+      "evidence_phrase": "Lea si zloží slúchadlá",
+      "physical_presence": true,
+      "owner": "LEA",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "lea-headphones",
+      "action": "Lea si zloží slúchadlá.",
+      "current_state": "Lea si zloží slúchadlá.",
+      "previous": null,
+      "next": "09/46",
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "09/35",
+      "stable_name": "Alexova gitara",
+      "source_evidence": "Lea vidí, že Sára manipuluje Alexom Alex práve docvičil na gitare, odkladá ju do puzdra a zatvára ho.",
+      "evidence_phrase": "Alex práve docvičil na gitare",
+      "physical_presence": true,
+      "owner": "ALEX",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "alex-guitar",
+      "action": "Lea vidí, že Sára manipuluje Alexom Alex práve docvičil na gitare, odkladá ju do puzdra a zatvára ho.",
+      "current_state": "Lea vidí, že Sára manipuluje Alexom Alex práve docvičil na gitare, odkladá ju do puzdra a zatvára ho.",
+      "previous": "08/41",
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "09/35",
+      "stable_name": "Puzdro na Alexovu gitaru",
+      "source_evidence": "Lea vidí, že Sára manipuluje Alexom Alex práve docvičil na gitare, odkladá ju do puzdra a zatvára ho.",
+      "evidence_phrase": "odkladá ju do puzdra",
+      "physical_presence": true,
+      "owner": "ALEX",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": "alex-guitar-case",
+      "action": "Lea vidí, že Sára manipuluje Alexom Alex práve docvičil na gitare, odkladá ju do puzdra a zatvára ho.",
+      "current_state": "Lea vidí, že Sára manipuluje Alexom Alex práve docvičil na gitare, odkladá ju do puzdra a zatvára ho.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "09/37LP",
+      "stable_name": "Veronikina pôvodná retiazka s príveskom V",
+      "source_evidence": "Na krku si našmátra retiazku so zlatým príveskom v tvare „V“.",
+      "evidence_phrase": "retiazku so zlatým príveskom v tvare „V“",
+      "physical_presence": true,
+      "owner": "VERONIKA",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": "veronika-original-v-necklace",
+      "action": "Na krku si našmátra retiazku so zlatým príveskom v tvare „V“.",
+      "current_state": "Na krku si našmátra retiazku so zlatým príveskom v tvare „V“.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "09/44",
+      "stable_name": "Alicina fľaša vína",
+      "source_evidence": "Nájdu tam Alicu sedieť pri stole s fľašou vína a naliatym pohárikom.",
+      "evidence_phrase": "s fľašou vína",
+      "physical_presence": true,
+      "owner": "ALICA",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Nájdu tam Alicu sedieť pri stole s fľašou vína a naliatym pohárikom.",
+      "current_state": "Nájdu tam Alicu sedieť pri stole s fľašou vína a naliatym pohárikom.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "09/44",
+      "stable_name": "Alicin pohár vína",
+      "source_evidence": "Nájdu tam Alicu sedieť pri stole s fľašou vína a naliatym pohárikom.",
+      "evidence_phrase": "naliatym pohárikom",
+      "physical_presence": true,
+      "owner": "ALICA",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Nájdu tam Alicu sedieť pri stole s fľašou vína a naliatym pohárikom.",
+      "current_state": "Nájdu tam Alicu sedieť pri stole s fľašou vína a naliatym pohárikom.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "09/46",
+      "stable_name": "Leine slúchadlá",
+      "source_evidence": "Lea si rovno vyberie slúchadla.",
+      "evidence_phrase": "Lea si rovno vyberie slúchadla",
+      "physical_presence": true,
+      "owner": "LEA",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "lea-headphones",
+      "action": "Lea si rovno vyberie slúchadla.",
+      "current_state": "Lea si rovno vyberie slúchadla.",
+      "previous": "09/34",
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "09/47",
+      "stable_name": "Lukášov pracovný počítač vo firme",
+      "source_evidence": "Lukáš sa pustí do práce na počítači, akoby tam Laura ani nestála.",
+      "evidence_phrase": "pustí do práce na počítači",
+      "physical_presence": true,
+      "owner": "LUKÁŠ",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Lukáš sa pustí do práce na počítači, akoby tam Laura ani nestála.",
+      "current_state": "Lukáš sa pustí do práce na počítači, akoby tam Laura ani nestála.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "09/45",
+      "stable_name": "Oblek pre Alexa od Sáry",
+      "source_evidence": "Alex v obleku a bez kravaty (sňal si ju z krku, aby ho nezväzovala) prichádza domov.",
+      "evidence_phrase": "Alex v obleku",
+      "physical_presence": true,
+      "owner": "ALEX",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "alex-suit-from-sara",
+      "action": "Alex v obleku a bez kravaty (sňal si ju z krku, aby ho nezväzovala) prichádza domov.",
+      "current_state": "Alex v obleku a bez kravaty (sňal si ju z krku, aby ho nezväzovala) prichádza domov.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "09/50",
+      "stable_name": "Luxusné auto Eleny a Štefana Révayovcov",
+      "source_evidence": "Potom sledujú, ako tí dvaja nastupujú do luxusného auta a odchádzajú preč spred vily.",
+      "evidence_phrase": "nastupujú do luxusného auta",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [
+        "Auto"
+      ],
+      "continuity_group": null,
+      "action": "Potom sledujú, ako tí dvaja nastupujú do luxusného auta a odchádzajú preč spred vily.",
+      "current_state": "Potom sledujú, ako tí dvaja nastupujú do luxusného auta a odchádzajú preč spred vily.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "09/51",
+      "stable_name": "Rodinná fotografia Révayovcov s Alexom a Sofiou",
+      "source_evidence": "Je noc, Sára sedí na posteli a pozerá si fotku z prezentácie nového ročníka sektu.",
+      "evidence_phrase": "pozerá si fotku z prezentácie",
+      "physical_presence": true,
+      "owner": "SÁRA",
+      "categories": [
+        "Osobná rekvizita",
+        "Dokument"
+      ],
+      "continuity_group": null,
+      "action": "Je noc, Sára sedí na posteli a pozerá si fotku z prezentácie nového ročníka sektu.",
+      "current_state": "Je noc, Sára sedí na posteli a pozerá si fotku z prezentácie nového ročníka sektu.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": "Potvrdiť, či Sára pozerá fyzickú vytlačenú fotografiu alebo digitálnu fotku na displeji."
+    },
+    {
+      "scene_id": "10/06",
+      "stable_name": "Alexova herná konzola",
+      "source_evidence": "Do Alexovej izby, kde Dogy hrá playko (pozn.",
+      "evidence_phrase": "Dogy hrá playko",
+      "physical_presence": true,
+      "owner": "ALEX",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "alex-game-console",
+      "action": "Do Alexovej izby, kde Dogy hrá playko (pozn.",
+      "current_state": "Do Alexovej izby, kde Dogy hrá playko (pozn.",
+      "previous": "08/09",
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/01LP",
+      "stable_name": "Dogyho spisovateľský notebook",
+      "source_evidence": "Dogy sedí vo Fefeho bistre a píše román.",
+      "evidence_phrase": "Dogy sedí vo Fefeho bistre a píše román",
+      "physical_presence": true,
+      "owner": "DOGY",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "dogy-writer-notebook",
+      "action": "Dogy sedí vo Fefeho bistre a píše román.",
+      "current_state": "Dogy sedí vo Fefeho bistre a píše román.",
+      "previous": "08/02LP",
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/02LP",
+      "stable_name": "Školské zošity Alexa, Bety a Veroniky",
+      "source_evidence": "Záber na vyučovaciu hodinu v triede, vidíme Alexa, Bety aj Veroniku, všetci sa sústredia na hodinu, robia si poznámky.",
+      "evidence_phrase": "robia si poznámky",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [
+        "Dokument"
+      ],
+      "continuity_group": null,
+      "action": "Záber na vyučovaciu hodinu v triede, vidíme Alexa, Bety aj Veroniku, všetci sa sústredia na hodinu, robia si poznámky.",
+      "current_state": "Záber na vyučovaciu hodinu v triede, vidíme Alexa, Bety aj Veroniku, všetci sa sústredia na hodinu, robia si poznámky.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": "Upresniť, či má mať každý študent samostatný zošit a aký predmet sa vyučuje."
+    },
+    {
+      "scene_id": "10/03LP",
+      "stable_name": "Alkoholické nápoje na párty u Alexa",
+      "source_evidence": "Bety, Veronika a Alex spolu tancujú, očividne majú vypité.",
+      "evidence_phrase": "očividne majú vypité",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "Bety, Veronika a Alex spolu tancujú, očividne majú vypité.",
+      "current_state": "Bety, Veronika a Alex spolu tancujú, očividne majú vypité.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/03LP",
+      "stable_name": "Alkoholické nápoje na párty u Alexa",
+      "source_evidence": "Alex spolu so svojimi spoluhráčmi neviazane skáče a pri tom pije alkohol.",
+      "evidence_phrase": "pije alkohol",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "Alex spolu so svojimi spoluhráčmi neviazane skáče a pri tom pije alkohol.",
+      "current_state": "Alex spolu so svojimi spoluhráčmi neviazane skáče a pri tom pije alkohol.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/07",
+      "stable_name": "Lukášova cestovná taška",
+      "source_evidence": "Lukáš stojí v kuchyni, vedľa seba má cestovnú tašku, Alex stojí pri ňom.",
+      "evidence_phrase": "má cestovnú tašku",
+      "physical_presence": true,
+      "owner": "LUKÁŠ",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Lukáš stojí v kuchyni, vedľa seba má cestovnú tašku, Alex stojí pri ňom.",
+      "current_state": "Lukáš stojí v kuchyni, vedľa seba má cestovnú tašku, Alex stojí pri ňom.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/11",
+      "stable_name": "Andyho osobný mobil",
+      "source_evidence": "Andy sedí na gauči vo svojom byte v ubytovni, má tam upratané, pije kávu, zodvihne mobil, volá mu Bety.",
+      "evidence_phrase": "zodvihne mobil, volá mu Bety",
+      "physical_presence": true,
+      "owner": "ANDY",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": "andy-mobile",
+      "action": "Andy sedí na gauči vo svojom byte v ubytovni, má tam upratané, pije kávu, zodvihne mobil, volá mu Bety.",
+      "current_state": "Andy sedí na gauči vo svojom byte v ubytovni, má tam upratané, pije kávu, zodvihne mobil, volá mu Bety.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/11",
+      "stable_name": "Andyho káva",
+      "source_evidence": "Andy sedí na gauči vo svojom byte v ubytovni, má tam upratané, pije kávu, zodvihne mobil, volá mu Bety.",
+      "evidence_phrase": "pije kávu",
+      "physical_presence": true,
+      "owner": "ANDY",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Andy sedí na gauči vo svojom byte v ubytovni, má tam upratané, pije kávu, zodvihne mobil, volá mu Bety.",
+      "current_state": "Andy sedí na gauči vo svojom byte v ubytovni, má tam upratané, pije kávu, zodvihne mobil, volá mu Bety.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/13",
+      "stable_name": "Betina čierna parochňa",
+      "source_evidence": "Bety a Fifo si hľadia priamo do očí a to sa viackrát prestrihne so spomienkami na tú noc, kedy Bety v parochni donútila Fifa k priznaniu.",
+      "evidence_phrase": "Bety v parochni",
+      "physical_presence": true,
+      "owner": "BETY",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "bety-black-wig",
+      "action": "Bety a Fifo si hľadia priamo do očí a to sa viackrát prestrihne so spomienkami na tú noc, kedy Bety v parochni donútila Fifa k priznaniu.",
+      "current_state": "Bety a Fifo si hľadia priamo do očí a to sa viackrát prestrihne so spomienkami na tú noc, kedy Bety v parochni donútila Fifa k priznaniu.",
+      "previous": null,
+      "next": "10/33",
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/17",
+      "stable_name": "Pizza Alexa a Dogyho",
+      "source_evidence": "Dogy vyťahuje z rúry pizzu a má dobrú náladu, Alex vyberá z chladničky plechovky s limonádou, chystajú sa spolu navečerať.",
+      "evidence_phrase": "vyťahuje z rúry pizzu",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "Dogy vyťahuje z rúry pizzu a má dobrú náladu, Alex vyberá z chladničky plechovky s limonádou, chystajú sa spolu navečerať.",
+      "current_state": "Dogy vyťahuje z rúry pizzu a má dobrú náladu, Alex vyberá z chladničky plechovky s limonádou, chystajú sa spolu navečerať.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/17",
+      "stable_name": "Nôž alebo krájač na pizzu",
+      "source_evidence": "Vezme nôž/krájač a prekrojí pizzu na polovicu.",
+      "evidence_phrase": "Vezme nôž/krájač",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "Vezme nôž/krájač a prekrojí pizzu na polovicu.",
+      "current_state": "Vezme nôž/krájač a prekrojí pizzu na polovicu.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": "Vybrať, či sa použije nôž alebo krájač na pizzu; scenár uvádza alternatívu."
+    },
+    {
+      "scene_id": "10/17",
+      "stable_name": "Plechovky limonády Alexa a Dogyho",
+      "source_evidence": "Dogy vyťahuje z rúry pizzu a má dobrú náladu, Alex vyberá z chladničky plechovky s limonádou, chystajú sa spolu navečerať.",
+      "evidence_phrase": "plechovky s limonádou",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "Dogy vyťahuje z rúry pizzu a má dobrú náladu, Alex vyberá z chladničky plechovky s limonádou, chystajú sa spolu navečerať.",
+      "current_state": "Dogy vyťahuje z rúry pizzu a má dobrú náladu, Alex vyberá z chladničky plechovky s limonádou, chystajú sa spolu navečerať.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/18",
+      "stable_name": "Liborove spisy a dokumenty pre právnika",
+      "source_evidence": "Laura robí poriadok v Liborových spisoch (v papieroch ale aj v notebooku, ktorý nezhabali).",
+      "evidence_phrase": "Liborových spisoch",
+      "physical_presence": true,
+      "owner": "LAURA",
+      "categories": [
+        "Osobná rekvizita",
+        "Dokument"
+      ],
+      "continuity_group": "libor-legal-files",
+      "action": "Laura robí poriadok v Liborových spisoch (v papieroch ale aj v notebooku, ktorý nezhabali).",
+      "current_state": "Laura robí poriadok v Liborových spisoch (v papieroch ale aj v notebooku, ktorý nezhabali).",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/18",
+      "stable_name": "Liborov notebook zaistený Laurou",
+      "source_evidence": "Laura robí poriadok v Liborových spisoch (v papieroch ale aj v notebooku, ktorý nezhabali).",
+      "evidence_phrase": "notebooku, ktorý nezhabali",
+      "physical_presence": true,
+      "owner": "LAURA",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Laura robí poriadok v Liborových spisoch (v papieroch ale aj v notebooku, ktorý nezhabali).",
+      "current_state": "Laura robí poriadok v Liborových spisoch (v papieroch ale aj v notebooku, ktorý nezhabali).",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/16",
+      "stable_name": "Betin nákupný zoznam na Dogyho oslavu",
+      "source_evidence": "Bety je sama v redakcii, dáva dokopy zoznam vecí, ktoré treba kúpiť na Dogyho oslavu narodenín.",
+      "evidence_phrase": "zoznam vecí, ktoré treba kúpiť",
+      "physical_presence": true,
+      "owner": "BETY",
+      "categories": [
+        "Osobná rekvizita",
+        "Dokument"
+      ],
+      "continuity_group": null,
+      "action": "Bety je sama v redakcii, dáva dokopy zoznam vecí, ktoré treba kúpiť na Dogyho oslavu narodenín.",
+      "current_state": "Bety je sama v redakcii, dáva dokopy zoznam vecí, ktoré treba kúpiť na Dogyho oslavu narodenín.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/20",
+      "stable_name": "Alexov osobný mobil",
+      "source_evidence": "Zazvoní mu mobil, je to Lukáš.",
+      "evidence_phrase": "Zazvoní mu mobil",
+      "physical_presence": true,
+      "owner": "ALEX",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "alex-mobile",
+      "action": "Zazvoní mu mobil, je to Lukáš.",
+      "current_state": "Zazvoní mu mobil, je to Lukáš.",
+      "previous": "09/24",
+      "next": "10/37",
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/21",
+      "stable_name": "Lukášov osobný mobil",
+      "source_evidence": "(prestrih – auto) Lukáš práve dorazil do Bratislavy a volá z auta Alexovi.",
+      "evidence_phrase": "volá z auta Alexovi",
+      "physical_presence": true,
+      "owner": "LUKÁŠ",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "lukas-mobile",
+      "action": "(prestrih – auto) Lukáš práve dorazil do Bratislavy a volá z auta Alexovi.",
+      "current_state": "(prestrih – auto) Lukáš práve dorazil do Bratislavy a volá z auta Alexovi.",
+      "previous": "08/13",
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/20",
+      "stable_name": "Fľaša alkoholu z párty",
+      "source_evidence": "Naštvane k nej podíde a vyberie si odtiaľ fľašu.",
+      "evidence_phrase": "vyberie si odtiaľ fľašu",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "Naštvane k nej podíde a vyberie si odtiaľ fľašu.",
+      "current_state": "Naštvane k nej podíde a vyberie si odtiaľ fľašu.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/23",
+      "stable_name": "Liborov list Veronike",
+      "source_evidence": "Právnik vytiahne list od Libora.",
+      "evidence_phrase": "Právnik vytiahne list od Libora",
+      "physical_presence": true,
+      "owner": "VERONIKA",
+      "categories": [
+        "Osobná rekvizita",
+        "Dokument"
+      ],
+      "continuity_group": "libor-letter-veronika",
+      "action": "Právnik vytiahne list od Libora.",
+      "current_state": "Právnik vytiahne list od Libora.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/22",
+      "stable_name": "Matejova literatúra o prežití v džungli",
+      "source_evidence": "Sára vojde do bistra s tým, že niekoho hľadá, pri stole sedí iba Matej a číta nejakú literatúru o prežití v džungli, potom pozrie Sára k baru a tam uvidí niekoho, koho by mohla využiť na svoje plány.",
+      "evidence_phrase": "číta nejakú literatúru o prežití v džungli",
+      "physical_presence": true,
+      "owner": "MATEJ",
+      "categories": [
+        "Osobná rekvizita",
+        "Dokument"
+      ],
+      "continuity_group": null,
+      "action": "Sára vojde do bistra s tým, že niekoho hľadá, pri stole sedí iba Matej a číta nejakú literatúru o prežití v džungli, potom pozrie Sára k baru a tam uvidí niekoho, koho by mohla využiť na svoje plány.",
+      "current_state": "Sára vojde do bistra s tým, že niekoho hľadá, pri stole sedí iba Matej a číta nejakú literatúru o prežití v džungli, potom pozrie Sára k baru a tam uvidí niekoho, koho by mohla využiť na svoje plány.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": "Upresniť konkrétny titul knihy alebo časopisu o prežití v džungli."
+    },
+    {
+      "scene_id": "10/22",
+      "stable_name": "Fifov burger a limonáda vo Fefe Beef",
+      "source_evidence": "Až teraz vidíme, že je to Fifo, ktorý si tam dáva burger a limču.",
+      "evidence_phrase": "dáva burger a limču",
+      "physical_presence": true,
+      "owner": "FIFO",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Až teraz vidíme, že je to Fifo, ktorý si tam dáva burger a limču.",
+      "current_state": "Až teraz vidíme, že je to Fifo, ktorý si tam dáva burger a limču.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/25",
+      "stable_name": "Kikov osobný mobil",
+      "source_evidence": "Kikovi príde správa od Bety, že Bety a Dogy idú.",
+      "evidence_phrase": "Kikovi príde správa od Bety",
+      "physical_presence": true,
+      "owner": "KIKO",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "kiko-mobile",
+      "action": "Kikovi príde správa od Bety, že Bety a Dogy idú.",
+      "current_state": "Kikovi príde správa od Bety, že Bety a Dogy idú.",
+      "previous": "07/32",
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/25",
+      "stable_name": "Betina správa Kikovi o príchode na oslavu",
+      "source_evidence": "Kikovi príde správa od Bety, že Bety a Dogy idú.",
+      "evidence_phrase": "Kikovi príde správa od Bety",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [
+        "Screen"
+      ],
+      "continuity_group": null,
+      "action": "Kikovi príde správa od Bety, že Bety a Dogy idú.",
+      "current_state": "Kikovi príde správa od Bety, že Bety a Dogy idú.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/26",
+      "stable_name": "Fľaša alkoholu na Dogyho oslave",
+      "source_evidence": "Vidíme v tme, ako si Veronika nalieva z fľaše alkohol.",
+      "evidence_phrase": "Veronika nalieva z fľaše alkohol",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "Vidíme v tme, ako si Veronika nalieva z fľaše alkohol.",
+      "current_state": "Vidíme v tme, ako si Veronika nalieva z fľaše alkohol.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/26",
+      "stable_name": "Dogyho narodeninová torta",
+      "source_evidence": "Prichádza k nim aj Bety s tortou a sviečkami.",
+      "evidence_phrase": "Bety s tortou a sviečkami",
+      "physical_presence": true,
+      "owner": "DOGY",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Prichádza k nim aj Bety s tortou a sviečkami.",
+      "current_state": "Prichádza k nim aj Bety s tortou a sviečkami.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/26",
+      "stable_name": "Sviečky na Dogyho narodeninovej torte",
+      "source_evidence": "Prichádza k nim aj Bety s tortou a sviečkami.",
+      "evidence_phrase": "tortou a sviečkami",
+      "physical_presence": true,
+      "owner": "DOGY",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Prichádza k nim aj Bety s tortou a sviečkami.",
+      "current_state": "Prichádza k nim aj Bety s tortou a sviečkami.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/27",
+      "stable_name": "Drink Alexa a Veroniky",
+      "source_evidence": "Veronika sa len povzdychne a tak jej Alex ponúkne drink.",
+      "evidence_phrase": "Alex ponúkne drink",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "Veronika sa len povzdychne a tak jej Alex ponúkne drink.",
+      "current_state": "Veronika sa len povzdychne a tak jej Alex ponúkne drink.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/28",
+      "stable_name": "Sud piva prinesený Patrikom",
+      "source_evidence": "Za ňou sa zjaví Patrik aj so sudom piva.",
+      "evidence_phrase": "Patrik aj so sudom piva",
+      "physical_presence": true,
+      "owner": "PATRIK",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Za ňou sa zjaví Patrik aj so sudom piva.",
+      "current_state": "Za ňou sa zjaví Patrik aj so sudom piva.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/30",
+      "stable_name": "Andyho zabalená kniha pre Dogyho",
+      "source_evidence": "Na dvere izby, ktoré sú otvorené a počuť zdola hudbu, zaklopká Andy a dokonca priniesol darček (zabalenú knihu).",
+      "evidence_phrase": "darček (zabalenú knihu)",
+      "physical_presence": true,
+      "owner": "DOGY",
+      "categories": [
+        "Osobná rekvizita",
+        "Dokument"
+      ],
+      "continuity_group": null,
+      "action": "Na dvere izby, ktoré sú otvorené a počuť zdola hudbu, zaklopká Andy a dokonca priniesol darček (zabalenú knihu).",
+      "current_state": "Na dvere izby, ktoré sú otvorené a počuť zdola hudbu, zaklopká Andy a dokonca priniesol darček (zabalenú knihu).",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/32",
+      "stable_name": "Kikov pohár na Dogyho oslave",
+      "source_evidence": "Príde k nej Kiko s pohárom v ruke, tiež pozerá ich smerom.",
+      "evidence_phrase": "Kiko s pohárom v ruke",
+      "physical_presence": true,
+      "owner": "KIKO",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Príde k nej Kiko s pohárom v ruke, tiež pozerá ich smerom.",
+      "current_state": "Príde k nej Kiko s pohárom v ruke, tiež pozerá ich smerom.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/33",
+      "stable_name": "Betin sáčok na odpadky",
+      "source_evidence": "Bety má v ruke sáčok na smeti a upratuje umelé poháre po pití.",
+      "evidence_phrase": "Bety má v ruke sáčok na smeti",
+      "physical_presence": true,
+      "owner": "BETY",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Bety má v ruke sáčok na smeti a upratuje umelé poháre po pití.",
+      "current_state": "Bety má v ruke sáčok na smeti a upratuje umelé poháre po pití.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/33",
+      "stable_name": "Umelé poháre z Dogyho oslavy",
+      "source_evidence": "Bety má v ruke sáčok na smeti a upratuje umelé poháre po pití.",
+      "evidence_phrase": "umelé poháre po pití",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "Bety má v ruke sáčok na smeti a upratuje umelé poháre po pití.",
+      "current_state": "Bety má v ruke sáčok na smeti a upratuje umelé poháre po pití.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/33",
+      "stable_name": "Betina čierna parochňa",
+      "source_evidence": "FLASH 3/44 VÍRIVKA (BETY V PAROCHNI MUČÍ FIFA VO VÍRIVKE)",
+      "evidence_phrase": "BETY V PAROCHNI",
+      "physical_presence": true,
+      "owner": "BETY",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "bety-black-wig",
+      "action": "FLASH 3/44 VÍRIVKA (BETY V PAROCHNI MUČÍ FIFA VO VÍRIVKE)",
+      "current_state": "FLASH 3/44 VÍRIVKA (BETY V PAROCHNI MUČÍ FIFA VO VÍRIVKE)",
+      "previous": "10/13",
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/37",
+      "stable_name": "Alexov osobný mobil",
+      "source_evidence": "Je zmätený a nešťastný, berie do ruky mobil a vidíme, že ide volať otcovi.",
+      "evidence_phrase": "berie do ruky mobil",
+      "physical_presence": true,
+      "owner": "ALEX",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "alex-mobile",
+      "action": "Je zmätený a nešťastný, berie do ruky mobil a vidíme, že ide volať otcovi.",
+      "current_state": "Je zmätený a nešťastný, berie do ruky mobil a vidíme, že ide volať otcovi.",
+      "previous": "10/20",
+      "next": "10/47",
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/40",
+      "stable_name": "Andyho čierna kožená bunda",
+      "source_evidence": "Síce si dala dolu koženú bundu, presťahovala sa do domčeka s predzáhradkou, ale obidvaja dobre vieme, že vlčí smrad zo seba nezmyješ.",
+      "evidence_phrase": "dala dolu koženú bundu",
+      "physical_presence": false,
+      "owner": "ANDY",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Síce si dala dolu koženú bundu, presťahovala sa do domčeka s predzáhradkou, ale obidvaja dobre vieme, že vlčí smrad zo seba nezmyješ.",
+      "current_state": "Síce si dala dolu koženú bundu, presťahovala sa do domčeka s predzáhradkou, ale obidvaja dobre vieme, že vlčí smrad zo seba nezmyješ.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": "Potvrdiť, či replika označuje fyzicky prítomnú Andyho bundu v obraze alebo iba obrazné pomenovanie minulosti."
+    },
+    {
+      "scene_id": "10/41",
+      "stable_name": "Mastné jedlo študentov po párty",
+      "source_evidence": "V bistre sedí len pár opitých študentov z párty a dojedajú mastné jedlo, aby im ustúpil alkohol.",
+      "evidence_phrase": "dojedajú mastné jedlo",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "V bistre sedí len pár opitých študentov z párty a dojedajú mastné jedlo, aby im ustúpil alkohol.",
+      "current_state": "V bistre sedí len pár opitých študentov z párty a dojedajú mastné jedlo, aby im ustúpil alkohol.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/43",
+      "stable_name": "Dogyho nafukovací matrac u Alexa",
+      "source_evidence": "Veronika spí v Alexovej posteli a Alex spí na zemi na Dogyho matraci.",
+      "evidence_phrase": "Dogyho matraci",
+      "physical_presence": true,
+      "owner": "DOGY",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "dogy-mattress-alex",
+      "action": "Veronika spí v Alexovej posteli a Alex spí na zemi na Dogyho matraci.",
+      "current_state": "Veronika spí v Alexovej posteli a Alex spí na zemi na Dogyho matraci.",
+      "previous": "07/50",
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/45",
+      "stable_name": "Gajdošova kosačka alebo smetiaky",
+      "source_evidence": "Veronika prichádza domov po prehýrenej noci, Gajdoš práve niečo robí na predzáhradke (kosí, dáva pred dom smetiaky.",
+      "evidence_phrase": "kosí, dáva pred dom smetiaky",
+      "physical_presence": true,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "action": "Veronika prichádza domov po prehýrenej noci, Gajdoš práve niečo robí na predzáhradke (kosí, dáva pred dom smetiaky.",
+      "current_state": "Veronika prichádza domov po prehýrenej noci, Gajdoš práve niečo robí na predzáhradke (kosí, dáva pred dom smetiaky.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": "Vybrať konkrétnu činnosť a rekvizitu Gajdoša na predzáhradke; scenár uvádza alternatívu kosačka/smetiaky."
+    },
+    {
+      "scene_id": "10/46",
+      "stable_name": "Laurina káva",
+      "source_evidence": "Veronika príde domov, Laura sedí za stolom a pije kávu.",
+      "evidence_phrase": "Laura sedí za stolom a pije kávu",
+      "physical_presence": true,
+      "owner": "LAURA",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Veronika príde domov, Laura sedí za stolom a pije kávu.",
+      "current_state": "Veronika príde domov, Laura sedí za stolom a pije kávu.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/47",
+      "stable_name": "Alexov osobný mobil",
+      "source_evidence": "Alexovi zazvoní mobil, vidíme, že je to Lukáš, ale Alex to nezodvihne.",
+      "evidence_phrase": "Alexovi zazvoní mobil",
+      "physical_presence": true,
+      "owner": "ALEX",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "alex-mobile",
+      "action": "Alexovi zazvoní mobil, vidíme, že je to Lukáš, ale Alex to nezodvihne.",
+      "current_state": "Alexovi zazvoní mobil, vidíme, že je to Lukáš, ale Alex to nezodvihne.",
+      "previous": "10/37",
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/49",
+      "stable_name": "Veronikina matcha pre Bety",
+      "source_evidence": "Matcha a šišky pre moju obľúbenú novinárku.",
+      "evidence_phrase": "Matcha a šišky",
+      "physical_presence": true,
+      "owner": "BETY",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Matcha a šišky pre moju obľúbenú novinárku.",
+      "current_state": "Matcha a šišky pre moju obľúbenú novinárku.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/49",
+      "stable_name": "Šišky od Veroniky pre Bety",
+      "source_evidence": "Matcha a šišky pre moju obľúbenú novinárku.",
+      "evidence_phrase": "Matcha a šišky",
+      "physical_presence": true,
+      "owner": "BETY",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Matcha a šišky pre moju obľúbenú novinárku.",
+      "current_state": "Matcha a šišky pre moju obľúbenú novinárku.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/48",
+      "stable_name": "Betina káva od Alice",
+      "source_evidence": "Podá Bety kávu.",
+      "evidence_phrase": "Podá Bety kávu",
+      "physical_presence": true,
+      "owner": "BETY",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Podá Bety kávu.",
+      "current_state": "Podá Bety kávu.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/50",
+      "stable_name": "Liborova náhradná retiazka s príveskom V pre Veroniku",
+      "source_evidence": "Ona ho otvorí a vo vnútri nájde krabičku s retiazkou a príveskom, rovnakou ako tá, čo ju roztrhla.",
+      "evidence_phrase": "krabičku s retiazkou a príveskom",
+      "physical_presence": true,
+      "owner": "VERONIKA",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Ona ho otvorí a vo vnútri nájde krabičku s retiazkou a príveskom, rovnakou ako tá, čo ju roztrhla.",
+      "current_state": "Ona ho otvorí a vo vnútri nájde krabičku s retiazkou a príveskom, rovnakou ako tá, čo ju roztrhla.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/50",
+      "stable_name": "Krabička na náhradnú retiazku pre Veroniku",
+      "source_evidence": "Ona ho otvorí a vo vnútri nájde krabičku s retiazkou a príveskom, rovnakou ako tá, čo ju roztrhla.",
+      "evidence_phrase": "krabičku s retiazkou",
+      "physical_presence": true,
+      "owner": "VERONIKA",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "action": "Ona ho otvorí a vo vnútri nájde krabičku s retiazkou a príveskom, rovnakou ako tá, čo ju roztrhla.",
+      "current_state": "Ona ho otvorí a vo vnútri nájde krabičku s retiazkou a príveskom, rovnakou ako tá, čo ju roztrhla.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "10/50",
+      "stable_name": "Liborov odkaz Veronike k retiazke",
+      "source_evidence": "V balíčku je odkaz – ďakujem, zlatíčko.",
+      "evidence_phrase": "V balíčku je odkaz",
+      "physical_presence": true,
+      "owner": "VERONIKA",
+      "categories": [
+        "Osobná rekvizita",
+        "Dokument"
+      ],
+      "continuity_group": null,
+      "action": "V balíčku je odkaz – ďakujem, zlatíčko.",
+      "current_state": "V balíčku je odkaz – ďakujem, zlatíčko.",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    }
+  ],
+  "questions": [
+    {
+      "scene_id": "07/05",
+      "question": "Upresniť presný obsah a počet krabíc s vybavením Veronikinej izby."
+    },
+    {
+      "scene_id": "07/30",
+      "question": "Potvrdiť, či sa Veronika líči podľa zrkadla alebo podľa mobilu; scenár uvádza alternatívu."
+    },
+    {
+      "scene_id": "07/50",
+      "question": "Vybrať, či bude použitá nafukovacia posteľ alebo samostatný matrac; scenár uvádza alternatívu."
+    },
+    {
+      "scene_id": "08/01LP",
+      "question": "Upresniť konkrétne spoločenské hry a počet kusov pre rodinný klip."
+    },
+    {
+      "scene_id": "08/11",
+      "question": "Upresniť druh a obsah papierov, ktoré Laura a Lukáš preberajú s Viliamom."
+    },
+    {
+      "scene_id": "08/27",
+      "question": "Upresniť počet, typy a vlastníkov motoriek zaparkovaných pred krčmou U Vlka."
+    },
+    {
+      "scene_id": "08/29",
+      "question": "Potvrdiť, že Lukáš v 08/29 prichádza na tom istom pracovnom pickupe ako v 08/16 a 08/21."
+    },
+    {
+      "scene_id": "08/31",
+      "question": "Potvrdiť, že Lukášovo auto v 08/31 je ten istý pracovný pickup ako v 08/16 a 08/21."
+    },
+    {
+      "scene_id": "09/26",
+      "question": "Potvrdiť, na čí mobil Sára, Lola a Popy pozerajú storku; pracovná identita je zatiaľ vedená pri Sáre."
+    },
+    {
+      "scene_id": "09/29",
+      "question": "Upresniť vzhľad a veľkosť obleku, ktorý Sára priniesla Alexovi."
+    },
+    {
+      "scene_id": "09/51",
+      "question": "Potvrdiť, či Sára pozerá fyzickú vytlačenú fotografiu alebo digitálnu fotku na displeji."
+    },
+    {
+      "scene_id": "10/02LP",
+      "question": "Upresniť, či má mať každý študent samostatný zošit a aký predmet sa vyučuje."
+    },
+    {
+      "scene_id": "10/17",
+      "question": "Vybrať, či sa použije nôž alebo krájač na pizzu; scenár uvádza alternatívu."
+    },
+    {
+      "scene_id": "10/22",
+      "question": "Upresniť konkrétny titul knihy alebo časopisu o prežití v džungli."
+    },
+    {
+      "scene_id": "10/40",
+      "question": "Potvrdiť, či replika označuje fyzicky prítomnú Andyho bundu v obraze alebo iba obrazné pomenovanie minulosti."
+    },
+    {
+      "scene_id": "10/45",
+      "question": "Vybrať konkrétnu činnosť a rekvizitu Gajdoša na predzáhradke; scenár uvádza alternatívu kosačka/smetiaky."
+    }
+  ]
+}

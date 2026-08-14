@@ -131,6 +131,7 @@ def extract(pdf_path: Path, episode: int):
         scene["labels"] = []
         scene["questions"] = []
         scenes.append(scene)
+    repair_parallel_scenes(scenes)
     return scenes, {
         "episode": episode, "filename": pdf_path.name,
         "sha256": source_hash, "pages": pages, "scenes": len(scenes),
@@ -139,6 +140,85 @@ def extract(pdf_path: Path, episode: int):
             scene_id: len(matches) for scene_id, matches in sorted(by_id.items())
         },
     }
+
+
+def split_blocks(text, default_scene, marker_rules, special_rules=()):
+    current = default_scene
+    result = {scene_id: [] for scene_id in {default_scene, *marker_rules.values(), *(value for _, value in special_rules)}}
+    for phrase in [*marker_rules, *(phrase for phrase, _ in special_rules)]:
+        text = re.sub(
+            rf"(?i)(?<!^)(\(?{re.escape(phrase)})", r"\n\n\1", text,
+        )
+    for block in re.split(r"\n\s*\n", text.strip()):
+        normalized = re.sub(r"[*_>\s]+", " ", block).strip().casefold()
+        for phrase, scene_id in special_rules:
+            if phrase.casefold() in normalized:
+                current = scene_id
+                break
+        for marker, scene_id in marker_rules.items():
+            if marker.casefold() in normalized:
+                current = scene_id
+                break
+        result[current].append(block)
+    return {scene_id: "\n\n".join(blocks).strip() for scene_id, blocks in result.items()}
+
+
+def raw_to_markdown(text):
+    output = []
+    for block in re.split(r"\n\s*\n", text.strip()):
+        lines = block.splitlines()
+        speaker = lines[0].strip() if lines else ""
+        if len(lines) > 1 and base.is_upper_line(speaker):
+            dialogue = " ".join(line.strip() for line in lines[1:] if line.strip())
+            output.append(f"> **{speaker}:**\n> {dialogue}")
+        else:
+            output.append(f"*{block.strip()}*")
+    return "\n\n".join(output)
+
+
+def repair_parallel_scenes(scenes):
+    by_id = {scene["scene_id"]: scene for scene in scenes}
+    repairs = [
+        ({"08/20", "08/21"}, "08/21", "08/20", {
+            "prestrih na stavenisko": "08/21", "prestrih do unimobunky": "08/20",
+        }, (("patrik si prešmátra", "08/21"),)),
+        ({"09/17", "09/18"}, "09/18", "09/17", {
+            "prestrih spomienka": "09/18", "prestrih hala": "09/17",
+        }, ()),
+        ({"10/03LP", "10/04LP", "10/05LP"}, "10/05LP", "10/03LP", {
+            "prestrih do telocvične": "10/04LP", "tréning tanečnej skupiny": "10/04LP",
+            "prestrih na párty": "10/03LP", "tréning basketbalistov": "10/05LP",
+        }, ()),
+        ({"10/11", "10/12"}, "10/12", "10/11", {
+            "prestrih redakcia": "10/12", "prestrih ubytovňa": "10/11",
+        }, ()),
+        ({"10/14", "10/15"}, "10/15", "10/14", {
+            "prestrih k evinej skrinke": "10/15", "prestrih na chodbu": "10/14",
+        }, ()),
+        ({"10/20", "10/21"}, "10/21", "10/20", {
+            "prestrih – auto": "10/21", "prestrih - auto": "10/21",
+            "prestrih auto": "10/21", "prestrih obývačka": "10/20",
+            "prestrih - obývačka": "10/20",
+        }, ()),
+    ]
+    for target_ids, source_id, default_id, markers, special in repairs:
+        if not target_ids.issubset(by_id):
+            continue
+        source = by_id[source_id]
+        raw = split_blocks(source["action_raw"], default_id, markers, special)
+        if target_ids == {"10/03LP", "10/04LP", "10/05LP"}:
+            tail = "(prestrih do telocvične) Poriadok a disciplína."
+            if raw["10/04LP"].endswith(tail):
+                raw["10/04LP"] = raw["10/04LP"][:-len(tail)].rstrip()
+                raw["10/05LP"] = tail + " " + raw["10/05LP"]
+        for scene_id in target_ids:
+            if not raw.get(scene_id):
+                raise ValueError(f"{scene_id}: empty repaired parallel action")
+            by_id[scene_id]["action_raw"] = raw[scene_id]
+            by_id[scene_id]["action_markdown"] = raw_to_markdown(raw[scene_id])
+            by_id[scene_id]["action_sha256"] = hashlib.sha256(
+                raw[scene_id].encode("utf-8")
+            ).hexdigest()
 
 
 def main():

@@ -45,9 +45,38 @@ class Ep0710ImportTest(unittest.TestCase):
             self.assertTrue(scene["action_raw"], scene["scene_id"])
             self.assertEqual(64, len(scene["action_sha256"]))
 
+    def test_parallel_scenes_are_split_and_complete(self):
+        scenes = {scene["scene_id"]: scene for scene in self.payload["scenes"]}
+        for scene_id in ("08/20", "09/17", "10/03LP", "10/04LP", "10/11", "10/14", "10/20"):
+            self.assertNotIn(scenes[scene_id]["action_raw"].strip().casefold(), {"paralelne", "parelelne"})
+            self.assertGreater(len(scenes[scene_id]["action_raw"]), 40, scene_id)
+        self.assertIn("Zoberte si z chladničky", scenes["08/20"]["action_raw"])
+        self.assertIn("nechal som tam mobil", scenes["08/21"]["action_raw"])
+        self.assertIn("Sára, všetci čakajú", scenes["09/17"]["action_raw"])
+        self.assertIn("Jakub plynulým pohybom", scenes["09/18"]["action_raw"])
+        self.assertIn("Tréning tanečnej skupiny", scenes["10/04LP"]["action_raw"])
+        self.assertIn("Tréning basketbalistov", scenes["10/05LP"]["action_raw"])
+
     def test_registry_alias_normalization(self):
         card = {"name": "ŠKOLA – KLUBOVŇA", "desc": "KANONICKÝ NÁZOV: ŠKOLA – KLUBOVŇA\nALIASY: ŠKOLA - KLUBOVŇA"}
         self.assertEqual({folded("ŠKOLA – KLUBOVŇA")}, registry_aliases(card))
+
+    def test_explicit_identity_map_is_evidence_backed(self):
+        with open("cierny_kamen_ep07_10_identity_map.json", encoding="utf-8") as stream:
+            identity = json.load(stream)
+        scenes = {scene["scene_id"]: scene for scene in self.payload["scenes"]}
+        self.assertGreaterEqual(identity["record_count"], 180)
+        for record in identity["records"]:
+            self.assertIn(record["evidence_phrase"].casefold(), scenes[record["scene_id"]]["action_raw"].casefold())
+            self.assertTrue(record["stable_name"])
+            if record["continuity_group"]:
+                self.assertTrue(record["physical_presence"])
+
+    def test_space_map_contains_reviewed_multi_space_headings(self):
+        with open("cierny_kamen_ep07_10_space_map.json", encoding="utf-8") as stream:
+            spaces = json.load(stream)
+        self.assertEqual(3, len(spaces["VERONIKINA VILA – VSTUP/OBÝVAČKA/JEDÁLEŇ"]))
+        self.assertEqual(["ALEXOV DOM – ALEXOVA IZBA"], spaces["ALEXOV DOM – ALIXOVA IZBA"])
 
 
 if __name__ == "__main__":

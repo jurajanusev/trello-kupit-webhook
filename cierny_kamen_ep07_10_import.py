@@ -12,6 +12,8 @@ from flask import jsonify, request
 KEY = "cierny-kamen-ep07-10-12aug-8d5a31c7"
 BOARD_REF = "CzuD55PR"
 PAYLOAD_PATH = Path(__file__).with_name("cierny_kamen_ep07_10_scenes.json")
+IDENTITY_PATH = Path(__file__).with_name("cierny_kamen_ep07_10_identity_map.json")
+SPACE_MAP_PATH = Path(__file__).with_name("cierny_kamen_ep07_10_space_map.json")
 SPACE_LIST = "REGISTER PRIESTOROV"
 SET_LIST = "NADVÄZNÉ SETY"
 PROP_LIST = "REGISTER REKVIZÍT"
@@ -49,6 +51,8 @@ def scene_summary(scene):
 
 def build_audit(api):
     payload = json.loads(PAYLOAD_PATH.read_text(encoding="utf-8"))
+    identity_map = json.loads(IDENTITY_PATH.read_text(encoding="utf-8"))
+    space_map = json.loads(SPACE_MAP_PATH.read_text(encoding="utf-8"))
     board = api["trello_get"](f"/boards/{BOARD_REF}", {"fields": "id,name,url,closed"})
     lists = api["trello_get"](f"/boards/{board['id']}/lists", {
         "fields": "id,name,pos,closed", "filter": "all",
@@ -86,11 +90,20 @@ def build_audit(api):
             alias_index[alias].append(card)
     location_rows = []
     for location, count in sorted(Counter(scene["location"] for scene in payload["scenes"]).items(), key=lambda row: folded(row[0])):
-        matches = alias_index.get(folded(location), [])
+        canonical_names = space_map.get(location, [location])
+        targets = []
+        for canonical_name in canonical_names:
+            matches = alias_index.get(folded(canonical_name), [])
+            targets.append({
+                "canonical": canonical_name,
+                "status": "matched" if len(matches) == 1 else "new" if not matches else "ambiguous",
+                "matches": [{"name": c["name"], "url": c["shortUrl"]} for c in matches],
+            })
+        statuses = {target["status"] for target in targets}
+        status = "ambiguous" if "ambiguous" in statuses else "new" if "new" in statuses else "matched"
         location_rows.append({
-            "source": location, "scene_count": count,
-            "status": "matched" if len(matches) == 1 else "new" if not matches else "ambiguous",
-            "matches": [{"name": c["name"], "url": c["shortUrl"]} for c in matches],
+            "source": location, "scene_count": count, "status": status,
+            "targets": targets,
         })
     ambiguous_locations = [row for row in location_rows if row["status"] == "ambiguous"]
     new_locations = [row for row in location_rows if row["status"] == "new"]
@@ -149,8 +162,15 @@ def build_audit(api):
             "policy": "create-only while all ep07-10 IDs are absent; any existing ID is a conflict and is not written",
         },
         "semantic_plan": {
-            "status": "pending explicit reviewed identity map",
-            "props": [], "sets": [], "questions": [],
+            "status": "explicit reviewed identity map loaded",
+            "prop_items": identity_map["record_count"],
+            "scenes_with_props": identity_map["scene_count_with_props"],
+            "unique_prop_identities": len({record["stable_name"] for record in identity_map["records"]}),
+            "continuity_groups": len({record["continuity_group"] for record in identity_map["records"] if record["continuity_group"]}),
+            "category_counts": dict(Counter(category for record in identity_map["records"] for category in record["categories"])),
+            "questions": identity_map["questions"],
+            "set_continuity_items": 0,
+            "set_continuity_note": "No explicit cross-scene physical set-state chain was confirmed in the four PDFs; ordinary repeated locations are not labelled.",
             "note": "No generic keyword classifier is used as authority.",
         },
     }
