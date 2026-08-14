@@ -12,7 +12,8 @@ if "flask" not in sys.modules:
     sys.modules["flask"] = flask_stub
 
 from cierny_kamen_ep07_10_import import (
-    CHECKLIST_NAMES, folded, merged_occurrence_links, prop_item_text,
+    CHECKLIST_NAMES, compatible_sample_checklists, folded,
+    merged_occurrence_links, prop_item_text,
     registry_aliases, registry_plan, runtime_state,
 )
 
@@ -159,6 +160,13 @@ class Ep0710ImportTest(unittest.TestCase):
         self.assertEqual(2, len(merged))
         self.assertIn("https://trello.com/c/old", merged[0])
         self.assertIn("https://trello.com/c/new", merged[1])
+
+    def test_only_shape_identical_samples_can_receive_generated_item_fix(self):
+        desired = [(name, ["new"] if name == "REKVIZITY" else []) for name in CHECKLIST_NAMES]
+        actual = [(name, ["old"] if name == "REKVIZITY" else []) for name in CHECKLIST_NAMES]
+        self.assertTrue(compatible_sample_checklists("09/35", actual, desired))
+        self.assertFalse(compatible_sample_checklists("09/36", actual, desired))
+        self.assertFalse(compatible_sample_checklists("09/35", actual[:-1], desired))
 
 
 if __name__ == "__main__":
