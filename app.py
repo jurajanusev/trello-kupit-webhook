@@ -3513,9 +3513,25 @@ def sync_dunaj_schedule():
     ).upper()), None)
     cards = []
     for list_id in open_lists:
-        cards.extend(trello_get(f"/lists/{list_id}/cards", {
-            "fields": "id,name,desc,idList,shortUrl,due,dueComplete,pos,closed", "filter": "open", "limit": 1000
-        }))
+        before = None
+        seen_page_ends = set()
+        while True:
+            params = {
+                "fields": "id,name,desc,idList,shortUrl,due,dueComplete,pos,closed",
+                "filter": "open",
+                "limit": 1000,
+            }
+            if before:
+                params["before"] = before
+            page = trello_get(f"/lists/{list_id}/cards", params)
+            cards.extend(page)
+            if len(page) < 1000:
+                break
+            page_end = page[-1]["id"]
+            if page_end in seen_page_ends:
+                return jsonify({"error": "Trello card pagination did not advance"}), 502
+            seen_page_ends.add(page_end)
+            before = page_end
 
     cards_by_scene = {}
     for card in cards:
