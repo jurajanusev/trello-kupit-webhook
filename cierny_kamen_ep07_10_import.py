@@ -85,6 +85,14 @@ def runtime_state(api):
             "filter": "open", "limit": 1000,
         }):
             cards_by_id[card["id"]] = card
+    search = api["trello_get"]("/search", {
+        "query": "Alexova gitara", "idBoards": board["id"],
+        "modelTypes": "cards", "cards_limit": 100,
+        "card_fields": "id,name,desc,idList,shortUrl,closed,idLabels",
+    })
+    for card in search.get("cards", []):
+        if not card.get("closed"):
+            cards_by_id[card["id"]] = card
     cards = list(cards_by_id.values())
     return {
         "board": board, "lists": lists, "labels": labels, "cards": cards,
