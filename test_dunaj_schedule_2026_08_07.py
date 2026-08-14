@@ -18,7 +18,7 @@ SOURCE_ROWS = DOCUMENT["rows"]
 
 class DunajAugust7ScheduleTests(unittest.TestCase):
     def test_authoritative_json_shape(self):
-        self.assertEqual(DOCUMENT["source"], app.DUNAJ_CURRENT_SOURCE_LABEL)
+        self.assertEqual(DOCUMENT["source"], "predbežná dispo DUNAJ 16 z 7. 8. 2026")
         self.assertEqual(len(SOURCE_ROWS), 108)
         self.assertEqual(len({row["scene_id"] for row in SOURCE_ROWS}), 108)
         self.assertTrue(all(row["location"] for row in SOURCE_ROWS))
@@ -27,7 +27,7 @@ class DunajAugust7ScheduleTests(unittest.TestCase):
     def test_next_seven_shooting_days_skip_days_off(self):
         dates = sorted({
             row["shooting_date"] for row in SOURCE_ROWS
-            if row["shooting_date"] >= app.DUNAJ_CURRENT_SCHEDULE_AS_OF
+            if row["shooting_date"] >= "2026-08-07"
         })[:7]
         self.assertEqual(dates, [
             "2026-08-10", "2026-08-11", "2026-08-12", "2026-08-13",
@@ -43,14 +43,6 @@ class DunajAugust7ScheduleTests(unittest.TestCase):
         self.assertNotIn("24/8B", by_id)
         self.assertEqual(by_id["24/8"]["order_display"], "8-9")
         self.assertEqual(by_id["24/8"]["characters"], "René, Lena, Gita")
-
-    def test_completed_endpoint_is_disabled(self):
-        response = app.app.test_client().post(
-            "/api/sync-dunaj-schedule?mode=dry-run&as_of=2026-08-07",
-            headers={"X-Sync-Key": app.DUNAJ_CURRENT_SCHEDULE_KEY},
-        )
-        self.assertEqual(response.status_code, 410)
-
 
 if __name__ == "__main__":
     unittest.main()

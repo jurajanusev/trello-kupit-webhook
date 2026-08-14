@@ -24,11 +24,11 @@ DOK4_CURRENT_SCHEDULE_FILE = "dok4_schedule_2026-08-07.json"
 DOK4_CURRENT_SCHEDULE_AS_OF = "2026-08-07"
 DOK4_CURRENT_SCHEDULE_ROWS = 160
 
-DUNAJ_CURRENT_SCHEDULE_KEY = "dunaj-schedule-07aug-74be2c91"
-DUNAJ_CURRENT_SCHEDULE_FILE = "dunaj_schedule_2026-08-07.json"
-DUNAJ_CURRENT_SCHEDULE_AS_OF = "2026-08-07"
-DUNAJ_CURRENT_SOURCE_LABEL = "predbežná dispo DUNAJ 16 z 7. 8. 2026"
-DUNAJ_CURRENT_SOURCE_ROWS = 108
+DUNAJ_CURRENT_SCHEDULE_KEY = "dunaj-schedule-14aug-5e8c219d"
+DUNAJ_CURRENT_SCHEDULE_FILE = "dunaj_schedule_2026-08-14.json"
+DUNAJ_CURRENT_SCHEDULE_AS_OF = "2026-08-14"
+DUNAJ_CURRENT_SOURCE_LABEL = "predbežná dispo DUNAJ 16 z 14. 8. 2026"
+DUNAJ_CURRENT_SOURCE_ROWS = 1148
 
 
 def canonicalize_dunaj_schedule_rows(source_rows):
@@ -58,6 +58,15 @@ def canonicalize_dunaj_schedule_rows(source_rows):
     if merged_24 is not None:
         raise ValueError("merged scene normalization failed")
     return schedule_rows
+
+
+def dunaj_schedule_bucket(shooting_date, as_of, active_dates):
+    """Classify a scene as already shot, currently active, or future."""
+    if shooting_date < as_of:
+        return "shot"
+    if shooting_date in set(active_dates):
+        return "active"
+    return "series"
 
 
 @app.errorhandler(requests.HTTPError)
@@ -3455,7 +3464,6 @@ def find_dunaj_board():
 
 @app.route("/api/sync-dunaj-schedule", methods=["POST"])
 def sync_dunaj_schedule():
-    return jsonify({"error": "completed one-off endpoint disabled"}), 410
     if request.headers.get("X-Sync-Key") != DUNAJ_CURRENT_SCHEDULE_KEY:
         return jsonify({"error": "forbidden"}), 403
 
@@ -3498,6 +3506,8 @@ def sync_dunaj_schedule():
     board_lists = trello_get(f"/boards/{board['id']}/lists", {"fields": "id,name,closed"})
     open_lists = {item["id"]: item for item in board_lists if not item.get("closed")}
     lists_by_name = {item["name"]: item for item in open_lists.values()}
+    series_list = lists_by_name.get("SERIA 15,16")
+    shot_list = lists_by_name.get("NATOČENÉ OBRAZY")
     cards = []
     for list_id in open_lists:
         cards.extend(trello_get(f"/lists/{list_id}/cards", {
@@ -3605,9 +3615,28 @@ def sync_dunaj_schedule():
     target_names = {date_text: date_list_name(date_text) for date_text in shooting_dates}
     missing_target_lists = [name for name in target_names.values() if name not in lists_by_name]
 
+    historical_actions = []
+    future_actions = []
+    for item in matched_for_updates:
+        row = item["row"]
+        card = item["card"]
+        current_list = open_lists.get(card.get("idList"), {}).get("name")
+        bucket = dunaj_schedule_bucket(row["shooting_date"], as_of, shooting_dates)
+        if bucket == "shot" and (
+            current_list != "NATOČENÉ OBRAZY" or card.get("due") or card.get("dueComplete")
+        ):
+            historical_actions.append({**item, "current_list": current_list})
+        elif bucket == "series" and (
+            current_list != "SERIA 15,16" or card.get("due") or card.get("dueComplete")
+        ):
+            future_actions.append({**item, "current_list": current_list})
+
     expected_target_by_card_id = {
         item["card"]["id"]: target_names[item["row"]["shooting_date"]]
         for item in window_cards
+    }
+    matched_nonwindow_card_ids = {
+        item["card"]["id"] for item in historical_actions + future_actions
     }
     stale_date_cards = []
     stale_by_list = {}
@@ -3616,7 +3645,11 @@ def sync_dunaj_schedule():
         if not re.fullmatch(r"\d{1,2}\.\d{1,2}\.", current_list):
             continue
         scene_id = scene_id_from_card_name(card.get("name"))
-        if not scene_id or card["id"] in expected_target_by_card_id:
+        if (
+            not scene_id
+            or card["id"] in expected_target_by_card_id
+            or card["id"] in matched_nonwindow_card_ids
+        ):
             continue
         stale_date_cards.append({
             "id": card["id"], "scene_id": scene_id, "name": card["name"],
@@ -3678,7 +3711,8 @@ def sync_dunaj_schedule():
         return metadata + ("\n\n" + old_desc if old_desc else "")
 
     metadata_pending_updates = []
-    for item in matched_for_updates:
+    metadata_actionable = []
+    for item in window_cards:
         row = item["row"]
         card = item["card"]
         fields = []
@@ -3687,13 +3721,14 @@ def sync_dunaj_schedule():
         if (card.get("due") or "")[:10] != row["shooting_date"]:
             fields.append("due")
         if fields:
+            metadata_actionable.append(item)
             metadata_pending_updates.append({
                 "scene_id": row["scene_id"], "fields": fields,
                 "url": card["shortUrl"],
             })
 
     mode = request.args.get("mode", "dry-run")
-    if mode not in {"dry-run", "apply-window", "cleanup-stale", "metadata"}:
+    if mode not in {"dry-run", "apply-window", "cleanup-stale", "metadata", "reconcile-history"}:
         return jsonify({"error": "apply modes disabled pending dry-run approval"}), 409
     if mode == "dry-run":
         matched_by_list = {}
@@ -3746,6 +3781,24 @@ def sync_dunaj_schedule():
             "window_pending_updates_count": len(window_pending_updates),
             "window_pending_updates": window_pending_updates,
             "metadata_due_pending_count": len(metadata_pending_updates),
+            "historical_schedule_rows": sum(
+                1 for row in schedule_rows if row["shooting_date"] < as_of
+            ),
+            "historical_to_shot_count": len(historical_actions),
+            "historical_to_shot_sample": [{
+                "scene_id": item["row"]["scene_id"],
+                "date": item["row"]["shooting_date"],
+                "from": item["current_list"], "to": "NATOČENÉ OBRAZY",
+                "url": item["card"]["shortUrl"],
+            } for item in historical_actions[:50]],
+            "future_to_series_count": len(future_actions),
+            "future_to_series_sample": [{
+                "scene_id": item["row"]["scene_id"],
+                "date": item["row"]["shooting_date"],
+                "from": item["current_list"], "to": "SERIA 15,16",
+                "url": item["card"]["shortUrl"],
+            } for item in future_actions[:50]],
+            "shot_list_found": bool(shot_list), "series_list_found": bool(series_list),
             "window_sample": [{
                 "scene_id": item["row"]["scene_id"], "date": item["row"]["shooting_date"],
                 "matched_scene_id": item["matched_scene_id"], "fallback_match": item["fallback_match"],
@@ -3753,6 +3806,53 @@ def sync_dunaj_schedule():
                 "from": open_lists.get(item["card"]["idList"], {}).get("name"),
                 "to": target_names[item["row"]["shooting_date"]], "url": item["card"]["shortUrl"],
             } for item in window_cards[:40]],
+        })
+
+    if mode == "reconcile-history":
+        if duplicate_ids or fallback_card_collisions:
+            return jsonify({
+                "error": "history reconciliation blocked by duplicate or collision matches",
+                "duplicates": duplicate_ids,
+                "fallback_collisions": fallback_card_collisions,
+            }), 409
+        if historical_actions and not shot_list:
+            return jsonify({"error": "NATOČENÉ OBRAZY list not found"}), 404
+        if future_actions and not series_list:
+            return jsonify({"error": "SERIA 15,16 list not found"}), 404
+        actions = [
+            {**item, "target": shot_list, "target_name": "NATOČENÉ OBRAZY"}
+            for item in historical_actions
+        ] + [
+            {**item, "target": series_list, "target_name": "SERIA 15,16"}
+            for item in future_actions
+        ]
+        actions.sort(key=lambda item: (
+            item["row"]["shooting_date"], item["row"]["order"], item["row"]["scene_id"]
+        ))
+        start = max(0, int(request.args.get("start", "0")))
+        limit = min(50, max(1, int(request.args.get("limit", "25"))))
+        batch = actions[start:start + limit]
+        updated = []; errors = []
+        for item in batch:
+            card = item["card"]
+            try:
+                result = trello_put_body(f"/cards/{card['id']}", {
+                    "idList": item["target"]["id"], "pos": "bottom",
+                    "due": "", "dueComplete": "false",
+                })
+                updated.append({
+                    "scene_id": item["row"]["scene_id"],
+                    "date": item["row"]["shooting_date"],
+                    "from": item["current_list"], "to": item["target_name"],
+                    "url": result["shortUrl"],
+                })
+            except Exception as exc:
+                errors.append({"scene_id": item["row"]["scene_id"], "error": str(exc)})
+        return jsonify({
+            "status": "history-reconciled", "planned": len(actions),
+            "batch": len(batch), "updated": len(updated),
+            "errors_count": len(errors), "errors": errors,
+            "remaining": max(0, len(actions) - start - len(batch)),
         })
 
     if mode == "apply-window":
@@ -3961,7 +4061,7 @@ def sync_dunaj_schedule():
     if mode == "metadata":
         batch_start = max(0, int(request.args.get("start", "0")))
         batch_limit = min(75, max(1, int(request.args.get("limit", "40"))))
-        batch = matched_for_updates[batch_start:batch_start + batch_limit]
+        batch = metadata_actionable[batch_start:batch_start + batch_limit]
         start_marker = "<!-- DUNAJ-SCHEDULE-METADATA:START -->"
         end_marker = "<!-- DUNAJ-SCHEDULE-METADATA:END -->"
         updated = []; unchanged = 0; moved = []; errors = []
@@ -4003,9 +4103,10 @@ def sync_dunaj_schedule():
         return jsonify({
             "status": "metadata-applied",
             "matched_card_copies": len(matched_for_updates),
+            "metadata_actionable": len(metadata_actionable),
             "fallback_collisions_skipped": fallback_card_collisions,
             "batch_start": batch_start, "batch_size": len(batch),
-            "remaining": max(0, len(matched_for_updates) - batch_start - len(batch)),
+            "remaining": max(0, len(metadata_actionable) - batch_start - len(batch)),
             "updated": len(updated), "unchanged": unchanged,
             "moved_count": len(moved), "errors_count": len(errors), "errors": errors[:20],
         })
