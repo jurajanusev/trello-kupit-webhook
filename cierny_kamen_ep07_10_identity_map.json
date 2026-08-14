@@ -1,6 +1,6 @@
 {
   "source": "cierny_kamen_ep07_10_scenes.json",
-  "record_count": 184,
+  "record_count": 183,
   "scene_count_with_props": 114,
   "records": [
     {
@@ -29,13 +29,14 @@
       "physical_presence": true,
       "owner": "DOGY",
       "categories": [
-        "Osobná rekvizita"
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
       ],
-      "continuity_group": null,
+      "continuity_group": "dogy-towel",
       "action": "Dogy ide po chodbe v pyžame s uterákom a kefkou.",
       "current_state": "Dogy ide po chodbe v pyžame s uterákom a kefkou.",
       "previous": null,
-      "next": null,
+      "next": "07/03",
       "ambiguity_question": null
     },
     {
@@ -63,12 +64,13 @@
       "physical_presence": true,
       "owner": "DOGY",
       "categories": [
-        "Osobná rekvizita"
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
       ],
-      "continuity_group": null,
+      "continuity_group": "dogy-towel",
       "action": "Dogy stojí v uteráku pred zrkadlom a češe si vlasy.",
       "current_state": "Dogy stojí v uteráku pred zrkadlom a češe si vlasy.",
-      "previous": null,
+      "previous": "07/02LP",
       "next": null,
       "ambiguity_question": null
     },
@@ -283,7 +285,7 @@
     },
     {
       "scene_id": "07/12",
-      "stable_name": "Andyho fľaša piva",
+      "stable_name": "Andyho fľaša piva v ubytovni",
       "source_evidence": "Kašeľ zapije pivom, fľašku ledabolo odloží.",
       "evidence_phrase": "Kašeľ zapije pivom",
       "physical_presence": true,
@@ -641,15 +643,13 @@
     },
     {
       "scene_id": "07/30",
-      "stable_name": "Veronikin osobný mobil",
+      "stable_name": "Neidentifikovaný mobil použitý ako zrkadlo – 07/30",
       "source_evidence": "Veronika sa postaví pred zrkadlo, alebo sa pozerá do mobilu (aby sa videla) a začne si maľovať pery.",
       "evidence_phrase": "pozerá do mobilu",
-      "physical_presence": true,
-      "owner": "VERONIKA",
-      "categories": [
-        "Osobná rekvizita"
-      ],
-      "continuity_group": "veronika-mobile",
+      "physical_presence": false,
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
       "action": "Veronika sa postaví pred zrkadlo, alebo sa pozerá do mobilu (aby sa videla) a začne si maľovať pery.",
       "current_state": "Veronika sa postaví pred zrkadlo, alebo sa pozerá do mobilu (aby sa videla) a začne si maľovať pery.",
       "previous": null,
@@ -874,7 +874,7 @@
     },
     {
       "scene_id": "07/51",
-      "stable_name": "Andyho fľaša piva",
+      "stable_name": "Andyho fľaša piva v chatke",
       "source_evidence": "Otvára si v fľašu a tackavo prejde až ku gauču, kde sa zvalí.",
       "evidence_phrase": "Otvára si v fľašu",
       "physical_presence": true,
@@ -1176,7 +1176,7 @@
       "action": "(prestrih na stavenisko) Patrik beží smerom k stavebnej ploche, kde je Lukášovo auto, miešačka, nádoby, náradie a veľký stavebný agregát.",
       "current_state": "(prestrih na stavenisko) Patrik beží smerom k stavebnej ploche, kde je Lukášovo auto, miešačka, nádoby, náradie a veľký stavebný agregát.",
       "previous": "08/16",
-      "next": "08/29",
+      "next": null,
       "ambiguity_question": null
     },
     {
@@ -1331,41 +1331,39 @@
     },
     {
       "scene_id": "08/29",
-      "stable_name": "Lukášov pracovný pickup",
+      "stable_name": "Lukášovo neidentifikované auto – 08/29",
       "source_evidence": "Andy pozrie na cestu, kde prudko zastaví auto, z ktorého vystupuje Lukáš.",
       "evidence_phrase": "zastaví auto, z ktorého vystupuje Lukáš",
       "physical_presence": true,
       "owner": "LUKÁŠ",
       "categories": [
         "Auto",
-        "Osobná rekvizita",
-        "Nadväzná rekvizita"
+        "Osobná rekvizita"
       ],
-      "continuity_group": "lukas-pickup",
+      "continuity_group": null,
       "action": "Andy pozrie na cestu, kde prudko zastaví auto, z ktorého vystupuje Lukáš.",
       "current_state": "Andy pozrie na cestu, kde prudko zastaví auto, z ktorého vystupuje Lukáš.",
-      "previous": "08/21",
-      "next": "08/31",
-      "ambiguity_question": "Potvrdiť, že Lukáš v 08/29 prichádza na tom istom pracovnom pickupe ako v 08/16 a 08/21."
+      "previous": null,
+      "next": null,
+      "ambiguity_question": "Potvrdiť, či Lukáš v 08/29 prichádza na tom istom pracovnom pickupe ako v 08/16 a 08/21."
     },
     {
       "scene_id": "08/31",
-      "stable_name": "Lukášov pracovný pickup",
+      "stable_name": "Lukášovo neidentifikované auto – 08/31",
       "source_evidence": "Alex trucovito sedí v Lukášovom aute.",
       "evidence_phrase": "Alex trucovito sedí v Lukášovom aute",
       "physical_presence": true,
       "owner": "LUKÁŠ",
       "categories": [
         "Auto",
-        "Osobná rekvizita",
-        "Nadväzná rekvizita"
+        "Osobná rekvizita"
       ],
-      "continuity_group": "lukas-pickup",
+      "continuity_group": null,
       "action": "Alex trucovito sedí v Lukášovom aute.",
       "current_state": "Alex trucovito sedí v Lukášovom aute.",
-      "previous": "08/29",
+      "previous": null,
       "next": null,
-      "ambiguity_question": "Potvrdiť, že Lukášovo auto v 08/31 je ten istý pracovný pickup ako v 08/16 a 08/21."
+      "ambiguity_question": "Potvrdiť, či Lukášovo auto v 08/31 je ten istý pracovný pickup ako v 08/16 a 08/21."
     },
     {
       "scene_id": "08/30",
@@ -1947,20 +1945,18 @@
     },
     {
       "scene_id": "09/26",
-      "stable_name": "Sárin osobný mobil",
+      "stable_name": "Neidentifikovaný mobil na storku – 09/26",
       "source_evidence": "Sára sedí na tulivaku/kresle a okolo nej sedia jej prívesky Lola a Popy, pozerajú nejakú storku a smejú sa.",
       "evidence_phrase": "pozerajú nejakú storku",
       "physical_presence": true,
-      "owner": "SÁRA",
-      "categories": [
-        "Osobná rekvizita"
-      ],
-      "continuity_group": "sara-mobile",
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
       "action": "Sára sedí na tulivaku/kresle a okolo nej sedia jej prívesky Lola a Popy, pozerajú nejakú storku a smejú sa.",
       "current_state": "Sára sedí na tulivaku/kresle a okolo nej sedia jej prívesky Lola a Popy, pozerajú nejakú storku a smejú sa.",
       "previous": null,
       "next": null,
-      "ambiguity_question": "Potvrdiť, na čí mobil Sára, Lola a Popy pozerajú storku; pracovná identita je zatiaľ vedená pri Sáre."
+      "ambiguity_question": "Potvrdiť, na čí mobil Sára, Lola a Popy pozerajú storku."
     },
     {
       "scene_id": "09/28LP",
@@ -2018,13 +2014,14 @@
       "physical_presence": true,
       "owner": "ALEX",
       "categories": [
-        "Osobná rekvizita"
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
       ],
-      "continuity_group": null,
+      "continuity_group": "alex-suit-from-sara",
       "action": "Za dverami stojí Sára a v ruke drží v priehľadnom obale oblek pre Alexa.",
       "current_state": "Za dverami stojí Sára a v ruke drží v priehľadnom obale oblek pre Alexa.",
       "previous": null,
-      "next": null,
+      "next": "09/45",
       "ambiguity_question": "Upresniť vzhľad a veľkosť obleku, ktorý Sára priniesla Alexovi."
     },
     {
@@ -2301,7 +2298,7 @@
       "continuity_group": "alex-suit-from-sara",
       "action": "Alex v obleku a bez kravaty (sňal si ju z krku, aby ho nezväzovala) prichádza domov.",
       "current_state": "Alex v obleku a bez kravaty (sňal si ju z krku, aby ho nezväzovala) prichádza domov.",
-      "previous": null,
+      "previous": "09/29",
       "next": null,
       "ambiguity_question": null
     },
@@ -2404,21 +2401,6 @@
       "continuity_group": null,
       "action": "Bety, Veronika a Alex spolu tancujú, očividne majú vypité.",
       "current_state": "Bety, Veronika a Alex spolu tancujú, očividne majú vypité.",
-      "previous": null,
-      "next": null,
-      "ambiguity_question": null
-    },
-    {
-      "scene_id": "10/03LP",
-      "stable_name": "Alkoholické nápoje na párty u Alexa",
-      "source_evidence": "Alex spolu so svojimi spoluhráčmi neviazane skáče a pri tom pije alkohol.",
-      "evidence_phrase": "pije alkohol",
-      "physical_presence": true,
-      "owner": null,
-      "categories": [],
-      "continuity_group": null,
-      "action": "Alex spolu so svojimi spoluhráčmi neviazane skáče a pri tom pije alkohol.",
-      "current_state": "Alex spolu so svojimi spoluhráčmi neviazane skáče a pri tom pije alkohol.",
       "previous": null,
       "next": null,
       "ambiguity_question": null
@@ -3144,15 +3126,15 @@
     },
     {
       "scene_id": "08/29",
-      "question": "Potvrdiť, že Lukáš v 08/29 prichádza na tom istom pracovnom pickupe ako v 08/16 a 08/21."
+      "question": "Potvrdiť, či Lukáš v 08/29 prichádza na tom istom pracovnom pickupe ako v 08/16 a 08/21."
     },
     {
       "scene_id": "08/31",
-      "question": "Potvrdiť, že Lukášovo auto v 08/31 je ten istý pracovný pickup ako v 08/16 a 08/21."
+      "question": "Potvrdiť, či Lukášovo auto v 08/31 je ten istý pracovný pickup ako v 08/16 a 08/21."
     },
     {
       "scene_id": "09/26",
-      "question": "Potvrdiť, na čí mobil Sára, Lola a Popy pozerajú storku; pracovná identita je zatiaľ vedená pri Sáre."
+      "question": "Potvrdiť, na čí mobil Sára, Lola a Popy pozerajú storku."
     },
     {
       "scene_id": "09/29",
