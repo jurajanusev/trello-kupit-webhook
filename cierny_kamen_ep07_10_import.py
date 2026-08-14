@@ -833,9 +833,18 @@ def register_routes(app, api):
                     scene, all_scenes, cards, prop_cards, space_cards,
                     space_map, identity_map,
                 )
-                card, writes, created = apply_scene(
-                    api, state, scene, desired, label_ids, scene_lists[0]["id"]
-                )
+                try:
+                    card, writes, created = apply_scene(
+                        api, state, scene, desired, label_ids, scene_lists[0]["id"]
+                    )
+                except Exception as error:
+                    return jsonify({
+                        "status": "blocked", "mode": mode,
+                        "failed_scene_id": scene["scene_id"],
+                        "error": f"{type(error).__name__}: {error}",
+                        "completed_results": results,
+                        "writes_before_failure": total_writes,
+                    }), 409
                 cards[scene["scene_id"]] = card
                 total_writes += writes
                 results.append({
