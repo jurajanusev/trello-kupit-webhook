@@ -12,7 +12,7 @@ if "flask" not in sys.modules:
     sys.modules["flask"] = flask_stub
 
 from cierny_kamen_ep07_10_import import (
-    CHECKLIST_NAMES, compatible_sample_checklists, folded,
+    CHECKLIST_NAMES, compatible_sample_checklists, ensure_attachments, folded,
     generated_checklist_prefix,
     merged_occurrence_links, prop_item_text,
     registry_aliases, registry_plan, runtime_state,
@@ -175,6 +175,20 @@ class Ep0710ImportTest(unittest.TestCase):
         self.assertTrue(generated_checklist_prefix(desired[:3], desired))
         self.assertFalse(generated_checklist_prefix([("SET", [])], desired))
         self.assertFalse(generated_checklist_prefix([("REKVIZITY", ["manual"])], desired))
+
+    def test_attachment_batch_reads_once_and_avoids_duplicates(self):
+        posts = []
+        api = {
+            "trello_get": lambda path, params: [{"url": "https://trello.com/c/existing"}],
+            "trello_post_body": lambda path, data: posts.append((path, data)),
+        }
+        added = ensure_attachments(api, {"id": "master"}, [
+            ("https://trello.com/c/existing", "Existing"),
+            ("https://trello.com/c/new", "New"),
+            ("https://trello.com/c/new", "New duplicate"),
+        ])
+        self.assertEqual(1, added)
+        self.assertEqual(1, len(posts))
 
 
 if __name__ == "__main__":

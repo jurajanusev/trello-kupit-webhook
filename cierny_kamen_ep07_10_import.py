@@ -10,7 +10,7 @@ import json
 from flask import jsonify, request
 
 from cierny_kamen_all_props_registry import (
-    PROP_AUTO_END, PROP_AUTO_START, ensure_attachment,
+    PROP_AUTO_END, PROP_AUTO_START,
 )
 from cierny_kamen_spaces_props import (
     SPACE_AUTO_END, SPACE_AUTO_START, replace_space_auto_block, space_marker,
@@ -575,6 +575,23 @@ def merged_occurrence_links(existing_desc, new_links):
     return result
 
 
+def ensure_attachments(api, card, links):
+    existing = api["trello_get"](
+        f"/cards/{card['id']}/attachments", {"fields": "id,name,url"}
+    )
+    urls = {item.get("url") for item in existing}
+    added = 0
+    for url, name in links:
+        if url in urls:
+            continue
+        api["trello_post_body"](
+            f"/cards/{card['id']}/attachments", {"url": url, "name": name}
+        )
+        urls.add(url)
+        added += 1
+    return added
+
+
 def sync_prop_master(api, state, row, scenes_by_id, cards_by_id, label_ids):
     if len(row["matches"]) != 1:
         raise ValueError(f"prop master conflict: {row['name']}")
@@ -601,11 +618,14 @@ def sync_prop_master(api, state, row, scenes_by_id, cards_by_id, label_ids):
         updates["idLabels"] = ",".join(desired_labels)
     if updates:
         api["trello_put_body"](f"/cards/{master['id']}", updates)
-    attachments = 0
+    attachments = ensure_attachments(api, master, [
+        (cards_by_id[sid]["shortUrl"], scenes_by_id[sid]["name"])
+        for sid in occurrence_ids
+    ])
     for sid in occurrence_ids:
-        scene_card = cards_by_id[sid]
-        attachments += int(ensure_attachment(api, master, scene_card["shortUrl"], scenes_by_id[sid]["name"]))
-        attachments += int(ensure_attachment(api, scene_card, master["shortUrl"], row["name"]))
+        attachments += ensure_attachments(
+            api, cards_by_id[sid], [(master["shortUrl"], row["name"])]
+        )
     return bool(updates), attachments
 
 
@@ -627,11 +647,15 @@ def sync_space_master(api, state, row, scenes, cards_by_id, space_map):
     updated = master.get("desc") != desired_desc
     if updated:
         api["trello_put_body"](f"/cards/{master['id']}", {"desc": desired_desc})
-    attachments = 0
+    attachments = ensure_attachments(api, master, [
+        (cards_by_id[scene["scene_id"]]["shortUrl"], scene["name"])
+        for scene in related
+    ])
     for scene in related:
-        scene_card = cards_by_id[scene["scene_id"]]
-        attachments += int(ensure_attachment(api, master, scene_card["shortUrl"], scene["name"]))
-        attachments += int(ensure_attachment(api, scene_card, master["shortUrl"], row["name"]))
+        attachments += ensure_attachments(
+            api, cards_by_id[scene["scene_id"]],
+            [(master["shortUrl"], row["name"])],
+        )
     return updated, attachments
 
 
