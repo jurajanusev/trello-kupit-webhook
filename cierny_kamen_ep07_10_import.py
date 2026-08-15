@@ -685,6 +685,41 @@ def sync_space_master(api, state, row, scenes, cards_by_id, space_map):
     return updated, attachments
 
 
+def space_master_diff(state, row, scenes, cards_by_id, space_map):
+    """Return a read-only description projection for idempotency diagnostics."""
+    if len(row["matches"]) != 1:
+        raise ValueError(f"space master conflict: {row['name']}")
+    master = next(
+        card for card in state["cards"]
+        if card["id"] == row["matches"][0]["id"]
+    )
+    related = [
+        scene for scene in scenes
+        if row["name"] in location_names(scene, space_map)
+        and scene["scene_id"] in cards_by_id
+    ]
+    links = merged_occurrence_links(
+        master.get("desc"),
+        [occurrence_link(scene, cards_by_id[scene["scene_id"]]) for scene in related],
+    )
+    desired = space_registry_description(row["name"]).replace(
+        "- Odkazy sa doplnia po vytvorení obrazových kariet.",
+        "\n".join(links) if links else "- Bez obrazového výskytu.",
+    )
+    actual = master.get("desc") or ""
+    desired_desc = replace_space_auto_block(actual, desired)
+    return {
+        "name": row["name"],
+        "changed": actual != desired_desc,
+        "actual_length": len(actual),
+        "desired_length": len(desired_desc),
+        "actual_sha256": hashlib.sha256(actual.encode("utf-8")).hexdigest(),
+        "desired_sha256": hashlib.sha256(desired_desc.encode("utf-8")).hexdigest(),
+        "start_markers": actual.count(SPACE_AUTO_START),
+        "end_markers": actual.count(SPACE_AUTO_END),
+    }
+
+
 def set_chain_plan(state):
     lists = exact_named(state["lists"], SET_LIST)
     cards = [card for card in state["cards"] if lists and card.get("idList") == lists[0]["id"]]
@@ -960,7 +995,7 @@ def register_routes(app, api):
             "audit", "dry-run", "sample-registry-init", "sample-space-init",
             "registry-init", "space-init", "sample-scenes-dry-run",
             "sample-scenes", "bootstrap", "finalize", "registry-sync",
-            "space-sync", "set-dry-run", "set-init", "set-sync",
+            "space-sync", "space-diff", "set-dry-run", "set-init", "set-sync",
             "final-audit",
         }
         if mode not in allowed:
@@ -1146,6 +1181,27 @@ def register_routes(app, api):
                 "writes": sum(item["writes"] + item["attachments_added"] for item in results),
                 "start": start, "selected": len(selected_set_rows),
                 "remaining": max(0, len(rows) - start - len(selected_set_rows)),
+            }), 200
+
+        if mode == "space-diff":
+            cards, card_collisions = card_map(api, state)
+            source_cards = {sid: cards[sid] for sid in scenes_by_id if sid in cards}
+            if card_collisions or len(source_cards) != len(scenes):
+                return jsonify({
+                    "status": "blocked", "card_collisions": list(card_collisions),
+                    "source_cards": len(source_cards), "expected": len(scenes),
+                }), 409
+            rows = space_plan(state, payload, space_map)
+            selected = rows[start:start + limit]
+            projections = [
+                space_master_diff(state, row, scenes, source_cards, space_map)
+                for row in selected
+            ]
+            return jsonify({
+                "status": "read-only", "mode": mode, "writes": 0,
+                "start": start, "selected": len(selected),
+                "remaining": max(0, len(rows) - start - len(selected)),
+                "changed": [row for row in projections if row["changed"]],
             }), 200
 
         if mode in {"registry-sync", "space-sync"}:
