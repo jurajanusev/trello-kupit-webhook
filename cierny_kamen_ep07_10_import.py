@@ -31,6 +31,31 @@ CHECKLIST_NAMES = (
     "OTÁZKY NA PORADU",
 )
 BOOTSTRAP_MARKER = "<!-- CIERNY-KAMEN-EP07-10-BOOTSTRAP -->"
+SET_CHAIN_AUTO_START = "<!-- CIERNY-KAMEN-SET-CHAIN-AUTO:START -->"
+SET_CHAIN_AUTO_END = "<!-- CIERNY-KAMEN-SET-CHAIN-AUTO:END -->"
+SET_CHAINS = (
+    {
+        "name": "Veronikina vila – výzdoba a pohostenie Sofiinej baby shower",
+        "occurrences": (
+            ("08/30", "vzniká vyzdobený a pohostením prestretý priestor baby shower"),
+            ("08/32", "baby shower pokračuje s hosťami, občerstvením a darčekmi"),
+            ("08/34", "hostky pokračujú v baby shower a rozbaľovaní darčekov"),
+            ("08/35", "po baby shower zostávajú poháre a neporiadok, ktoré sa upratujú"),
+        ),
+    },
+    {
+        "name": "Alexov dom – výzdoba a neporiadok po Dogyho oslave",
+        "occurrences": (
+            ("10/25", "vzniká výzdoba a občerstvenie na Dogyho prekvapivú oslavu"),
+            ("10/26", "výzdoba a občerstvenie pokračujú pri príchode oslávenca"),
+            ("10/28", "stav párty sa rozširuje o ďalších hostí, sud piva a hlasnú hudbu"),
+            ("10/29", "párty v obývačke pokračuje v plnom prúde"),
+            ("10/33", "v kuchyni zostáva párty neporiadok a použité umelé poháre"),
+            ("10/39", "párty a rozmiestnenie hostí pokračujú až do záverečnej drámy"),
+            ("10/42", "po skončení párty zostáva v obývačke explicitný neporiadok"),
+        ),
+    },
+)
 CATEGORY_LABELS = (
     "Auto", "Osobná rekvizita", "Dokument", "Screen",
     "Nadväzná rekvizita", "Nadväzný priestor", "Nadväzný set",
@@ -72,7 +97,8 @@ def runtime_state(api):
     # source scenes and the one old master known to fall outside that page.
     # This keeps the request below Render's timeout while preserving coverage.
     supplement_names = {
-        "SCENÁRE", PROP_LIST, SPACE_LIST, "ALEX – OS. REKVIZITY",
+        "SCENÁRE", PROP_LIST, SPACE_LIST, SET_LIST,
+        "ALEX – OS. REKVIZITY",
     }
     for item in lists:
         if item.get("closed") or not any(
@@ -659,6 +685,115 @@ def sync_space_master(api, state, row, scenes, cards_by_id, space_map):
     return updated, attachments
 
 
+def set_chain_plan(state):
+    lists = exact_named(state["lists"], SET_LIST)
+    cards = [card for card in state["cards"] if lists and card.get("idList") == lists[0]["id"]]
+    rows = []
+    for chain in SET_CHAINS:
+        matches = [card for card in cards if folded(card.get("name")) == folded(chain["name"])]
+        rows.append({
+            **chain, "matches": matches,
+            "status": "reuse" if len(matches) == 1 else "create" if not matches else "conflict",
+        })
+    return rows
+
+
+def set_chain_block(chain, scenes_by_id, cards_by_id):
+    links = [
+        occurrence_link(scenes_by_id[scene_id], cards_by_id[scene_id])
+        for scene_id, _ in chain["occurrences"]
+    ]
+    timeline = [
+        f"- {scene_id}: {context}" for scene_id, context in chain["occurrences"]
+    ]
+    return (
+        f"{SET_CHAIN_AUTO_START}\nKANONICKÝ NÁZOV: {chain['name']}\n"
+        "TYP: priamo nadväzný fyzický stav scénografie\n\n"
+        "### VÝSKYTY V OBRAZOCH\n" + "\n".join(links) + "\n\n"
+        "### ČASOVÁ OS STAVU\n" + "\n".join(timeline) + "\n"
+        f"{SET_CHAIN_AUTO_END}"
+    )
+
+
+def set_chain_item(chain, index, master_url):
+    scene_id, context = chain["occurrences"][index]
+    previous = chain["occurrences"][index - 1][0] if index else "prvý výskyt"
+    following = (
+        chain["occurrences"][index + 1][0]
+        if index + 1 < len(chain["occurrences"])
+        else "ďalší potvrdený obraz neurčený"
+    )
+    return (
+        f"<n> **{chain['name']}** — *{context} | ← {previous} | "
+        f"TU: {context} | → {following}* | KARTA: {master_url}"
+    )
+
+
+def append_description_link(desc, name, url):
+    link = f"- [{name}]({url})"
+    if url in (desc or ""):
+        return desc
+    marker = "\n\n### KONTINUITA PRIESTORU"
+    if marker not in (desc or ""):
+        raise ValueError("scene continuity section missing")
+    return desc.replace(marker, f"\n{link}{marker}", 1)
+
+
+def sync_set_chain(api, state, chain, scenes_by_id, cards_by_id, label_ids):
+    if len(chain["matches"]) != 1:
+        raise ValueError(f"set master conflict: {chain['name']}")
+    master = next(card for card in state["cards"] if card["id"] == chain["matches"][0]["id"])
+    desired_block = set_chain_block(chain, scenes_by_id, cards_by_id)
+    desired_desc = replace_auto_block(
+        master.get("desc"), SET_CHAIN_AUTO_START, SET_CHAIN_AUTO_END,
+        desired_block,
+    )
+    desired_labels = sorted(set(master.get("idLabels", [])) | {label_ids["Nadväzný priestor"]})
+    master_updates = {}
+    if master.get("desc") != desired_desc:
+        master_updates["desc"] = desired_desc
+    if sorted(master.get("idLabels", [])) != desired_labels:
+        master_updates["idLabels"] = ",".join(desired_labels)
+    if master_updates:
+        api["trello_put_body"](f"/cards/{master['id']}", master_updates)
+    writes = int(bool(master_updates))
+    scene_urls = []
+    for index, (scene_id, _) in enumerate(chain["occurrences"]):
+        card = cards_by_id[scene_id]
+        checklists = read_checklists(api, card["id"])
+        set_lists = [item for item in checklists if item["name"] == "SET"]
+        if len(set_lists) != 1:
+            raise ValueError(f"SET checklist conflict on {scene_id}")
+        desired_item = set_chain_item(chain, index, master["shortUrl"])
+        existing_items = [item["name"] for item in set_lists[0].get("checkItems", [])]
+        related = [item for item in existing_items if chain["name"] in item or master["shortUrl"] in item]
+        if related and related != [desired_item]:
+            raise ValueError(f"set item conflict on {scene_id}")
+        if not related:
+            api["trello_post_body"](
+                f"/checklists/{set_lists[0]['id']}/checkItems",
+                {"name": desired_item, "pos": "bottom"},
+            )
+            writes += 1
+        new_desc = append_description_link(card.get("desc"), chain["name"], master["shortUrl"])
+        scene_labels = sorted(set(card.get("idLabels", [])) | {label_ids["Nadväzný set"]})
+        updates = {}
+        if new_desc != card.get("desc"):
+            updates["desc"] = new_desc
+        if sorted(card.get("idLabels", [])) != scene_labels:
+            updates["idLabels"] = ",".join(scene_labels)
+        if updates:
+            api["trello_put_body"](f"/cards/{card['id']}", updates)
+            writes += 1
+        scene_urls.append((card["shortUrl"], scenes_by_id[scene_id]["name"]))
+    attachments = ensure_attachments(api, master, scene_urls)
+    for scene_id, _ in chain["occurrences"]:
+        attachments += ensure_attachments(
+            api, cards_by_id[scene_id], [(master["shortUrl"], chain["name"])]
+        )
+    return writes, attachments
+
+
 def scene_summary(scene):
     return {
         "scene_id": scene["scene_id"], "name": scene["name"],
@@ -679,6 +814,7 @@ def build_audit(api, state=None):
     cards = state["cards"]
     prop_plan = registry_plan(state, identity_map)
     spaces_plan = space_plan(state, payload, space_map)
+    sets_plan = set_chain_plan(state)
     groups = defaultdict(list)
     for card in cards:
         info = api["cierny_kamen_scene_name_info"](card.get("name", ""))
@@ -734,6 +870,8 @@ def build_audit(api, state=None):
         blockers.append("prop registry identity conflicts")
     if any(row["status"] == "conflict" for row in spaces_plan):
         blockers.append("space registry identity conflicts")
+    if any(row["status"] == "conflict" for row in sets_plan):
+        blockers.append("set continuity identity conflicts")
     required_labels = (
         "Auto", "Osobná rekvizita", "Dokument", "Screen",
         "Nadväzná rekvizita", "Nadväzný priestor", "Nadväzný set",
@@ -788,8 +926,14 @@ def build_audit(api, state=None):
             "continuity_groups": len({record["continuity_group"] for record in identity_map["records"] if record["continuity_group"]}),
             "category_counts": dict(Counter(category for record in identity_map["records"] for category in record["categories"])),
             "questions": identity_map["questions"],
-            "set_continuity_items": 0,
-            "set_continuity_note": "No explicit cross-scene physical set-state chain was confirmed in the four PDFs; ordinary repeated locations are not labelled.",
+            "set_continuity_chains": len(SET_CHAINS),
+            "set_continuity_items": sum(len(item["occurrences"]) for item in SET_CHAINS),
+            "set_continuity_note": "Only two explicit carried physical states are included; ordinary repeated locations are not labelled.",
+            "set_registry": {
+                "reuse": sum(row["status"] == "reuse" for row in sets_plan),
+                "create": sum(row["status"] == "create" for row in sets_plan),
+                "conflict": [row["name"] for row in sets_plan if row["status"] == "conflict"],
+            },
             "note": "No generic keyword classifier is used as authority.",
             "registry": {
                 "reuse": sum(row["status"] == "reuse" for row in prop_plan),
@@ -816,7 +960,8 @@ def register_routes(app, api):
             "audit", "dry-run", "sample-registry-init", "sample-space-init",
             "registry-init", "space-init", "sample-scenes-dry-run",
             "sample-scenes", "bootstrap", "finalize", "registry-sync",
-            "space-sync", "final-audit",
+            "space-sync", "set-dry-run", "set-init", "set-sync",
+            "final-audit",
         }
         if mode not in allowed:
             return jsonify({"error": "unsupported mode"}), 409
@@ -938,6 +1083,68 @@ def register_routes(app, api):
                 "results": results,
             }), 200
 
+        if mode in {"set-dry-run", "set-init", "set-sync"}:
+            rows = set_chain_plan(state)
+            if any(row["status"] == "conflict" for row in rows):
+                return jsonify({
+                    "status": "blocked",
+                    "conflicts": [row["name"] for row in rows if row["status"] == "conflict"],
+                }), 409
+            if mode == "set-dry-run":
+                return jsonify({
+                    "status": "dry-run", "writes": 0,
+                    "chains": [{
+                        "name": row["name"], "status": row["status"],
+                        "scene_ids": [item[0] for item in row["occurrences"]],
+                    } for row in rows],
+                    "scene_count": sum(len(row["occurrences"]) for row in rows),
+                }), 200
+            set_lists = exact_named(state["lists"], SET_LIST)
+            if len(set_lists) != 1:
+                return jsonify({"status": "blocked", "set_lists": len(set_lists)}), 409
+            if mode == "set-init":
+                created = []
+                for row in rows:
+                    if row["status"] == "reuse":
+                        continue
+                    card = api["trello_post_body"]("/cards", {
+                        "idList": set_lists[0]["id"], "name": row["name"],
+                        "desc": f"{SET_CHAIN_AUTO_START}\nOdkazy sa doplnia po prepojení scén.\n{SET_CHAIN_AUTO_END}",
+                        "idLabels": label_ids["Nadväzný priestor"], "pos": "bottom",
+                    })
+                    created.append({"name": row["name"], "id": card["id"], "url": card.get("shortUrl")})
+                return jsonify({
+                    "status": "applied", "mode": mode, "created": created,
+                    "writes": len(created), "unchanged": len(rows) - len(created),
+                }), 200
+            cards, card_collisions = card_map(api, state)
+            source_cards = {sid: cards[sid] for sid in scenes_by_id if sid in cards}
+            if card_collisions or len(source_cards) != len(scenes):
+                return jsonify({
+                    "status": "blocked", "card_collisions": list(card_collisions),
+                    "source_cards": len(source_cards), "expected": len(scenes),
+                }), 409
+            results = []
+            for row in rows:
+                try:
+                    writes, attachments = sync_set_chain(
+                        api, state, row, scenes_by_id, source_cards, label_ids
+                    )
+                except Exception as error:
+                    return jsonify({
+                        "status": "blocked", "failed_master": row["name"],
+                        "error": f"{type(error).__name__}: {error}",
+                        "completed": results,
+                    }), 409
+                results.append({
+                    "name": row["name"], "writes": writes,
+                    "attachments_added": attachments,
+                })
+            return jsonify({
+                "status": "applied", "mode": mode, "results": results,
+                "writes": sum(item["writes"] + item["attachments_added"] for item in results),
+            }), 200
+
         if mode in {"registry-sync", "space-sync"}:
             cards, card_collisions = card_map(api, state)
             source_cards = {sid: cards[sid] for sid in scenes_by_id if sid in cards}
@@ -997,9 +1204,19 @@ def register_routes(app, api):
             source_cards = {sid: cards[sid] for sid in scenes_by_id if sid in cards}
             missing = sorted(set(scenes_by_id) - set(source_cards))
             bootstrap = [sid for sid, card in source_cards.items() if BOOTSTRAP_MARKER in (card.get("desc") or "")]
+            selected_audit = scenes[start:start + limit]
             checklist_errors = []
             description_errors = []
-            for sid, card in source_cards.items():
+            verbatim_errors = []
+            link_errors = []
+            name_errors = []
+            for scene in selected_audit:
+                sid = scene["scene_id"]
+                card = source_cards.get(sid)
+                if not card:
+                    continue
+                if card.get("name") != scene["name"]:
+                    name_errors.append(sid)
                 actual = read_checklists(api, card["id"])
                 if [item["name"] for item in actual] != list(CHECKLIST_NAMES):
                     checklist_errors.append(sid)
@@ -1012,7 +1229,20 @@ def register_routes(app, api):
                 )
                 if not all(marker in desc for marker in required):
                     description_errors.append(sid)
-            ok = not (missing or card_collisions or bootstrap or checklist_errors or description_errors)
+                if scene["action_markdown"] not in desc:
+                    verbatim_errors.append(sid)
+                for checklist in actual:
+                    if checklist["name"] not in {"REKVIZITY", "SET"}:
+                        continue
+                    for item in checklist.get("checkItems", []):
+                        if "KARTA:" in item["name"] and not re.search(
+                            r"\| KARTA: https://trello\.com/c/[A-Za-z0-9]+", item["name"]
+                        ):
+                            link_errors.append({"scene_id": sid, "item": item["name"]})
+            ok = not (
+                missing or card_collisions or bootstrap or checklist_errors
+                or description_errors or verbatim_errors or link_errors or name_errors
+            )
             return jsonify({
                 "status": "verified" if ok else "blocked", "writes": 0,
                 "source_count": len(scenes), "source_cards": len(source_cards),
@@ -1020,6 +1250,10 @@ def register_routes(app, api):
                 "bootstrap_remaining": bootstrap,
                 "checklist_errors": checklist_errors,
                 "description_errors": description_errors,
+                "verbatim_errors": verbatim_errors,
+                "link_errors": link_errors, "name_errors": name_errors,
+                "checked_start": start, "checked": len(selected_audit),
+                "remaining": max(0, len(scenes) - start - len(selected_audit)),
             }), 200 if ok else 409
 
         if mode.endswith("registry-init"):

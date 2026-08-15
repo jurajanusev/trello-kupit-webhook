@@ -12,10 +12,11 @@ if "flask" not in sys.modules:
     sys.modules["flask"] = flask_stub
 
 from cierny_kamen_ep07_10_import import (
-    CHECKLIST_NAMES, compatible_sample_checklists, ensure_attachments, folded,
+    CHECKLIST_NAMES, SET_CHAINS, append_description_link,
+    compatible_sample_checklists, ensure_attachments, folded,
     generated_checklist_prefix,
     merged_occurrence_links, prop_item_text,
-    registry_aliases, registry_plan, runtime_state,
+    registry_aliases, registry_plan, runtime_state, set_chain_item,
 )
 
 
@@ -189,6 +190,22 @@ class Ep0710ImportTest(unittest.TestCase):
         ])
         self.assertEqual(1, added)
         self.assertEqual(1, len(posts))
+
+    def test_only_confirmed_set_state_chains_are_mapped(self):
+        self.assertEqual(2, len(SET_CHAINS))
+        self.assertEqual(11, sum(len(item["occurrences"]) for item in SET_CHAINS))
+        all_ids = {scene_id for chain in SET_CHAINS for scene_id, _ in chain["occurrences"]}
+        self.assertNotIn("08/23", all_ids)
+        self.assertNotIn("10/40", all_ids)
+        value = set_chain_item(SET_CHAINS[0], 0, "https://trello.com/c/set")
+        self.assertTrue(value.startswith("<n> **"))
+        self.assertTrue(value.endswith("| KARTA: https://trello.com/c/set"))
+
+    def test_set_master_link_is_appended_before_space_continuity(self):
+        desc = "### ODKAZY\n- [Priestor](https://trello.com/c/space)\n\n### KONTINUITA PRIESTORU\n- Predchádzajúci: —"
+        result = append_description_link(desc, "Oslava", "https://trello.com/c/set")
+        self.assertIn("- [Oslava](https://trello.com/c/set)\n\n### KONTINUITA PRIESTORU", result)
+        self.assertEqual(result, append_description_link(result, "Oslava", "https://trello.com/c/set"))
 
 
 if __name__ == "__main__":
