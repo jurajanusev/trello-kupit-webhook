@@ -1125,7 +1125,8 @@ def register_routes(app, api):
                     "source_cards": len(source_cards), "expected": len(scenes),
                 }), 409
             results = []
-            for row in rows:
+            selected_set_rows = rows[start:start + limit]
+            for row in selected_set_rows:
                 try:
                     writes, attachments = sync_set_chain(
                         api, state, row, scenes_by_id, source_cards, label_ids
@@ -1143,6 +1144,8 @@ def register_routes(app, api):
             return jsonify({
                 "status": "applied", "mode": mode, "results": results,
                 "writes": sum(item["writes"] + item["attachments_added"] for item in results),
+                "start": start, "selected": len(selected_set_rows),
+                "remaining": max(0, len(rows) - start - len(selected_set_rows)),
             }), 200
 
         if mode in {"registry-sync", "space-sync"}:
