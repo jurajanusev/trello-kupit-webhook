@@ -8317,6 +8317,10 @@ from cierny_kamen_ep07_10_import import register_routes as register_ep07_10_rout
 
 register_ep07_10_routes(app, globals())
 
+from meeting_notes_dryrun import register_routes as register_meeting_notes_dryrun_routes
+
+register_meeting_notes_dryrun_routes(app, globals())
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
