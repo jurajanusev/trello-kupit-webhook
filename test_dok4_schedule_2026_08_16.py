@@ -55,6 +55,13 @@ class Dok4August16ScheduleTests(unittest.TestCase):
             "2026-08-23", "2026-08-24", "2026-08-25",
         ])
 
+    def test_completed_endpoint_is_disabled(self):
+        response = app.app.test_client().post(
+            "/api/sync-dok4-current-schedule?mode=dry-run&as_of=2026-08-16",
+            headers={"X-Sync-Key": app.DOK4_CURRENT_SCHEDULE_KEY},
+        )
+        self.assertEqual(response.status_code, 410)
+
 
 if __name__ == "__main__":
     unittest.main()

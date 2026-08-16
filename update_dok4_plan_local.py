@@ -364,7 +364,7 @@ def apply(trello, state, metadata_only=False, skip_metadata=False, metadata_limi
     blockers = {
         "wrong_board": state["board"].get("shortLink") != BOARD_REF,
         "duplicates": len(state["duplicates"]),
-        "fallback_collisions": len(state["reused_card_conflicts"]),
+        "fallback_collisions": len(state.get("reused_card_conflicts", [])),
         "duplicate_target_lists": len(state["duplicate_target_lists"]),
         "missing_anchor": state["anchor"] is None,
     }
