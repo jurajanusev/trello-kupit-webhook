@@ -938,6 +938,27 @@ def scene_summary(scene):
     }
 
 
+def legacy_alias_evidence(scene_id, card, authoritative_by_id):
+    candidates = []
+    if scene_id.endswith("EXT"):
+        candidates.append(scene_id[:-3])
+    source_id = next((item for item in candidates if item in authoritative_by_id), None)
+    source = authoritative_by_id.get(source_id) if source_id else None
+    desc = card.get("desc") or ""
+    return {
+        "candidate_source_id": source_id,
+        "prepis_present": bool(source and source.get("prepis") in desc),
+        "verbatim_action_present": bool(
+            source and source.get("action_markdown") in desc
+        ),
+        "metadata_source_id_present": bool(
+            source and re.search(
+                rf"(?mi)^ČÍSLO OBRAZU:\s*{re.escape(source_id)}\s*$", desc
+            )
+        ),
+    }
+
+
 def build_audit(api, state=None):
     payload = json.loads(PAYLOAD_PATH.read_text(encoding="utf-8"))
     identity_map = json.loads(IDENTITY_PATH.read_text(encoding="utf-8"))
@@ -959,6 +980,9 @@ def build_audit(api, state=None):
     source_set = set(source_ids)
     all_authoritative = combined_scenes(api, payload)
     all_authoritative_ids = {scene["scene_id"] for scene in all_authoritative}
+    authoritative_by_id = {
+        scene["scene_id"]: scene for scene in all_authoritative
+    }
     collisions = {
         sid: [{"name": c["name"], "url": c["shortUrl"], "closed": c["closed"]} for c in groups[sid]]
         for sid in source_ids if len(groups.get(sid, [])) > 1
@@ -1045,6 +1069,9 @@ def build_audit(api, state=None):
                 "description_sha256": hashlib.sha256(
                     (card.get("desc") or "").encode("utf-8")
                 ).hexdigest(),
+                "alias_evidence": legacy_alias_evidence(
+                    scene_id, card, authoritative_by_id
+                ),
             } for card in groups[scene_id]]
             for scene_id in sorted(set(groups) - all_authoritative_ids)
         },

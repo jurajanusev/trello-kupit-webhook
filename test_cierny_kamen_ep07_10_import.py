@@ -16,6 +16,7 @@ from cierny_kamen_ep07_10_import import (
     authoritative_payload, canonical_space_names,
     compatible_sample_checklists, ensure_attachments, folded,
     generated_checklist_prefix,
+    legacy_alias_evidence,
     merged_occurrence_links, prop_item_text,
     registry_aliases, registry_plan, runtime_state, set_chain_item,
     space_master_diff, space_registry_description,
@@ -254,6 +255,22 @@ class Ep0710ImportTest(unittest.TestCase):
             ["ŠKOLA - KLUBOVŇA"],
             canonical_space_names(payload, space_map),
         )
+
+    def test_legacy_ext_alias_requires_verbatim_source_evidence(self):
+        source = {
+            "03/13": {
+                "prepis": "Veronika a Fifo na rande",
+                "action_markdown": "*Presný dej.*",
+            }
+        }
+        evidence = legacy_alias_evidence("03/13EXT", {
+            "desc": "## Veronika a Fifo na rande\n\n*Presný dej.*\n"
+                    "ČÍSLO OBRAZU: 03/13",
+        }, source)
+        self.assertEqual("03/13", evidence["candidate_source_id"])
+        self.assertTrue(evidence["prepis_present"])
+        self.assertTrue(evidence["verbatim_action_present"])
+        self.assertTrue(evidence["metadata_source_id_present"])
 
 
 if __name__ == "__main__":
