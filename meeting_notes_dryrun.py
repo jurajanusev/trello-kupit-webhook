@@ -485,12 +485,23 @@ def register_routes(app, api):
         selected_projects = PROJECTS if project == "all" else {project: PROJECTS[project]}
         results = []
         for config in selected_projects.values():
-            result = paginated_project(
-                audit_project(
-                    api, config, include_processed=include_processed,
-                    processed_sample_limit=sample_limit,
-                ), start, limit,
-            )
+            try:
+                result = paginated_project(
+                    audit_project(
+                        api, config, include_processed=include_processed,
+                        processed_sample_limit=sample_limit,
+                    ), start, limit,
+                )
+            except Exception as error:
+                app.logger.exception(
+                    "Read-only meeting-notes audit failed for %s", config["name"]
+                )
+                return jsonify({
+                    "status": "read-only-audit-failed", "mode": "dry-run",
+                    "writes": 0, "microsoft_todo_accessed": False,
+                    "project": config["name"],
+                    "error": f"{type(error).__name__}: {error}",
+                }), 502
             if summary_only:
                 result["findings"]["cards"] = []
                 result["findings"]["returned_cards"] = 0
