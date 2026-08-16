@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import Counter, defaultdict
+from concurrent.futures import ThreadPoolExecutor
 import re
 import unicodedata
 from urllib.parse import urlencode
@@ -278,9 +279,9 @@ def load_list_cards(trello_get, list_id, include_checklists):
 
 def load_list_cards_batched(trello_get, list_specs):
     """Load up to ten Trello lists per read-only batch request."""
-    result = {}
-    for offset in range(0, len(list_specs), 10):
-        chunk = list_specs[offset:offset + 10]
+    chunks = [list_specs[offset:offset + 10] for offset in range(0, len(list_specs), 10)]
+
+    def load_chunk(chunk):
         urls = []
         for spec in chunk:
             params = {
@@ -293,6 +294,7 @@ def load_list_cards_batched(trello_get, list_specs):
         responses = trello_get("/batch", {"urls": ",".join(urls)})
         if len(responses) != len(chunk):
             raise RuntimeError("Trello batch response length mismatch")
+        loaded = {}
         for spec, response in zip(chunk, responses):
             body = response.get("200")
             if body is None:
@@ -300,7 +302,16 @@ def load_list_cards_batched(trello_get, list_specs):
                 raise RuntimeError(
                     f"Trello batch list read failed for {spec['name']}: {status}"
                 )
-            result[spec["id"]] = body
+            loaded[spec["id"]] = body
+        return loaded
+
+    result = {}
+    # Larger boards have dozens of active and registry lists. Fetch independent
+    # read-only Trello batches concurrently so the audit stays below the web
+    # worker timeout without changing its scope.
+    with ThreadPoolExecutor(max_workers=min(4, max(1, len(chunks)))) as executor:
+        for loaded in executor.map(load_chunk, chunks):
+            result.update(loaded)
     return result
 
 
