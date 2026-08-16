@@ -145,15 +145,32 @@ def build_state(trello, schedule, source_date, as_of):
         lists_by_name.setdefault(item["name"], []).append(item)
 
     def fetch_list_cards(board_list):
-        return trello.get(f"/lists/{board_list['id']}/cards", {
-            "fields": "id,name,desc,idList,shortUrl,due,dueComplete,pos,closed",
-            "filter": "open", "limit": 1000,
-        })
+        result = []
+        before = None
+        seen_page_ends = set()
+        while True:
+            params = {
+                "fields": "id,name,desc,idList,shortUrl,due,dueComplete,pos,closed",
+                "filter": "open", "limit": 1000,
+            }
+            if before:
+                params["before"] = before
+            page = trello.get(f"/lists/{board_list['id']}/cards", params)
+            result.extend(page)
+            if len(page) < 1000:
+                break
+            page_end = page[-1]["id"]
+            if page_end in seen_page_ends:
+                raise RuntimeError("Trello card pagination did not advance")
+            seen_page_ends.add(page_end)
+            before = page_end
+        return result
 
     cards = []
     with ThreadPoolExecutor(max_workers=8) as pool:
         for list_cards in pool.map(fetch_list_cards, lists):
             cards.extend(list_cards)
+    cards = list({card["id"]: card for card in cards}.values())
     cards_by_scene = {}
     for card in cards:
         match = SCENE_RE.match(card.get("name", ""))
