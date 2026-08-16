@@ -183,6 +183,7 @@ def public_plan(plan, include_description=False):
 def register_routes(app, api):
     @app.route("/api/apply-ck-meeting-notes-ep01-03", methods=["POST"])
     def apply_ck_meeting_notes_ep01_03():
+        return jsonify({"error": "completed one-off endpoint disabled"}), 410
         if request.headers.get("X-Meeting-Notes-Apply-Key") != KEY:
             return jsonify({"error": "forbidden"}), 403
         mode = request.args.get("mode", "dry-run").strip().casefold()
