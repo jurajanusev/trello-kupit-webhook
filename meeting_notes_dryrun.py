@@ -75,6 +75,7 @@ def placeholder_reason(checklist_name, text):
         "doplni sa na porade",
         "bez poloziek",
         "placeholder",
+        "x", "xx", "test", "-", ".", "...",
     }
     if value in exact or value.startswith("doplnit sem zmeny schvalene na porade"):
         return "template/placeholder item"
@@ -118,6 +119,7 @@ CLARIFY_CUES = (
     ("potvrdené/schválené", r"\b(?:potvrdene|schvalene)\b"),
     ("ostáva/bude", r"\b(?:ostava|zostava|bude)\b"),
     ("farba/rozmer/počet/stav", r"\b(?:farba|rozmer|pocet|stav)\b"),
+    ("explicit visual state", r"\b(?:prazdn[ay]|rozbit[ay]|poskoden[ay]|otvoren[ay]|zatvoren[ay]|cist[ay]|spinav[ay])\b"),
 )
 
 
@@ -129,6 +131,20 @@ def classify_item(checklist_name, text):
             "reason": placeholder, "cues": [],
         }
     raw_folded = folded(text)
+    checklist_folded = folded(checklist_name)
+    if (
+        raw_folded.startswith("bez ")
+        and not re.match(r"^bez\s+(?:zmeny|zmien|problemu|otazok)\b", raw_folded)
+        and (
+            checklist_folded in {"rekvizity", "set"}
+            or "porad" in checklist_folded
+        )
+    ):
+        return {
+            "classification": "cancelled", "confidence": "contextual",
+            "reason": f"'Bez …' in {checklist_name} removes an expected element",
+            "cues": ["contextual bez …"],
+        }
     groups = {
         "cancelled": cue_matches(raw_folded, CANCEL_CUES),
         "changed": cue_matches(raw_folded, CHANGE_CUES),
@@ -163,7 +179,6 @@ def classify_item(checklist_name, text):
             "reason": "declarative clarification wording",
             "cues": groups["clarified"],
         }
-    checklist_folded = folded(checklist_name)
     if checklist_folded in {"rekvizity", "set"}:
         return {
             "classification": "added", "confidence": "contextual",

@@ -42,6 +42,18 @@ class MeetingNotesDryRunTest(unittest.TestCase):
             "added",
             classify_item("REKVIZITY", "Alicin mobil")["classification"],
         )
+        self.assertEqual(
+            "cancelled",
+            classify_item("Poznámky z porady", "Bez makety Olivera")["classification"],
+        )
+        self.assertEqual(
+            "clarified",
+            classify_item("SET", "Prázdna čakáreň")["classification"],
+        )
+        self.assertEqual(
+            "ignored_placeholder",
+            classify_item("REKVIZITY", "x")["classification"],
+        )
 
     def test_normalization_removes_only_technical_formatting(self):
         value = normalized_text(
