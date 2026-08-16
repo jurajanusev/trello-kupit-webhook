@@ -34,6 +34,8 @@ CHECKLIST_NAMES = (
 BOOTSTRAP_MARKER = "<!-- CIERNY-KAMEN-EP07-10-BOOTSTRAP -->"
 SET_CHAIN_AUTO_START = "<!-- CIERNY-KAMEN-SET-CHAIN-AUTO:START -->"
 SET_CHAIN_AUTO_END = "<!-- CIERNY-KAMEN-SET-CHAIN-AUTO:END -->"
+LEGACY_0313_CARD_ID = "6a673f9451567f6f47587b28"
+LEGACY_0313_DESC_SHA256 = "e2a0a559addb898c9f2782c0eaef4459618690baffe5d34af7c13f199a7c44b3"
 SET_CHAINS = (
     {
         "name": "Veronikina vila – výzdoba a pohostenie Sofiinej baby shower",
@@ -959,6 +961,32 @@ def legacy_alias_evidence(scene_id, card, authoritative_by_id):
     }
 
 
+def protected_card_snapshot(api, card):
+    checklists = api["trello_get"](f"/cards/{card['id']}/checklists", {
+        "checkItems": "all", "fields": "id,name,pos",
+    })
+    attachments = api["trello_get"](f"/cards/{card['id']}/attachments", {
+        "fields": "id,name,url",
+    })
+    comments = api["trello_get"](f"/cards/{card['id']}/actions", {
+        "filter": "commentCard", "fields": "id,data,date", "limit": 1000,
+    })
+    protected = {
+        "description_sha256": hashlib.sha256(
+            (card.get("desc") or "").encode("utf-8")
+        ).hexdigest(),
+        "idList": card.get("idList"),
+        "idLabels": sorted(card.get("idLabels", [])),
+        "checklists": checklists,
+        "attachments": attachments,
+        "comments": comments,
+    }
+    encoded = json.dumps(
+        protected, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")
+    return {"sha256": hashlib.sha256(encoded).hexdigest(), **protected}
+
+
 def build_audit(api, state=None):
     payload = json.loads(PAYLOAD_PATH.read_text(encoding="utf-8"))
     identity_map = json.loads(IDENTITY_PATH.read_text(encoding="utf-8"))
@@ -1147,6 +1175,7 @@ def register_routes(app, api):
             "registry-init", "space-init", "sample-scenes-dry-run",
             "sample-scenes", "bootstrap", "finalize", "registry-sync",
             "space-sync", "space-diff", "set-dry-run", "set-init", "set-sync",
+            "legacy-alias-dry-run", "legacy-alias-apply",
             "final-audit",
         }
         if mode not in allowed:
@@ -1251,6 +1280,58 @@ def register_routes(app, api):
                 "selected": len(selected_scenes), "writes": total_writes,
                 "remaining": 0 if sample_only else max(0, len(scenes) - start - len(selected_scenes)),
                 "results": results,
+            }), 200
+
+        if mode in {"legacy-alias-dry-run", "legacy-alias-apply"}:
+            matches = [
+                card for card in state["cards"]
+                if card.get("id") == LEGACY_0313_CARD_ID and not card.get("closed")
+            ]
+            if len(matches) != 1:
+                return jsonify({
+                    "status": "blocked", "reason": "legacy 03/13 card mismatch",
+                    "found": len(matches),
+                }), 409
+            card = matches[0]
+            current_sha = hashlib.sha256(
+                (card.get("desc") or "").encode("utf-8")
+            ).hexdigest()
+            if (
+                card.get("name") != "03/13 EXT. PRED FEFE BEEF"
+                or current_sha != LEGACY_0313_DESC_SHA256
+            ):
+                return jsonify({
+                    "status": "blocked", "reason": "legacy 03/13 guard changed",
+                    "name": card.get("name"), "description_sha256": current_sha,
+                }), 409
+            source = next(
+                scene for scene in api["cierny_kamen_import_payload"]()["scenes"]
+                if scene["scene_id"] == "03/13"
+            )
+            before = protected_card_snapshot(api, card)
+            if mode == "legacy-alias-dry-run":
+                return jsonify({
+                    "status": "dry-run", "writes": 0, "url": card["shortUrl"],
+                    "current_name": card["name"], "desired_name": source["name"],
+                    "protected_snapshot": before["sha256"],
+                }), 200
+            api["trello_put_body"](
+                f"/cards/{card['id']}", {"name": source["name"]}
+            )
+            readback = api["trello_get"](f"/cards/{card['id']}", {
+                "fields": "id,name,desc,idList,shortUrl,closed,idLabels",
+            })
+            after = protected_card_snapshot(api, readback)
+            if readback.get("name") != source["name"] or before != after:
+                return jsonify({
+                    "status": "blocked", "reason": "legacy rename readback mismatch",
+                    "name_ok": readback.get("name") == source["name"],
+                    "protected_equal": before == after,
+                }), 409
+            return jsonify({
+                "status": "applied", "writes": 1, "url": readback["shortUrl"],
+                "name": readback["name"], "protected_equal": True,
+                "protected_snapshot": after["sha256"],
             }), 200
 
         if mode == "bootstrap":
