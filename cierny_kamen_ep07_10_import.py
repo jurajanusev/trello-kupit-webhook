@@ -1030,7 +1030,12 @@ def build_audit(api, state=None):
         "authoritative_missing_ep01_10": sorted(all_authoritative_ids - set(groups)),
         "non_authoritative_scene_ids": sorted(set(groups) - all_authoritative_ids),
         "authoritative_missing_summaries": [
-            scene_summary(scene) for scene in all_authoritative
+            {
+                "scene_id": scene["scene_id"], "name": scene.get("name"),
+                "prepis": scene.get("prepis"), "location": scene.get("location"),
+                "source_pdf": scene.get("source_pdf"),
+                "source_page": scene.get("source_page"),
+            } for scene in all_authoritative
             if scene["scene_id"] not in groups
         ],
         "non_authoritative_scene_cards": {
