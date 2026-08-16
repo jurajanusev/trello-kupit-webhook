@@ -241,6 +241,21 @@ def build_state(trello, schedule, source_date, as_of):
         row["shooting_date"] for row in schedule if row["shooting_date"] >= as_of
     })[:WINDOW_SHOOTING_DAYS]
     shooting_date_set = set(shooting_dates)
+    reused_card_conflicts = []
+    schedule_by_scene = {row["scene_id"]: row for row in schedule}
+    for reused in reused_cards:
+        options = [schedule_by_scene[scene_id] for scene_id in reused["scene_ids"]]
+        destinations = {
+            ("active", row["shooting_date"])
+            if row["shooting_date"] in shooting_date_set
+            else ("inactive", None)
+            for row in options
+        }
+        if len(destinations) > 1:
+            reused_card_conflicts.append({
+                **reused,
+                "destinations": [list(value) for value in sorted(destinations)],
+            })
     window_rows = [row for row in schedule if row["shooting_date"] in shooting_date_set]
     target_names = {date: date_list_name(date) for date in shooting_dates}
     missing_lists = [name for name in target_names.values() if name not in lists_by_name]
@@ -290,7 +305,9 @@ def build_state(trello, schedule, source_date, as_of):
         "lists_by_name": lists_by_name, "cards": cards, "matches": matches,
         "missing": missing, "duplicates": duplicates, "resolved_duplicates": resolved_duplicates,
         "fallbacks": fallbacks,
-        "reused_cards": reused_cards, "window_rows": window_rows,
+        "reused_cards": reused_cards,
+        "reused_card_conflicts": reused_card_conflicts,
+        "window_rows": window_rows,
         "window_matches": window_matches, "window_moves": window_moves,
         "stale_window_cards": stale_window_cards,
         "shooting_dates": shooting_dates, "target_names": target_names,
@@ -316,8 +333,10 @@ def summary(state, schedule):
         "duplicates": state["duplicates"], "fallback_count": len(state["fallbacks"]),
         "resolved_duplicates": state["resolved_duplicates"],
         "fallbacks": state["fallbacks"], "reused_card_count": len(state["reused_cards"]),
-        "fallback_collision_count": len(state["reused_cards"]),
-        "fallback_collisions": state["reused_cards"],
+        "shared_fallback_card_count": len(state["reused_cards"]),
+        "shared_fallback_cards": state["reused_cards"],
+        "fallback_collision_count": len(state["reused_card_conflicts"]),
+        "fallback_collisions": state["reused_card_conflicts"],
         "reused_cards": state["reused_cards"], "metadata_due_to_update": state["update_count"],
         "window_type": "next_shooting_days", "window_shooting_days": WINDOW_SHOOTING_DAYS,
         "window_as_of": state["as_of"],
@@ -345,7 +364,7 @@ def apply(trello, state, metadata_only=False, skip_metadata=False, metadata_limi
     blockers = {
         "wrong_board": state["board"].get("shortLink") != BOARD_REF,
         "duplicates": len(state["duplicates"]),
-        "fallback_collisions": len(state["reused_cards"]),
+        "fallback_collisions": len(state["reused_card_conflicts"]),
         "duplicate_target_lists": len(state["duplicate_target_lists"]),
         "missing_anchor": state["anchor"] is None,
     }
