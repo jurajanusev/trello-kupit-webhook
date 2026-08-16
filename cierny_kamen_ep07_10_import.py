@@ -1029,6 +1029,20 @@ def build_audit(api, state=None):
         "authoritative_scene_count_ep01_10": len(all_authoritative_ids),
         "authoritative_missing_ep01_10": sorted(all_authoritative_ids - set(groups)),
         "non_authoritative_scene_ids": sorted(set(groups) - all_authoritative_ids),
+        "authoritative_missing_summaries": [
+            scene_summary(scene) for scene in all_authoritative
+            if scene["scene_id"] not in groups
+        ],
+        "non_authoritative_scene_cards": {
+            scene_id: [{
+                "id": card["id"], "name": card["name"],
+                "url": card.get("shortUrl"), "idList": card.get("idList"),
+                "description_sha256": hashlib.sha256(
+                    (card.get("desc") or "").encode("utf-8")
+                ).hexdigest(),
+            } for card in groups[scene_id]]
+            for scene_id in sorted(set(groups) - all_authoritative_ids)
+        },
         "all_source_ids": source_ids,
         "trello_scene_cards_all": sum(1 for values in groups.values() if len(values) == 1),
         "trello_unique_scene_ids_all": len(groups),
