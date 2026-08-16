@@ -708,6 +708,20 @@ def space_master_diff(state, row, scenes, cards_by_id, space_map):
     )
     actual = master.get("desc") or ""
     desired_desc = replace_space_auto_block(actual, desired)
+    actual_lines = actual.splitlines()
+    desired_lines = desired_desc.splitlines()
+    differing_lines = []
+    for index in range(max(len(actual_lines), len(desired_lines))):
+        actual_line = actual_lines[index] if index < len(actual_lines) else None
+        desired_line = desired_lines[index] if index < len(desired_lines) else None
+        if actual_line != desired_line:
+            differing_lines.append({
+                "line": index + 1,
+                "actual": actual_line,
+                "desired": desired_line,
+            })
+            if len(differing_lines) == 5:
+                break
     return {
         "name": row["name"],
         "changed": actual != desired_desc,
@@ -717,6 +731,7 @@ def space_master_diff(state, row, scenes, cards_by_id, space_map):
         "desired_sha256": hashlib.sha256(desired_desc.encode("utf-8")).hexdigest(),
         "start_markers": actual.count(SPACE_AUTO_START),
         "end_markers": actual.count(SPACE_AUTO_END),
+        "differing_lines": differing_lines,
     }
 
 
