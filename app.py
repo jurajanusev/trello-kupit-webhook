@@ -551,6 +551,10 @@ def sync_project_microsoft_todo(project):
                         f"Trello: {card['shortUrl']}\n\n{card.get('desc', '')}"
                     )[:24000], "contentType": "text"},
                 }
+                payload["body"] = {
+                    "content": plan["desired_body"],
+                    "contentType": "text",
+                }
                 if plan["desired_due"]:
                     payload["dueDateTime"] = plan["desired_due"]
                 task = graph_post(f"/me/todo/lists/{TODO_LIST_ID}/tasks", access_token, payload)
