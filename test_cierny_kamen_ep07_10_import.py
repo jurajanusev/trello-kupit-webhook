@@ -13,6 +13,7 @@ if "flask" not in sys.modules:
 
 from cierny_kamen_ep07_10_import import (
     CHECKLIST_NAMES, SET_CHAINS, append_description_link,
+    canonical_space_names,
     compatible_sample_checklists, ensure_attachments, folded,
     generated_checklist_prefix,
     merged_occurrence_links, prop_item_text,
@@ -223,6 +224,20 @@ class Ep0710ImportTest(unittest.TestCase):
         }
         result = space_master_diff(state, row, [], {}, {})
         self.assertFalse(result["changed"])
+
+    def test_space_alias_dash_variants_create_one_master_identity(self):
+        payload = {"scenes": [
+            {"scene_id": "01/01", "location": "A"},
+            {"scene_id": "01/02", "location": "B"},
+        ]}
+        space_map = {
+            "A": ["ŠKOLA - KLUBOVŇA"],
+            "B": ["ŠKOLA – KLUBOVŇA"],
+        }
+        self.assertEqual(
+            ["ŠKOLA - KLUBOVŇA"],
+            canonical_space_names(payload, space_map),
+        )
 
 
 if __name__ == "__main__":

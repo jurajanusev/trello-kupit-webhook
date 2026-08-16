@@ -237,12 +237,15 @@ def registry_plan(state, identity_map, scene_filter=None):
 
 
 def canonical_space_names(payload, space_map, scene_filter=None):
-    names = set()
+    # PDF headings mix ASCII hyphens and typographic dashes for the same
+    # story space. Treat those spellings as aliases, not separate masters.
+    names = {}
     for scene in payload["scenes"]:
         if scene_filter and scene["scene_id"] not in scene_filter:
             continue
-        names.update(space_map.get(scene["location"], [scene["location"]]))
-    return sorted(names, key=folded)
+        for name in space_map.get(scene["location"], [scene["location"]]):
+            names.setdefault(folded(name), name)
+    return sorted(names.values(), key=folded)
 
 
 def space_plan(state, payload, space_map, scene_filter=None):
