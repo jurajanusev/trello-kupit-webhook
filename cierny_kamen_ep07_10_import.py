@@ -664,7 +664,10 @@ def sync_space_master(api, state, row, scenes, cards_by_id, space_map):
         master.get("desc"),
         [occurrence_link(scene, cards_by_id[scene["scene_id"]]) for scene in related],
     )
-    desired = space_registry_description(row["name"])
+    # Reused registry cards are the authority for display punctuation in their
+    # canonical name (for example an en dash instead of an ASCII hyphen).
+    # The folded alias match proves identity; do not fight a preserved name.
+    desired = space_registry_description(master.get("name") or row["name"])
     desired = desired.replace(
         "- Odkazy sa doplnia po vytvorení obrazových kariet.",
         "\n".join(links) if links else "- Bez obrazového výskytu.",
@@ -702,7 +705,7 @@ def space_master_diff(state, row, scenes, cards_by_id, space_map):
         master.get("desc"),
         [occurrence_link(scene, cards_by_id[scene["scene_id"]]) for scene in related],
     )
-    desired = space_registry_description(row["name"]).replace(
+    desired = space_registry_description(master.get("name") or row["name"]).replace(
         "- Odkazy sa doplnia po vytvorení obrazových kariet.",
         "\n".join(links) if links else "- Bez obrazového výskytu.",
     )

@@ -17,6 +17,7 @@ from cierny_kamen_ep07_10_import import (
     generated_checklist_prefix,
     merged_occurrence_links, prop_item_text,
     registry_aliases, registry_plan, runtime_state, set_chain_item,
+    space_master_diff, space_registry_description,
 )
 
 
@@ -206,6 +207,22 @@ class Ep0710ImportTest(unittest.TestCase):
         result = append_description_link(desc, "Oslava", "https://trello.com/c/set")
         self.assertIn("- [Oslava](https://trello.com/c/set)\n\n### KONTINUITA PRIESTORU", result)
         self.assertEqual(result, append_description_link(result, "Oslava", "https://trello.com/c/set"))
+
+    def test_reused_space_master_preserves_display_punctuation(self):
+        master_name = "DOM BETY – OBÝVAČKA"
+        actual = space_registry_description(master_name).replace(
+            "- Odkazy sa doplnia po vytvorení obrazových kariet.",
+            "- Bez obrazového výskytu.",
+        )
+        state = {"cards": [{
+            "id": "space", "name": master_name, "desc": actual,
+        }]}
+        row = {
+            "name": "DOM BETY - OBÝVAČKA",
+            "matches": [{"id": "space"}],
+        }
+        result = space_master_diff(state, row, [], {}, {})
+        self.assertFalse(result["changed"])
 
 
 if __name__ == "__main__":
