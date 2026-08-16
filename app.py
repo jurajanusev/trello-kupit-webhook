@@ -8321,6 +8321,9 @@ from meeting_notes_dryrun import register_routes as register_meeting_notes_dryru
 
 register_meeting_notes_dryrun_routes(app, globals())
 
+from meeting_notes_apply_ep01_03 import register_routes as register_meeting_notes_apply_ep01_03_routes
+
+register_meeting_notes_apply_ep01_03_routes(app, globals())
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))

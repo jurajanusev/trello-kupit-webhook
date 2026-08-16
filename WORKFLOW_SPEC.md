@@ -124,6 +124,12 @@ Tento postup sa pouziva pre projekty Dunaj, DOK 4 a Riverdale:
 - Synchronizacia po porade najprv zobrazi dry-run po jednotlivych checklistoch; nejednoznacne volne poznamky oznaci na potvrdenie.
 - Zmeny sa zapisu do obrazovej karty, registra kontinuity a podla potreby do Trello ToDo a Microsoft To Do. Checklisty a rucne poznamky sa pri synchronizacii neprepisuju ani nemazu.
 - Po zapracovani porady sa najprv aktualizuju zlucene Trello ToDo karty a potom Microsoft To Do.
+- Potvrdene jednoznacne polozky z `INFO Z PORADY` a `INFO Z NATACANIA` sa na
+  karte eviduju v ohranicenom automatickom bloku v casti `RUCNE DOPLNENIA`.
+  Povodna checklistova polozka, jej stav, poradie a text zostavaju bez zmeny.
+  Kazdy zapis obsahuje stabilny marker ID checklistovej polozky, aby bol opakovany
+  beh idempotentny. Otazniky a ine nejednoznacne rozhodnutia sa nezapisuju
+  naslepo; zostanu v audite na rozhodnutie.
 
 ### Microsoft To Do
 
