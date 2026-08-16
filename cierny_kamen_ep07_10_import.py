@@ -1171,6 +1171,9 @@ def build_audit(api, state=None):
 def register_routes(app, api):
     @app.route("/api/cierny-kamen-ep07-10", methods=["POST"])
     def cierny_kamen_ep07_10():
+        return jsonify({
+            "error": "completed Čierny Kameň episode 07-10 endpoint disabled"
+        }), 410
         if request.headers.get("X-CK-Ep07-10-Key") != KEY:
             return jsonify({"error": "forbidden"}), 403
         mode = request.args.get("mode", "dry-run").casefold().strip()
