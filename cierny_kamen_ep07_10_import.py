@@ -3,6 +3,7 @@ from __future__ import annotations
 import re
 import unicodedata
 import hashlib
+import copy
 from collections import Counter, defaultdict
 from pathlib import Path
 import json
@@ -604,6 +605,84 @@ def merged_occurrence_links(existing_desc, new_links):
     return result
 
 
+def authoritative_payload(base_payload):
+    """Extend the permanent ep01-06 payload with reviewed ep07-10 data."""
+    result = copy.deepcopy(base_payload)
+    new_payload = json.loads(PAYLOAD_PATH.read_text(encoding="utf-8"))
+    identity_map = json.loads(IDENTITY_PATH.read_text(encoding="utf-8"))
+    records_by_id = defaultdict(list)
+    questions_by_id = defaultdict(list)
+    for record in identity_map["records"]:
+        if record.get("physical_presence", True):
+            records_by_id[record["scene_id"]].append(record)
+    for question in identity_map.get("questions", []):
+        questions_by_id[question["scene_id"]].append(question["question"])
+
+    existing_ids = {scene["scene_id"] for scene in result["scenes"]}
+    overlap = existing_ids & {scene["scene_id"] for scene in new_payload["scenes"]}
+    if overlap:
+        raise ValueError(f"authoritative scene overlap: {sorted(overlap)}")
+    order_offset = max((int(scene.get("order", 0)) for scene in result["scenes"]), default=-1) + 1
+    for source_scene in new_payload["scenes"]:
+        scene = copy.deepcopy(source_scene)
+        scene["order"] = order_offset + int(source_scene.get("order", 0))
+        records = records_by_id.get(scene["scene_id"], [])
+        scene["props"] = [{
+            "stable_name": record["stable_name"],
+            "action": record["action"],
+            "source_text": f"{record['stable_name']} — {record['action']}",
+            "registry_key": re.sub(
+                r"[^a-z0-9]+", "-", folded(record["stable_name"])
+            ).strip("-"),
+            "continuity": bool(record.get("continuity_group")),
+            "categories": list(record.get("categories", [])),
+        } for record in records]
+        scene["questions"] = list(questions_by_id.get(scene["scene_id"], []))
+        scene["labels"] = sorted({
+            label for record in records for label in record.get("categories", [])
+            if label in {"Auto", "Nadväzná rekvizita"}
+        }, key=folded)
+        result["scenes"].append(scene)
+
+    result["source_pdfs"] = [
+        *result.get("source_pdfs", []), *new_payload.get("source_pdfs", [])
+    ]
+    result["episode_counts"] = {
+        **result.get("episode_counts", {}), **new_payload["episode_counts"]
+    }
+    result["source_kind"] = "ten_final_pdfs_ep01_10"
+    result["stats"] = {
+        **result.get("stats", {}),
+        "scenes": len(result["scenes"]),
+        "unique_scene_ids": len({scene["scene_id"] for scene in result["scenes"]}),
+        "episodes": 10,
+    }
+
+    prop_registry = result.setdefault("prop_registry", {})
+    for name, records in identity_groups(identity_map).items():
+        key = re.sub(r"[^a-z0-9]+", "-", folded(name)).strip("-")
+        entry = prop_registry.setdefault(key, {
+            "identity": name, "aliases": [name], "occurrences": [],
+        })
+        seen = {item["scene_id"] for item in entry.get("occurrences", [])}
+        entry.setdefault("occurrences", []).extend({
+            "scene_id": record["scene_id"], "action": record["action"],
+        } for record in records if record["scene_id"] not in seen)
+
+    set_registry = result.setdefault("set_registry", {})
+    for chain in SET_CHAINS:
+        key = re.sub(r"[^a-z0-9]+", "-", folded(chain["name"])).strip("-")
+        set_registry[key] = {
+            "identity": chain["name"], "aliases": [chain["name"]],
+            "reason": "Explicit reviewed physical set-state continuity.",
+            "occurrences": [
+                {"scene_id": scene_id, "action": context}
+                for scene_id, context in chain["occurrences"]
+            ],
+        }
+    return result
+
+
 def ensure_attachments(api, card, links):
     existing = api["trello_get"](
         f"/cards/{card['id']}/attachments", {"fields": "id,name,url"}
@@ -878,6 +957,8 @@ def build_audit(api, state=None):
             groups[info["scene_id"]].append(card)
     source_ids = [scene["scene_id"] for scene in payload["scenes"]]
     source_set = set(source_ids)
+    all_authoritative = combined_scenes(api, payload)
+    all_authoritative_ids = {scene["scene_id"] for scene in all_authoritative}
     collisions = {
         sid: [{"name": c["name"], "url": c["shortUrl"], "closed": c["closed"]} for c in groups[sid]]
         for sid in source_ids if len(groups.get(sid, [])) > 1
@@ -945,6 +1026,9 @@ def build_audit(api, state=None):
         "board": board, "blockers": blockers,
         "sources": payload["source_pdfs"], "episode_counts": payload["episode_counts"],
         "source_scene_count": len(source_ids), "unique_source_ids": len(source_set),
+        "authoritative_scene_count_ep01_10": len(all_authoritative_ids),
+        "authoritative_missing_ep01_10": sorted(all_authoritative_ids - set(groups)),
+        "non_authoritative_scene_ids": sorted(set(groups) - all_authoritative_ids),
         "all_source_ids": source_ids,
         "trello_scene_cards_all": sum(1 for values in groups.values() if len(values) == 1),
         "trello_unique_scene_ids_all": len(groups),

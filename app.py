@@ -6570,11 +6570,12 @@ CIERNY_KAMEN_IMPORT_CHECKLISTS = [
 def cierny_kamen_import_payload():
     from cierny_kamen_prop_identities import apply_identity_map
     from cierny_kamen_split_0440 import augment_payload
+    from cierny_kamen_ep07_10_import import authoritative_payload
 
     path = Path(__file__).with_name("cierny_kamen_pdf_payload.json")
-    return augment_payload(apply_identity_map(
+    return authoritative_payload(augment_payload(apply_identity_map(
         json.loads(path.read_text(encoding="utf-8"))
-    ))
+    )))
 
 
 def cierny_kamen_import_state(payload):

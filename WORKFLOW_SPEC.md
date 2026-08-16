@@ -5,11 +5,19 @@
 Táto časť nahrádza staršie pravidlá Riverdale pre board `CzuD55PR`. Projekt sa
 volá **Čierny Kameň**; názov boardu sa bez osobitného pokynu nemení.
 
-- Zdrojom scenára je šesť schválených finálnych PDF. Aktívny rozsah je 313
-  unikátnych obrazov. Staré JSON/extracted-script súbory nie sú produkčný vstup.
+- Zdrojom scenára je desať schválených finálnych PDF pre epizódy 01–10.
+  Trvalý autoritatívny payload obsahuje 514 unikátnych obrazov: 314 v epizódach
+  01–06 vrátane samostatne obnoveného obrazu 04/40 a 200 v epizódach 07–10
+  (51 + 47 + 51 + 51). Staré JSON/extracted-script súbory nie sú produkčný vstup.
+- Epizódy 07–10 používajú výhradne PDF
+  `SC_01_07_ČK_1.8_MK._KC_FINAL.pdf`, `SC_01_08_ČK_2.2_NJ_SG_FINAL.pdf`,
+  `SC_01_09_ČK_1.4_MV_KC_FINALdocx .pdf` a
+  `SC_01_10_ČK_1.7_MV_KC_FINALdocx.pdf`. V epizóde 08 existuje
+  `08/07FLASH`, nie samostatný `08/07`.
 - Popis obrazovej karty zachováva referenčnú štruktúru 01/16: názov obrazu,
-  `REKVIZITY V KONTEXTE`, `KONTINUITA`, `ODKAZY`, nadväzné obrazy,
-  `RUČNÉ DOPLNENIA`, kompletná `AKCIA A DIALÓGY` a metadata na konci.
+  `REKVIZITY V KONTEXTE`, `NADVAZNOSŤ`, `ODKAZY`, `KONTINUITA PRIESTORU`,
+  `KONTINUITA POSTÁV`, `RUČNÉ DOPLNENIA`, kompletná `AKCIA A DIALÓGY`
+  a metadata na konci.
 - Checklisty sú v poradí `REKVIZITY`, `SET`, `INFO Z PORADY`,
   `INFO Z NATÁČANIA`, `OTÁZKY NA PORADU`.
 - Používateľ môže do `REKVIZITY` zapísať prirodzený názov. Automatizácia

@@ -13,7 +13,7 @@ if "flask" not in sys.modules:
 
 from cierny_kamen_ep07_10_import import (
     CHECKLIST_NAMES, SET_CHAINS, append_description_link,
-    canonical_space_names,
+    authoritative_payload, canonical_space_names,
     compatible_sample_checklists, ensure_attachments, folded,
     generated_checklist_prefix,
     merged_occurrence_links, prop_item_text,
@@ -33,6 +33,22 @@ class Ep0710ImportTest(unittest.TestCase):
         ids = [scene["scene_id"] for scene in self.payload["scenes"]]
         self.assertEqual(200, len(ids))
         self.assertEqual(200, len(set(ids)))
+
+    def test_permanent_payload_extends_through_episode_10(self):
+        from cierny_kamen_prop_identities import apply_identity_map
+        from cierny_kamen_split_0440 import augment_payload
+        with open("cierny_kamen_pdf_payload.json", encoding="utf-8") as stream:
+            old_payload = json.load(stream)
+        payload = authoritative_payload(augment_payload(apply_identity_map(old_payload)))
+        ids = [scene["scene_id"] for scene in payload["scenes"]]
+        self.assertEqual(514, len(ids))
+        self.assertEqual(514, len(set(ids)))
+        self.assertEqual(10, payload["stats"]["episodes"])
+        self.assertEqual(47, payload["episode_counts"]["08"])
+        self.assertEqual(181, sum(
+            len(scene["props"]) for scene in payload["scenes"]
+            if scene["episode"] >= 7
+        ))
 
     def test_0807_is_flash_only(self):
         ids = {scene["scene_id"] for scene in self.payload["scenes"]}
