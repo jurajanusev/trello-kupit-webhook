@@ -1080,6 +1080,10 @@ def build_audit(api, state=None):
         "source_scene_count": len(source_ids), "unique_source_ids": len(source_set),
         "authoritative_scene_count_ep01_10": len(all_authoritative_ids),
         "authoritative_missing_ep01_10": sorted(all_authoritative_ids - set(groups)),
+        "authoritative_duplicate_scene_ids_ep01_10": sorted(
+            scene_id for scene_id in all_authoritative_ids
+            if len(groups.get(scene_id, [])) > 1
+        ),
         "non_authoritative_scene_ids": sorted(set(groups) - all_authoritative_ids),
         "authoritative_missing_summaries": [
             {
