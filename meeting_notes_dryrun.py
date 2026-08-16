@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections import Counter, defaultdict
 import re
 import unicodedata
+from urllib.parse import urlencode
 
 from flask import jsonify, request
 
@@ -275,6 +276,34 @@ def load_list_cards(trello_get, list_id, include_checklists):
     return trello_get(f"/lists/{list_id}/cards", params)
 
 
+def load_list_cards_batched(trello_get, list_specs):
+    """Load up to ten Trello lists per read-only batch request."""
+    result = {}
+    for offset in range(0, len(list_specs), 10):
+        chunk = list_specs[offset:offset + 10]
+        urls = []
+        for spec in chunk:
+            params = {
+                "fields": "id,name,desc,due,dueComplete,shortUrl,closed,idList,pos",
+                "filter": "open", "limit": 1000,
+            }
+            if spec["include_checklists"]:
+                params.update({"checklists": "all", "checklist_fields": "all"})
+            urls.append(f"/lists/{spec['id']}/cards?{urlencode(params)}")
+        responses = trello_get("/batch", {"urls": ",".join(urls)})
+        if len(responses) != len(chunk):
+            raise RuntimeError("Trello batch response length mismatch")
+        for spec, response in zip(chunk, responses):
+            body = response.get("200")
+            if body is None:
+                status = next(iter(response), "unknown")
+                raise RuntimeError(
+                    f"Trello batch list read failed for {spec['name']}: {status}"
+                )
+            result[spec["id"]] = body
+    return result
+
+
 def scene_id_for(api, name):
     parser = api.get("scene_id_from_card_name")
     return parser(name) if parser else None
@@ -290,6 +319,11 @@ def audit_project(api, config, include_processed=False):
     })
     open_lists = [item for item in lists if not item.get("closed")]
     kinds = {item["id"]: list_kind(item.get("name")) for item in open_lists}
+    list_specs = [{
+        "id": item["id"], "name": item["name"],
+        "include_checklists": kinds[item["id"]] == "active",
+    } for item in open_lists if kinds[item["id"]] in {"active", "todo", "registry"}]
+    cards_by_list = load_list_cards_batched(trello_get, list_specs)
 
     support_cards_by_kind = defaultdict(list)
     support_by_url = {}
@@ -299,7 +333,7 @@ def audit_project(api, config, include_processed=False):
         if kind not in {"todo", "registry"}:
             continue
         support_list_names[kind].append(board_list["name"])
-        for card in load_list_cards(trello_get, board_list["id"], False):
+        for card in cards_by_list.get(board_list["id"], []):
             projection = support_projection(card, board_list["name"], kind)
             support_cards_by_kind[kind].append(projection)
             if projection.get("url"):
@@ -312,7 +346,7 @@ def audit_project(api, config, include_processed=False):
         if kinds[board_list["id"]] != "active":
             continue
         active_list_names.append(board_list["name"])
-        for card in load_list_cards(trello_get, board_list["id"], True):
+        for card in cards_by_list.get(board_list["id"], []):
             scene_id = scene_id_for(api, card.get("name"))
             if not scene_id:
                 skipped_non_scene_cards += 1

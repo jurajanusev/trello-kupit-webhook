@@ -2,6 +2,7 @@ import re
 import sys
 import types
 import unittest
+from urllib.parse import urlparse
 
 
 if "flask" not in sys.modules:
@@ -115,6 +116,12 @@ class MeetingNotesDryRunTest(unittest.TestCase):
                 return {"id": "board", "name": "Board", "url": "https://trello.com/b/ref"}
             if path == "/boards/board/lists":
                 return lists
+            if path == "/batch":
+                result = []
+                for url in params["urls"].split(","):
+                    list_id = urlparse(url).path.split("/")[2]
+                    result.append({"200": cards.get(list_id, [])})
+                return result
             match = re.match(r"/lists/([^/]+)/cards", path)
             if match:
                 return cards.get(match.group(1), [])
@@ -130,7 +137,7 @@ class MeetingNotesDryRunTest(unittest.TestCase):
         self.assertEqual(2, result["counts"]["already_processed"])
         self.assertEqual(2, result["counts"]["review_items"])
         self.assertEqual({"ambiguous": 1, "changed": 1}, result["classification_counts"])
-        self.assertNotIn("/lists/shot/cards", calls)
+        self.assertEqual(1, calls.count("/batch"))
         self.assertEqual(1, len(result["finding_cards"]))
         returned = [
             item for checklist in result["finding_cards"][0]["checklists"]
