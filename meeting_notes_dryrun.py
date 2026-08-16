@@ -217,15 +217,18 @@ def text_matches(core, full, projection):
     return len(core) >= 18 and core in projection["folded_text"]
 
 
-def processed_evidence(item, card, support_cards_by_kind, support_by_url):
+def processed_evidence(
+    item, card, support_cards_by_kind, support_by_url, desc_projection=None
+):
     text = item.get("name") or ""
     full = normalized_text(text)
     core = semantic_core(text)
     evidence = []
-    desc_projection = {
-        "folded_text": normalized_text(card.get("desc") or ""),
-        "lines": normalized_lines(card.get("desc") or ""),
-    }
+    if desc_projection is None:
+        desc_projection = {
+            "folded_text": normalized_text(card.get("desc") or ""),
+            "lines": normalized_lines(card.get("desc") or ""),
+        }
     if text_matches(core, full, desc_projection):
         evidence.append({"kind": "scene_description", "card": card.get("shortUrl")})
     if item.get("id") and item["id"] in (card.get("desc") or ""):
@@ -273,7 +276,7 @@ def load_list_cards(trello_get, list_id, include_checklists):
         "filter": "open", "limit": 1000,
     }
     if include_checklists:
-        params.update({"checklists": "all", "checklist_fields": "all"})
+        params.update({"checklists": "all", "checklist_fields": "name,pos"})
     return trello_get(f"/lists/{list_id}/cards", params)
 
 
@@ -289,7 +292,7 @@ def load_list_cards_batched(trello_get, list_specs):
                 "filter": "open", "limit": 1000,
             }
             if spec["include_checklists"]:
-                params.update({"checklists": "all", "checklist_fields": "all"})
+                params.update({"checklists": "all", "checklist_fields": "name,pos"})
             urls.append(f"/lists/{spec['id']}/cards?{urlencode(params)}")
         responses = trello_get("/batch", {"urls": ",".join(urls)})
         if len(responses) != len(chunk):
@@ -372,6 +375,12 @@ def audit_project(api, config, include_processed=False, processed_sample_limit=2
     classifications = Counter()
     checklist_names = Counter()
     for card in scene_cards:
+        # Scene descriptions can contain the complete script. Normalize once per
+        # card instead of once per checklist item.
+        desc_projection = {
+            "folded_text": normalized_text(card.get("desc") or ""),
+            "lines": normalized_lines(card.get("desc") or ""),
+        }
         checklist_results = []
         for checklist in sorted(card.get("checklists", []), key=lambda row: row.get("pos", 0)):
             checklist_names[checklist.get("name") or ""] += 1
@@ -379,7 +388,8 @@ def audit_project(api, config, include_processed=False, processed_sample_limit=2
             for item in sorted(checklist.get("checkItems", []), key=lambda row: row.get("pos", 0)):
                 totals["items"] += 1
                 evidence = processed_evidence(
-                    item, card, support_cards_by_kind, support_by_url
+                    item, card, support_cards_by_kind, support_by_url,
+                    desc_projection=desc_projection,
                 )
                 classification = classify_item(checklist.get("name"), item.get("name"))
                 if evidence:
