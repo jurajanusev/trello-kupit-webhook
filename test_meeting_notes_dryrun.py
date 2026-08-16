@@ -145,6 +145,19 @@ class MeetingNotesDryRunTest(unittest.TestCase):
         ]
         self.assertEqual({"change", "question"}, {item["id"] for item in returned})
 
+    def test_processed_sample_can_be_suppressed_without_changing_counts(self):
+        # The compact production verification mode changes presentation only.
+        result = audit_project({
+            "trello_get": lambda path, params: (
+                {"id": "board", "name": "Board", "url": "url"}
+                if path == "/boards/ref" else
+                [] if path == "/boards/board/lists" else []
+            ),
+            "scene_id_from_card_name": lambda name: None,
+        }, {"board_ref": "ref", "name": "Test"}, processed_sample_limit=0)
+        self.assertEqual([], result["processed_sample"])
+        self.assertEqual(0, result["counts"]["checklist_items"])
+
 
 if __name__ == "__main__":
     unittest.main()

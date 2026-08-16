@@ -309,7 +309,7 @@ def scene_id_for(api, name):
     return parser(name) if parser else None
 
 
-def audit_project(api, config, include_processed=False):
+def audit_project(api, config, include_processed=False, processed_sample_limit=25):
     trello_get = api["trello_get"]
     board = trello_get(f"/boards/{config['board_ref']}", {
         "fields": "id,name,url,shortLink,closed",
@@ -373,7 +373,7 @@ def audit_project(api, config, include_processed=False):
                 classification = classify_item(checklist.get("name"), item.get("name"))
                 if evidence:
                     totals["processed"] += 1
-                    if len(processed_sample) < 25:
+                    if len(processed_sample) < processed_sample_limit:
                         processed_sample.append({
                             "project": config["name"], "scene_id": card["scene_id"],
                             "card": card["name"], "url": card.get("shortUrl"),
@@ -477,13 +477,24 @@ def register_routes(app, api):
         except ValueError:
             return jsonify({"error": "invalid start/limit"}), 400
         include_processed = request.args.get("include_processed", "0") == "1"
+        summary_only = request.args.get("summary_only", "0") == "1"
+        try:
+            sample_limit = min(100, max(0, int(request.args.get("sample_limit", "25"))))
+        except ValueError:
+            return jsonify({"error": "invalid sample_limit"}), 400
         selected_projects = PROJECTS if project == "all" else {project: PROJECTS[project]}
         results = []
         for config in selected_projects.values():
-            results.append(paginated_project(
-                audit_project(api, config, include_processed=include_processed),
-                start, limit,
-            ))
+            result = paginated_project(
+                audit_project(
+                    api, config, include_processed=include_processed,
+                    processed_sample_limit=sample_limit,
+                ), start, limit,
+            )
+            if summary_only:
+                result["findings"]["cards"] = []
+                result["findings"]["returned_cards"] = 0
+            results.append(result)
         totals = Counter()
         classifications = Counter()
         for result in results:
