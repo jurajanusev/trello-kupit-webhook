@@ -1565,6 +1565,18 @@ def show_checklist_powerup_health():
     return jsonify({"app": "dunaj-show-checklist-powerup", "status": "ok"})
 
 
+@app.route("/powerup/config.js", methods=["GET"])
+def show_checklist_powerup_config():
+    response = app.response_class(
+        "window.ShowChecklistConfig = Object.freeze({appKey: "
+        + json.dumps(API_KEY)
+        + "});\n",
+        mimetype="text/javascript",
+    )
+    response.headers["Cache-Control"] = "no-store"
+    return response
+
+
 @app.route("/powerup/<path:filename>", methods=["GET"])
 def show_checklist_powerup_asset(filename):
     return send_from_directory(POWERUP, filename)

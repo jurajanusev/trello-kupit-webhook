@@ -13,12 +13,18 @@ function loadCapabilities() {
     Promise,
     URL,
     ShowChecklistCore: Core,
+    ShowChecklistConfig: { appKey: "test-api-key" },
     location: { href: "https://example.test/powerup/" },
     TrelloPowerUp: {
       initialize(value) { capabilities = value; },
     },
   };
   context.window = context;
+  vm.runInNewContext(
+    fs.readFileSync(path.join(__dirname, "trello-rest.js"), "utf8"),
+    context,
+    { filename: "trello-rest.js" },
+  );
   vm.runInNewContext(
     fs.readFileSync(path.join(__dirname, "client.js"), "utf8"),
     context,

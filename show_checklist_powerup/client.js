@@ -4,28 +4,12 @@
   const ICON = new URL("./icon.svg", window.location.href).href;
   const SETTINGS_KEY = "showChecklistSettingsV1";
   const Core = window.ShowChecklistCore;
+  const Rest = window.ShowChecklistRest;
 
   function readSettings(t) {
     return t.get("board", "private", SETTINGS_KEY, Core.DEFAULT_SETTINGS)
       .then(Core.normalizeSettings)
       .catch(function () { return Core.normalizeSettings(); });
-  }
-
-  function readChecklists(t) {
-    // Trello sometimes returns checklist metadata without checkItems. Try the
-    // narrow request first, then card('all') only as a best-effort fallback.
-    return t.card("id", "checklists").then(function (card) {
-      const checklists = Array.isArray(card && card.checklists) ? card.checklists : [];
-      const hasItems = checklists.every(function (checklist) {
-        return Array.isArray(checklist && checklist.checkItems);
-      });
-      if (!checklists.length || hasItems) return checklists;
-      return t.card("all").then(function (fullCard) {
-        const fullChecklists = Array.isArray(fullCard && fullCard.checklists)
-          ? fullCard.checklists : [];
-        return fullChecklists.length ? fullChecklists : checklists;
-      }).catch(function () { return checklists; });
-    });
   }
 
   function errorBadge(error) {
@@ -35,9 +19,9 @@
 
   window.TrelloPowerUp.initialize({
     "card-badges": function (t) {
-      return Promise.all([readChecklists(t), readSettings(t)])
+      return Promise.all([Rest.load(t), readSettings(t)])
         .then(function (result) {
-          return Core.buildBadges(result[0], result[1]).map(function (badge) {
+          return Core.buildBadges(result[0].checklists, result[1]).map(function (badge) {
             return Object.assign({ icon: ICON, monochrome: true }, badge);
           });
         })
@@ -65,7 +49,5 @@
         height: 590,
       });
     },
-  }, {
-    appName: "Dunaj Show Checklist",
-  });
+  }, Rest.OPTIONS);
 })();

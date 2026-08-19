@@ -13,7 +13,7 @@ class ShowChecklistPowerUpRoutesTest(unittest.TestCase):
             self.assertIn(b"TrelloPowerUp.initialize", response.data + client.data)
 
     def test_powerup_assets_are_served(self):
-        for path in ("core.js", "client.js", "settings.html", "checklists.html", "icon.svg"):
+        for path in ("core.js", "trello-rest.js", "client.js", "settings.html", "checklists.html", "icon.svg"):
             with self.subTest(path=path):
                 with self.client.get(f"/powerup/{path}") as response:
                     self.assertEqual(200, response.status_code)
@@ -22,6 +22,14 @@ class ShowChecklistPowerUpRoutesTest(unittest.TestCase):
         with self.client.get("/powerup/health") as response:
             self.assertEqual(200, response.status_code)
             self.assertEqual("dunaj-show-checklist-powerup", response.get_json()["app"])
+
+    def test_powerup_config_exposes_only_public_api_key(self):
+        with self.client.get("/powerup/config.js") as response:
+            self.assertEqual(200, response.status_code)
+            self.assertIn(b"ShowChecklistConfig", response.data)
+            self.assertIn(b"appKey", response.data)
+            self.assertNotIn(b"TRELLO_TOKEN", response.data)
+            self.assertEqual("no-store", response.headers["Cache-Control"])
 
 
 if __name__ == "__main__":

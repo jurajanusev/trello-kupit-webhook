@@ -1,6 +1,7 @@
 (function () {
   "use strict";
-  const t = window.TrelloPowerUp.iframe();
+  const Rest = window.ShowChecklistRest;
+  const t = window.TrelloPowerUp.iframe(Rest.OPTIONS);
   const Core = window.ShowChecklistCore;
 
   function escapeHtml(value) {
@@ -43,21 +44,37 @@
       '<div class="error">Checklisty sa nepodarilo načítať. Skús kartu znovu otvoriť.</div>';
   }
 
-  t.render(function () {
-    return t.card("id", "checklists")
-      .then(function (card) {
-        const checklists = Array.isArray(card && card.checklists) ? card.checklists : [];
-        const hasItems = checklists.every(function (checklist) {
-          return Array.isArray(checklist && checklist.checkItems);
+  function renderAuthorization() {
+    document.getElementById("summary").textContent = "Trello neposkytlo položky checklistov.";
+    const content = document.getElementById("content");
+    content.innerHTML = '<div class="empty"><p>Na zobrazenie položiek a presných počtov povoľ Power-Upu prístup iba na čítanie.</p>' +
+      '<button type="button" id="authorize-trello">Povoliť čítanie checklistov</button></div>';
+    document.getElementById("authorize-trello").addEventListener("click", function (event) {
+      const button = event.currentTarget;
+      button.disabled = true;
+      button.textContent = "Otváram povolenie…";
+      Rest.authorize(t)
+        .then(loadAndRender)
+        .catch(function () {
+          button.disabled = false;
+          button.textContent = "Povoliť čítanie checklistov";
         });
-        if (!checklists.length || hasItems) return checklists;
-        return t.card("all").then(function (fullCard) {
-          const fullChecklists = Array.isArray(fullCard && fullCard.checklists)
-            ? fullCard.checklists : [];
-          return fullChecklists.length ? fullChecklists : checklists;
-        }).catch(function () { return checklists; });
-      })
-      .then(render)
+    });
+  }
+
+  function loadAndRender() {
+    return Rest.load(t).then(function (result) {
+      if (!result.authorized && !Rest.hasItems(result.checklists)) {
+        renderAuthorization();
+      } else {
+        render(result.checklists);
+      }
+      return t.sizeTo("#checklists");
+    });
+  }
+
+  t.render(function () {
+    return loadAndRender()
       .catch(renderError)
       .then(function () { return t.sizeTo("#checklists"); });
   });
