@@ -17,7 +17,7 @@ BOARD_REF = "CzuD55PR"
 EPISODES = {1, 2, 3}
 PHOTO_LABEL = "FOTKA"
 PHOTO_CONFIRMED = {
-    "01/12LP", "02/19LP", "03/13", "03/15", "03/20", "03/22",
+    "01/09", "01/12LP", "02/19LP", "03/13", "03/15", "03/20", "03/22",
     "03/27", "03/28", "03/47LP",
 }
 PHOTO_AMBIGUOUS = {"03/16", "01/53LP"}
@@ -40,13 +40,15 @@ VEHICLE_RE = re.compile(
     r"dod[aá]vk\w*|sanitk\w*|pohrebn[eé]\s+auto|volkswagen\w*|toyota\w*|"
     r"policajn[eé]\s+auto|[čc]ln\w*|pramic\w*|motork\w*|bicykl\w*)\b", re.I,
 )
-DOGY_RE = re.compile(r"\bdog(?:y|gy)\b", re.I)
+DOGY_RE = re.compile(r"\bdog(?:y|gy)(?:ho|mu|m)?\b", re.I)
 DOGY_PHYSICAL_RE = re.compile(
     r"\bdog(?:y|gy)(?:ho|mu|m)?\s+(?:sed[ií]|stoj[ií]|ide|vojde|pr[ií]de|"
     r"prech[aá]dza|pozoruje|p[ií][šs]e|sle(?:duje|doval)|[čc]ak[aá]|"
     r"zostane|od[ií]de|kr[aá][čc]a|prik[ýy]vne|usmeje|pohne|zjav[ií])\b",
     re.I,
 )
+DOGY_PHYSICAL_OVERRIDES = {"01/12LP", "01/27FLASH", "03/24FLASH", "03/55LP"}
+SCENE_REF_RE = re.compile(r"\b0*([1-9]\d*)\s*/\s*0*(\d+)([A-Za-z]*)\b")
 
 
 SCENE_0153LP_SOURCE = {
@@ -155,6 +157,8 @@ def scene_cards(api, state):
     parser = api["scene_id_from_card_name"]
     grouped = defaultdict(list)
     for card in state["cards"]:
+        if folded(card.get("list_name")) != "scenare":
+            continue
         scene_id = parser(card.get("name"))
         if episode_of(scene_id) in EPISODES:
             grouped[canonical_scene_id(scene_id)].append(card)
@@ -194,6 +198,14 @@ def set_master_plan(state, master_name, additions):
     matches = find_cards(state, master_name)
     exact = [card for card in matches if folded(card.get("name")) == folded(master_name)]
     selected = exact if exact else matches
+    continuity_set = [
+        card for card in selected
+        if "nadvazne set" in folded(card.get("list_name"))
+    ]
+    # A set master is distinct from the ordinary story-space card. Prefer the
+    # continuity register when it exists; ŠKOLA currently only has a space master.
+    if continuity_set:
+        selected = continuity_set
     result = {
         "requested_master": master_name,
         "matches": [public_card(card, state) for card in selected],
@@ -225,6 +237,14 @@ def photo_plan(scenes, grouped, state):
         scene = source.get(scene_id)
         cards = grouped.get(scene_id, [])
         text = "\n".join((scene or {}).get(key, "") for key in ("prepis", "action_raw"))
+        if scene_id == "01/09":
+            manual = "\n".join(
+                item.get("name") or ""
+                for card in cards for checklist in card.get("checklists", [])
+                for item in checklist.get("checkItems", [])
+                if "fotoapar" in folded(item.get("name"))
+            )
+            text += "\n" + manual
         confirmed.append({
             "scene_id": scene_id, "title": (scene or {}).get("prepis"),
             "evidence": evidence_snippets(text, PHOTO_RE),
@@ -254,7 +274,12 @@ def photo_plan(scenes, grouped, state):
             continue
         hits = []
         for card in cards:
-            hits.extend(evidence_snippets(card_text(card), PHOTO_RE, limit=3))
+            checklist_text = "\n".join(
+                item.get("name") or ""
+                for checklist in card.get("checklists", [])
+                for item in checklist.get("checkItems", [])
+            )
+            hits.extend(evidence_snippets(checklist_text, PHOTO_RE, limit=3))
         if hits:
             board_only.append({
                 "scene_id": scene_id, "reason": "Trello-only/manual evidence; requires semantic confirmation",
@@ -333,6 +358,8 @@ def dogy_plan(scenes, grouped, state):
         characters = [folded(value) for value in scene.get("characters", [])]
         exact_character = "dogy" in characters
         physical_evidence = evidence_snippets(scene.get("action_raw", ""), DOGY_PHYSICAL_RE)
+        if scene_id in DOGY_PHYSICAL_OVERRIDES and not physical_evidence:
+            physical_evidence = evidence_snippets(scene.get("action_raw", ""), DOGY_RE)
         only_vo_mo = not exact_character and not physical_evidence
         row = {
             "scene_id": scene_id, "title": scene.get("prepis"),
@@ -495,6 +522,7 @@ def vehicles_plan(state):
     target_lists = [row for row in state["open_lists"] if folded(row.get("name")) == "auta"]
     candidates = []
     ambiguous = []
+    excluded_non_vehicle = []
     for card in state["cards"]:
         list_name = folded(card.get("list_name"))
         master_list = (
@@ -508,6 +536,25 @@ def vehicles_plan(state):
         vehicle_hit = bool(VEHICLE_RE.search(card.get("name") or ""))
         if not has_auto_label and not vehicle_hit:
             continue
+        references = {
+            canonical_scene_id("/".join(match.groups()))
+            for match in SCENE_REF_RE.finditer(card_text(card))
+        }
+        in_scope_references = sorted(
+            scene_id for scene_id in references if episode_of(scene_id) in EPISODES
+        )
+        if not in_scope_references:
+            continue
+        component_or_content = any(token in folded(card.get("name")) for token in (
+            "batozinovy priestor", "fotografi", "vesla", "mobil s fotograf",
+        ))
+        if component_or_content:
+            excluded_non_vehicle.append({
+                **public_card(card, state),
+                "reason": "name describes vehicle content/component, not the physical vehicle",
+                "scene_references": in_scope_references,
+            })
+            continue
         public = public_card(card, state)
         generic = folded(card.get("name")) in {
             "auto", "vozidlo", "auto vozidlo", "dodavka", "cln", "pramica",
@@ -518,12 +565,17 @@ def vehicles_plan(state):
             ),
             "needs_auto_label": not has_auto_label,
             "move_needed": folded(card.get("list_name")) != "auta",
+            "scene_references": in_scope_references,
         }
         if generic or (not has_auto_label and len(folded(card.get("name")).split()) < 2):
             row["ambiguity"] = "generic identity; do not move until the physical vehicle is resolved"
             ambiguous.append(row)
         else:
             candidates.append(row)
+    groups = defaultdict(list)
+    for row in candidates:
+        groups[folded(row["name"])].append(row)
+    duplicate_groups = [rows for rows in groups.values() if len(rows) > 1]
     return {
         "existing_AUTA_lists": target_lists,
         "list_action": "reuse" if len(target_lists) == 1 else (
@@ -532,6 +584,8 @@ def vehicles_plan(state):
         "existing_Auto_labels": auto_labels,
         "confirmed_master_count": len(candidates), "confirmed_master_cards": candidates,
         "ambiguous_count": len(ambiguous), "ambiguous_or_excluded": ambiguous,
+        "duplicate_identity_groups": duplicate_groups,
+        "excluded_non_vehicle": excluded_non_vehicle,
         "exclusion_rule": "scene cards and ToDo cards are never candidates; generic identities are not moved",
     }
 
@@ -556,6 +610,12 @@ def build_audit(api):
     payload, scenes = payload_scenes()
     state = load_board(api)
     grouped = scene_cards(api, state)
+    parser = api["scene_id_from_card_name"]
+    parallel_scene_cards = [
+        public_card(card, state) for card in state["cards"]
+        if folded(card.get("list_name")) == "original screener"
+        and episode_of(parser(card.get("name"))) in EPISODES
+    ]
     duplicate_scenes = {
         scene_id: [public_card(card, state) for card in cards]
         for scene_id, cards in grouped.items() if len(cards) > 1
@@ -576,9 +636,14 @@ def build_audit(api):
             "board_scene_ids_ep01_03": len(grouped),
             "board_scene_cards_ep01_03": sum(len(cards) for cards in grouped.values()),
             "duplicate_scene_ids": len(duplicate_scenes),
+            "parallel_original_screener_cards_excluded": len(parallel_scene_cards),
             "open_lists": len(state["open_lists"]), "board_labels": len(state["labels"]),
         },
         "duplicate_scenes": duplicate_scenes,
+        "parallel_original_screener": {
+            "excluded_from_every_proposed_change": True,
+            "count": len(parallel_scene_cards), "cards": parallel_scene_cards,
+        },
         "set_masters": {"fefe_beef_parkovisko": fefe, "skola": school, "pitevna": pitva},
         "photo_label": photo_plan(scenes, grouped, state),
         "scene_01_53": scene_0153_plan(grouped, state, payload),
@@ -613,4 +678,3 @@ def register_routes(app, api):
                 "status": "read-only-audit-failed", "writes": 0,
                 "error": f"{type(error).__name__}: {error}",
             }), 502
-
