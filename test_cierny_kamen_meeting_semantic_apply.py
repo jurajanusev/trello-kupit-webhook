@@ -15,6 +15,11 @@ from cierny_kamen_meeting_semantic_dryrun import vehicles_plan
 
 
 class SemanticApplyTest(unittest.TestCase):
+    def test_one_off_endpoint_source_is_disabled_after_completion(self):
+        from pathlib import Path
+        source = Path(__file__).with_name("cierny_kamen_meeting_semantic_apply.py").read_text(encoding="utf-8")
+        self.assertIn('return jsonify({"error": "completed one-off endpoint disabled"}), 410', source)
+
     def test_eclipse_is_scoped_to_dance_group_context(self):
         self.assertIn("02/46", SAFE_SET_NOTES)
         self.assertIn("02/47A", SAFE_SET_NOTES)
