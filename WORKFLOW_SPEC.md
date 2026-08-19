@@ -59,6 +59,22 @@ volá **Čierny Kameň**; názov boardu sa bez osobitného pokynu nemení.
   súbežné ručné úpravy. Pri konflikte sa karta preskočí a nič sa nemaže.
 - Každá migrácia ide cez audit, dry-run, malú vzorku, idempotentné dávky a
   read-back audit. Jednorazový endpoint sa po overení vypne.
+- Checklist `REKVIZITY` je jediná pracovná vrstva rekvizít obrazovej karty.
+  Jedna fyzická identita má na obraze jeden riadok; nové companion položky so
+  šípkou sa nevytvárajú. Kontext, stav, kontinuita a master URL sa dopĺňajú
+  do existujúceho riadka bez zmeny jeho check state.
+- Pred každým zápisom sa najprv vyrieši identita. Poradie dôkazov je:
+  existujúca master URL, kanonický názov, explicitný alias, vlastník + typ a
+  napokon potvrdená fyzická totožnosť zo scenára alebo poznámky. Podobnosť
+  slov ani generický keyword classifier nie sú dôkazom.
+- Pri porovnaní identity sa odstraňujú iba technické obaly: `<n>`, Markdown,
+  kontext za identitnou hranicou, `TU`/šípky a suffix `KARTA` s URL. Ručný
+  názov sa nemení, kým ho explicitné potvrdenie nezaradí ako alias.
+- Pred vytvorením master karty sa prehľadávajú otvorené aj archivované karty
+  a aliasy. Neistota blokuje create/merge a vytvára otázku; nikdy druhý riadok.
+- Povinný dry-run hlási duplicitnú identitu v obraze, viac aktívnych masterov,
+  rovnakú URL vo viacerých riadkoch, item bez registry URL a názov podobný aliasu.
+  Apply je hotový až po druhom dry-rune s nulou nových jednoznačných zápisov.
 
 Schvalene nastavenie pre dalsi vyvoj:
 

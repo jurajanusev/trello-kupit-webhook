@@ -11,6 +11,7 @@ from flask import jsonify, request
 
 from cierny_kamen_reference_all import board_support_data
 from cierny_kamen_prop_markdown_format import format_registry_item
+from cierny_kamen_prop_identity_resolution import strip_technical_wrappers
 
 
 KEY = "cierny-kamen-all-props-registry-5aug-1f7c3b92"
@@ -75,9 +76,7 @@ def with_formatted_card_suffix(value, canonical_name, url):
 
 
 def alias_core(value):
-    value = without_card_suffix(value).strip()
-    value = re.sub(r"^(?:<[^>]+>\s*|↳\s*)", "", value).strip()
-    return re.split(r"\s+—\s+", value, maxsplit=1)[0].strip()
+    return strip_technical_wrappers(value)
 
 
 def replace_auto_block(value, block):

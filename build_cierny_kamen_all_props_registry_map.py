@@ -8,6 +8,8 @@ import unicodedata
 from collections import defaultdict
 from pathlib import Path
 
+from cierny_kamen_prop_identity_resolution import strip_technical_wrappers
+
 
 ROOT = Path(__file__).resolve().parent
 SOURCE_MAP = ROOT / "cierny_kamen_prop_identity_map.json"
@@ -21,12 +23,7 @@ def folded(value: str) -> str:
 
 
 def identity_core(value: str) -> str:
-    value = re.sub(
-        r"\s*\|\s*KARTA:\s*https://trello\.com/c/[A-Za-z0-9]+\s*$",
-        "", value or "", flags=re.IGNORECASE,
-    ).strip()
-    value = re.sub(r"^(?:<[^>]+>\s*|↳\s*)", "", value).strip()
-    return re.split(r"\s+—\s+", value, maxsplit=1)[0].strip()
+    return strip_technical_wrappers(value)
 
 
 # These mappings were reviewed item-by-item against the current board and the
