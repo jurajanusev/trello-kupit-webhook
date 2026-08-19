@@ -3,11 +3,13 @@
 
   const config = root.ShowChecklistConfig || {};
   const APP_KEY = String(config.appKey || "");
-  const OPTIONS = Object.freeze({
+  // Trello mutates this options object during initialization (for example by
+  // adding useADSTokens), so it must stay extensible.
+  const OPTIONS = {
     appKey: APP_KEY,
     appName: "Dunaj Show Checklist",
     appAuthor: "Juraj Anusev",
-  });
+  };
 
   function hasItems(checklists) {
     return (Array.isArray(checklists) ? checklists : []).every(function (checklist) {
