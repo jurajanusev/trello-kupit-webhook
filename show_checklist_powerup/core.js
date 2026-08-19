@@ -49,6 +49,9 @@
   }
 
   function normalizeChecklist(checklist, index) {
+    const itemsAvailable = Boolean(checklist && (
+      Array.isArray(checklist.checkItems) || Array.isArray(checklist.items)
+    ));
     const rawItems = Array.isArray(checklist && checklist.checkItems)
       ? checklist.checkItems
       : Array.isArray(checklist && checklist.items) ? checklist.items : [];
@@ -68,7 +71,8 @@
       items: items,
       completeCount: completeCount,
       totalCount: items.length,
-      complete: items.length > 0 && completeCount === items.length,
+      itemsAvailable: itemsAvailable,
+      complete: itemsAvailable && items.length > 0 && completeCount === items.length,
     };
   }
 
@@ -86,7 +90,10 @@
   function badgeText(checklist, settings) {
     const parts = [];
     if (settings.showChecklistName) parts.push(checklist.name);
-    if (settings.showProgress) parts.push(checklist.completeCount + "/" + checklist.totalCount);
+    if (settings.showProgress) {
+      parts.push(checklist.itemsAvailable
+        ? checklist.completeCount + "/" + checklist.totalCount : "stav nedostupný");
+    }
 
     const candidates = settings.showCompleteItems
       ? checklist.items
@@ -107,7 +114,9 @@
     const badges = visible.map(function (checklist) {
       return {
         text: badgeText(checklist, settings),
-        color: checklist.complete ? settings.completeColor : settings.incompleteColor,
+        color: checklist.itemsAvailable
+          ? (checklist.complete ? settings.completeColor : settings.incompleteColor)
+          : "light-gray",
       };
     });
     const hiddenCount = normalized.length - visible.length;

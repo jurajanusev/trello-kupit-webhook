@@ -5,10 +5,11 @@ strane karty a celý prehľad v samostatnom okne.
 
 ## Prečo zvládne veľa checklistov
 
-Konektor volá iba `t.card("checklists")`. Nežiada celý objekt karty cez
-`t.card("all")`, čo je zbytočné a na kartách s veľkým množstvom checklistov
-môže zlyhať. Predná strana má konfigurovateľný limit odznakov; ďalšie
-checklisty sa spočítajú do jedného odznaku. Detail karty zobrazí všetky.
+Konektor najprv volá úzky dotaz `t.card("id", "checklists")`. Keď Trello v
+tomto výsledku neposkytne položky checklistov, bezpečne skúsi `t.card("all")`;
+ak veľká karta tento dotaz odmietne, zobrazí názvy checklistov bez nepravdivého
+stavu `0/0`. Predná strana má konfigurovateľný limit odznakov a ďalšie
+checklisty sa spočítajú do jedného odznaku.
 
 Power-Up nepotrebuje Trello API token ani serverovú databázu. Používateľské
 nastavenia ukladá Trello do súkromných plugin dát danej nástenky.

@@ -48,6 +48,14 @@ test("poškodené a prázdne vstupy sa normalizujú", () => {
   assert.match(badges[0].text, /Checklist · 0\/1/);
 });
 
+test("checklist bez checkItems nehlási nepravdivé 0/0", () => {
+  const normalized = Core.normalizeChecklists([{ name: "Rekvizity" }]);
+  assert.equal(normalized[0].itemsAvailable, false);
+  const badges = Core.buildBadges([{ name: "Rekvizity" }], {});
+  assert.equal(badges[0].text, "Rekvizity · stav nedostupný");
+  assert.equal(badges[0].color, "light-gray");
+});
+
 test("súhrn spočíta checklisty aj položky", () => {
   assert.deepEqual(Core.summarize([checklist(1), checklist(2, true)]), {
     checklists: 2,

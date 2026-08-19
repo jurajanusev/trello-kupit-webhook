@@ -12,10 +12,19 @@
   }
 
   function readChecklists(t) {
-    // Request only checklists. Asking Trello for card('all') is unnecessary and
-    // can fail on cards containing many checklists.
-    return t.card("checklists").then(function (card) {
-      return Array.isArray(card && card.checklists) ? card.checklists : [];
+    // Trello sometimes returns checklist metadata without checkItems. Try the
+    // narrow request first, then card('all') only as a best-effort fallback.
+    return t.card("id", "checklists").then(function (card) {
+      const checklists = Array.isArray(card && card.checklists) ? card.checklists : [];
+      const hasItems = checklists.every(function (checklist) {
+        return Array.isArray(checklist && checklist.checkItems);
+      });
+      if (!checklists.length || hasItems) return checklists;
+      return t.card("all").then(function (fullCard) {
+        const fullChecklists = Array.isArray(fullCard && fullCard.checklists)
+          ? fullCard.checklists : [];
+        return fullChecklists.length ? fullChecklists : checklists;
+      }).catch(function () { return checklists; });
     });
   }
 

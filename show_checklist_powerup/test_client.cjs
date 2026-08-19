@@ -27,7 +27,7 @@ function loadCapabilities() {
   return capabilities;
 }
 
-test("card-badges žiada iba checklists a zvládne desať checklistov", async () => {
+test("card-badges žiada najprv iba id a checklists a zvládne desať checklistov", async () => {
   const capabilities = loadCapabilities();
   const calls = [];
   const checklists = Array.from({ length: 10 }, (_, index) => ({
@@ -43,10 +43,30 @@ test("card-badges žiada iba checklists a zvládne desať checklistov", async ()
   };
 
   const badges = await capabilities["card-badges"](t);
-  assert.deepEqual(calls, [["checklists"]]);
+  assert.deepEqual(calls, [["id", "checklists"]]);
   assert.equal(badges.length, 7);
   assert.match(badges.at(-1).text, /^\+4/);
   assert.equal(badges[0].icon, "https://example.test/powerup/icon.svg");
+});
+
+test("pri chýbajúcich položkách bezpečne skúsi card all", async () => {
+  const capabilities = loadCapabilities();
+  const calls = [];
+  const t = {
+    card(...fields) {
+      calls.push(fields);
+      if (fields[0] === "all") {
+        return Promise.resolve({
+          checklists: [{ name: "Rekvizity", checkItems: [{ name: "x", state: "incomplete" }] }],
+        });
+      }
+      return Promise.resolve({ checklists: [{ name: "Rekvizity" }] });
+    },
+    get() { return Promise.resolve(Core.DEFAULT_SETTINGS); },
+  };
+  const badges = await capabilities["card-badges"](t);
+  assert.deepEqual(calls, [["id", "checklists"], ["all"]]);
+  assert.match(badges[0].text, /0\/1/);
 });
 
 test("chyba načítania sa zobrazí ako červený odznak", async () => {

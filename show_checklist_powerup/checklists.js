@@ -21,14 +21,17 @@
       return;
     }
     content.innerHTML = normalized.map(function (checklist) {
-      const items = checklist.items.length ? checklist.items.map(function (item) {
+      const items = !checklist.itemsAvailable
+        ? '<li class="item"><span class="item-mark">?</span><span>Položky Trello neposkytlo</span></li>'
+        : checklist.items.length ? checklist.items.map(function (item) {
         return '<li class="item ' + (item.complete ? "complete" : "") + '">' +
           '<span class="item-mark">' + (item.complete ? "✓" : "○") + "</span>" +
           "<span>" + escapeHtml(item.name) + "</span></li>";
       }).join("") : '<li class="item"><span class="item-mark">–</span><span>Bez položiek</span></li>';
       return '<section class="checklist"><div class="checklist-head">' +
         '<span class="checklist-title">' + escapeHtml(checklist.name) + "</span>" +
-        '<span class="progress">' + checklist.completeCount + "/" + checklist.totalCount + "</span>" +
+        '<span class="progress">' + (checklist.itemsAvailable
+          ? checklist.completeCount + "/" + checklist.totalCount : "–") + "</span>" +
         '</div><ul class="items">' + items + "</ul></section>";
     }).join("");
   }
@@ -41,8 +44,20 @@
   }
 
   t.render(function () {
-    return t.card("checklists")
-      .then(function (card) { render(card && card.checklists); })
+    return t.card("id", "checklists")
+      .then(function (card) {
+        const checklists = Array.isArray(card && card.checklists) ? card.checklists : [];
+        const hasItems = checklists.every(function (checklist) {
+          return Array.isArray(checklist && checklist.checkItems);
+        });
+        if (!checklists.length || hasItems) return checklists;
+        return t.card("all").then(function (fullCard) {
+          const fullChecklists = Array.isArray(fullCard && fullCard.checklists)
+            ? fullCard.checklists : [];
+          return fullChecklists.length ? fullChecklists : checklists;
+        }).catch(function () { return checklists; });
+      })
+      .then(render)
       .catch(renderError)
       .then(function () { return t.sizeTo("#checklists"); });
   });
