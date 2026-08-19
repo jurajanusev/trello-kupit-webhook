@@ -166,6 +166,21 @@ def build_audit(api):
         board_list = state["list_by_id"].get(card.get("idList"), {})
         state["cards"].append({**card, "list_name": board_list.get("name", "ARCHIVED/UNKNOWN")})
         known.add(card["id"])
+    archived_list_cards = 0
+    for board_list in state["lists"]:
+        if not board_list.get("closed"):
+            continue
+        rows = api["trello_get"](f"/lists/{board_list['id']}/cards", {
+            "fields": "id,name,desc,shortUrl,idList,closed,pos,idLabels,dateLastActivity",
+            "filter": "all", "limit": 1000,
+            "checklists": "all", "checklist_fields": "name,pos",
+        })
+        archived_list_cards += len(rows)
+        for card in rows:
+            if card["id"] in known:
+                continue
+            state["cards"].append({**card, "list_name": board_list.get("name", "ARCHIVED/UNKNOWN")})
+            known.add(card["id"])
     card_matches = grouped.get("01/09", [])
     if len(card_matches) != 1:
         raise RuntimeError(f"01/09 must resolve to one production card, got {len(card_matches)}")
@@ -191,6 +206,7 @@ def build_audit(api):
                         "master_candidates": boat, "occurrences": occurrence_rows(grouped, BOAT_CANONICAL, BOAT_ALIASES)},
         "whole_board_report_only": board_audit(grouped),
         "archived_cards_loaded": len(closed_cards),
+        "cards_loaded_from_archived_lists": archived_list_cards,
     }
 
 
