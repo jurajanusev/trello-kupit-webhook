@@ -120,11 +120,10 @@ def occurrence_rows(grouped, canonical, aliases):
 def desired_0109_description(desc):
     sections = split_sections(desc)
     by_name = {folded(row["title"]): row for row in sections}
-    required = {
-        "kontinuita priestoru", "kontinuita postav", "rucne doplnenia",
-        "akcia a dialogy",
-    }
-    if not required.issubset(by_name):
+    common = {"rucne doplnenia", "akcia a dialogy"}
+    legacy_navigation = {"kontinuita priestoru", "kontinuita postav"}.issubset(by_name)
+    current_navigation = {"navigacia", "rovnaky priestor", "rovnake postavy"}.issubset(by_name)
+    if not common.issubset(by_name) or not (legacy_navigation or current_navigation):
         return None, "required description sections are missing or ambiguous"
     metadata = re.search(
         r"<!--\s*CIERNY-KAMEN-SCHEDULE-METADATA:START\s*-->.*?"
@@ -135,10 +134,12 @@ def desired_0109_description(desc):
     first = sections[0]
     if first["body"]:
         return None, "title section unexpectedly contains body text"
-    space = by_name["kontinuita priestoru"]["body"]
+    space_key = "kontinuita priestoru" if legacy_navigation else "rovnaky priestor"
+    characters_key = "kontinuita postav" if legacy_navigation else "rovnake postavy"
+    space = by_name[space_key]["body"]
     character_lines = []
     seen = set()
-    for line in by_name["kontinuita postav"]["body"].splitlines():
+    for line in by_name[characters_key]["body"].splitlines():
         match = re.match(r"\s*-\s*([^:]+):", line)
         key = folded(match.group(1)) if match else folded(line)
         if key in seen:

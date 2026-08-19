@@ -50,6 +50,9 @@ class ReferenceIdentityTest(unittest.TestCase):
         self.assertIsNone(conflict)
         self.assertEqual(1, desired.count("- A: x"))
         self.assertTrue(desired.endswith("<!-- CIERNY-KAMEN-SCHEDULE-METADATA:END -->"))
+        desired_again, conflict_again = desired_0109_description(desired)
+        self.assertIsNone(conflict_again)
+        self.assertEqual(desired, desired_again)
 
     def test_master_url_precedes_alias(self):
         result = resolve_identity(
