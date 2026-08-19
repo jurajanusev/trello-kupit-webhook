@@ -574,6 +574,10 @@ def vehicles_plan(state):
             candidates.append(row)
     def conflict_family(row):
         name = folded(row["name"])
+        if name.startswith("dodavka") and not any(
+            owner in name for owner in ("alic", "bet", "dogy", "jakub", "kiko", "laur", "olas", "sar", "veronik")
+        ):
+            return "Neidentifikovaná dodávka – vlastníctvo/dejová identita neurčená"
         if "auto" in name and "jakub" in name and "sar" in name:
             return "Auto Jakuba a Sáry"
         if "auto" in name and "olasov" in name:

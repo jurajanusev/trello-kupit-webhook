@@ -397,8 +397,19 @@ def _apply_content(api, start, limit):
 def _apply_vehicles(api):
     state = load_board(api); audit = build_audit(api)
     target, list_writes = _ensure_list(api, state, "AUTÁ")
+    registry_matches = _exact(state["open_lists"], "REGISTER REKVIZÍT")
+    if len(registry_matches) != 1:
+        raise RuntimeError("REGISTER REKVIZÍT is missing or ambiguous")
     label, label_writes = _ensure_label(api, state, "Auto", "blue")
     writes = list_writes + label_writes; changed = []; errors = []
+    # Narrow repair for the just-created generic candidate. It remains an Auto,
+    # but without a proven owner/dej identity it belongs in the global register.
+    generic_vans = [card for card in state["cards"] if folded(card.get("name")) == folded("DODÁVKA - REKVI")]
+    if len(generic_vans) == 1 and folded(generic_vans[0].get("list_name")) == "auta":
+        api["trello_put_body"](f"/cards/{generic_vans[0]['id']}", {"idList": registry_matches[0]["id"]})
+        writes += 1
+        changed.append({"name": generic_vans[0]["name"], "url": generic_vans[0]["shortUrl"],
+                        "action": "returned to REGISTER REKVIZÍT; generic identity"})
     for row in audit["vehicles_list"]["confirmed_master_cards"]:
         try:
             cards = [card for card in state["cards"] if card["id"] == row["id"]]
@@ -410,7 +421,7 @@ def _apply_vehicles(api):
                 writes += 1
             count = _ensure_label_on_card(api, card, label["id"])
             writes += count
-            changed.append({"name": card["name"], "url": card["shortUrl"]})
+            changed.append({"name": card["name"], "url": card["shortUrl"], "action": "kept/moved in AUTÁ"})
         except Exception as exc:
             errors.append({"name": row["name"], "error": str(exc)})
     return {"status": "vehicles-applied", "writes": writes, "changed": changed, "errors": errors,

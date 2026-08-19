@@ -11,6 +11,7 @@ if "flask" not in sys.modules:
 from cierny_kamen_meeting_semantic_apply import (
     BANNER_SCENES, SAFE_PROP_NOTES, SAFE_SET_NOTES, _scene_item,
 )
+from cierny_kamen_meeting_semantic_dryrun import vehicles_plan
 
 
 class SemanticApplyTest(unittest.TestCase):
@@ -34,6 +35,20 @@ class SemanticApplyTest(unittest.TestCase):
         self.assertEqual(8, len(BANNER_SCENES))
         self.assertIn("02/47C", BANNER_SCENES)
         self.assertIn("02/48", BANNER_SCENES)
+
+    def test_generic_van_is_not_a_safe_vehicle_move(self):
+        state = {
+            "labels": [{"id": "auto", "name": "Auto"}],
+            "open_lists": [],
+            "cards": [{
+                "id": "van", "name": "DODÁVKA - REKVI", "desc": "01/09",
+                "shortUrl": "https://trello.com/c/van", "list_name": "REGISTER REKVIZÍT",
+                "idLabels": ["auto"], "checklists": [], "closed": False,
+            }],
+        }
+        plan = vehicles_plan(state)
+        self.assertEqual(0, plan["confirmed_master_count"])
+        self.assertEqual(1, len(plan["blocked_semantic_conflict_groups"]))
 
 
 if __name__ == "__main__":
