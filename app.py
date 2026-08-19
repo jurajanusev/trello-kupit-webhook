@@ -1542,6 +1542,7 @@ def find_cards_with_exact_item(search_term, board_id, exclude_card_id=None):
 ROOT = Path(__file__).parent.resolve()
 PUBLIC = ROOT / "public"
 POWERUP = ROOT / "show_checklist_powerup"
+POWERUP_APP_KEY = "8cee1da3131005357e26b21b774ce597"
 
 SCENE_HEADING_RE = re.compile(
     r"^\s*(?:(?:OBRAZ|SC[ÉE]NA|SCENE)\s*)?(\d{1,4})[\).:-]?\s*(.*)$",
@@ -1571,7 +1572,7 @@ def show_checklist_powerup_health():
 def show_checklist_powerup_config():
     response = app.response_class(
         "window.ShowChecklistConfig = Object.freeze({appKey: "
-        + json.dumps(API_KEY)
+        + json.dumps(POWERUP_APP_KEY)
         + "});\n",
         mimetype="text/javascript",
     )
