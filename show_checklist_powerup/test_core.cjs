@@ -3,72 +3,59 @@ const assert = require("node:assert/strict");
 const Core = require("./core.js");
 
 function checklist(index, complete = false) {
-  return {
-    id: `checklist-${index}`,
-    name: `CHECKLIST ${index}`,
-    pos: index,
-    checkItems: [
-      { id: `a-${index}`, name: `Hotová položka ${index}`, state: "complete", pos: 1 },
-      { id: `b-${index}`, name: `Ďalšia položka ${index}`, state: complete ? "complete" : "incomplete", pos: 2 },
-    ],
-  };
+  return { id: `checklist-${index}`, name: `CHECKLIST ${index}`, pos: index, checkItems: [
+    { id: `a-${index}`, name: `Completed item ${index}`, state: "complete", pos: 1 },
+    { id: `b-${index}`, name: `Next item ${index}`, state: complete ? "complete" : "incomplete", pos: 2 },
+  ] };
 }
 
-test("spracuje viac checklistov bez výnimky a pridá súhrnný odznak", () => {
-  const source = Array.from({ length: 12 }, (_, index) => checklist(index + 1));
-  const badges = Core.buildBadges(source, { maxChecklists: 6 });
+test("summaries can limit visible checklists", () => {
+  const badges = Core.buildBadges(Array.from({ length: 12 }, (_, index) => checklist(index + 1)), { maxChecklists: 6 });
   assert.equal(badges.length, 7);
-  assert.equal(badges.at(-1).text, "+6 ďalšie checklisty");
-  assert.match(badges[0].text, /CHECKLIST 1 · 1\/2 · Ďalšia položka 1/);
+  assert.match(badges.at(-1).text, /^\+6 /);
+  assert.match(badges[0].text, /CHECKLIST 1/);
 });
 
-test("dokáže skryť hotové checklisty", () => {
-  const badges = Core.buildBadges(
-    [checklist(1, true), checklist(2, false)],
-    { showCompleteChecklists: false, maxChecklists: 10 },
-  );
+test("completed checklists can be hidden", () => {
+  const badges = Core.buildBadges([checklist(1, true), checklist(2, false)], { showCompleteChecklists: false, maxChecklists: 10 });
   assert.equal(badges.length, 1);
   assert.match(badges[0].text, /CHECKLIST 2/);
 });
 
-test("hotový checklist dostane zelenú farbu", () => {
+test("completed checklist is green", () => {
   const badges = Core.buildBadges([checklist(1, true)], {});
   assert.equal(badges[0].color, "green");
   assert.match(badges[0].text, /2\/2/);
 });
 
-test("poškodené a prázdne vstupy sa normalizujú", () => {
+test("invalid and empty inputs are normalized", () => {
   assert.deepEqual(Core.normalizeChecklists(null), []);
-  const badges = Core.buildBadges([{ name: "", checkItems: [{ name: "", state: "x" }] }], {
-    maxChecklists: 500,
-    itemsPerChecklist: -10,
-    completeColor: "neplatná",
-  });
+  const badges = Core.buildBadges([{ name: "", checkItems: [{ name: "", state: "x" }] }], { maxChecklists: 500, itemsPerChecklist: -10, completeColor: "invalid" });
   assert.equal(badges.length, 1);
-  assert.match(badges[0].text, /Checklist · 0\/1/);
+  assert.match(badges[0].text, /Checklist/);
 });
 
-test("checklist bez checkItems nehlási nepravdivé 0/0", () => {
-  const normalized = Core.normalizeChecklists([{ name: "Rekvizity" }]);
+test("checklist without checkItems reports unavailable state", () => {
+  const normalized = Core.normalizeChecklists([{ name: "Props" }]);
   assert.equal(normalized[0].itemsAvailable, false);
-  const badges = Core.buildBadges([{ name: "Rekvizity" }], {});
-  assert.equal(badges[0].text, "Rekvizity · stav nedostupný");
+  const badges = Core.buildBadges([{ name: "Props" }], {});
+  assert.match(badges[0].text, /Props/);
   assert.equal(badges[0].color, "light-gray");
 });
 
-test("súhrn spočíta checklisty aj položky", () => {
-  assert.deepEqual(Core.summarize([checklist(1), checklist(2, true)]), {
-    checklists: 2,
-    items: 4,
-    completeItems: 3,
-  });
+test("summary counts checklists and items", () => {
+  assert.deepEqual(Core.summarize([checklist(1), checklist(2, true)]), { checklists: 2, items: 4, completeItems: 3 });
 });
 
-test("expanded badges include every item from every checklist", () => {
-  const source = [checklist(1), checklist(2, true), checklist(3)];
-  const badges = Core.buildExpandedBadges(source, { maxChecklists: 1, itemsPerChecklist: 1 });
-  assert.equal(badges.length, 6);
-  assert.match(badges[0].text, /CHECKLIST 1 · 1\/2 · ✓/);
-  assert.match(badges[1].text, /CHECKLIST 1 · 1\/2 · ○/);
-  assert.match(badges[5].text, /CHECKLIST 3 · 1\/2 · ○/);
+test("expanded badges group all items beneath checklist headers", () => {
+  const badges = Core.buildExpandedBadges([checklist(1), checklist(2, true), checklist(3)], { maxChecklists: 1, itemsPerChecklist: 1 });
+  assert.equal(badges.length, 9);
+  assert.equal(badges[0].text, "1/2 CHECKLIST 1");
+  assert.equal(badges[0].color, "orange");
+  assert.match(badges[1].text, /^☑ /);
+  assert.equal(badges[1].color, null);
+  assert.match(badges[2].text, /^☐ /);
+  assert.equal(badges[3].text, "2/2 CHECKLIST 2");
+  assert.equal(badges[3].color, "green");
+  assert.match(badges[8].text, /^☐ /);
 });

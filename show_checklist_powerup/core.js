@@ -134,20 +134,26 @@
     return normalizeChecklists(checklists).flatMap(function (checklist) {
       const progress = checklist.itemsAvailable
         ? checklist.completeCount + "/" + checklist.totalCount
-        : "stav nedostupný";
-      const prefix = checklist.name + " · " + progress;
+        : "–";
+      const header = {
+        text: progress + " " + checklist.name,
+        color: !checklist.itemsAvailable
+          ? "light-gray"
+          : (checklist.items.length === 0 || checklist.complete
+            ? settings.completeColor : settings.incompleteColor),
+      };
       if (!checklist.itemsAvailable) {
-        return [{ text: prefix, color: "light-gray" }];
+        return [header];
       }
       if (!checklist.items.length) {
-        return [{ text: prefix + " · Bez položiek", color: settings.incompleteColor }];
+        return [header];
       }
-      return checklist.items.map(function (item) {
+      return [header].concat(checklist.items.map(function (item) {
         return {
-          text: truncate(prefix + " · " + (item.complete ? "✓ " : "○ ") + item.name, 120),
-          color: item.complete ? settings.completeColor : settings.incompleteColor,
+          text: (item.complete ? "☑ " : "☐ ") + item.name,
+          color: null,
         };
-      });
+      }));
     });
   }
 

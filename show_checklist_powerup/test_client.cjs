@@ -3,84 +3,44 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const vm = require("node:vm");
 const path = require("node:path");
-
 const Core = require("./core.js");
 
 function loadCapabilities() {
   let capabilities;
-  const context = {
-    console: { error() {}, log: console.log },
-    Promise,
-    URL,
-    ShowChecklistCore: Core,
-    ShowChecklistConfig: { appKey: "test-api-key" },
-    location: { href: "https://example.test/powerup/" },
-    TrelloPowerUp: {
-      initialize(value) { capabilities = value; },
-    },
-  };
+  const context = { console: { error() {}, log: console.log }, Promise, URL, ShowChecklistCore: Core,
+    ShowChecklistConfig: { appKey: "test-api-key" }, location: { href: "https://example.test/powerup/" },
+    TrelloPowerUp: { initialize(value) { capabilities = value; } } };
   context.window = context;
-  vm.runInNewContext(
-    fs.readFileSync(path.join(__dirname, "trello-rest.js"), "utf8"),
-    context,
-    { filename: "trello-rest.js" },
-  );
-  vm.runInNewContext(
-    fs.readFileSync(path.join(__dirname, "client.js"), "utf8"),
-    context,
-    { filename: "client.js" },
-  );
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, "trello-rest.js"), "utf8"), context, { filename: "trello-rest.js" });
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, "client.js"), "utf8"), context, { filename: "client.js" });
   return capabilities;
 }
 
-test("card-badges žiada najprv iba id a checklists a zvládne desať checklistov", async () => {
+test("card badges load all checklists and group their items", async () => {
   const capabilities = loadCapabilities();
   const calls = [];
-  const checklists = Array.from({ length: 10 }, (_, index) => ({
-    name: `LIST ${index + 1}`,
-    checkItems: [{ name: `Položka ${index + 1}`, state: "incomplete" }],
-  }));
-  const t = {
-    card(...fields) {
-      calls.push(fields);
-      return Promise.resolve({ checklists });
-    },
-    get() { return Promise.resolve({ maxChecklists: 6 }); },
-  };
-
+  const checklists = Array.from({ length: 10 }, (_, index) => ({ name: `LIST ${index + 1}`, checkItems: [{ name: `Item ${index + 1}`, state: "incomplete" }] }));
+  const t = { card(...fields) { calls.push(fields); return Promise.resolve({ checklists }); }, get() { return Promise.resolve({ maxChecklists: 6 }); } };
   const badges = await capabilities["card-badges"](t);
   assert.deepEqual(calls, [["id", "checklists"]]);
-  assert.equal(badges.length, 10);
-  assert.match(badges.at(-1).text, /LIST 10/);
-  assert.equal(badges[0].icon, "https://example.test/powerup/icon.svg");
+  assert.equal(badges.length, 20);
+  assert.match(badges[18].text, /0\/1 LIST 10/);
+  assert.match(badges[19].text, /^☐ /);
+  assert.equal(badges[0].icon, undefined);
 });
 
-test("pri chýbajúcich položkách bezpečne skúsi card all", async () => {
+test("missing item data falls back to card all", async () => {
   const capabilities = loadCapabilities();
   const calls = [];
-  const t = {
-    card(...fields) {
-      calls.push(fields);
-      if (fields[0] === "all") {
-        return Promise.resolve({
-          checklists: [{ name: "Rekvizity", checkItems: [{ name: "x", state: "incomplete" }] }],
-        });
-      }
-      return Promise.resolve({ checklists: [{ name: "Rekvizity" }] });
-    },
-    get() { return Promise.resolve(Core.DEFAULT_SETTINGS); },
-  };
+  const t = { card(...fields) { calls.push(fields); if (fields[0] === "all") return Promise.resolve({ checklists: [{ name: "Props", checkItems: [{ name: "x", state: "incomplete" }] }] }); return Promise.resolve({ checklists: [{ name: "Props" }] }); }, get() { return Promise.resolve(Core.DEFAULT_SETTINGS); } };
   const badges = await capabilities["card-badges"](t);
   assert.deepEqual(calls, [["id", "checklists"], ["all"]]);
   assert.match(badges[0].text, /0\/1/);
 });
 
-test("chyba načítania sa zobrazí ako červený odznak", async () => {
+test("loading failure is shown as a red badge", async () => {
   const capabilities = loadCapabilities();
-  const t = {
-    card() { return Promise.reject(new Error("test failure")); },
-    get() { return Promise.resolve(Core.DEFAULT_SETTINGS); },
-  };
+  const t = { card() { return Promise.reject(new Error("test failure")); }, get() { return Promise.resolve(Core.DEFAULT_SETTINGS); } };
   const badges = await capabilities["card-badges"](t);
   assert.equal(badges.length, 1);
   assert.equal(badges[0].color, "red");

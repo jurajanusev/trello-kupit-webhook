@@ -22,7 +22,7 @@
       return Promise.all([Rest.load(t), readSettings(t)])
         .then(function (result) {
           return Core.buildExpandedBadges(result[0].checklists, result[1]).map(function (badge) {
-            return Object.assign({ icon: ICON, monochrome: true }, badge);
+            return Object.assign({ monochrome: true }, badge);
           });
         })
         .catch(errorBadge);
