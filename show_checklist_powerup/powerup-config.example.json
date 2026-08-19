@@ -1,0 +1,7 @@
+{
+  "name": "Dunaj Show Checklist",
+  "connectorUrl": "https://example.onrender.com/powerup/",
+  "iconUrl": "https://example.onrender.com/powerup/icon.svg",
+  "allowedOrigins": ["https://example.onrender.com"],
+  "capabilities": ["card-badges", "card-buttons", "show-settings"]
+}

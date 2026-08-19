@@ -1541,6 +1541,7 @@ def find_cards_with_exact_item(search_term, board_id, exclude_card_id=None):
 
 ROOT = Path(__file__).parent.resolve()
 PUBLIC = ROOT / "public"
+POWERUP = ROOT / "show_checklist_powerup"
 
 SCENE_HEADING_RE = re.compile(
     r"^\s*(?:(?:OBRAZ|SC[ÉE]NA|SCENE)\s*)?(\d{1,4})[\).:-]?\s*(.*)$",
@@ -1551,6 +1552,22 @@ TV_SCENE_HEADING_RE = re.compile(
     r"^\s*(?P<scene>\d+/\d+)(?P<tag>[A-Z]{0,12})?\.?\s*(?P<title>(?:INT\.?|EXT\.?).*)$",
     re.IGNORECASE,
 )
+
+
+@app.route("/powerup", methods=["GET"])
+@app.route("/powerup/", methods=["GET"])
+def show_checklist_powerup():
+    return send_from_directory(POWERUP, "index.html")
+
+
+@app.route("/powerup/health", methods=["GET"])
+def show_checklist_powerup_health():
+    return jsonify({"app": "dunaj-show-checklist-powerup", "status": "ok"})
+
+
+@app.route("/powerup/<path:filename>", methods=["GET"])
+def show_checklist_powerup_asset(filename):
+    return send_from_directory(POWERUP, filename)
 
 
 @app.route("/screener", methods=["GET"])
