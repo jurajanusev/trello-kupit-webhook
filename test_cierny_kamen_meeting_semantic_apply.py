@@ -20,6 +20,10 @@ class SemanticApplyTest(unittest.TestCase):
         self.assertIn("02/47A", SAFE_SET_NOTES)
         self.assertTrue(any("ECLIPSE" in row for row in SAFE_SET_NOTES["02/46"]))
 
+    def test_pitevna_item_is_defined_for_continuity_master(self):
+        from cierny_kamen_meeting_semantic_apply import SET_MASTER_ITEMS
+        self.assertEqual(["Podsvetľovací box na röntgen"], SET_MASTER_ITEMS["PITEVŇA"])
+
     def test_negative_presence_notes_are_not_created_as_props(self):
         flat = "\n".join(value for rows in SAFE_PROP_NOTES.values() for value in rows).casefold()
         self.assertNotIn("auto nevidíme", flat)

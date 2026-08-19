@@ -314,7 +314,7 @@ def _apply_content(api, start, limit):
     # Fixed master SET additions.
     for master_name, items in SET_MASTER_ITEMS.items():
         matches = [card for card in state["cards"] if folded(card.get("name")) == folded(master_name)]
-        if master_name == "FEFE BEEF – PARKOVISKO":
+        if master_name in {"FEFE BEEF – PARKOVISKO", "PITEVŇA"}:
             matches = [card for card in matches if "nadvazne set" in folded(card.get("list_name"))]
         if len(matches) == 1:
             for text in items:
