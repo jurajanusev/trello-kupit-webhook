@@ -80,3 +80,37 @@ test("empty checkItems arrays require authorization", async () => {
   assert.equal(result.authorized, false);
   assert.equal(result.source, "metadata");
 });
+
+test("authorization token is saved in private member data", async () => {
+  const Rest = loadRest();
+  const writes = [];
+  const t = {
+    getRestApi() {
+      return { authorize: () => Promise.resolve("fresh-token") };
+    },
+    set(...args) {
+      writes.push(args);
+      return Promise.resolve();
+    },
+  };
+  const token = await Rest.authorize(t);
+  assert.equal(token, "fresh-token");
+  assert.deepEqual(writes, [["member", "private", "showChecklistRestTokenV1", "fresh-token"]]);
+});
+
+test("fresh authorization token bypasses broken browser storage", async () => {
+  const Rest = loadRest();
+  const t = {
+    card() {
+      return Promise.resolve({ id: "card-1", checklists: [{ name: "Rekvizity", checkItems: [] }] });
+    },
+    getRestApi() { return { getToken: () => Promise.resolve(null) }; },
+  };
+  const fetchImpl = async (url) => ({
+    ok: true,
+    json: async () => [{ name: "Rekvizity", checkItems: [{ name: "x", state: "incomplete" }] }],
+  });
+  const result = await Rest.load(t, fetchImpl, "fresh-token");
+  assert.equal(result.authorized, true);
+  assert.equal(result.checklists[0].checkItems[0].name, "x");
+});

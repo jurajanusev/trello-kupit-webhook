@@ -10,6 +10,33 @@
     appName: "Dunaj Show Checklist",
     appAuthor: "Juraj Anusev",
   };
+  const TOKEN_KEY = "showChecklistRestTokenV1";
+
+  function validToken(token) {
+    return typeof token === "string" && token.length > 0 && token.indexOf("&error=") !== 0;
+  }
+
+  function privateToken(t) {
+    if (typeof t.get !== "function") return Promise.resolve(null);
+    return t.get("member", "private", TOKEN_KEY, null).catch(function () { return null; });
+  }
+
+  function resolveToken(t, tokenOverride) {
+    if (validToken(tokenOverride)) return Promise.resolve(tokenOverride);
+    return t.getRestApi().getToken()
+      .catch(function () { return null; })
+      .then(function (token) {
+        return validToken(token) ? token : privateToken(t);
+      });
+  }
+
+  function saveToken(t, token) {
+    if (!validToken(token)) return Promise.reject(new Error("Trello authorization returned no token"));
+    if (typeof t.set !== "function") return Promise.resolve(token);
+    return t.set("member", "private", TOKEN_KEY, token)
+      .then(function () { return token; })
+      .catch(function () { return token; });
+  }
 
   function hasItems(checklists) {
     return (Array.isArray(checklists) ? checklists : []).every(function (checklist) {
@@ -45,7 +72,7 @@
     });
   }
 
-  function load(t, fetchImpl) {
+  function load(t, fetchImpl, tokenOverride) {
     const doFetch = fetchImpl || root.fetch;
     return readCard(t, ["id", "checklists"]).then(function (narrow) {
       if (!narrow.checklists.length || hasReliableItems(narrow.checklists)) {
@@ -59,8 +86,8 @@
           if (!APP_KEY || typeof doFetch !== "function") {
             return { checklists: narrow.checklists, authorized: false, source: "metadata" };
           }
-          return t.getRestApi().getToken().then(function (token) {
-            if (!token) {
+          return resolveToken(t, tokenOverride).then(function (token) {
+            if (!validToken(token)) {
               return { checklists: narrow.checklists, authorized: false, source: "metadata" };
             }
             return fetchChecklists(narrow.id, token, doFetch).then(function (checklists) {
@@ -75,7 +102,8 @@
 
   function authorize(t) {
     if (!APP_KEY) return Promise.reject(new Error("Chýba Trello API key"));
-    return t.getRestApi().authorize({ scope: "read", expiration: "never" });
+    return t.getRestApi().authorize({ scope: "read", expiration: "never" })
+      .then(function (token) { return saveToken(t, token); });
   }
 
   root.ShowChecklistRest = Object.freeze({

@@ -62,8 +62,8 @@
     });
   }
 
-  function loadAndRender() {
-    return Rest.load(t).then(function (result) {
+  function loadAndRender(token) {
+    return Rest.load(t, undefined, token).then(function (result) {
       if (!result.authorized) {
         renderAuthorization();
       } else {
