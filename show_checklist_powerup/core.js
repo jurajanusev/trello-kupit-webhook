@@ -129,6 +129,28 @@
     return badges;
   }
 
+  function buildExpandedBadges(checklists, rawSettings) {
+    const settings = normalizeSettings(rawSettings);
+    return normalizeChecklists(checklists).flatMap(function (checklist) {
+      const progress = checklist.itemsAvailable
+        ? checklist.completeCount + "/" + checklist.totalCount
+        : "stav nedostupný";
+      const prefix = checklist.name + " · " + progress;
+      if (!checklist.itemsAvailable) {
+        return [{ text: prefix, color: "light-gray" }];
+      }
+      if (!checklist.items.length) {
+        return [{ text: prefix + " · Bez položiek", color: settings.incompleteColor }];
+      }
+      return checklist.items.map(function (item) {
+        return {
+          text: truncate(prefix + " · " + (item.complete ? "✓ " : "○ ") + item.name, 120),
+          color: item.complete ? settings.completeColor : settings.incompleteColor,
+        };
+      });
+    });
+  }
+
   function summarize(checklists) {
     const normalized = normalizeChecklists(checklists);
     return normalized.reduce(function (summary, checklist) {
@@ -144,6 +166,7 @@
     normalizeSettings: normalizeSettings,
     normalizeChecklists: normalizeChecklists,
     buildBadges: buildBadges,
+    buildExpandedBadges: buildExpandedBadges,
     summarize: summarize,
     truncate: truncate,
   };

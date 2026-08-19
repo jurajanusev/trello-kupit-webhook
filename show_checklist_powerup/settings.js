@@ -9,10 +9,7 @@
     ["purple", "Fialová"], ["pink", "Ružová"], ["sky", "Svetlomodrá"],
     ["lime", "Limetková"], ["light-gray", "Sivá"],
   ];
-  const ids = [
-    "showCompleteChecklists", "showChecklistName", "showProgress", "showCompleteItems",
-    "maxChecklists", "itemsPerChecklist", "completeColor", "incompleteColor",
-  ];
+  const ids = ["completeColor", "incompleteColor"];
 
   function element(id) { return document.getElementById(id); }
 
@@ -41,6 +38,13 @@
 
   fillColors("completeColor");
   fillColors("incompleteColor");
+  [
+    "showCompleteChecklists", "showChecklistName", "showProgress", "showCompleteItems",
+    "maxChecklists", "itemsPerChecklist",
+  ].forEach(function (id) {
+    const label = element(id).closest("label");
+    if (label) label.hidden = true;
+  });
 
   t.render(function () {
     return t.get("board", "private", KEY, Core.DEFAULT_SETTINGS)

@@ -63,3 +63,12 @@ test("súhrn spočíta checklisty aj položky", () => {
     completeItems: 3,
   });
 });
+
+test("expanded badges include every item from every checklist", () => {
+  const source = [checklist(1), checklist(2, true), checklist(3)];
+  const badges = Core.buildExpandedBadges(source, { maxChecklists: 1, itemsPerChecklist: 1 });
+  assert.equal(badges.length, 6);
+  assert.match(badges[0].text, /CHECKLIST 1 · 1\/2 · ✓/);
+  assert.match(badges[1].text, /CHECKLIST 1 · 1\/2 · ○/);
+  assert.match(badges[5].text, /CHECKLIST 3 · 1\/2 · ○/);
+});

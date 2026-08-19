@@ -50,8 +50,8 @@ test("card-badges žiada najprv iba id a checklists a zvládne desať checklisto
 
   const badges = await capabilities["card-badges"](t);
   assert.deepEqual(calls, [["id", "checklists"]]);
-  assert.equal(badges.length, 7);
-  assert.match(badges.at(-1).text, /^\+4/);
+  assert.equal(badges.length, 10);
+  assert.match(badges.at(-1).text, /LIST 10/);
   assert.equal(badges[0].icon, "https://example.test/powerup/icon.svg");
 });
 
