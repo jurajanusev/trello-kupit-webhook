@@ -1557,7 +1557,9 @@ TV_SCENE_HEADING_RE = re.compile(
 @app.route("/powerup", methods=["GET"])
 @app.route("/powerup/", methods=["GET"])
 def show_checklist_powerup():
-    return send_from_directory(POWERUP, "index.html")
+    response = send_from_directory(POWERUP, "index.html")
+    response.headers["Cache-Control"] = "no-store"
+    return response
 
 
 @app.route("/powerup/health", methods=["GET"])
@@ -1579,7 +1581,9 @@ def show_checklist_powerup_config():
 
 @app.route("/powerup/<path:filename>", methods=["GET"])
 def show_checklist_powerup_asset(filename):
-    return send_from_directory(POWERUP, filename)
+    response = send_from_directory(POWERUP, filename)
+    response.headers["Cache-Control"] = "no-store"
+    return response
 
 
 @app.route("/screener", methods=["GET"])
