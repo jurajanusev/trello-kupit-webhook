@@ -190,6 +190,11 @@ def build_audit(api):
     tape = [row for row in props if "pask" in folded(row["core"]) and "policajn" in folded(row["core"])]
     scout = master_candidates(api, state, SCOUT_CANONICAL, SCOUT_ALIASES)
     boat = master_candidates(api, state, BOAT_CANONICAL, BOAT_ALIASES)
+    scout_keyword_cards = [
+        public_card(card, state) for card in state["cards"]
+        if folded(card.get("list_name")) != "scenare"
+        and any(token in folded(card_text(card)) for token in ("skaut", "matejovej skupiny", "kurz prezitia"))
+    ]
     return {
         "status": "read-only-dry-run", "writes": 0,
         "board": state["board"], "scene_cards": sum(len(rows) for rows in grouped.values()),
@@ -201,7 +206,8 @@ def build_audit(api):
             "prop_items": props, "police_tape_items": tape,
         },
         "scout_gear": {"canonical": SCOUT_CANONICAL, "aliases": SCOUT_ALIASES,
-                       "master_candidates": scout, "occurrences": occurrence_rows(grouped, SCOUT_CANONICAL, SCOUT_ALIASES)},
+                       "master_candidates": scout, "keyword_cards": scout_keyword_cards,
+                       "occurrences": occurrence_rows(grouped, SCOUT_CANONICAL, SCOUT_ALIASES)},
         "wooden_boat": {"canonical": BOAT_CANONICAL, "aliases": BOAT_ALIASES,
                         "master_candidates": boat, "occurrences": occurrence_rows(grouped, BOAT_CANONICAL, BOAT_ALIASES)},
         "whole_board_report_only": board_audit(grouped),
