@@ -9,12 +9,24 @@ if "flask" not in sys.modules:
     sys.modules["flask"] = flask_stub
 
 from cierny_kamen_reference_identity_0109 import (
+    _duplicate_detail_for_apply,
     _pair_plan, desired_0109_description, identity_core, split_sections,
 )
 from cierny_kamen_prop_identity_resolution import resolve_identity
 
 
 class ReferenceIdentityTest(unittest.TestCase):
+    def test_archived_duplicate_uses_dry_run_snapshot(self):
+        calls = []
+        row = {
+            "id": "archived-id", "name": "Old master", "url": "https://trello.com/c/old",
+            "closed": True, "list": "REGISTER REKVIZÍT", "attachments": [],
+        }
+        detail = _duplicate_detail_for_apply({"trello_get": lambda *args: calls.append(args)}, row)
+        self.assertEqual([], calls)
+        self.assertEqual("https://trello.com/c/old", detail["shortUrl"])
+        self.assertTrue(detail["closed"])
+
     def test_alias_normalization_is_accent_and_case_insensitive(self):
         from meeting_notes_dryrun import folded
         self.assertEqual(folded("Čln Jakuba a Sáry"), folded("CLN JAKUBA A SARY"))

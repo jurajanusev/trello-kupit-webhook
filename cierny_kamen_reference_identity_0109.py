@@ -415,6 +415,20 @@ def _ensure_attachment(api, card, url, name):
     return 1
 
 
+def _duplicate_detail_for_apply(api, row):
+    """Archived duplicates can return 400 from Trello's card detail endpoint.
+
+    The dry-run already captured the immutable fields needed to finish an
+    interrupted idempotent merge, so do not reopen an already archived card.
+    """
+    if row.get("closed"):
+        return {
+            "id": row["id"], "name": row["name"], "shortUrl": row["url"],
+            "closed": True, "idLabels": [], "attachments": row.get("attachments", []),
+        }
+    return card_details(api, {"id": row["id"], "list_name": row["list"]})
+
+
 def apply_confirmed_identities(api):
     audit = build_audit(api); plan = audit["reference_plan"]
     if not plan["safe_to_apply"]:
@@ -428,8 +442,7 @@ def apply_confirmed_identities(api):
     for identity in plan["identities"]:
         survivor_public = identity["survivor"]
         survivor = card_details(api, {"id": survivor_public["id"], "list_name": survivor_public["list"]})
-        duplicates = [card_details(api, {"id": row["id"], "list_name": row["list"]})
-                      for row in identity["duplicates"]]
+        duplicates = [_duplicate_detail_for_apply(api, row) for row in identity["duplicates"]]
         source_urls = [row.get("shortUrl") for row in [survivor, *duplicates] if row.get("shortUrl")]
         occurrences = identity["occurrences"]
         grouped_occurrences = defaultdict(list)
