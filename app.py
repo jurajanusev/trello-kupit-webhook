@@ -8359,6 +8359,10 @@ from cierny_kamen_meeting_semantic_dryrun import register_routes as register_ck_
 
 register_ck_meeting_semantic_dryrun_routes(app, globals())
 
+from cierny_kamen_meeting_semantic_apply import register_routes as register_ck_meeting_semantic_apply_routes
+
+register_ck_meeting_semantic_apply_routes(app, globals())
+
 from meeting_notes_apply_ep01_03 import register_routes as register_meeting_notes_apply_ep01_03_routes
 
 register_meeting_notes_apply_ep01_03_routes(app, globals())
