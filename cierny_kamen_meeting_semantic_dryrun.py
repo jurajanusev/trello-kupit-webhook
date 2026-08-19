@@ -537,7 +537,7 @@ def vehicles_plan(state):
         if not has_auto_label and not vehicle_hit:
             continue
         references = {
-            canonical_scene_id("/".join(match.groups()))
+            canonical_scene_id(f"{match.group(1)}/{match.group(2)}{match.group(3)}")
             for match in SCENE_REF_RE.finditer(card_text(card))
         }
         in_scope_references = sorted(
@@ -572,17 +572,47 @@ def vehicles_plan(state):
             ambiguous.append(row)
         else:
             candidates.append(row)
+    def conflict_family(row):
+        name = folded(row["name"])
+        if "auto" in name and "jakub" in name and "sar" in name:
+            return "Auto Jakuba a Sáry"
+        if "auto" in name and "olasov" in name:
+            return "Olasovej auto"
+        if "policajn" in name and "auto" in name:
+            return "Policajné auto – identity/kusy neurčené"
+        if ("cln" in name or "pramica" in name) and "policajn" not in name:
+            return "Čln/pramica pri rieke – totožnosť neurčená"
+        if name.startswith("auto ") and not any(
+            owner in name for owner in ("kiko", "jakub", "sar", "olasov")
+        ):
+            return "Neidentifikované auto podľa lokálneho kontextu"
+        return None
+
     groups = defaultdict(list)
     for row in candidates:
         groups[folded(row["name"])].append(row)
     duplicate_groups = [rows for rows in groups.values() if len(rows) > 1]
+    conflict_groups = defaultdict(list)
+    safe_candidates = []
+    for row in candidates:
+        family = conflict_family(row)
+        if family:
+            conflict_groups[family].append(row)
+        else:
+            safe_candidates.append(row)
     return {
         "existing_AUTA_lists": target_lists,
         "list_action": "reuse" if len(target_lists) == 1 else (
             "create" if not target_lists else "conflict"
         ),
         "existing_Auto_labels": auto_labels,
-        "confirmed_master_count": len(candidates), "confirmed_master_cards": candidates,
+        "reviewed_physical_vehicle_cards": len(candidates),
+        "confirmed_master_count": len(safe_candidates),
+        "confirmed_master_cards": safe_candidates,
+        "blocked_semantic_conflict_groups": [
+            {"identity_family": family, "cards": rows}
+            for family, rows in sorted(conflict_groups.items())
+        ],
         "ambiguous_count": len(ambiguous), "ambiguous_or_excluded": ambiguous,
         "duplicate_identity_groups": duplicate_groups,
         "excluded_non_vehicle": excluded_non_vehicle,
