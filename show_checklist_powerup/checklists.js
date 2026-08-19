@@ -64,7 +64,7 @@
 
   function loadAndRender() {
     return Rest.load(t).then(function (result) {
-      if (!result.authorized && !Rest.hasItems(result.checklists)) {
+      if (!result.authorized) {
         renderAuthorization();
       } else {
         render(result.checklists);
