@@ -61,3 +61,22 @@ test("bez tokenu vráti metadata a vyžiada autorizáciu", async () => {
   assert.equal(result.authorized, false);
   assert.equal(result.source, "metadata");
 });
+
+test("empty checkItems arrays require authorization", async () => {
+  const Rest = loadRest();
+  const calls = [];
+  const t = {
+    card(...fields) {
+      calls.push(fields);
+      return Promise.resolve({
+        id: "card-1",
+        checklists: [{ name: "Rekvizity", checkItems: [] }],
+      });
+    },
+    getRestApi() { return { getToken: () => Promise.resolve(null) }; },
+  };
+  const result = await Rest.load(t, async () => { throw new Error("fetch must not run"); });
+  assert.deepEqual(calls, [["id", "checklists"], ["all"]]);
+  assert.equal(result.authorized, false);
+  assert.equal(result.source, "metadata");
+});

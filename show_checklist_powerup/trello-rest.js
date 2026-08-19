@@ -17,6 +17,12 @@
     });
   }
 
+  function hasReliableItems(checklists) {
+    return hasItems(checklists) && checklists.some(function (checklist) {
+      return checklist.checkItems.length > 0;
+    });
+  }
+
   function readCard(t, fields) {
     return t.card.apply(t, fields).then(function (card) {
       return {
@@ -42,12 +48,12 @@
   function load(t, fetchImpl) {
     const doFetch = fetchImpl || root.fetch;
     return readCard(t, ["id", "checklists"]).then(function (narrow) {
-      if (!narrow.checklists.length || hasItems(narrow.checklists)) {
+      if (!narrow.checklists.length || hasReliableItems(narrow.checklists)) {
         return { checklists: narrow.checklists, authorized: true, source: "card" };
       }
       return readCard(t, ["all"]).catch(function () { return narrow; })
         .then(function (full) {
-          if (full.checklists.length && hasItems(full.checklists)) {
+          if (full.checklists.length && hasReliableItems(full.checklists)) {
             return { checklists: full.checklists, authorized: true, source: "card-all" };
           }
           if (!APP_KEY || typeof doFetch !== "function") {
