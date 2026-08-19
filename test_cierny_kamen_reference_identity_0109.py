@@ -12,6 +12,10 @@ from cierny_kamen_reference_identity_0109 import identity_core, split_sections
 
 
 class ReferenceIdentityTest(unittest.TestCase):
+    def test_alias_normalization_is_accent_and_case_insensitive(self):
+        from meeting_notes_dryrun import folded
+        self.assertEqual(folded("Čln Jakuba a Sáry"), folded("CLN JAKUBA A SARY"))
+
     def test_identity_core_strips_only_technical_wrappers(self):
         value = "<n> **Drevená pramica Jakuba a Sáry** — *na vode | TU: prevrátená* | KARTA: https://trello.com/c/x"
         self.assertEqual("Drevená pramica Jakuba a Sáry", identity_core(value))

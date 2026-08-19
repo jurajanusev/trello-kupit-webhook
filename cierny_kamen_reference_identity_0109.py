@@ -152,6 +152,20 @@ def board_audit(grouped):
 
 def build_audit(api):
     state = load_board(api); grouped = scene_cards(api, state)
+    # load_board intentionally optimizes for open production lists. Identity
+    # resolution must also inspect archived cards before choosing a survivor.
+    closed_cards = api["trello_get"](f"/boards/{state['board']['id']}/cards", {
+        "fields": "id,name,desc,shortUrl,idList,closed,pos,idLabels,dateLastActivity",
+        "filter": "closed", "limit": 1000,
+        "checklists": "all", "checklist_fields": "name,pos",
+    })
+    known = {card["id"] for card in state["cards"]}
+    for card in closed_cards:
+        if card["id"] in known:
+            continue
+        board_list = state["list_by_id"].get(card.get("idList"), {})
+        state["cards"].append({**card, "list_name": board_list.get("name", "ARCHIVED/UNKNOWN")})
+        known.add(card["id"])
     card_matches = grouped.get("01/09", [])
     if len(card_matches) != 1:
         raise RuntimeError(f"01/09 must resolve to one production card, got {len(card_matches)}")
@@ -176,6 +190,7 @@ def build_audit(api):
         "wooden_boat": {"canonical": BOAT_CANONICAL, "aliases": BOAT_ALIASES,
                         "master_candidates": boat, "occurrences": occurrence_rows(grouped, BOAT_CANONICAL, BOAT_ALIASES)},
         "whole_board_report_only": board_audit(grouped),
+        "archived_cards_loaded": len(closed_cards),
     }
 
 
