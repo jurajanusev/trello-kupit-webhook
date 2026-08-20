@@ -12,6 +12,7 @@ from cierny_kamen_reference_all import board_support_data, protected_card_value
 
 
 KEY = "cierny-kamen-split-0535flash-20aug-4f09d26c"
+ENDPOINT_DISABLED = True
 SCENE_ID = "05/35FLASH"
 SOURCE = "SC_01_05_ČK_1.6_NJ_FINAL.pdf"
 ACTION_RAW = (
@@ -348,6 +349,8 @@ def apply(api):
 def register_routes(app, api):
     @app.route("/api/cierny-kamen-split-0535flash", methods=["POST"])
     def split_0535flash():
+        if ENDPOINT_DISABLED:
+            return jsonify({"status": "disabled"}), 410
         if request.headers.get("X-Split-0535FLASH-Key") != KEY:
             return jsonify({"error": "forbidden"}), 403
         mode = request.args.get("mode", "dry-run").casefold()
