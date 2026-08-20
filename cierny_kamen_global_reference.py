@@ -226,13 +226,20 @@ def apply_descriptions(api, start, limit):
     selected = audit["description_ops"][start:start + limit]
     writes, errors = 0, []
     for op in selected:
-        live = api["trello_get"](f"/cards/{op['card_id']}", {"fields": "id,desc"})
+        live = audit["_cards"][op["scene_id"]]
         if live.get("desc") != op["before"]:
             errors.append({"scene_id": op["scene_id"], "error": "description changed after dry-run"}); continue
         api["trello_put_body"](f"/cards/{op['card_id']}", {"desc": op["after"]}); writes += 1
-        after = api["trello_get"](f"/cards/{op['card_id']}", {"fields": "id,desc"})
-        if after.get("desc") != op["after"]:
-            errors.append({"scene_id": op["scene_id"], "error": "description read-back mismatch"}); break
+    if writes:
+        after_state = load_board(api)
+        after_cards = {card["id"]: card for card in after_state["cards"]}
+        for op in selected:
+            before, after = audit["_cards"][op["scene_id"]], after_cards.get(op["card_id"], {})
+            if after.get("desc") != op["after"]:
+                errors.append({"scene_id": op["scene_id"], "error": "description read-back mismatch"}); break
+            protected_keys = ("id", "name", "idList", "closed", "idLabels", "checklists")
+            if any(before.get(key) != after.get(key) for key in protected_keys):
+                errors.append({"scene_id": op["scene_id"], "error": "read-back differs outside description"}); break
     return {"status": "descriptions-applied", "writes": writes, "selected": len(selected), "errors": errors,
             "scene_ids": [op["scene_id"] for op in selected], "pending_before": audit["description_pending"]}
 
