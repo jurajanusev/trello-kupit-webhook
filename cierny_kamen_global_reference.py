@@ -13,6 +13,7 @@ from cierny_kamen_meeting_semantic_dryrun import load_board
 
 
 KEY = "ck-global-reference-20aug-8e57c104"
+ENDPOINT_DISABLED = True
 META_START = "<!-- CIERNY-KAMEN-SCHEDULE-METADATA:START -->"
 META_END = "<!-- CIERNY-KAMEN-SCHEDULE-METADATA:END -->"
 HEADING = re.compile(r"(?m)^(#{2,3})\s+(.+?)\s*$")
@@ -266,6 +267,8 @@ def apply_props(api, start, limit):
 def register_routes(app, api):
     @app.route("/api/ck-global-reference", methods=["POST"])
     def ck_global_reference():
+        if ENDPOINT_DISABLED:
+            return jsonify({"error": "global reference migration is disabled"}), 410
         if request.headers.get("X-CK-Global-Reference-Key") != KEY:
             return jsonify({"error": "forbidden"}), 403
         mode = request.args.get("mode", "dry-run").casefold()

@@ -2,13 +2,16 @@ import sys, types, unittest
 if "flask" not in sys.modules:
     f = types.ModuleType("flask"); f.jsonify = lambda x: x; f.request = None; sys.modules["flask"] = f
 
-from cierny_kamen_global_reference import _scene_groups, desired_description
+from cierny_kamen_global_reference import ENDPOINT_DISABLED, _scene_groups, desired_description
 
 
 META = "<!-- CIERNY-KAMEN-SCHEDULE-METADATA:START -->\nČÍSLO OBRAZU: 01/01\n<!-- CIERNY-KAMEN-SCHEDULE-METADATA:END -->"
 
 
 class GlobalReferenceTests(unittest.TestCase):
+    def test_one_time_endpoint_is_disabled(self):
+        self.assertTrue(ENDPOINT_DISABLED)
+
     def test_original_screener_cards_are_excluded(self):
         state = {
             "lists_by_id": {"prod": {"name": "SCENÁRE"}, "old": {"name": "original screener"}},
