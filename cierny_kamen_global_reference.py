@@ -261,7 +261,7 @@ def register_routes(app, api):
         mode = request.args.get("mode", "dry-run").casefold()
         try:
             start, limit = int(request.args.get("start", "0")), int(request.args.get("limit", "5"))
-            if start < 0 or limit < 1 or limit > 10:
+            if start < 0 or limit < 1 or limit > 25:
                 return jsonify({"error": "invalid batch"}), 400
             if mode in {"dry-run", "audit", "final-audit"}:
                 audit = build_audit(api)
