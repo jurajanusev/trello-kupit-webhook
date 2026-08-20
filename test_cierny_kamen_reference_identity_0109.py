@@ -10,12 +10,25 @@ if "flask" not in sys.modules:
 
 from cierny_kamen_reference_identity_0109 import (
     _duplicate_detail_for_apply,
+    _candidate_detail,
     _pair_plan, desired_0109_description, identity_core, split_sections,
 )
 from cierny_kamen_prop_identity_resolution import resolve_identity
 
 
 class ReferenceIdentityTest(unittest.TestCase):
+    def test_confirmed_duplicate_can_use_board_snapshot_when_detail_is_unavailable(self):
+        card = {
+            "id": "duplicate-id", "name": "Duplicate", "desc": "", "idLabels": [],
+            "shortUrl": "https://trello.com/c/j848oCTw", "closed": False,
+        }
+        detail, fallback = _candidate_detail(
+            {"trello_get": lambda *args, **kwargs: (_ for _ in ()).throw(RuntimeError("400"))},
+            card,
+        )
+        self.assertTrue(fallback)
+        self.assertEqual(card["id"], detail["id"])
+
     def test_duplicate_uses_dry_run_snapshot(self):
         calls = []
         row = {

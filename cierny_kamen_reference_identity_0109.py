@@ -27,6 +27,10 @@ HEADING_RE = re.compile(r"(?m)^(#{2,3})\s+(.+?)\s*$")
 AUTO_BLOCK_RE = re.compile(r"<!--[^>]+:START\s*-->.*?<!--[^>]+:END\s*-->", re.S)
 IDENTITY_START = "<!-- CIERNY-KAMEN-PROP-IDENTITY:START -->"
 IDENTITY_END = "<!-- CIERNY-KAMEN-PROP-IDENTITY:END -->"
+CONFIRMED_DUPLICATE_URLS = {
+    "https://trello.com/c/j848octw",
+    "https://trello.com/c/zqlpmwnb",
+}
 
 
 def identity_core(value):
@@ -59,6 +63,18 @@ def card_details(api, card):
     return detail
 
 
+def _candidate_detail(api, card):
+    try:
+        return card_details(api, card), False
+    except Exception:
+        if (card.get("shortUrl") or "").casefold() not in CONFIRMED_DUPLICATE_URLS:
+            raise
+        return {
+            **card, "attachments": [], "comments": [],
+            "dateLastActivity": card.get("dateLastActivity"),
+        }, True
+
+
 def item_rows(card):
     result = []
     for checklist in card.get("checklists", []):
@@ -84,7 +100,7 @@ def master_candidates(api, state, canonical, aliases):
         if name in tokens or any(token in name or token in text for token in tokens):
             if "rekviz" not in folded(card.get("list_name")) and not card.get("closed"):
                 continue
-            detail = card_details(api, card)
+            detail, detail_read_fallback = _candidate_detail(api, card)
             manual_desc = AUTO_BLOCK_RE.sub("", detail.get("desc") or "").strip()
             matches.append({
                 **public_card(detail, state), "date_last_activity": detail.get("dateLastActivity"),
@@ -97,6 +113,7 @@ def master_candidates(api, state, canonical, aliases):
                                 for row in detail.get("attachments", [])],
                 "comments": [{"id": row.get("id"), "text": (row.get("data") or {}).get("text")}
                              for row in detail.get("comments", [])],
+                "detail_read_fallback": detail_read_fallback,
             })
     matches.sort(key=lambda row: (
         -(row["manual_desc_chars"] + row["attachment_count"] * 1000 + row["comment_count"] * 1000),
