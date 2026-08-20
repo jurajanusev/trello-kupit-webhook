@@ -157,6 +157,15 @@ def build_audit(api):
     cards = {key: value[0] for key, value in groups.items() if len(value) == 1}
     missing = [scene["scene_id"] for scene in payload["scenes"] if scene["scene_id"] not in cards]
     support = board_support_data(api, state["board"]["id"])
+    selection_diagnostics = []
+    for card in state["cards"]:
+        info = api["cierny_kamen_scene_name_info"](card.get("name", ""))
+        if info and info.get("scene_id") in {"01/09", "01/16", "02/28"}:
+            board_list = state["lists_by_id"].get(card.get("idList"), {})
+            selection_diagnostics.append({"scene_id": info.get("scene_id"), "name": card.get("name"),
+                                          "url": card.get("shortUrl"), "closed": card.get("closed"),
+                                          "list": board_list.get("name"), "list_id": card.get("idList"),
+                                          "list_closed": board_list.get("closed")})
     description_ops, description_conflicts = [], []
     all_rows = []
     for scene in payload["scenes"]:
@@ -199,6 +208,7 @@ def build_audit(api):
             "description_pending": len(description_ops), "description_conflicts": description_conflicts,
             "prop_items": len(all_rows), "prop_companion_merges": len(prop_ops), "prop_conflicts": prop_conflicts,
             "prop_items_without_url": len(missing_url), "description_ops": description_ops, "prop_ops": prop_ops,
+            "selection_diagnostics": selection_diagnostics,
             "_payload": payload, "_state": state, "_support": support, "_cards": cards}
 
 
