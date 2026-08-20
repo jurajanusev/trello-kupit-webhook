@@ -55,6 +55,13 @@ def split_parent_description(desc):
     return desc[:marker.end()] + "\n\n" + desired_action + "\n\n" + desc[metadata_at:]
 
 
+def _action_section(desc):
+    marker = re.search(r"(?m)^#{2,3}\s+AKCIA A DIALÓGY\s*$", desc or "")
+    if not marker or (desc or "").count(METADATA_START) != 1:
+        raise ValueError("action section is ambiguous")
+    return desc[marker.end():desc.index(METADATA_START)]
+
+
 def scene_0535flash():
     return {
         "scene_id": SCENE_ID, "episode": 5,
@@ -194,7 +201,12 @@ def build_audit(api):
     if parent:
         if completed:
             parent_after = parent.get("desc") or ""
-            if "5/35FLASH" in parent_after or "Je deň, kedy sa Jakub stratil" in parent_after or "Jakub a Sára sa objímu." in parent_after:
+            try:
+                parent_action = _action_section(parent_after)
+            except ValueError as exc:
+                blockers.append(f"05/34 {exc}")
+                parent_action = ""
+            if HEADER_PATTERN.search(parent_action) or "Je deň, kedy sa Jakub stratil" in parent_action or "Jakub a Sára sa objímu." in parent_action:
                 blockers.append("05/34 still contains 05/35FLASH content")
         else:
             try:
