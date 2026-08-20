@@ -6610,12 +6610,13 @@ CIERNY_KAMEN_IMPORT_CHECKLISTS = [
 def cierny_kamen_import_payload():
     from cierny_kamen_prop_identities import apply_identity_map
     from cierny_kamen_split_0440 import augment_payload
+    from cierny_kamen_split_0535flash import augment_payload as augment_payload_0535flash
     from cierny_kamen_ep07_10_import import authoritative_payload
 
     path = Path(__file__).with_name("cierny_kamen_pdf_payload.json")
-    return authoritative_payload(augment_payload(apply_identity_map(
+    return authoritative_payload(augment_payload_0535flash(augment_payload(apply_identity_map(
         json.loads(path.read_text(encoding="utf-8"))
-    )))
+    ))))
 
 
 def cierny_kamen_import_state(payload):
@@ -8366,6 +8367,10 @@ register_ck_meeting_semantic_apply_routes(app, globals())
 from cierny_kamen_reference_identity_0109 import register_routes as register_ck_reference_identity_0109_routes
 
 register_ck_reference_identity_0109_routes(app, globals())
+
+from cierny_kamen_split_0535flash import register_routes as register_split_0535flash_routes
+
+register_split_0535flash_routes(app, globals())
 
 from meeting_notes_apply_ep01_03 import register_routes as register_meeting_notes_apply_ep01_03_routes
 

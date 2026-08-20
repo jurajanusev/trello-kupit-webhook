@@ -6,9 +6,12 @@ Táto časť nahrádza staršie pravidlá Riverdale pre board `CzuD55PR`. Projek
 volá **Čierny Kameň**; názov boardu sa bez osobitného pokynu nemení.
 
 - Zdrojom scenára je desať schválených finálnych PDF pre epizódy 01–10.
-  Trvalý autoritatívny payload obsahuje 514 unikátnych obrazov: 314 v epizódach
+  Trvalý autoritatívny payload obsahuje 515 unikátnych obrazov: 315 v epizódach
   01–06 vrátane samostatne obnoveného obrazu 04/40 a 200 v epizódach 07–10
   (51 + 47 + 51 + 51). Staré JSON/extracted-script súbory nie sú produkčný vstup.
+- Paralelný alebo FLASH obraz vložený do rodičovského deja je samostatný obraz.
+  Parser ho nesmie pohltiť do rodičovskej karty. Epizóda 05 obsahuje samostatný
+  `05/35FLASH` medzi `05/34` a `05/36`; dve flashové pasáže patria iba na jeho kartu.
 - Epizódy 07–10 používajú výhradne PDF
   `SC_01_07_ČK_1.8_MK._KC_FINAL.pdf`, `SC_01_08_ČK_2.2_NJ_SG_FINAL.pdf`,
   `SC_01_09_ČK_1.4_MV_KC_FINALdocx .pdf` a
