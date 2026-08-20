@@ -155,9 +155,11 @@ def build_audit(api):
     state = load_board(api)
     state["lists_by_id"] = state["list_by_id"]
     groups = _scene_groups(api, state)
-    collisions = {key: len(value) for key, value in groups.items() if len(value) != 1 and key in {s['scene_id'] for s in payload['scenes']}}
+    source_scene_ids = {scene["scene_id"] for scene in payload["scenes"]}
+    collisions = {key: len(value) for key, value in groups.items() if len(value) != 1 and key in source_scene_ids}
     cards = {key: value[0] for key, value in groups.items() if len(value) == 1}
     missing = [scene["scene_id"] for scene in payload["scenes"] if scene["scene_id"] not in cards]
+    extra_scene_ids = sorted(set(cards) - source_scene_ids)
     support = board_support_data(api, state["board"]["id"])
     selection_diagnostics = []
     for card in state["cards"]:
@@ -207,6 +209,7 @@ def build_audit(api):
                                    "reason": "not one compatible original plus automatic companion"})
     return {"status": "read-only-dry-run", "writes": 0, "board": state["board"], "source_scenes": len(payload["scenes"]),
             "unique_scene_cards": len(cards), "missing_scene_ids": missing, "collisions": collisions,
+            "extra_scene_ids": extra_scene_ids,
             "description_pending": len(description_ops), "description_conflicts": description_conflicts,
             "prop_items": len(all_rows), "prop_companion_merges": len(prop_ops), "prop_conflicts": prop_conflicts,
             "prop_items_without_url": len(missing_url), "description_ops": description_ops, "prop_ops": prop_ops,
