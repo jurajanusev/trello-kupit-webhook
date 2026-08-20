@@ -448,6 +448,13 @@ def _duplicate_detail_for_apply(api, row):
     }
 
 
+def _archive_duplicate_master(api, duplicate):
+    try:
+        api["trello_put_body"](f"/cards/{duplicate['id']}", {"closed": True})
+    except Exception:
+        api["trello_put_body"](f"/cards/{duplicate['id']}/closed", {"value": "true"})
+
+
 def apply_confirmed_identities(api):
     audit = build_audit(api); plan = audit["reference_plan"]
     if not plan["safe_to_apply"]:
@@ -517,7 +524,7 @@ def apply_confirmed_identities(api):
         for duplicate in duplicates:
             writes += _ensure_attachment(api, survivor, duplicate["shortUrl"], f"Zlúčený zdroj: {duplicate['name']}")
             if not duplicate.get("closed"):
-                api["trello_put_body"](f"/cards/{duplicate['id']}", {"closed": True})
+                _archive_duplicate_master(api, duplicate)
                 writes += 1; identity_changes.append(f"archived master {duplicate['shortUrl']}")
         results.append({"canonical": identity["canonical"], "survivor_url": survivor["shortUrl"],
                         "changes": identity_changes, "source_urls": source_urls})
