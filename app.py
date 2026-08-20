@@ -8372,6 +8372,10 @@ from cierny_kamen_split_0535flash import register_routes as register_split_0535f
 
 register_split_0535flash_routes(app, globals())
 
+from cierny_kamen_global_reference import register_routes as register_ck_global_reference_routes
+
+register_ck_global_reference_routes(app, globals())
+
 from meeting_notes_apply_ep01_03 import register_routes as register_meeting_notes_apply_ep01_03_routes
 
 register_meeting_notes_apply_ep01_03_routes(app, globals())

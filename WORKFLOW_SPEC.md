@@ -17,10 +17,12 @@ volá **Čierny Kameň**; názov boardu sa bez osobitného pokynu nemení.
   `SC_01_09_ČK_1.4_MV_KC_FINALdocx .pdf` a
   `SC_01_10_ČK_1.7_MV_KC_FINALdocx.pdf`. V epizóde 08 existuje
   `08/07FLASH`, nie samostatný `08/07`.
-- Popis obrazovej karty zachováva referenčnú štruktúru 01/16: názov obrazu,
-  `REKVIZITY V KONTEXTE`, `NADVAZNOSŤ`, `ODKAZY`, `KONTINUITA PRIESTORU`,
-  `KONTINUITA POSTÁV`, `RUČNÉ DOPLNENIA`, kompletná `AKCIA A DIALÓGY`
-  a metadata na konci.
+- Popis obrazovej karty používa referenčnú štruktúru 01/09: presný názov obrazu,
+  kompaktnú `NAVIGÁCIU` s podsekciami `Rovnaký priestor` a `Rovnaké postavy`,
+  `RUČNÉ DOPLNENIA`, kompletnú `AKCIA A DIALÓGY` a metadata na konci.
+  Rekvizity a kontinuita sa vedú v checklistoch a registroch, nie v duplicitných
+  opisových sekciách. Jedinečný starší údaj sa pred odstránením presunie do
+  `RUČNÉ DOPLNENIA` s označením pôvodu.
 - Checklisty sú v poradí `REKVIZITY`, `SET`, `INFO Z PORADY`,
   `INFO Z NATÁČANIA`, `OTÁZKY NA PORADU`.
 - Používateľ môže do `REKVIZITY` zapísať prirodzený názov. Automatizácia
