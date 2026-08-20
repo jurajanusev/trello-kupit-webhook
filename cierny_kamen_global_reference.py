@@ -9,6 +9,7 @@ from collections import defaultdict
 from flask import jsonify, request
 
 from cierny_kamen_reference_all import board_support_data, protected_card_value
+from cierny_kamen_meeting_semantic_dryrun import load_board
 
 
 KEY = "ck-global-reference-20aug-8e57c104"
@@ -151,7 +152,8 @@ def _companion_target(original, companion, master_name, url):
 
 def build_audit(api):
     payload = api["cierny_kamen_import_payload"]()
-    state = api["cierny_kamen_import_state"](payload)
+    state = load_board(api)
+    state["lists_by_id"] = state["list_by_id"]
     groups = _scene_groups(api, state)
     collisions = {key: len(value) for key, value in groups.items() if len(value) != 1 and key in {s['scene_id'] for s in payload['scenes']}}
     cards = {key: value[0] for key, value in groups.items() if len(value) == 1}
