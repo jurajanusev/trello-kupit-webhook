@@ -15,6 +15,7 @@ from cierny_kamen_prop_identity_resolution import strip_technical_wrappers
 
 
 KEY = "ck-reference-0109-identities-19aug-7c319e5a"
+ENDPOINT_DISABLED = True
 SCOUT_CANONICAL = "Výbava skautskej skupiny"
 SCOUT_ALIASES = (
     "Výbava pre skautov", "Výbava skautov", "Skautská výbava",
@@ -534,6 +535,8 @@ def apply_confirmed_identities(api):
 def register_routes(app, api):
     @app.route("/api/ck-reference-0109-identities", methods=["POST"])
     def ck_reference_0109_identities():
+        if ENDPOINT_DISABLED:
+            return jsonify({"status": "disabled"}), 410
         if request.headers.get("X-CK-Reference-Key") != KEY:
             return jsonify({"error": "forbidden"}), 403
         mode = request.args.get("mode", "dry-run").casefold()
