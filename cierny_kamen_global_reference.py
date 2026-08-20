@@ -115,8 +115,16 @@ def desired_description(desc, prop_items):
 
 
 def _scene_groups(api, state):
-    groups = api["cierny_kamen_scene_cards_by_id"](state)
-    return {key: value for key, value in groups.items()}
+    groups = defaultdict(list)
+    for card in state["cards"]:
+        list_name = state["lists_by_id"].get(card.get("idList"), {}).get("name", "")
+        if "original screener" in folded(list_name):
+            continue
+        info = api["cierny_kamen_scene_name_info"](card.get("name", ""))
+        if not info or info.get("test"):
+            continue
+        groups[info["scene_id"]].append(card)
+    return dict(groups)
 
 
 def _prop_rows(card, support):
