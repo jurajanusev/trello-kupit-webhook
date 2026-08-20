@@ -185,15 +185,22 @@ def build_audit(api):
         if len(groups.get(scene_id, [])) != 1:
             blockers.append(f"{scene_id} production card missing or duplicated")
     variants = {key: value for key, value in groups.items() if key.startswith("05/35")}
-    if variants:
+    existing = variants.get(SCENE_ID, []) if set(variants) <= {SCENE_ID} else []
+    completed = len(existing) == 1 and set(variants) == {SCENE_ID}
+    if variants and not completed:
         blockers.append("05/35 production variant already exists")
     parent = groups.get("05/34", [None])[0]
     parent_after = None
     if parent:
-        try:
-            parent_after = split_parent_description(parent.get("desc") or "")
-        except ValueError as exc:
-            blockers.append(str(exc))
+        if completed:
+            parent_after = parent.get("desc") or ""
+            if "5/35FLASH" in parent_after or "Je deň, kedy sa Jakub stratil" in parent_after or "Jakub a Sára sa objímu." in parent_after:
+                blockers.append("05/34 still contains 05/35FLASH content")
+        else:
+            try:
+                parent_after = split_parent_description(parent.get("desc") or "")
+            except ValueError as exc:
+                blockers.append(str(exc))
     source_ids = [scene["scene_id"] for scene in payload["scenes"]]
     if source_ids.count(SCENE_ID) != 1 or source_ids.index(SCENE_ID) != source_ids.index("05/34") + 1:
         blockers.append("authoritative payload order is invalid")
@@ -206,7 +213,8 @@ def build_audit(api):
     links = {scene_id: groups[scene_id][0] for scene_id in required if len(groups.get(scene_id, [])) == 1}
     neighbor_plan = {}
     if len(links) == len(required):
-        placeholder = "[05/35FLASH – Sára a Jakub sa objímajú pri odchode](<NEW_05_35FLASH_URL>)"
+        placeholder = (_link(SCENE_ID, existing[0]) if completed else
+                       "[05/35FLASH – Sára a Jakub sa objímajú pri odchode](<NEW_05_35FLASH_URL>)")
         operations = {
             "03/54FLASH": lambda d: _replace_space_next(d, placeholder),
             "05/34": lambda d: _replace_character_navigation(d, "SÁRA", "next", placeholder),
@@ -224,6 +232,20 @@ def build_audit(api):
     if len(scene_lists) != 1:
         blockers.append("SCENÁRE target list missing or ambiguous")
     snapshots = {card["id"]: protected_card_value(card, support) for card in links.values()}
+    if completed:
+        existing_support = sorted(support["checklists"].get(existing[0]["id"], []), key=lambda row: row.get("pos", 0))
+        expected_names = ["REKVIZITY", "SET", "INFO Z PORADY", "INFO Z NATÁČANIA", "OTÁZKY NA PORADU"]
+        if [row.get("name") for row in existing_support] != expected_names:
+            blockers.append("existing 05/35FLASH checklist structure mismatch")
+        props = next((row for row in existing_support if row.get("name") == "REKVIZITY"), {})
+        set_list = next((row for row in existing_support if row.get("name") == "SET"), {})
+        if props.get("checkItems"):
+            blockers.append("existing 05/35FLASH has unexpected prop items")
+        if len(set_list.get("checkItems", [])) != 1 or space_url not in (set_list.get("checkItems", [{}])[0].get("name") or ""):
+            blockers.append("existing 05/35FLASH SET link mismatch")
+        desc = existing[0].get("desc") or ""
+        if ACTION_RAW.split("\n\n")[0] not in desc or ACTION_RAW.split("\n\n")[1] not in desc:
+            blockers.append("existing 05/35FLASH action read-back mismatch")
     return {
         "status": "read-only-dry-run", "writes": 0, "blockers": blockers,
         "board": state["board"], "payload_scene_count": len(payload["scenes"]),
@@ -237,8 +259,11 @@ def build_audit(api):
         "space": {"url": space_url, "master": space_matches[0].get("name") if len(space_matches) == 1 else None},
         "neighbors": {scene_id: {"url": card["shortUrl"], "name": card["name"]} for scene_id, card in links.items()},
         "neighbor_updates": {scene_id: {"changed": row["before"] != row["after"]} for scene_id, row in neighbor_plan.items()},
-        "planned": {"create_cards": 1, "create_checklists": 5, "create_set_items": 1, "create_prop_items": 0,
-                    "update_parent": 1, "update_neighbor_navigation": len(neighbor_plan)},
+        "completed": completed,
+        "planned": {"create_cards": 0 if completed else 1, "create_checklists": 0 if completed else 5,
+                    "create_set_items": 0 if completed else 1, "create_prop_items": 0,
+                    "update_parent": int(bool(parent and parent_after != parent.get("desc"))),
+                    "update_neighbor_navigation": sum(row["before"] != row["after"] for row in neighbor_plan.values())},
         "snapshots": snapshots, "_state": state, "_support": support, "_groups": groups,
         "_links": links, "_neighbor_plan": neighbor_plan, "_space_matches": space_matches, "_scene_lists": scene_lists,
     }
@@ -252,6 +277,10 @@ def apply(api):
     audit = build_audit(api)
     if audit["blockers"]:
         return _public_audit(audit), 409
+    if audit["completed"] and not any(audit["planned"].values()):
+        card = audit["production_variants_05_35"][SCENE_ID][0]
+        return {"status": "unchanged", "writes": 0, "new_card": card,
+                "read_back": {"05_34": 1, "05_35": 0, "05_35FLASH": 1, "05_36": 1, "errors": []}}, 200
     state, support, groups = audit["_state"], audit["_support"], audit["_groups"]
     for card_id, before in audit["snapshots"].items():
         live = next(card for card in state["cards"] if card["id"] == card_id)
