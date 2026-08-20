@@ -16,16 +16,18 @@ from cierny_kamen_prop_identity_resolution import resolve_identity
 
 
 class ReferenceIdentityTest(unittest.TestCase):
-    def test_archived_duplicate_uses_dry_run_snapshot(self):
+    def test_duplicate_uses_dry_run_snapshot(self):
         calls = []
         row = {
             "id": "archived-id", "name": "Old master", "url": "https://trello.com/c/old",
-            "closed": True, "list": "REGISTER REKVIZÍT", "attachments": [],
+            "closed": False, "list": "REGISTER REKVIZÍT", "attachments": [],
+            "id_labels": ["label-id"],
         }
         detail = _duplicate_detail_for_apply({"trello_get": lambda *args: calls.append(args)}, row)
         self.assertEqual([], calls)
         self.assertEqual("https://trello.com/c/old", detail["shortUrl"])
-        self.assertTrue(detail["closed"])
+        self.assertFalse(detail["closed"])
+        self.assertEqual(["label-id"], detail["idLabels"])
 
     def test_alias_normalization_is_accent_and_case_insensitive(self):
         from meeting_notes_dryrun import folded

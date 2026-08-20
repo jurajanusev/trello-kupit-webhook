@@ -90,6 +90,7 @@ def master_candidates(api, state, canonical, aliases):
                 **public_card(detail, state), "date_last_activity": detail.get("dateLastActivity"),
                 "attachment_count": len(detail.get("attachments", [])),
                 "comment_count": len(detail.get("comments", [])),
+                "id_labels": list(detail.get("idLabels", [])),
                 "manual_desc_chars": len(manual_desc),
                 "manual_desc": manual_desc,
                 "attachments": [{"id": row.get("id"), "name": row.get("name"), "url": row.get("url")}
@@ -416,17 +417,18 @@ def _ensure_attachment(api, card, url, name):
 
 
 def _duplicate_detail_for_apply(api, row):
-    """Archived duplicates can return 400 from Trello's card detail endpoint.
+    """Use the complete dry-run snapshot for duplicate masters.
 
-    The dry-run already captured the immutable fields needed to finish an
-    interrupted idempotent merge, so do not reopen an already archived card.
+    Trello can list a duplicate on the board while rejecting a second direct
+    card-detail read (including during an interrupted archive). The dry-run
+    already captured every field used by apply, so a second read is both
+    redundant and less reliable.
     """
-    if row.get("closed"):
-        return {
-            "id": row["id"], "name": row["name"], "shortUrl": row["url"],
-            "closed": True, "idLabels": [], "attachments": row.get("attachments", []),
-        }
-    return card_details(api, {"id": row["id"], "list_name": row["list"]})
+    return {
+        "id": row["id"], "name": row["name"], "shortUrl": row["url"],
+        "closed": bool(row.get("closed")), "idLabels": list(row.get("id_labels", [])),
+        "attachments": row.get("attachments", []),
+    }
 
 
 def apply_confirmed_identities(api):
