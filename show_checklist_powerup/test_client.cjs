@@ -27,7 +27,7 @@ test("card badges load all checklists and group their items", async () => {
   assert.match(badges[18].text, /0\/1 LIST 10/);
   assert.match(badges[19].text, /^☐ /);
   assert.equal(badges[0].icon, undefined);
-  assert.equal(badges[0].text.endsWith("\u00a0".repeat(200)), true);
+  assert.equal(badges[0].text.endsWith("\u00a0".repeat(48)), true);
 });
 
 test("missing item data falls back to card all", async () => {
@@ -67,6 +67,6 @@ test("long checklist items stay on one row and end with three dots", async () =>
   const badges = await capabilities["card-badges"](t);
   assert.equal(badges.length, 2);
   assert.match(badges[1].text, /^☐ /);
-  assert.equal(badges[1].text.slice(0, -200).endsWith("..."), true);
-  assert.equal(badges.every((badge) => badge.text.endsWith("\u00a0".repeat(200))), true);
+  assert.equal(badges[1].text.slice(0, -48).endsWith("..."), true);
+  assert.equal(badges.every((badge) => badge.text.endsWith("\u00a0".repeat(48))), true);
 });

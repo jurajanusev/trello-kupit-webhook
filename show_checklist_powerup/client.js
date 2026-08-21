@@ -3,7 +3,7 @@
 
   const ICON = new URL("./icon.svg", window.location.href).href;
   const SETTINGS_KEY = "showChecklistSettingsV1";
-  const FULL_WIDTH_SPACER = "\u00a0".repeat(200);
+  const FULL_WIDTH_SPACER = "\u00a0".repeat(48);
   const ITEM_LINE_LENGTH = 30;
   const Core = window.ShowChecklistCore;
   const Rest = window.ShowChecklistRest;
