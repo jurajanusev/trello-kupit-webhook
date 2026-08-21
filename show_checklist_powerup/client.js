@@ -3,8 +3,8 @@
 
   const ICON = new URL("./icon.svg", window.location.href).href;
   const SETTINGS_KEY = "showChecklistSettingsV1";
-  const ITEM_LINE_LENGTH = 30;
-  const ROW_WIDTH_UNITS = 30;
+  const ITEM_LINE_LENGTH = 25;
+  const ROW_WIDTH_UNITS = 26;
   const Core = window.ShowChecklistCore;
   const Rest = window.ShowChecklistRest;
 
