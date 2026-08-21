@@ -191,6 +191,7 @@ def build_state(
     missing = []
     duplicates = []
     resolved_duplicates = []
+    ignored_reference_duplicates = []
     fallbacks = []
     card_usage = {}
     for row in schedule:
@@ -209,6 +210,19 @@ def build_state(
         if not candidates:
             missing.append({"scene_id": planned_id, "base_id": matched_id, "date": row["shooting_date"]})
             continue
+        if len(candidates) > 1:
+            working = [
+                card for card in candidates
+                if lists_by_id[card["idList"]]["name"].strip().casefold() != "original screener"
+            ]
+            references = [card for card in candidates if card not in working]
+            if len(working) == 1 and references:
+                ignored_reference_duplicates.append({
+                    "scene_id": planned_id,
+                    "selected": {"id": working[0]["id"], "url": working[0]["shortUrl"]},
+                    "ignored": [{"id": card["id"], "url": card["shortUrl"]} for card in references],
+                })
+                candidates = working
         if len(candidates) > 1 and CANONICAL_CARD_IDS.get(planned_id):
             canonical_id = CANONICAL_CARD_IDS[planned_id]
             canonical = next((card for card in candidates if card["id"] == canonical_id), None)
@@ -240,17 +254,20 @@ def build_state(
                 "url": card["shortUrl"], "list": lists_by_id[card["idList"]]["name"],
             })
     reused_cards = [{"card_id": card_id, "scene_ids": ids} for card_id, ids in card_usage.items() if len(ids) > 1]
-    selected_matches = []
-    for card_id in card_usage:
-        options = [item for item in matches if item["card"]["id"] == card_id]
-        options.sort(key=lambda item: (item["row"]["shooting_date"], item["row"]["order"]))
-        selected_matches.append(options[0])
-    matches = selected_matches
-
     shooting_dates = sorted({
         row["shooting_date"] for row in schedule if row["shooting_date"] >= as_of
     })[:WINDOW_SHOOTING_DAYS]
     shooting_date_set = set(shooting_dates)
+    selected_matches = []
+    for card_id in card_usage:
+        options = [item for item in matches if item["card"]["id"] == card_id]
+        options.sort(key=lambda item: (
+            item["row"]["shooting_date"] not in shooting_date_set,
+            item["row"]["shooting_date"], item["row"]["order"],
+        ))
+        selected_matches.append(options[0])
+    matches = selected_matches
+
     reused_card_conflicts = []
     schedule_by_scene = {row["scene_id"]: row for row in schedule}
     for reused in reused_cards:
@@ -261,7 +278,8 @@ def build_state(
             else ("inactive", None)
             for row in options
         }
-        if len(destinations) > 1:
+        active_destinations = {value for value in destinations if value[0] == "active"}
+        if len(active_destinations) > 1:
             reused_card_conflicts.append({
                 **reused,
                 "destinations": [list(value) for value in sorted(destinations)],
@@ -317,6 +335,7 @@ def build_state(
         "board": board, "lists": lists, "lists_by_id": lists_by_id,
         "lists_by_name": lists_by_name, "cards": cards, "matches": matches,
         "missing": missing, "duplicates": duplicates, "resolved_duplicates": resolved_duplicates,
+        "ignored_reference_duplicates": ignored_reference_duplicates,
         "fallbacks": fallbacks,
         "reused_cards": reused_cards,
         "reused_card_conflicts": reused_card_conflicts,
@@ -347,6 +366,7 @@ def summary(state, schedule):
         "missing": state["missing"], "duplicate_scene_ids_count": len(state["duplicates"]),
         "duplicates": state["duplicates"], "fallback_count": len(state["fallbacks"]),
         "resolved_duplicates": state["resolved_duplicates"],
+        "ignored_reference_duplicates": state.get("ignored_reference_duplicates", []),
         "fallbacks": state["fallbacks"], "reused_card_count": len(state["reused_cards"]),
         "shared_fallback_card_count": len(state["reused_cards"]),
         "shared_fallback_cards": state["reused_cards"],
