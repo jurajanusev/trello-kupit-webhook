@@ -5142,7 +5142,7 @@ def repair_main_list_due_dates():
     configs = {
         "dok4": {"board": "lzNy4AtY", "main_list": "VŠETKY EPIZÓDY"},
         "dunaj": {"board": "qCPeWA3e", "main_list": "SERIA 15,16"},
-        "riverdale": {"board": RIVERDALE_BOARD_REF, "main_list": "VŠETKY EPIZÓDY"},
+        "riverdale": {"board": RIVERDALE_BOARD_REF, "main_list": "SCENÁRE"},
     }
     config = configs.get(project)
     if not config:
