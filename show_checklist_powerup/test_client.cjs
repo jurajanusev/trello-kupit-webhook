@@ -46,3 +46,27 @@ test("loading failure is shown as a red badge", async () => {
   assert.equal(badges.length, 1);
   assert.equal(badges[0].color, "red");
 });
+
+test("long checklist items wrap at word boundaries onto full-width rows", async () => {
+  const capabilities = loadCapabilities();
+  const t = {
+    card() {
+      return Promise.resolve({
+        checklists: [{
+          name: "SET",
+          checkItems: [{
+            name: "KOLÁŽ STOCKSHOTOV DAY NIGHT tabuľa s názvom mesta",
+            state: "incomplete",
+          }],
+        }],
+      });
+    },
+    get() { return Promise.resolve(Core.DEFAULT_SETTINGS); },
+  };
+
+  const badges = await capabilities["card-badges"](t);
+  assert.equal(badges.length > 2, true);
+  assert.match(badges[1].text, /^☐ /);
+  assert.match(badges[2].text, /^\u00a0{3}/);
+  assert.equal(badges.every((badge) => badge.text.endsWith("\u00a0".repeat(200))), true);
+});
