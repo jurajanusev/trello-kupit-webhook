@@ -4,38 +4,20 @@
   const ICON = new URL("./icon.svg", window.location.href).href;
   const SETTINGS_KEY = "showChecklistSettingsV1";
   const FULL_WIDTH_SPACER = "\u00a0".repeat(200);
-  const ITEM_LINE_LENGTH = 32;
-  const CONTINUATION_PREFIX = "\u00a0\u00a0\u00a0";
+  const ITEM_LINE_LENGTH = 30;
   const Core = window.ShowChecklistCore;
   const Rest = window.ShowChecklistRest;
 
-  function wrapItemText(text) {
+  function compactItemText(text) {
     const source = String(text || "").trim();
-    if (!/^[☐☑]\s/.test(source) || source.length <= ITEM_LINE_LENGTH) return [source];
-
-    const marker = source.slice(0, 2);
-    const words = source.slice(2).trim().split(/\s+/);
-    const lines = [];
-    let line = marker;
-    words.forEach(function (word) {
-      const next = line + (line === marker ? "" : " ") + word;
-      if (line !== marker && next.length > ITEM_LINE_LENGTH) {
-        lines.push(line);
-        line = CONTINUATION_PREFIX + word;
-      } else {
-        line = next;
-      }
-    });
-    if (line.trim()) lines.push(line);
-    return lines;
+    if (!/^[☐☑]\s/.test(source) || source.length <= ITEM_LINE_LENGTH) return source;
+    return source.slice(0, ITEM_LINE_LENGTH - 3).trimEnd() + "...";
   }
 
   function layoutBadges(badges) {
-    return badges.flatMap(function (badge) {
-      return wrapItemText(badge.text).map(function (line) {
-        return Object.assign({ monochrome: true }, badge, {
-          text: line + FULL_WIDTH_SPACER,
-        });
+    return badges.map(function (badge) {
+      return Object.assign({ monochrome: true }, badge, {
+        text: compactItemText(badge.text) + FULL_WIDTH_SPACER,
       });
     });
   }

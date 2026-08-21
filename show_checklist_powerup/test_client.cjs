@@ -47,7 +47,7 @@ test("loading failure is shown as a red badge", async () => {
   assert.equal(badges[0].color, "red");
 });
 
-test("long checklist items wrap at word boundaries onto full-width rows", async () => {
+test("long checklist items stay on one row and end with three dots", async () => {
   const capabilities = loadCapabilities();
   const t = {
     card() {
@@ -65,8 +65,8 @@ test("long checklist items wrap at word boundaries onto full-width rows", async 
   };
 
   const badges = await capabilities["card-badges"](t);
-  assert.equal(badges.length > 2, true);
+  assert.equal(badges.length, 2);
   assert.match(badges[1].text, /^☐ /);
-  assert.match(badges[2].text, /^\u00a0{3}/);
+  assert.equal(badges[1].text.slice(0, -200).endsWith("..."), true);
   assert.equal(badges.every((badge) => badge.text.endsWith("\u00a0".repeat(200))), true);
 });
