@@ -19,10 +19,19 @@ from update_dok4_plan_local import (
 
 app = Flask(__name__)
 
-DOK4_CURRENT_SCHEDULE_KEY = "dok4-schedule-16aug-4c7e92a1"
-DOK4_CURRENT_SCHEDULE_FILE = "dok4_schedule_2026-08-16.json"
-DOK4_CURRENT_SCHEDULE_AS_OF = "2026-08-16"
-DOK4_CURRENT_SCHEDULE_ROWS = 287
+DOK4_CURRENT_SCHEDULE_KEY = "dok4-schedule-21aug-8e4a29c7"
+DOK4_CURRENT_SCHEDULE_FILE = "dok4_schedule_2026-08-21.json"
+DOK4_CURRENT_SCHEDULE_AS_OF = "2026-08-21"
+DOK4_CURRENT_SCHEDULE_ROWS = 503
+
+RIVERDALE_CURRENT_SCHEDULE_KEY = "riverdale-schedule-21aug-53db810f"
+RIVERDALE_CURRENT_SCHEDULE_FILE = "riverdale_schedule_2026-08-21.json"
+RIVERDALE_CURRENT_SCHEDULE_AS_OF = "2026-08-21"
+RIVERDALE_CURRENT_SCHEDULE_ROWS = 142
+RIVERDALE_BOARD_REF = "CzuD55PR"
+RIVERDALE_START_MARKER = "<!-- RIVERDALE-SCHEDULE-METADATA:START -->"
+RIVERDALE_END_MARKER = "<!-- RIVERDALE-SCHEDULE-METADATA:END -->"
+RIVERDALE_SOURCE_LABEL = "predbežné dispo Riverdale / Čierny Kameň"
 
 DUNAJ_CURRENT_SCHEDULE_KEY = "dunaj-schedule-14aug-5e8c219d"
 DUNAJ_CURRENT_SCHEDULE_FILE = "dunaj_schedule_2026-08-14.json"
@@ -5127,17 +5136,17 @@ def repair_dok4_returned_card_date():
 
 @app.route("/api/repair-main-list-due-dates", methods=["POST"])
 def repair_main_list_due_dates():
-    return jsonify({"error": "completed one-off endpoint disabled"}), 410
     if request.headers.get("X-Repair-Key") != "main-list-due-audit-09aug-3db186f4":
         return jsonify({"error": "forbidden"}), 403
     project = request.args.get("project", "").strip().casefold()
     configs = {
         "dok4": {"board": "lzNy4AtY", "main_list": "VŠETKY EPIZÓDY"},
         "dunaj": {"board": "qCPeWA3e", "main_list": "SERIA 15,16"},
+        "riverdale": {"board": RIVERDALE_BOARD_REF, "main_list": "VŠETKY EPIZÓDY"},
     }
     config = configs.get(project)
     if not config:
-        return jsonify({"error": "project must be dok4 or dunaj"}), 400
+        return jsonify({"error": "project must be dok4, dunaj, or riverdale"}), 400
     board = trello_get(f"/boards/{config['board']}", {"fields": "id,name,url"})
     lists = trello_get(f"/boards/{board['id']}/lists", {
         "fields": "id,name,closed", "filter": "open",
@@ -5188,7 +5197,6 @@ def sync_dok4_current_schedule():
     The active window is the next seven shooting dates on or after ``as_of``.
     Calendar days without shooting never consume a slot.
     """
-    return jsonify({"error": "completed one-off endpoint disabled"}), 410
     if request.headers.get("X-Sync-Key") != DOK4_CURRENT_SCHEDULE_KEY:
         return jsonify({"error": "forbidden"}), 403
 
@@ -5243,6 +5251,71 @@ def sync_dok4_current_schedule():
         result = apply_dok4_schedule(trello, state)
     result.update({
         "schedule_file": DOK4_CURRENT_SCHEDULE_FILE,
+        "schedule_rows": len(schedule),
+        "window_type": "next_shooting_days",
+        "window_as_of": as_of,
+        "shooting_dates": state["shooting_dates"],
+    })
+    return jsonify(result)
+
+
+@app.route("/api/sync-riverdale-current-schedule", methods=["POST"])
+def sync_riverdale_current_schedule():
+    """Synchronize Riverdale from the latest supplied plan."""
+    if request.headers.get("X-Sync-Key") != RIVERDALE_CURRENT_SCHEDULE_KEY:
+        return jsonify({"error": "forbidden"}), 403
+    mode = request.args.get("mode", "dry-run")
+    if mode not in {"dry-run", "apply", "metadata", "window"}:
+        return jsonify({
+            "error": "mode must be dry-run, apply, metadata, or window"
+        }), 400
+    as_of = request.args.get("as_of", RIVERDALE_CURRENT_SCHEDULE_AS_OF)
+    if as_of != RIVERDALE_CURRENT_SCHEDULE_AS_OF:
+        return jsonify({
+            "error": "this one-off endpoint has a fixed as_of date",
+            "expected_as_of": RIVERDALE_CURRENT_SCHEDULE_AS_OF,
+        }), 400
+    schedule_path = os.path.join(
+        os.path.dirname(__file__), RIVERDALE_CURRENT_SCHEDULE_FILE
+    )
+    with open(schedule_path, "r", encoding="utf-8") as handle:
+        schedule_document = json.load(handle)
+    source_date = schedule_document.get("source", {}).get("dated", as_of)
+    schedule = schedule_document["rows"]
+    unique_scene_ids = {row.get("scene_id") for row in schedule}
+    if (
+        source_date != RIVERDALE_CURRENT_SCHEDULE_AS_OF
+        or len(schedule) != RIVERDALE_CURRENT_SCHEDULE_ROWS
+        or len(unique_scene_ids) != RIVERDALE_CURRENT_SCHEDULE_ROWS
+        or None in unique_scene_ids
+    ):
+        return jsonify({
+            "error": "schedule source validation failed",
+            "source_date": source_date,
+            "rows": len(schedule),
+            "unique_scene_ids": len(unique_scene_ids),
+        }), 409
+    trello = Dok4ScheduleTrello(API_KEY, TOKEN)
+    state = build_dok4_schedule_state(
+        trello, schedule, source_date=source_date, as_of=as_of,
+        board_ref=RIVERDALE_BOARD_REF,
+        start_marker=RIVERDALE_START_MARKER,
+        end_marker=RIVERDALE_END_MARKER,
+        source_label=RIVERDALE_SOURCE_LABEL,
+    )
+    if mode == "dry-run":
+        return jsonify(summarize_dok4_schedule(state, schedule))
+    if mode == "metadata":
+        result = apply_dok4_schedule(
+            trello, state, metadata_only=True,
+            metadata_limit=min(40, max(1, int(request.args.get("limit", "35")))),
+        )
+    elif mode == "window":
+        result = apply_dok4_schedule(trello, state, skip_metadata=True)
+    else:
+        result = apply_dok4_schedule(trello, state)
+    result.update({
+        "schedule_file": RIVERDALE_CURRENT_SCHEDULE_FILE,
         "schedule_rows": len(schedule),
         "window_type": "next_shooting_days",
         "window_as_of": as_of,

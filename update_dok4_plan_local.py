@@ -97,28 +97,34 @@ def date_list_name(date_text):
     return f"{day}.{month}."
 
 
-def metadata(row, source_date):
+def metadata(
+    row, source_date, start_marker=START_MARKER, end_marker=END_MARKER,
+    source_label="predbežné dispo DOK 4",
+):
     source_date = row.get("source_date", source_date)
     source_day = datetime.strptime(source_date, "%Y-%m-%d").date()
     source_date_display = f"{source_day.day}. {source_day.month}. {source_day.year}"
     return (
-        f"{START_MARKER}\n"
+        f"{start_marker}\n"
         f"**ČÍSLO OBRAZU:** {row['scene_id']}\n"
-        f"**ZDROJ:** predbežné dispo DOK 4 z {source_date_display}\n"
+        f"**ZDROJ:** {source_label} z {source_date_display}\n"
         f"**NATÁČACÍ DEŇ:** {row['shooting_day']}\n"
         f"**DÁTUM NATÁČANIA:** {row['shooting_date']}\n"
         f"**PORADIE DŇA:** {row['order']}\n"
         f"**UNIT:** {row['unit']}\n"
         f"**LOKÁCIA:** {row['location']}\n"
         f"**POSTAVY:** {row['characters']}\n"
-        f"{END_MARKER}"
+        f"{end_marker}"
     )
 
 
-def merged_description(old_desc, row, source_date):
-    block = metadata(row, source_date)
-    if START_MARKER in old_desc and END_MARKER in old_desc:
-        pattern = re.escape(START_MARKER) + r".*?" + re.escape(END_MARKER)
+def merged_description(
+    old_desc, row, source_date, start_marker=START_MARKER,
+    end_marker=END_MARKER, source_label="predbežné dispo DOK 4",
+):
+    block = metadata(row, source_date, start_marker, end_marker, source_label)
+    if start_marker in old_desc and end_marker in old_desc:
+        pattern = re.escape(start_marker) + r".*?" + re.escape(end_marker)
         return re.sub(pattern, lambda _: block, old_desc, count=1, flags=re.S)
     return block + ("\n\n" + old_desc if old_desc else "")
 
@@ -133,8 +139,12 @@ def pick_anchor(lists):
     return sorted(candidates, key=lambda item: item["pos"])[0] if candidates else None
 
 
-def build_state(trello, schedule, source_date, as_of):
-    board = trello.get(f"/boards/{BOARD_REF}", {"fields": "id,name,url,shortLink"})
+def build_state(
+    trello, schedule, source_date, as_of, board_ref=BOARD_REF,
+    start_marker=START_MARKER, end_marker=END_MARKER,
+    source_label="predbežné dispo DOK 4",
+):
+    board = trello.get(f"/boards/{board_ref}", {"fields": "id,name,url,shortLink"})
     lists = trello.get(f"/boards/{board['id']}/lists", {
         "fields": "id,name,pos,closed", "filter": "open"
     })
@@ -284,7 +294,10 @@ def build_state(trello, schedule, source_date, as_of):
 
     update_count = 0
     for item in matches:
-        expected_desc = merged_description(item["card"].get("desc", ""), item["row"], source_date)
+        expected_desc = merged_description(
+            item["card"].get("desc", ""), item["row"], source_date,
+            start_marker, end_marker, source_label,
+        )
         expected_date = (
             item["row"]["shooting_date"]
             if item["row"]["shooting_date"] in shooting_date_set else ""
@@ -313,7 +326,9 @@ def build_state(trello, schedule, source_date, as_of):
         "shooting_dates": shooting_dates, "target_names": target_names,
         "missing_lists": missing_lists, "duplicate_target_lists": duplicate_target_lists,
         "update_count": update_count, "anchor": anchor, "date_lists": date_lists,
-        "as_of": as_of, "source_date": source_date,
+        "as_of": as_of, "source_date": source_date, "board_ref": board_ref,
+        "start_marker": start_marker, "end_marker": end_marker,
+        "source_label": source_label,
     }
 
 
@@ -362,7 +377,7 @@ def summary(state, schedule):
 
 def apply(trello, state, metadata_only=False, skip_metadata=False, metadata_limit=None):
     blockers = {
-        "wrong_board": state["board"].get("shortLink") != BOARD_REF,
+        "wrong_board": state["board"].get("shortLink") != state.get("board_ref", BOARD_REF),
         "duplicates": len(state["duplicates"]),
         "fallback_collisions": len(state.get("reused_card_conflicts", [])),
         "duplicate_target_lists": len(state["duplicate_target_lists"]),
@@ -391,7 +406,12 @@ def apply(trello, state, metadata_only=False, skip_metadata=False, metadata_limi
         row = item["row"]
         card = item["card"]
         payload = {}
-        new_desc = merged_description(card.get("desc", ""), row, state["source_date"])
+        new_desc = merged_description(
+            card.get("desc", ""), row, state["source_date"],
+            state.get("start_marker", START_MARKER),
+            state.get("end_marker", END_MARKER),
+            state.get("source_label", "predbežné dispo DOK 4"),
+        )
         if new_desc != card.get("desc", ""):
             payload["desc"] = new_desc
         expected_due_date = (
@@ -530,7 +550,7 @@ def apply(trello, state, metadata_only=False, skip_metadata=False, metadata_limi
 
 
 def cleanup_stale(trello, state):
-    if state["board"].get("shortLink") != BOARD_REF or not state["anchor"]:
+    if state["board"].get("shortLink") != state.get("board_ref", BOARD_REF) or not state["anchor"]:
         raise RuntimeError("cleanup blocked: wrong board or missing series anchor")
     returned = []
     for card in state["stale_window_cards"]:
