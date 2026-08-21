@@ -43,10 +43,20 @@
     return text + "\u00a0".repeat(Math.ceil(missingPixels / spaceWidth));
   }
 
+  function fineTuneHeader(text) {
+    const name = text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+    if (/\bSET$/.test(name)) return "\u00a0\u202f";
+    if (name.includes("INFO Z PORADY")) return "\u00a0\u200a";
+    if (name.includes("INFO Z NATACANIA")) return "\u200a";
+    if (name.includes("OTAZKY NA PORADU")) return "\u00a0\u202f\u200a";
+    return "";
+  }
+
   function layoutBadges(badges) {
     return badges.map(function (badge) {
+      const compactText = compactItemText(badge.text);
       return Object.assign({ monochrome: true }, badge, {
-        text: fitToRow(compactItemText(badge.text)),
+        text: fitToRow(compactText) + (badge.color ? fineTuneHeader(compactText) : ""),
       });
     });
   }

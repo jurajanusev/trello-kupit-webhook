@@ -68,6 +68,6 @@ test("long checklist items stay on one row and end with three dots", async () =>
   assert.equal(badges.length, 2);
   assert.match(badges[1].text, /^☐ /);
   assert.equal(badges[1].text.includes("..."), true);
-  assert.equal(badges.every((badge) => badge.text.endsWith("\u00a0")), true);
+  assert.equal(badges.every((badge) => /[\u00a0\u202f\u200a]$/.test(badge.text)), true);
   assert.equal(badges[1].text.length < badges[0].text.length + 15, true);
 });
