@@ -3,8 +3,8 @@
 
   const ICON = new URL("./icon.svg", window.location.href).href;
   const SETTINGS_KEY = "showChecklistSettingsV1";
-  const FULL_WIDTH_SPACER = "\u00a0".repeat(48);
   const ITEM_LINE_LENGTH = 30;
+  const ROW_WIDTH_UNITS = 30;
   const Core = window.ShowChecklistCore;
   const Rest = window.ShowChecklistRest;
 
@@ -14,10 +14,24 @@
     return source.slice(0, ITEM_LINE_LENGTH - 3).trimEnd() + "...";
   }
 
+  function textWidthUnits(text) {
+    return Array.from(text).reduce(function (width, character) {
+      if (/\s/.test(character)) return width + 0.5;
+      if (/[ilI1|.,:;!'`]/.test(character)) return width + 0.45;
+      if (/[MW@#%&]/.test(character)) return width + 1.25;
+      return width + 1;
+    }, 0);
+  }
+
+  function fitToRow(text) {
+    const missingUnits = Math.max(0, ROW_WIDTH_UNITS - textWidthUnits(text));
+    return text + "\u00a0".repeat(Math.ceil(missingUnits / 0.5));
+  }
+
   function layoutBadges(badges) {
     return badges.map(function (badge) {
       return Object.assign({ monochrome: true }, badge, {
-        text: compactItemText(badge.text) + FULL_WIDTH_SPACER,
+        text: fitToRow(compactItemText(badge.text)),
       });
     });
   }
