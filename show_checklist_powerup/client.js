@@ -4,7 +4,7 @@
   const ICON = new URL("./icon.svg", window.location.href).href;
   const SETTINGS_KEY = "showChecklistSettingsV1";
   const ITEM_LINE_LENGTH = 25;
-  const ROW_TEXT_WIDTH_PX = 206;
+  const ROW_TEXT_WIDTH_PX = 200;
   const Core = window.ShowChecklistCore;
   const Rest = window.ShowChecklistRest;
   let measureContext;
@@ -29,7 +29,7 @@
       if (!measureContext) {
         measureContext = window.document.createElement("canvas").getContext("2d");
         if (measureContext) {
-          measureContext.font = '14px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+          measureContext.font = '12px "Atlassian Sans", ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Ubuntu, "Helvetica Neue", sans-serif';
         }
       }
       if (measureContext) return measureContext.measureText(text).width;
