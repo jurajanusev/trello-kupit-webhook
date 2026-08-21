@@ -4,9 +4,10 @@
   const ICON = new URL("./icon.svg", window.location.href).href;
   const SETTINGS_KEY = "showChecklistSettingsV1";
   const ITEM_LINE_LENGTH = 25;
-  const ROW_WIDTH_UNITS = 26;
+  const ROW_TEXT_WIDTH_PX = 206;
   const Core = window.ShowChecklistCore;
   const Rest = window.ShowChecklistRest;
+  let measureContext;
 
   function compactItemText(text) {
     const source = String(text || "").trim();
@@ -23,9 +24,23 @@
     }, 0);
   }
 
+  function textWidthPixels(text) {
+    if (window.document && typeof window.document.createElement === "function") {
+      if (!measureContext) {
+        measureContext = window.document.createElement("canvas").getContext("2d");
+        if (measureContext) {
+          measureContext.font = '14px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+        }
+      }
+      if (measureContext) return measureContext.measureText(text).width;
+    }
+    return textWidthUnits(text) * 7;
+  }
+
   function fitToRow(text) {
-    const missingUnits = Math.max(0, ROW_WIDTH_UNITS - textWidthUnits(text));
-    return text + "\u00a0".repeat(Math.ceil(missingUnits / 0.5));
+    const missingPixels = Math.max(0, ROW_TEXT_WIDTH_PX - textWidthPixels(text));
+    const spaceWidth = Math.max(1, textWidthPixels("\u00a0"));
+    return text + "\u00a0".repeat(Math.ceil(missingPixels / spaceWidth));
   }
 
   function layoutBadges(badges) {
