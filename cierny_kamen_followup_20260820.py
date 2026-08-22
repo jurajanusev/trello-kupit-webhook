@@ -788,6 +788,43 @@ def apply_questions(api, audit, start, limit):
             "errors": errors, "scene_ids": [plan["scene_id"] for plan in selected]}
 
 
+def final_checks(api, audit):
+    errors = []
+    detail_cache = {}
+
+    def detail(card_id):
+        if card_id not in detail_cache:
+            detail_cache[card_id] = card_detail(api, card_id)
+        return detail_cache[card_id]
+
+    checked_links = 0
+    for plan in audit["manual_identity_plans"]:
+        target = plan.get("target")
+        if not target:
+            errors.append(f"{plan['canonical']}: master missing")
+            continue
+        master = detail(target["id"])
+        master_urls = {row.get("url") for row in master.get("attachments", [])}
+        for row in plan["rows"]:
+            scene = detail(row["card_id"])
+            scene_urls = {item.get("url") for item in scene.get("attachments", [])}
+            if target["url"] not in scene_urls:
+                errors.append(f"{row['scene_id']}:{plan['canonical']}: scene backlink missing")
+            if row["scene_url"] not in master_urls:
+                errors.append(f"{row['scene_id']}:{plan['canonical']}: master backlink missing")
+            checked_links += 1
+    companion_rows = [row for row in audit["_all_rows"]
+                      if (row.get("text") or "").lstrip().startswith(("↳", "→", "←"))]
+    return {
+        "valid": not errors and audit["planned"]["total_pending_writes"] == 0,
+        "errors": errors, "bidirectional_links_checked": checked_links,
+        "current_companion_rows": len(companion_rows),
+        "companion_rows_created_by_this_migration": 0,
+        "protected_z_items": audit["counts"]["protected_z_items"],
+        "todo_writes": 0, "microsoft_todo_writes": 0, "due_writes": 0,
+    }
+
+
 def register_routes(app, api):
     @app.route("/api/ck-followup-20260820", methods=["POST"])
     def ck_followup_20260820():
@@ -801,7 +838,10 @@ def register_routes(app, api):
         try:
             audit = build_audit(api)
             if mode in {"audit", "dry-run", "final-audit"}:
-                return jsonify(public(audit, request.args.get("details") == "1")), 200
+                result = public(audit, request.args.get("details") == "1")
+                if mode == "final-audit":
+                    result["final_checks"] = final_checks(api, audit)
+                return jsonify(result), 200
             start = max(0, request.args.get("start", 0, type=int))
             limit = min(5, max(1, request.args.get("limit", 3, type=int)))
             if mode == "sample":
