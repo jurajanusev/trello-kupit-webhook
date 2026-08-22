@@ -15,8 +15,11 @@ from cierny_kamen_followup_20260820 import (
     contains_z,
     explicit_school_bag,
     is_production_list,
+    master_block,
     starts_n,
+    with_card_suffix,
 )
+from cierny_kamen_prop_identity_resolution import school_bag_type
 
 
 class FollowupTests(unittest.TestCase):
@@ -33,6 +36,9 @@ class FollowupTests(unittest.TestCase):
         self.assertTrue(explicit_school_bag("Alexov školský batoh"))
         self.assertFalse(explicit_school_bag("Betin tanečný batoh"))
         self.assertEqual("bety", bag_owner("Betynina školská taška nadv. 1/21"))
+        self.assertEqual("skolska taska", school_bag_type("Alexov školský batoh"))
+        self.assertEqual("skolska taska", school_bag_type("Alexov batoh", school_context=True))
+        self.assertIsNone(school_bag_type("Betin tanečný batoh"))
 
     def test_manual_n_delta_uses_last_identity_map(self):
         row = {"has_n": True}
@@ -44,6 +50,19 @@ class FollowupTests(unittest.TestCase):
         text = "<n> **Betin mobil** [z] | KARTA: https://trello.com/c/abc"
         self.assertTrue(starts_n(text))
         self.assertTrue(contains_z(text))
+
+    def test_url_suffix_keeps_manual_core_verbatim(self):
+        before = "<n> Alexova školská taška - nadväzný z 1/18"
+        self.assertEqual(before + " | KARTA: https://trello.com/c/x", with_card_suffix(before, "https://trello.com/c/x"))
+
+    def test_master_block_has_alias_occurrence_and_timeline(self):
+        block = master_block("Alexova školská taška", [{
+            "scene_id": "01/18", "scene_url": "https://trello.com/c/s",
+            "text": "<n> Alexov školský batoh", "pos": 1,
+        }], aliases=["Alexov školský batoh"])
+        self.assertIn("ALIASY: Alexov školský batoh", block)
+        self.assertIn("[01/18](https://trello.com/c/s)", block)
+        self.assertIn("KATEGÓRIE: Nadväzná rekvizita", block)
 
 
 if __name__ == "__main__":

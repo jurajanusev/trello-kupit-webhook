@@ -35,8 +35,20 @@ volá **Čierny Kameň**; názov boardu sa bez osobitného pokynu nemení.
   a trvalého rozlíšenia. Všeobecné slovo ako mobil, auto alebo taška nie je
   dôkazom totožnosti. Nejasná položka dostane bezpečne oddelenú kontextovú
   identitu a konkrétnu otázku v `OTÁZKY NA PORADU`.
+- V školskom kontexte je `batoh` typovým aliasom `školskej tašky`. Alias nemení
+  vlastníka ani fyzickú identitu: `Alexov školský batoh` a `Alexova školská
+  taška` môžu byť jedna potvrdená identita, ale Betin tanečný batoh, batoh s
+  planžetou, skautský batoh a tašky iných postáv zostávajú samostatné. Poradie
+  dôkazov URL → kanonický názov/alias → vlastník + typ → scenárový kontext platí
+  aj pri tomto aliasovaní; samotné slovo `batoh` mimo školského kontextu nestačí.
 - `<n>` znamená iba potvrdený rovnaký fyzický kus v kontinuite. Dialógová
   zmienka ani opakovaný názov nestačia.
+- Ručne doplnené `<n>` je autoritatívne potvrdenie kontinuity konkrétnej
+  položky. Automatizácia najprv vyrieši jednu master identitu, nevytvorí
+  companion riadok, pridá masteru label `Nadväzná rekvizita` a obnoví jeho
+  automatický zoznam výskytov. Nejasný alebo zložený riadok sa nemení a dostane
+  otázku. Značka `[z]` sa spracúva iba v osobitnom výslovne autorizovanom ToDo
+  behu; ostatné migrácie ju chránia kontrolným súčtom a nemenia jej text.
 - Registry-linked položka `REKVIZITY` používa Markdown tvar
   `<n> **Kanonický názov** — *kontext | TU: stav | → obraz* | KARTA: URL`.
   `<n>` a technický suffix zostávajú mimo zvýraznenia; bez kontextu sa použije

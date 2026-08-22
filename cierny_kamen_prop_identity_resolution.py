@@ -1,9 +1,25 @@
 from __future__ import annotations
 
 import re
+import unicodedata
 
 
 CARD_URL_RE = re.compile(r"https://trello\.com/c/[A-Za-z0-9]+", re.I)
+
+
+def school_bag_type(value, *, school_context=False, fold=None):
+    """Return the durable type alias without inferring an owner or a physical item."""
+    if fold is None:
+        fold = lambda text: "".join(
+            character for character in unicodedata.normalize("NFKD", text or "")
+            if not unicodedata.combining(character)
+        ).casefold()
+    core = fold(strip_technical_wrappers(value))
+    explicit_school = bool(re.search(r"\bskolsk\w*\b", core))
+    has_bag = bool(re.search(r"\b(?:batoh|task)\w*\b", core))
+    if has_bag and (explicit_school or school_context):
+        return "skolska taska"
+    return None
 
 
 def strip_technical_wrappers(value):
