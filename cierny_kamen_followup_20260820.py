@@ -674,7 +674,7 @@ def apply_bag_merge(api, audit):
     for row in confirmed:
         writes += _ensure_attachment(api, survivor["id"], row["scene_url"], row["scene_id"])
         writes += _ensure_attachment(api, row["card_id"], survivor["url"], survivor["name"])
-    api["trello_put_body"](f"/cards/{duplicate['id']}", {"closed": True}); writes += 1
+    api["trello_put_body"](f"/cards/{duplicate['id']}", {"closed": "true"}); writes += 1
     read_survivor = card_detail(api, survivor["id"])
     read_duplicate = card_detail(api, duplicate["id"])
     if read_survivor.get("desc") != desired_desc or sorted(read_survivor.get("idLabels", [])) != desired_labels:
@@ -706,7 +706,7 @@ def _resolve_or_create_master(api, audit, plan):
         card = matches[0]
         body = {}
         if card.get("closed"):
-            body["closed"] = False
+            body["closed"] = "false"
         if card.get("idList") != list_matches[0]["id"]:
             body["idList"] = list_matches[0]["id"]
         if body:
