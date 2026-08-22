@@ -9,6 +9,7 @@ if "flask" not in sys.modules:
     sys.modules["flask"] = flask
 
 from cierny_kamen_followup_20260820 import (
+    ENDPOINT_DISABLED,
     _manual_n_status,
     bag_type,
     bag_owner,
@@ -23,6 +24,9 @@ from cierny_kamen_prop_identity_resolution import school_bag_type
 
 
 class FollowupTests(unittest.TestCase):
+    def test_one_time_endpoint_is_disabled(self):
+        self.assertTrue(ENDPOINT_DISABLED)
+
     def test_production_list_filter_excludes_non_scene_lists(self):
         self.assertTrue(is_production_list("SCENÁRE"))
         self.assertFalse(is_production_list("original screener"))

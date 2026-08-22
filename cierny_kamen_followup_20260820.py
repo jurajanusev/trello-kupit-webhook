@@ -21,7 +21,7 @@ from cierny_kamen_prop_identity_resolution import strip_technical_wrappers
 
 
 KEY = "ck-followup-20aug-4f91d37c"
-ENDPOINT_DISABLED = False
+ENDPOINT_DISABLED = True
 URL_RE = re.compile(r"https://trello\.com/c/[A-Za-z0-9]+", re.I)
 LEGACY_HEADINGS = {
     "rekvizity v kontexte", "nadvaznost", "odkazy",
