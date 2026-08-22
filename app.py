@@ -8452,6 +8452,10 @@ from cierny_kamen_global_reference import register_routes as register_ck_global_
 
 register_ck_global_reference_routes(app, globals())
 
+from cierny_kamen_followup_20260820 import register_routes as register_ck_followup_20260820_routes
+
+register_ck_followup_20260820_routes(app, globals())
+
 from meeting_notes_apply_ep01_03 import register_routes as register_meeting_notes_apply_ep01_03_routes
 
 register_meeting_notes_apply_ep01_03_routes(app, globals())
