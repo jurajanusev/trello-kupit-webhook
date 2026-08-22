@@ -32,6 +32,19 @@ EXCLUDED_LIST_PARTS = (
 )
 MAP_PATH = Path(__file__).with_name("cierny_kamen_all_props_registry_map.json")
 CONTINUITY_LABEL = "Nadväzná rekvizita"
+KNOWN_AUTOMATED_N_IDENTITIES = {
+    "Doggyho slúchadlá",
+    "BANNER NA OTVORENIE BASKETBALOVEJ SEZÓNY",
+    "Drevená pramica Jakuba a Sáry",
+    "Výbava skautskej skupiny",
+}
+OWNER_ALIASES = {
+    "alex": ("alexov", "alexova", "alexove", "alex"),
+    "bety": ("betin", "betina", "betynina", "bety"),
+    "kiko": ("kikov", "kikova", "kiko"),
+    "veronika": ("veronikin", "veronikina", "veronika"),
+    "dogy": ("dogyho", "dogy", "dagyho", "dagy"),
+}
 
 
 def starts_n(value):
@@ -56,6 +69,24 @@ def bag_type(value):
     if re.search(r"\b(?:batoh|skolsk\w*\s+(?:task|batoh))", key):
         return "školská taška"
     return None
+
+
+def explicit_school_bag(value):
+    key = folded(strip_technical_wrappers(value))
+    return bool(re.search(r"\bskolsk\w*\b", key) and re.search(r"\b(?:task|batoh)\w*\b", key))
+
+
+def bag_owner(value):
+    key = folded(strip_technical_wrappers(value))
+    for owner, aliases in OWNER_ALIASES.items():
+        if any(re.search(rf"\b{re.escape(alias)}\w*\b", key) for alias in aliases):
+            return owner
+    return None
+
+
+def known_automated_n(value):
+    core = folded(strip_technical_wrappers(value))
+    return core in {folded(name) for name in KNOWN_AUTOMATED_N_IDENTITIES}
 
 
 def owner_from_list(list_name):
@@ -200,7 +231,7 @@ def build_audit(api):
             })
     by_owner = defaultdict(list)
     for card in bag_master_candidates:
-        if card["owner_from_list"]:
+        if card["owner_from_list"] and explicit_school_bag(card["name"]):
             by_owner[folded(card["owner_from_list"])].append(card)
     bag_duplicate_groups = [
         {"owner": owner, "cards": cards, "action": "review_same_owner_school_bag_identity"}
@@ -210,13 +241,65 @@ def build_audit(api):
 
     identity_map = json.loads(MAP_PATH.read_text(encoding="utf-8"))
     old_by_item = {row["item_id"]: row for row in identity_map["records"]}
+    canonical_lookup = defaultdict(list)
+    alias_lookup = defaultdict(list)
+    owner_school_lookup = defaultdict(list)
+    for card in masters:
+        canonical_lookup[folded(card.get("name"))].append(card)
+        for alias in aliases_from_master(card):
+            alias_lookup[folded(alias)].append(card)
+        if explicit_school_bag(card.get("name")):
+            owner = bag_owner(card.get("name")) or folded(owner_from_list(
+                list_by_id.get(card.get("idList"), {}).get("name") or card.get("list_name")
+            ))
+            if owner:
+                owner_school_lookup[owner].append(card)
+
+    def resolve_manual(row):
+        linked = [masters_by_url[url.casefold()] for url in row["urls"] if url.casefold() in masters_by_url]
+        if len(linked) == 1:
+            return linked, "existing_master_url", None
+        if len(linked) > 1:
+            return linked, "conflict_multiple_master_urls", None
+        core = folded(strip_technical_wrappers(row["text"]))
+        exact = canonical_lookup.get(core, []) or alias_lookup.get(core, [])
+        if len(exact) == 1:
+            return exact, "canonical_or_alias", None
+        prefix = []
+        for name, cards in list(canonical_lookup.items()) + list(alias_lookup.items()):
+            if core == name or re.match(rf"^{re.escape(name)}(?:\s+(?:-|nadv|z\b|v\b|pri\b|z\s+\d))", core):
+                prefix.extend(cards)
+        prefix = list({card["id"]: card for card in prefix}.values())
+        if len(prefix) == 1:
+            return prefix, "canonical_or_alias_prefix", None
+        if bag_type(row["text"]):
+            owner = bag_owner(row["text"])
+            owner_cards = owner_school_lookup.get(owner, []) if owner else []
+            if len(owner_cards) == 1:
+                return owner_cards, "owner_plus_school_bag_type", None
+            if owner and not owner_cards:
+                canonical = {
+                    "alex": "Alexova školská taška", "bety": "Betina školská taška",
+                    "kiko": "Kikova školská taška", "veronika": "Veronikina školská taška",
+                    "dogy": "Dogyho školská taška",
+                }.get(owner)
+                return [], "create_confirmed_owner_school_bag", canonical
+            if len(owner_cards) > 1:
+                return owner_cards, "conflict_duplicate_owner_school_bag_masters", None
+        return [], "conflict_unresolved_identity", None
+
     manual_n = []
+    automated_n_excluded = []
     for row in all_rows:
         if not (row["scene_id"].startswith("01/") or row["scene_id"].startswith("02/")):
             continue
         status = _manual_n_status(row, old_by_item.get(row["item_id"]))
         if status in {"new_item_after_identity_map", "n_added_after_identity_map"}:
-            linked = [masters_by_url[url.casefold()] for url in row["urls"] if url.casefold() in masters_by_url]
+            if known_automated_n(row["text"]):
+                automated_n_excluded.append({"scene_id": row["scene_id"], "item_id": row["item_id"],
+                                             "identity_core": strip_technical_wrappers(row["text"])})
+                continue
+            linked, resolution, create_name = resolve_manual(row)
             manual_n.append({
                 **{key: row[key] for key in ("scene_id", "scene_url", "card_id", "checklist_id", "item_id", "text", "state", "pos", "urls", "has_z", "text_sha256")},
                 "status": status,
@@ -224,11 +307,15 @@ def build_audit(api):
                 "linked_masters": [{"id": card["id"], "name": card.get("name"),
                                     "url": card.get("shortUrl"), "closed": card.get("closed"),
                                     "idLabels": card.get("idLabels", [])} for card in linked],
-                "resolution": "existing_master_url" if len(linked) == 1 else "conflict_or_missing_master",
+                "resolution": resolution, "create_name": create_name,
             })
 
     labels = exact_named(state["labels"], CONTINUITY_LABEL)
-    manual_n_planned = [row for row in manual_n if row["resolution"] == "existing_master_url"]
+    safe_manual_resolutions = {
+        "existing_master_url", "canonical_or_alias", "canonical_or_alias_prefix",
+        "owner_plus_school_bag_type", "create_confirmed_owner_school_bag",
+    }
+    manual_n_planned = [row for row in manual_n if row["resolution"] in safe_manual_resolutions]
     z_rows = [row for row in all_rows if row["has_z"]]
     return {
         "status": "read-only-dry-run", "writes": 0,
@@ -242,6 +329,7 @@ def build_audit(api):
             "bag_occurrences": len(bag_occurrences), "bag_master_candidates": len(bag_master_candidates),
             "bag_duplicate_groups": len(bag_duplicate_groups), "bag_conflicts": len(bag_conflicts),
             "manual_n_new_or_changed_ep01_02": len(manual_n),
+            "known_automated_n_excluded": len(automated_n_excluded),
             "manual_n_with_existing_master": len(manual_n_planned),
             "manual_n_conflicts": len(manual_n) - len(manual_n_planned),
         },
@@ -254,6 +342,7 @@ def build_audit(api):
         "bag_master_candidates": bag_master_candidates,
         "bag_duplicate_groups": bag_duplicate_groups, "bag_conflicts": bag_conflicts,
         "manual_n": manual_n,
+        "known_automated_n_excluded": automated_n_excluded,
         "continuity_label_matches": [{"id": row["id"], "name": row.get("name")} for row in labels],
         "protected_z": [{"scene_id": row["scene_id"], "item_id": row["item_id"],
                          "text": row["text"], "sha256": row["text_sha256"]} for row in z_rows],

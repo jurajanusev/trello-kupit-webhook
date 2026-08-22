@@ -11,7 +11,9 @@ if "flask" not in sys.modules:
 from cierny_kamen_followup_20260820 import (
     _manual_n_status,
     bag_type,
+    bag_owner,
     contains_z,
+    explicit_school_bag,
     is_production_list,
     starts_n,
 )
@@ -28,6 +30,9 @@ class FollowupTests(unittest.TestCase):
         self.assertEqual("školská taška", bag_type("**Betin batoh** | KARTA: https://trello.com/c/abc"))
         self.assertEqual("školská taška", bag_type("Kikova školská taška"))
         self.assertIsNone(bag_type("Výbava skautskej skupiny"))
+        self.assertTrue(explicit_school_bag("Alexov školský batoh"))
+        self.assertFalse(explicit_school_bag("Betin tanečný batoh"))
+        self.assertEqual("bety", bag_owner("Betynina školská taška nadv. 1/21"))
 
     def test_manual_n_delta_uses_last_identity_map(self):
         row = {"has_n": True}
