@@ -1,12 +1,12 @@
 import json
 import re
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import pdfplumber
 
 
-DAY_RE = re.compile(r"Day\s*#(\d+)", re.I)
+DAY_RE = re.compile(r"Day\s*#(\d+):.*?(\d{2}/\d{2}/\d{4})", re.I)
 SOURCE_DATE_RE = re.compile(r"dated:\s*(\d{1,2}\.\d{1,2}\.\d{4})", re.I)
 EPISODE_RE = re.compile(r"Episode:\s*(\d+)", re.I)
 SCENE_RE = re.compile(r"^\d+[A-Z]*$", re.I)
@@ -31,7 +31,6 @@ def parse(pdf_path):
         if not source_match:
             raise ValueError("source date not found")
         source_date = datetime.strptime(source_match.group(1), "%d.%m.%Y").date()
-        event_date = source_date - timedelta(days=1)
         current_day = None
         current_date = None
         order = 0
@@ -41,13 +40,15 @@ def parse(pdf_path):
         for page_number, page in enumerate(pdf.pages, start=1):
             for table in page.extract_tables():
                 for cells in table:
-                    values = [clean(value) for value in (cells + [None] * 4)[:4]]
-                    first, setting, text, detail = values
+                    values = [clean(value) for value in cells]
+                    if len(values) >= 5:
+                        first, setting, _, text, detail = values[:5]
+                    else:
+                        first, setting, text, detail = (values + [""] * 4)[:4]
                     if "SHOOT END" in first.upper():
                         stopped = True
                         break
                     if "DAY OFF" in first.upper():
-                        event_date += timedelta(days=1)
                         current_day = None
                         current_date = None
                         order = 0
@@ -55,9 +56,10 @@ def parse(pdf_path):
                         continue
                     day_match = DAY_RE.search(first)
                     if day_match:
-                        event_date += timedelta(days=1)
                         current_day = int(day_match.group(1))
-                        current_date = event_date.isoformat()
+                        current_date = datetime.strptime(
+                            day_match.group(2), "%m/%d/%Y"
+                        ).date().isoformat()
                         order = 0
                         pending = None
                         continue
@@ -105,10 +107,7 @@ def parse(pdf_path):
             "title": "Schedule Style A - Cierny kamen",
             "dated": source_date.isoformat(),
             "file": pdf_path,
-            "date_derivation": (
-                "Day #1 is the schedule's dated day; each Day Off or numbered "
-                "day advances one calendar date."
-            ),
+            "date_derivation": "Explicit date from each numbered Day header.",
         },
         "rows": rows,
     }
