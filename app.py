@@ -8428,6 +8428,10 @@ from cierny_kamen_ep07_10_import import register_routes as register_ep07_10_rout
 
 register_ep07_10_routes(app, globals())
 
+from cierny_kamen_missing_0731_0845 import register_routes as register_ck_missing_0731_0845_routes
+
+register_ck_missing_0731_0845_routes(app, globals())
+
 from meeting_notes_dryrun import register_routes as register_meeting_notes_dryrun_routes
 
 register_meeting_notes_dryrun_routes(app, globals())
