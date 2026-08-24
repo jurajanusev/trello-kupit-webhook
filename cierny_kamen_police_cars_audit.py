@@ -7,7 +7,7 @@ from flask import jsonify, request
 
 
 KEY = "ck-police-cars-audit-24aug-2d691fb0"
-ENDPOINT_DISABLED = False
+ENDPOINT_DISABLED = True
 BOARD_REF = "CzuD55PR"
 MASTER_URL = re.compile(r"\|\s*KARTA:\s*(https://trello\.com/c/[A-Za-z0-9]+)", re.I)
 
