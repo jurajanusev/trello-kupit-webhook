@@ -89,11 +89,18 @@ def apply_subscription(api):
     writes = 0
     created = None
     if not board_hooks:
-        created = api["trello_post"]("/webhooks", {
+        response = api["trello_request"]("POST", f"{api['BASE']}/webhooks/", params={
             "description": "Dunaj board-wide [z] ToDo synchronization",
             "callbackURL": CALLBACK_URL,
             "idModel": dunaj_board["id"],
+            "key": api["API_KEY"], "token": api["TOKEN"],
         })
+        if not response.ok:
+            return {"status": "blocked", "writes": 0,
+                    "reason": "Trello rejected board webhook registration",
+                    "trello_status": response.status_code,
+                    "trello_error": response.text[:1000]}, 409
+        created = response.json()
         writes += 1
     verification = build_audit(api)
     verified_board_hooks = [row for row in verification["_rows"] if row["project"] == "dunaj"
