@@ -89,7 +89,7 @@ def apply_subscription(api):
     writes = 0
     created = None
     if not board_hooks:
-        created = api["trello_post_body"]("/webhooks", {
+        created = api["trello_post"]("/webhooks", {
             "description": "Dunaj board-wide [z] ToDo synchronization",
             "callbackURL": CALLBACK_URL,
             "idModel": dunaj_board["id"],
