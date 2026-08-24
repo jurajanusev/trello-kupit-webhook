@@ -19,19 +19,22 @@ def folded(value):
 
 
 def police_car_classification(item_text, master_name=""):
-    combined = folded(f"{item_text} {master_name}")
+    identity = re.split(r"\s+[–—]\s+", item_text or "", maxsplit=1)[0]
+    identity = re.sub(r"^(?:<n>|\[n\])\s*", "", identity, flags=re.I)
+    identity = identity.replace("*", "").strip()
+    combined = folded(f"{identity} {master_name}")
     if "cln" in combined and not any(word in combined for word in ("auto", "vozidlo", "voz")):
         return None
     police = any(word in combined for word in ("policajn", "policie", "policajt"))
     vehicle = any(word in combined for word in ("auto", "vozidlo", "automobil"))
     if police and vehicle:
         return "confirmed"
-    local = folded(item_text)
-    if vehicle and any(phrase in combined for phrase in (
-        "pri rieke", "patracieho timu", "zasahoveho timu", "policajna scena",
-    )):
-        return "ambiguous"
-    if any(phrase in local for phrase in ("auto pri rieke", "vozidlo pri rieke")):
+    local = folded(identity)
+    generic_river = any(phrase in combined for phrase in (
+        "auto pri rieke", "auto odstavene pri rieke", "vozidlo pri rieke",
+    ))
+    owner_specific = any(name in combined for name in ("jakub", "sara", "olasovej"))
+    if vehicle and generic_river and not owner_specific:
         return "ambiguous"
     return None
 

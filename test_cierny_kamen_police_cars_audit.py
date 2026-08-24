@@ -26,6 +26,13 @@ class PoliceCarClassificationTests(unittest.TestCase):
     def test_dialogue_mention_without_vehicle_identity_is_excluded(self):
         self.assertIsNone(police_car_classification("postava hovorí o polícii"))
 
+    def test_police_car_only_in_mobile_context_is_excluded(self):
+        item = "**Alicin reportérsky mobil** — *na mieste je policajné auto*"
+        self.assertIsNone(police_car_classification(item, "Alicin reportérsky mobil"))
+
+    def test_owner_specific_river_car_is_not_police_candidate(self):
+        self.assertIsNone(police_car_classification("**Auto Jakuba a Sáry** — *zastavia pri rieke*", "Auto Jakuba a Sáry"))
+
 
 if __name__ == "__main__":
     unittest.main()
