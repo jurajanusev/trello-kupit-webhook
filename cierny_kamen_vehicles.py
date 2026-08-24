@@ -221,7 +221,10 @@ def build_audit(api):
             "kind": first["kind"], "owner": None,
             "current_list": (master or {}).get("list"), "labels": (master or {}).get("labels", []),
             "master_closed": (master or {}).get("closed", False),
-            "master_url": first.get("master_url"), "occurrences": [{"scene_id": row["scene_id"], "item_text": row["item_text"], "scene_url": row["scene_url"]} for row in rows],
+            "master_url": first.get("master_url"), "occurrences": [{
+                "card_id": row["card_id"], "scene_id": row["scene_id"], "item_id": row["item_id"],
+                "item_text": row["item_text"], "scene_url": row["scene_url"], "item_state": row["item_state"],
+            } for row in rows],
             "planned_action": action, "identity_evidence": [row["evidence"] for row in rows],
             "confidence": confidence,
         })
@@ -353,26 +356,16 @@ def apply_changes(api, mode, start=0, limit=5):
 
 def detailed_occurrences(api, candidate):
     """Read cards immediately before writes; matching keeps state and manual text intact."""
-    wanted = {(item["scene_id"], item["item_text"]) for item in candidate["occurrences"]}
-    # Re-scan the exact live checklist rows, including stable card and item IDs.
-    board = api["trello_get"](f"/boards/{BOARD_REF}", {"fields": "id"})
-    lists = api["trello_get"](f"/boards/{board['id']}/lists", {"fields": "id,name,closed", "filter": "open"})
     rows = []
-    for board_list in lists:
-        if excluded_scene_list(board_list["name"]):
-            continue
-        for card in api["trello_get"](f"/lists/{board_list['id']}/cards", {"fields": "id,name,shortUrl,closed", "checklists": "all", "checklist_fields": "name,pos", "checklist_checkItems": "all", "filter": "open", "limit": 1000}):
-            info = api["cierny_kamen_scene_name_info"](card.get("name", ""))
-            if not info or info.get("test"):
-                continue
-            for checklist in card.get("checklists", []):
-                if folded(checklist.get("name")) != "rekvizity":
-                    continue
-                for item in checklist.get("checkItems", []):
-                    if (info["scene_id"], item.get("name", "")) in wanted:
-                        rows.append({"card_id": card["id"], "scene_id": info["scene_id"], "scene_url": card["shortUrl"], "item_id": item["id"], "identity": identity_text(item.get("name", ""))})
-    if len(rows) != len(wanted):
-        raise ValueError(f"concurrent checklist change for {candidate['canonical_name']}")
+    for occurrence in candidate["occurrences"]:
+        card = live_card(api, occurrence["card_id"])
+        checklists = api["trello_get"](f"/cards/{card['id']}/checklists", {
+            "checkItems": "all", "fields": "id,name,pos",
+        })
+        item = next((item for checklist in checklists for item in checklist.get("checkItems", []) if item.get("id") == occurrence["item_id"]), None)
+        if not item or item.get("name") != occurrence["item_text"]:
+            raise ValueError(f"concurrent checklist change for {candidate['canonical_name']}")
+        rows.append({"card_id": card["id"], "scene_id": occurrence["scene_id"], "scene_url": card["shortUrl"], "item_id": occurrence["item_id"], "identity": identity_text(item["name"])})
     return rows
 
 
