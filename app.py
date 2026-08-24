@@ -8436,6 +8436,10 @@ from dunaj_board_webhook_repair import register_routes as register_dunaj_board_w
 
 register_dunaj_board_webhook_repair_routes(app, globals())
 
+from cierny_kamen_police_cars_audit import register_routes as register_ck_police_cars_audit_routes
+
+register_ck_police_cars_audit_routes(app, globals())
+
 from meeting_notes_dryrun import register_routes as register_meeting_notes_dryrun_routes
 
 register_meeting_notes_dryrun_routes(app, globals())
