@@ -8440,6 +8440,10 @@ from cierny_kamen_police_cars_audit import register_routes as register_ck_police
 
 register_ck_police_cars_audit_routes(app, globals())
 
+from cierny_kamen_vehicles import register_routes as register_ck_vehicle_routes
+
+register_ck_vehicle_routes(app, globals())
+
 from meeting_notes_dryrun import register_routes as register_meeting_notes_dryrun_routes
 
 register_meeting_notes_dryrun_routes(app, globals())
