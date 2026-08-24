@@ -8432,6 +8432,10 @@ from cierny_kamen_missing_0731_0845 import register_routes as register_ck_missin
 
 register_ck_missing_0731_0845_routes(app, globals())
 
+from dunaj_board_webhook_repair import register_routes as register_dunaj_board_webhook_repair_routes
+
+register_dunaj_board_webhook_repair_routes(app, globals())
+
 from meeting_notes_dryrun import register_routes as register_meeting_notes_dryrun_routes
 
 register_meeting_notes_dryrun_routes(app, globals())
