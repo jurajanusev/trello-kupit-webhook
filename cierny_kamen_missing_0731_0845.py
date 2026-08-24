@@ -217,6 +217,39 @@ def build_audit(api):
                 if action_probe and action_probe in re.sub(r"[*_#]", "", card.get("desc") or ""):
                     swallowed.append({"target": target["scene_id"], "neighbor": neighbor["scene_id"], "url": card.get("shortUrl")})
                     blockers.append(f"{target['scene_id']} content appears swallowed by {neighbor['scene_id']}")
+    existing_content = {}
+    scene_by_id = {row["scene_id"]: row for row in scenes}
+    for scene_id in TARGET_IDS:
+        cards = groups.get(scene_id, [])
+        if len(cards) != 1:
+            continue
+        card = cards[0]
+        checklists = sorted(api["trello_get"](f"/cards/{card['id']}/checklists", {
+            "checkItems": "all", "fields": "id,name,pos",
+        }), key=lambda row: row.get("pos", 0))
+        desc = card.get("desc") or ""
+        source = scene_by_id[scene_id]
+        existing_content[scene_id] = {
+            "url": card.get("shortUrl"), "list": card.get("list_name"),
+            "exact_card_name": card.get("name") == source.get("name"),
+            "description_chars": len(desc),
+            "description_sha256": hashlib.sha256(desc.encode("utf-8")).hexdigest(),
+            "exact_action_present": source.get("action_markdown") in desc,
+            "exact_title_present": f"## {source.get('prepis')}" in desc,
+            "metadata_present": desc.count("<!-- CIERNY-KAMEN-SCHEDULE-METADATA:START -->") == 1,
+            "simplified_description": all(marker in desc for marker in (
+                "## NAVIGÁCIA", "## RUČNÉ DOPLNENIA", "## AKCIA A DIALÓGY",
+            )) and not any(marker in desc for marker in (
+                "REKVIZITY V KONTEXTE", "NADVAZNOSŤ", "### ODKAZY",
+                "KONTINUITA PRIESTORU", "KONTINUITA POSTÁV",
+            )),
+            "checklist_names": [row.get("name") for row in checklists],
+            "checklist_item_counts": {row.get("name"): len(row.get("checkItems", [])) for row in checklists},
+            "prop_items": [item.get("name") for row in checklists if folded(row.get("name")) == "rekvizity"
+                           for item in sorted(row.get("checkItems", []), key=lambda value: value.get("pos", 0))],
+            "set_items": [item.get("name") for row in checklists if folded(row.get("name")) == "set"
+                          for item in sorted(row.get("checkItems", []), key=lambda value: value.get("pos", 0))],
+        }
     return {
         "status": "read-only-dry-run", "writes": 0, "board": state["board"],
         "target_ids": list(TARGET_IDS), "source_count": len(scenes),
@@ -226,6 +259,7 @@ def build_audit(api):
         "production_matches": {sid: [{"name": c["name"], "url": c.get("shortUrl"), "list": c["list_name"]}
                                     for c in groups.get(sid, [])] for sid in TARGET_IDS},
         "open_archived_variants": variants, "swallowed_content": swallowed,
+        "existing_content": existing_content,
         "spaces": spaces, "props": props,
         "planned": {"create_scenes": sum(not groups.get(sid) for sid in TARGET_IDS),
                     "create_prop_masters": sum(row["status"] == "create" for row in props),
