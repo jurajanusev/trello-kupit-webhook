@@ -19,10 +19,10 @@ from update_dok4_plan_local import (
 
 app = Flask(__name__)
 
-DOK4_CURRENT_SCHEDULE_KEY = "dok4-schedule-21aug-8e4a29c7"
-DOK4_CURRENT_SCHEDULE_FILE = "dok4_schedule_2026-08-21.json"
-DOK4_CURRENT_SCHEDULE_AS_OF = "2026-08-21"
-DOK4_CURRENT_SCHEDULE_ROWS = 503
+DOK4_CURRENT_SCHEDULE_KEY = "dok4-schedule-24aug-61b7d4e9"
+DOK4_CURRENT_SCHEDULE_FILE = "dok4_schedule_2026-08-24.json"
+DOK4_CURRENT_SCHEDULE_AS_OF = "2026-08-24"
+DOK4_CURRENT_SCHEDULE_ROWS = 482
 
 RIVERDALE_CURRENT_SCHEDULE_KEY = "riverdale-schedule-22aug-9f31c6d2"
 RIVERDALE_CURRENT_SCHEDULE_FILE = "riverdale_schedule_2026-08-22.json"
@@ -5136,7 +5136,6 @@ def repair_dok4_returned_card_date():
 
 @app.route("/api/repair-main-list-due-dates", methods=["POST"])
 def repair_main_list_due_dates():
-    return jsonify({"error": "completed one-off endpoint disabled"}), 410
     if request.headers.get("X-Repair-Key") != "main-list-due-audit-09aug-3db186f4":
         return jsonify({"error": "forbidden"}), 403
     project = request.args.get("project", "").strip().casefold()
@@ -5198,7 +5197,6 @@ def sync_dok4_current_schedule():
     The active window is the next seven shooting dates on or after ``as_of``.
     Calendar days without shooting never consume a slot.
     """
-    return jsonify({"error": "completed one-off endpoint disabled"}), 410
     if request.headers.get("X-Sync-Key") != DOK4_CURRENT_SCHEDULE_KEY:
         return jsonify({"error": "forbidden"}), 403
 
