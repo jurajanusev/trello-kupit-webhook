@@ -7,7 +7,7 @@ from flask import jsonify, request
 
 
 KEY = "dunaj-board-webhook-24aug-69a4c8d2"
-ENDPOINT_DISABLED = False
+ENDPOINT_DISABLED = True
 CALLBACK_URL = "https://trello-kupit-webhook.onrender.com/trello-webhook"
 BOARDS = {"dunaj": "qCPeWA3e", "riverdale": "CzuD55PR"}
 BACKGROUND = {"status": "idle", "result": None, "http_status": None}
