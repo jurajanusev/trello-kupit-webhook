@@ -29,6 +29,9 @@ class VehicleTests(unittest.TestCase):
     def test_identity_ignores_context(self):
         self.assertEqual(identity_text("<n> **Policajné auto** — *jazdí pri rieke*"), "Policajné auto")
 
+    def test_identity_preserves_but_does_not_classify_protected_z_marker(self):
+        self.assertEqual(identity_text("**Olasovej auto** [z]"), "Olasovej auto")
+
 
 if __name__ == "__main__":
     unittest.main()

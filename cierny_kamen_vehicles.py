@@ -5,6 +5,9 @@ import unicodedata
 from collections import defaultdict
 
 from flask import jsonify, request
+from cierny_kamen_all_props_registry import (
+    PROP_AUTO_END, PROP_AUTO_START, ensure_attachment, replace_auto_block,
+)
 
 
 KEY = "ck-vehicles-24aug-c3857a14"
@@ -12,6 +15,10 @@ ENDPOINT_DISABLED = False
 BOARD_REF = "CzuD55PR"
 CARD_URL = re.compile(r"\|\s*KARTA:\s*(https://trello\.com/c/[A-Za-z0-9]+)", re.I)
 VEHICLE_WORDS = ("auto", "vozidl", "taxi", "taxik", "dodav", "pickup", "pohreb", "koroner", "cln", "pramica", "lod")
+SAFE_CREATE_IDENTITIES = {"auto sary"}
+CONFIRMED_ALIAS_TARGETS = {
+    "cln sary a jakuba": "drevena pramica jakuba a sary",
+}
 
 
 def folded(value):
@@ -66,6 +73,33 @@ def aliases(card):
         for value in re.findall(rf"(?mi)^{field}:\s*(.+)$", desc):
             result.update(part.strip() for part in value.split(",") if part.strip() not in {"—", "-"})
     return sorted(result, key=folded)
+
+
+def prop_block(name, rows, categories):
+    """Only the marked automatic block may be changed on a master card."""
+    aliases = sorted({row["identity"] for row in rows if folded(row["identity"]) != folded(name)}, key=folded)
+    timeline = []
+    seen = set()
+    for row in sorted(rows, key=lambda item: item["scene_id"]):
+        if row["scene_id"] in seen:
+            continue
+        seen.add(row["scene_id"])
+        timeline.append(f"- [{row['scene_id']}]({row['scene_url']}) — {row['identity']}")
+    occurrence_links = [
+        f"- [{row['scene_id']}]({row['scene_url']})"
+        for row in sorted(rows, key=lambda item: item["scene_id"])
+    ]
+    return (
+        f"{PROP_AUTO_START}\n"
+        f"KANONICKÝ NÁZOV: {name}\n"
+        f"ALIASY: {', '.join(aliases) if aliases else '—'}\n"
+        f"KATEGÓRIE: {', '.join(sorted(categories, key=folded))}\n\n"
+        "### VÝSKYTY V OBRAZOCH\n"
+        f"{chr(10).join(occurrence_links) or '- —'}\n\n"
+        "### ČASOVÁ OS\n"
+        f"{chr(10).join(timeline) or '- —'}\n"
+        f"{PROP_AUTO_END}"
+    )
 
 
 def excluded_scene_list(name):
@@ -140,6 +174,9 @@ def build_audit(api):
                 url = link.group(1) if link else None
                 master = master_by_url.get((url or "").casefold())
                 alias_matches = master_by_alias.get(folded(core), []) if not master else []
+                if not master and not alias_matches:
+                    approved_target = CONFIRMED_ALIAS_TARGETS.get(folded(core))
+                    alias_matches = master_by_alias.get(approved_target, []) if approved_target else []
                 if not master and len(alias_matches) == 1:
                     master = alias_matches[0]
                     url = master["url"]
@@ -152,7 +189,7 @@ def build_audit(api):
                 kind = core_kind or master.get("kind") or "unknown_vehicle"
                 evidence = "checklist identity" if core_kind else "linked vehicle master"
                 row = {
-                    "scene_id": card["scene_id"], "scene_url": card.get("shortUrl"), "scene_list": card["list_name"],
+                    "card_id": card["id"], "scene_id": card["scene_id"], "scene_url": card.get("shortUrl"), "scene_list": card["list_name"],
                     "item_id": item.get("id"), "item_state": item.get("state"), "item_text": raw,
                     "identity": core, "kind": kind, "master_url": url,
                     "master_name": (master or {}).get("name"), "master_list": (master or {}).get("list"),
@@ -174,10 +211,12 @@ def build_audit(api):
             action = "conflict" if master.get("closed") else ("unchanged" if master["in_autá"] and has_auto_label else "move+label" if not master["in_autá"] else "label")
             confidence = "confirmed"
         else:
-            action = "create" if first["master_url"] is None else "conflict"
-            confidence = "confirmed" if vehicle_kind(first["identity"]) else "ambiguous"
+            identity_key = folded(first["identity"])
+            action = "create" if identity_key in SAFE_CREATE_IDENTITIES else "defer"
+            confidence = "confirmed" if action == "create" else "ambiguous"
         candidates.append({
             "canonical_name": (master or {}).get("name") or first["identity"],
+            "master_id": (master or {}).get("id"),
             "aliases": (master or {}).get("aliases", [first["identity"]]),
             "kind": first["kind"], "owner": None,
             "current_list": (master or {}).get("list"), "labels": (master or {}).get("labels", []),
@@ -198,21 +237,143 @@ def build_audit(api):
     except Exception as exc:
         source_candidates = [{"error": f"{type(exc).__name__}: {exc}"}]
     duplicates = [row for row in candidates if row["master_url"] and sum(
-        1 for master in master_cards if folded(master["name"]) == folded(row["canonical_name"])) > 1]
+        1 for master in master_cards
+        if not master.get("closed") and folded(master["name"]) == folded(row["canonical_name"])
+    ) > 1]
     return {
         "status": "read-only-dry-run", "writes": 0,
         "board": {"name": board["name"], "url": board["url"]},
         "scene_cards_scanned": len(scene_cards), "vehicle_occurrences": len(occurrences),
         "vehicle_masters": len(master_cards), "candidates": candidates,
+        "master_inventory": [{
+            "name": item["name"], "url": item["url"], "list": item["list"],
+            "closed": item["closed"], "labels": item["labels"], "aliases": item["aliases"],
+        } for item in master_cards],
         "source_vehicle_candidates": source_candidates, "unresolved": unresolved,
         "duplicates_or_aliases": duplicates,
         "planned": {"move": sum(row["planned_action"] == "move+label" for row in candidates),
                     "label": sum(row["planned_action"] == "label" for row in candidates),
                     "create": sum(row["planned_action"] == "create" for row in candidates),
+                    "defer": sum(row["planned_action"] == "defer" for row in candidates),
                     "conflicts": sum(row["planned_action"] == "conflict" for row in candidates),
                     "todo_writes": 0, "microsoft_writes": 0},
         "exclusions": ["original screener", "archív", "ToDo", "registry karty ako scény", "SET", "[z]"],
     }
+
+
+def live_card(api, card_id):
+    return api["trello_get"](f"/cards/{card_id}", {
+        "fields": "id,name,desc,idList,shortUrl,idLabels,closed",
+    })
+
+
+def add_card_link(raw, url):
+    if CARD_URL.search(raw or ""):
+        return raw
+    return f"{(raw or '').rstrip()} | KARTA: {url}"
+
+
+def sync_master(api, master, auto_list_id, auto_label_id, candidate, rows):
+    current = live_card(api, master["id"])
+    if current.get("closed"):
+        raise ValueError(f"master {current['name']} is archived")
+    label_ids = set(current.get("idLabels", []))
+    label_ids.add(auto_label_id)
+    block = prop_block(current["name"], rows, {"Auto"} | set(candidate.get("labels", [])))
+    description = replace_auto_block(current.get("desc", ""), block)
+    api["trello_put_body"](f"/cards/{current['id']}", {
+        "idList": auto_list_id, "idLabels": ",".join(sorted(label_ids)), "desc": description,
+    })
+    return live_card(api, current["id"])
+
+
+def create_master(api, auto_list_id, auto_label_id, candidate, rows):
+    created = api["trello_post_body"]("/cards", {
+        "idList": auto_list_id, "name": candidate["canonical_name"],
+        "desc": prop_block(candidate["canonical_name"], rows, {"Auto"}),
+        "idLabels": auto_label_id,
+    })
+    return live_card(api, created["id"])
+
+
+def link_occurrence(api, row, master):
+    """Only append a missing technical link; do not rewrite a manual item."""
+    card = live_card(api, row["card_id"])
+    checklists = api["trello_get"](f"/cards/{card['id']}/checklists", {
+        "checkItems": "all", "fields": "id,name,pos",
+    })
+    found = None
+    for checklist in checklists:
+        if folded(checklist.get("name")) != "rekvizity":
+            continue
+        found = next((item for item in checklist.get("checkItems", []) if item.get("id") == row["item_id"]), None)
+    if not found:
+        raise ValueError(f"missing live checklist item {row['item_id']}")
+    expected = add_card_link(found.get("name", ""), master["shortUrl"])
+    if expected != found.get("name", ""):
+        api["trello_put_body"](f"/cards/{card['id']}/checkItem/{found['id']}", {"name": expected})
+    ensure_attachment(api, master, card["shortUrl"], card["name"])
+    ensure_attachment(api, card, master["shortUrl"], master["name"])
+    return expected
+
+
+def apply_changes(api, mode, start=0, limit=5):
+    audit = build_audit(api)
+    board_id = api["trello_get"](f"/boards/{BOARD_REF}", {"fields": "id"})["id"]
+    lists = api["trello_get"](f"/boards/{board_id}/lists", {"fields": "id,name,closed", "filter": "open"})
+    auto_lists = [item for item in lists if folded(item.get("name")) == "auta"]
+    labels = api["trello_get"](f"/boards/{board_id}/labels", {"fields": "id,name", "limit": 1000})
+    auto_labels = [item for item in labels if folded(item.get("name")) == "auto"]
+    if len(auto_lists) != 1 or len(auto_labels) != 1:
+        return {"status": "blocked", "writes": 0, "reason": "AUTÁ list or Auto label is not unique", "audit": audit}
+    eligible = [item for item in audit["candidates"] if item["planned_action"] in {"move+label", "label", "create"}]
+    if mode == "sample":
+        moves = [item for item in eligible if item["planned_action"] in {"move+label", "label"}][:1]
+        creates = [item for item in eligible if item["planned_action"] == "create"][:1]
+        eligible = moves + creates
+    else:
+        eligible = eligible[start:start + limit]
+    applied = []
+    for candidate in eligible:
+        # Rebuild the live rows from Trello immediately before each write.
+        fresh = build_audit(api)
+        current = next((item for item in fresh["candidates"] if item["canonical_name"] == candidate["canonical_name"] and item.get("master_url") == candidate.get("master_url")), None)
+        if not current or current["planned_action"] not in {"move+label", "label", "create"}:
+            applied.append({"name": candidate["canonical_name"], "status": "skipped-concurrent-change"})
+            continue
+        detailed = detailed_occurrences(api, current)
+        if candidate["planned_action"] == "create":
+            master = create_master(api, auto_lists[0]["id"], auto_labels[0]["id"], current, detailed)
+        else:
+            master = sync_master(api, {"id": current["master_id"]}, auto_lists[0]["id"], auto_labels[0]["id"], current, detailed)
+        linked = [link_occurrence(api, row, master) for row in detailed]
+        applied.append({"name": current["canonical_name"], "master_url": master["shortUrl"], "linked_items": len(linked), "status": "applied"})
+    return {"status": "applied", "writes": len([row for row in applied if row["status"] == "applied"]), "applied": applied, "remaining": build_audit(api)["planned"]}
+
+
+def detailed_occurrences(api, candidate):
+    """Read cards immediately before writes; matching keeps state and manual text intact."""
+    wanted = {(item["scene_id"], item["item_text"]) for item in candidate["occurrences"]}
+    # Re-scan the exact live checklist rows, including stable card and item IDs.
+    board = api["trello_get"](f"/boards/{BOARD_REF}", {"fields": "id"})
+    lists = api["trello_get"](f"/boards/{board['id']}/lists", {"fields": "id,name,closed", "filter": "open"})
+    rows = []
+    for board_list in lists:
+        if excluded_scene_list(board_list["name"]):
+            continue
+        for card in api["trello_get"](f"/lists/{board_list['id']}/cards", {"fields": "id,name,shortUrl,closed", "checklists": "all", "checklist_fields": "name,pos", "checklist_checkItems": "all", "filter": "open", "limit": 1000}):
+            info = api["cierny_kamen_scene_name_info"](card.get("name", ""))
+            if not info or info.get("test"):
+                continue
+            for checklist in card.get("checklists", []):
+                if folded(checklist.get("name")) != "rekvizity":
+                    continue
+                for item in checklist.get("checkItems", []):
+                    if (info["scene_id"], item.get("name", "")) in wanted:
+                        rows.append({"card_id": card["id"], "scene_id": info["scene_id"], "scene_url": card["shortUrl"], "item_id": item["id"], "identity": identity_text(item.get("name", ""))})
+    if len(rows) != len(wanted):
+        raise ValueError(f"concurrent checklist change for {candidate['canonical_name']}")
+    return rows
 
 
 def register_routes(app, api):
@@ -222,10 +383,13 @@ def register_routes(app, api):
             return jsonify({"status": "disabled"}), 410
         if request.headers.get("X-CK-Vehicles-Key") != KEY:
             return jsonify({"error": "forbidden"}), 403
-        if request.args.get("mode", "dry-run").casefold() not in {"dry-run", "audit"}:
-            return jsonify({"error": "read-only dry-run only", "writes": 0}), 409
+        mode = request.args.get("mode", "dry-run").casefold()
+        if mode not in {"dry-run", "audit", "sample", "apply"}:
+            return jsonify({"error": "unsupported mode", "writes": 0}), 400
         try:
-            return jsonify(build_audit(api)), 200
+            if mode in {"dry-run", "audit"}:
+                return jsonify(build_audit(api)), 200
+            return jsonify(apply_changes(api, mode, int(request.args.get("start", "0")), int(request.args.get("limit", "5")))), 200
         except Exception as exc:
             app.logger.exception("Čierny Kameň vehicle audit failed")
             return jsonify({"status": "failed", "writes": 0, "error": f"{type(exc).__name__}: {exc}"}), 502
