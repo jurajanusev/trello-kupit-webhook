@@ -28,6 +28,14 @@ def identity_text(item):
 
 def vehicle_kind(value):
     value = folded(value)
+    if any(value.startswith(prefix) for prefix in (
+        "majak", "drot", "plachta", "veci", "kufor", "krabice", "vesla", "odznaky", "vybava", "rozpisana",
+    )):
+        return None
+    if any(fragment in value for fragment in (
+        " s ktorym ", " ktorym je auto", " na auto", " v aute", "pohrebna rec",
+    )):
+        return None
     if "automat" in value and not any(word in value for word in ("auto ", "auto-", "automobil")):
         return None
     if not any(word in value for word in VEHICLE_WORDS):
@@ -111,6 +119,10 @@ def build_audit(api):
                 "in_autá": folded(list_name) == "auta",
             })
     master_by_url = {card["url"].casefold(): card for card in master_cards if card.get("url")}
+    master_by_alias = defaultdict(list)
+    for master in master_cards:
+        for alias in master["aliases"]:
+            master_by_alias[folded(alias)].append(master)
     occurrences, unresolved = [], []
     for card in scene_cards:
         for checklist in card.get("checklists", []):
@@ -122,6 +134,10 @@ def build_audit(api):
                 link = CARD_URL.search(raw)
                 url = link.group(1) if link else None
                 master = master_by_url.get((url or "").casefold())
+                alias_matches = master_by_alias.get(folded(core), []) if not master else []
+                if not master and len(alias_matches) == 1:
+                    master = alias_matches[0]
+                    url = master["url"]
                 kind = vehicle_kind(core) or (master or {}).get("kind")
                 if not kind:
                     continue

@@ -20,6 +20,12 @@ class VehicleTests(unittest.TestCase):
     def test_automatic_snack_machine_is_not_vehicle(self):
         self.assertIsNone(vehicle_kind("Automat na snacky"))
 
+    def test_vehicle_related_components_are_not_vehicles(self):
+        self.assertIsNone(vehicle_kind("maják na Kelerové auto"))
+        self.assertIsNone(vehicle_kind("plachta tmavej farby ktorou je auto prekryté"))
+        self.assertIsNone(vehicle_kind("drôt s ktorým Bety otvorí Olasovej auto"))
+        self.assertIsNone(vehicle_kind("rozpísaná Sárina pohrebná reč"))
+
     def test_identity_ignores_context(self):
         self.assertEqual(identity_text("<n> **Policajné auto** — *jazdí pri rieke*"), "Policajné auto")
 
