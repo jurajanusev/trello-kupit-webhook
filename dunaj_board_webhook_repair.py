@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import threading
+import time
+
 from flask import jsonify, request
 
 
@@ -7,6 +10,7 @@ KEY = "dunaj-board-webhook-24aug-69a4c8d2"
 ENDPOINT_DISABLED = False
 CALLBACK_URL = "https://trello-kupit-webhook.onrender.com/trello-webhook"
 BOARDS = {"dunaj": "qCPeWA3e", "riverdale": "CzuD55PR"}
+BACKGROUND = {"status": "idle", "result": None, "http_status": None}
 
 
 def classify_webhooks(webhooks, boards, list_owners):
@@ -128,6 +132,16 @@ def apply_subscription(api):
 
 
 def register_routes(app, api):
+    def background_apply():
+        time.sleep(1.0)
+        try:
+            result, status = apply_subscription(api)
+        except Exception as exc:
+            app.logger.exception("background Dunaj webhook subscription failed")
+            result, status = {"status": "failed", "writes": 0,
+                              "error": f"{type(exc).__name__}: {exc}"}, 502
+        BACKGROUND.update({"status": "complete", "result": result, "http_status": status})
+
     @app.route("/api/repair-dunaj-board-webhook", methods=["POST"])
     def repair_dunaj_board_webhook():
         if ENDPOINT_DISABLED:
@@ -135,9 +149,17 @@ def register_routes(app, api):
         if request.headers.get("X-Dunaj-Webhook-Key") != KEY:
             return jsonify({"error": "forbidden"}), 403
         mode = request.args.get("mode", "dry-run").casefold()
-        if mode not in {"dry-run", "audit", "apply-subscription"}:
+        if mode not in {"dry-run", "audit", "apply-subscription", "queue-subscription", "poll"}:
             return jsonify({"error": "unsupported mode", "writes": 0}), 409
         try:
+            if mode == "poll":
+                return jsonify(BACKGROUND), 200
+            if mode == "queue-subscription":
+                if BACKGROUND["status"] == "running":
+                    return jsonify({"status": "already-running", "writes": 0}), 202
+                BACKGROUND.update({"status": "running", "result": None, "http_status": None})
+                threading.Thread(target=background_apply, daemon=True).start()
+                return jsonify({"status": "queued", "writes": 0}), 202
             if mode == "apply-subscription":
                 result, status = apply_subscription(api)
                 return jsonify(result), status
