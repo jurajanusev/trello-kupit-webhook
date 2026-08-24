@@ -35,6 +35,15 @@ class DunajBoardWebhookTests(unittest.TestCase):
         self.assertEqual(rows[0]["project"], "riverdale")
         self.assertTrue(rows[0]["is_production_callback"])
 
+    def test_dunaj_and_riverdale_stay_separate(self):
+        boards = {"dunaj": {"id": "bd"}, "riverdale": {"id": "br"}}
+        hooks = [
+            {"id": "hd", "idModel": "bd", "active": True, "callbackURL": CALLBACK_URL},
+            {"id": "hr", "idModel": "br", "active": True, "callbackURL": CALLBACK_URL},
+        ]
+        rows = classify_webhooks(hooks, boards, {})
+        self.assertEqual([row["project"] for row in rows], ["dunaj", "riverdale"])
+
 
 if __name__ == "__main__":
     unittest.main()

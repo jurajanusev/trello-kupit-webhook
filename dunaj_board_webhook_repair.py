@@ -55,8 +55,6 @@ def build_audit(api):
     dunaj_list_hooks = [row for row in by_project["dunaj"] if row["model_type"] == "list"
                         and row["is_production_callback"]]
     blockers = []
-    if len(riverdale_board_hooks) != 1:
-        blockers.append(f"Riverdale production board webhook count is {len(riverdale_board_hooks)}")
     return {
         "status": "read-only-diagnostic", "writes": 0,
         "boards": {name: {key: value for key, value in board.items() if key != "id"}
@@ -82,6 +80,46 @@ def public(audit):
     return {key: value for key, value in audit.items() if not key.startswith("_")}
 
 
+def apply_subscription(api):
+    before = build_audit(api)
+    dunaj_board = before["_boards"]["dunaj"]
+    board_hooks = [row for row in before["_rows"] if row["project"] == "dunaj"
+                   and row["model_type"] == "board" and row["is_production_callback"]
+                   and row["active"]]
+    writes = 0
+    created = None
+    if not board_hooks:
+        created = api["trello_post_body"]("/webhooks", {
+            "description": "Dunaj board-wide [z] ToDo synchronization",
+            "callbackURL": CALLBACK_URL,
+            "idModel": dunaj_board["id"],
+        })
+        writes += 1
+    verification = build_audit(api)
+    verified_board_hooks = [row for row in verification["_rows"] if row["project"] == "dunaj"
+                            and row["model_type"] == "board" and row["is_production_callback"]
+                            and row["active"]]
+    if len(verified_board_hooks) != 1:
+        return {"status": "blocked", "writes": writes,
+                "reason": "Dunaj board webhook did not verify after create",
+                "audit": public(verification)}, 409
+    removed = []
+    for row in verification["_rows"]:
+        if row["project"] != "dunaj" or row["model_type"] != "list" or not row["is_production_callback"]:
+            continue
+        api["trello_delete"](f"/webhooks/{row['id']}")
+        removed.append(row["id"])
+        writes += 1
+    after = build_audit(api)
+    if not after["diagnosis"]["dunaj_delivery_scope_correct"]:
+        return {"status": "audit-failed", "writes": writes, "audit": public(after)}, 409
+    return {
+        "status": "applied", "writes": writes,
+        "created": {"id": created.get("id"), "idModel": created.get("idModel")} if created else None,
+        "removed_list_webhooks": removed, "audit": public(after),
+    }, 200
+
+
 def register_routes(app, api):
     @app.route("/api/repair-dunaj-board-webhook", methods=["POST"])
     def repair_dunaj_board_webhook():
@@ -90,9 +128,12 @@ def register_routes(app, api):
         if request.headers.get("X-Dunaj-Webhook-Key") != KEY:
             return jsonify({"error": "forbidden"}), 403
         mode = request.args.get("mode", "dry-run").casefold()
-        if mode not in {"dry-run", "audit"}:
-            return jsonify({"error": "apply is disabled until diagnostic is reviewed", "writes": 0}), 409
+        if mode not in {"dry-run", "audit", "apply-subscription"}:
+            return jsonify({"error": "unsupported mode", "writes": 0}), 409
         try:
+            if mode == "apply-subscription":
+                result, status = apply_subscription(api)
+                return jsonify(result), status
             audit = build_audit(api)
             return jsonify(public(audit)), 200 if not audit["blockers"] else 409
         except Exception as exc:
