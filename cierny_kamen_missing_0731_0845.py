@@ -23,7 +23,7 @@ from cierny_kamen_ep07_10_import import (
 
 
 KEY = "ck-missing-0731-0845-24aug-72f9c3e1"
-ENDPOINT_DISABLED = False
+ENDPOINT_DISABLED = True
 TARGET_IDS = ("07/31", "07/32", "07/36", "08/45")
 SOURCE_HASHES = {
     "07": "09ede7bfbd8ecb641b18f20a805dc3ff87c4ebff546ca2071ae48ca8288742a3",
