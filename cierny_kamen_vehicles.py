@@ -23,6 +23,8 @@ def folded(value):
 def identity_text(item):
     value = re.split(r"\s+[–—]\s+", item or "", maxsplit=1)[0]
     value = re.sub(r"^(?:<n>|\[n\])\s*", "", value, flags=re.I)
+    # [z] is a protected ToDo marker, never a part of the prop identity.
+    value = re.sub(r"\s*\[z\]\s*", " ", value, flags=re.I)
     return value.replace("*", "").strip()
 
 
@@ -109,7 +111,10 @@ def build_audit(api):
         if not is_vehicle_registry:
             continue
         card_aliases = aliases(card)
-        kind = next((vehicle_kind(value) for value in card_aliases if vehicle_kind(value)), None)
+        # An alias must not turn an unrelated registry card into a vehicle.
+        # `Auto` is the only permitted fallback for a legacy vehicle whose
+        # canonical title does not state its type (for example a limuzína).
+        kind = vehicle_kind(card.get("name", ""))
         labels = sorted(label_by_id.get(label_id, label_id) for label_id in card.get("idLabels", []))
         if kind or auto_label_ids & set(card.get("idLabels", [])):
             master_cards.append({
@@ -138,10 +143,14 @@ def build_audit(api):
                 if not master and len(alias_matches) == 1:
                     master = alias_matches[0]
                     url = master["url"]
-                kind = vehicle_kind(core) or (master or {}).get("kind")
-                if not kind:
+                core_kind = vehicle_kind(core)
+                master_is_vehicle = bool(master and (master.get("kind") or any(
+                    folded(label) == "auto" for label in master.get("labels", [])
+                )))
+                if not core_kind and not master_is_vehicle:
                     continue
-                evidence = "checklist identity" if vehicle_kind(core) else "linked vehicle master"
+                kind = core_kind or master.get("kind") or "unknown_vehicle"
+                evidence = "checklist identity" if core_kind else "linked vehicle master"
                 row = {
                     "scene_id": card["scene_id"], "scene_url": card.get("shortUrl"), "scene_list": card["list_name"],
                     "item_id": item.get("id"), "item_state": item.get("state"), "item_text": raw,
@@ -161,7 +170,8 @@ def build_audit(api):
         first = rows[0]
         master = master_by_url.get((first.get("master_url") or "").casefold())
         if master:
-            action = "conflict" if master.get("closed") else ("unchanged" if master["in_autá"] and "Auto" in master["labels"] else "move+label" if not master["in_autá"] else "label")
+            has_auto_label = any(folded(label) == "auto" for label in master["labels"])
+            action = "conflict" if master.get("closed") else ("unchanged" if master["in_autá"] and has_auto_label else "move+label" if not master["in_autá"] else "label")
             confidence = "confirmed"
         else:
             action = "create" if first["master_url"] is None else "conflict"
