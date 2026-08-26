@@ -8476,10 +8476,6 @@ from meeting_notes_apply_ep01_03 import register_routes as register_meeting_note
 
 register_meeting_notes_apply_ep01_03_routes(app, globals())
 
-from original_screener_ep09_10 import register_routes as register_original_screener_ep09_10_routes
-
-register_original_screener_ep09_10_routes(app, globals())
-
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
