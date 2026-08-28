@@ -283,7 +283,7 @@ def register_routes(app, api):
             limit = int(request.args.get("limit", "5"))
         except ValueError:
             return jsonify({"error": "invalid start/limit"}), 400
-        if start < 0 or limit < 1 or limit > 10:
+        if start < 0 or limit < 1 or limit > 25:
             return jsonify({"error": "invalid start/limit"}), 400
         payload, mapping = load_sources()
         state = runtime_state(api)
