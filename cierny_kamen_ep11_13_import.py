@@ -254,7 +254,33 @@ def apply_scene_new(api, state, scene, desired, label_ids, scene_list_id):
     projection = [(item["name"], [entry["name"] for entry in sorted(item.get("checkItems", []), key=lambda x: x.get("pos", 0))]) for item in actual]
     expected = [(name, checklists[name]) for name in CHECKLIST_NAMES]
     if actual and projection != expected:
-        raise ValueError(f"existing checklist conflict: {scene['scene_id']}")
+        actual_by_name = {name: items for name, items in projection}
+        if len(actual_by_name) != len(projection) or any(name not in CHECKLIST_NAMES for name in actual_by_name):
+            raise ValueError(f"existing checklist conflict: {scene['scene_id']}")
+        # A timed-out request may have created only a prefix of the generated
+        # checklist structure. Complete that prefix, but never remove, reorder,
+        # or overwrite an unexpected/manual item.
+        for name, items in projection:
+            desired_items = checklists[name]
+            if items != desired_items[:len(items)]:
+                raise ValueError(f"existing checklist conflict: {scene['scene_id']}")
+        checklist_by_name = {item["name"]: item for item in actual}
+        for position, name in enumerate(CHECKLIST_NAMES, 1):
+            checklist = checklist_by_name.get(name)
+            if not checklist:
+                checklist = api["trello_post_body"](
+                    f"/cards/{card['id']}/checklists",
+                    {"name": name, "pos": position * 16384},
+                )
+                writes += 1
+            existing_count = len(actual_by_name.get(name, []))
+            for item in checklists[name][existing_count:]:
+                api["trello_post_body"](
+                    f"/checklists/{checklist['id']}/checkItems",
+                    {"name": item, "pos": "bottom"},
+                )
+                writes += 1
+        return card, writes, created
     if not actual:
         def create_checklist(entry):
             position, name = entry
