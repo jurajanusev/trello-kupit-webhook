@@ -20,6 +20,7 @@ BOARD_REF = "CzuD55PR"
 PAYLOAD_PATH = Path(__file__).with_name("cierny_kamen_ep11_13_scenes.json")
 MAP_PATH = Path(__file__).with_name("cierny_kamen_ep11_13_identity_space_map.json")
 EXCLUDED = ("original screener", "register", "rekvizit", "nadvazne", "todo", "auta")
+_WRITE_STATE_CACHE = {"state": None}
 
 
 def scene_info(api, name):
@@ -268,7 +269,7 @@ def register_routes(app, api):
         if request.headers.get("X-CK-Ep11-13-Key") != KEY:
             return jsonify({"error": "forbidden"}), 403
         mode = request.args.get("mode", "dry-run").casefold()
-        allowed = {"dry-run", "audit", "master-init", "sample", "apply", "finalize", "final-audit"}
+        allowed = {"dry-run", "audit", "master-init", "sample", "apply", "fill", "finalize", "final-audit"}
         if mode not in allowed:
             return jsonify({"error": "unsupported mode", "writes": 0}), 409
         if mode in {"dry-run", "audit"}:
@@ -285,7 +286,14 @@ def register_routes(app, api):
         if start < 0 or limit < 1 or limit > 25:
             return jsonify({"error": "invalid start/limit"}), 400
         payload, mapping = load_sources()
-        state = runtime_state(api)
+        # Write batches operate only on the new ep11-13 scene IDs. Reusing the
+        # state loaded by the previous small batch avoids a second full-board
+        # download while every created card is appended to this cache below.
+        # `refresh=1` remains available for an explicit read-before-write reset.
+        refresh = request.args.get("refresh") == "1"
+        if refresh or _WRITE_STATE_CACHE["state"] is None:
+            _WRITE_STATE_CACHE["state"] = runtime_state(api)
+        state = _WRITE_STATE_CACHE["state"]
         source_ids = {scene["scene_id"] for scene in payload["scenes"]}
         if set(mapping["spaces_by_scene"]) != source_ids:
             return jsonify({"status": "blocked", "error": "identity/space map does not cover source scenes"}), 409
@@ -312,7 +320,12 @@ def register_routes(app, api):
         # time. Resolve them by the same accent/case-insensitive key used by the
         # rest of the importer while retaining the board's real label IDs.
         label_ids = {folded(row["name"]): row["id"] for row in state["labels"]}
-        selected = ([payload["scenes"][0]] if mode == "sample" else payload["scenes"][start:start + limit])
+        if mode == "sample":
+            selected = [payload["scenes"][0]]
+        elif mode == "fill":
+            selected = [scene for scene in payload["scenes"] if scene["scene_id"] not in cards][:limit]
+        else:
+            selected = payload["scenes"][start:start + limit]
         results = []
         writes = 0
         for scene in selected:
