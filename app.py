@@ -5136,6 +5136,7 @@ def repair_dok4_returned_card_date():
 
 @app.route("/api/repair-main-list-due-dates", methods=["POST"])
 def repair_main_list_due_dates():
+    return jsonify({"error": "completed one-off endpoint disabled"}), 410
     if request.headers.get("X-Repair-Key") != "main-list-due-audit-09aug-3db186f4":
         return jsonify({"error": "forbidden"}), 403
     project = request.args.get("project", "").strip().casefold()
@@ -5263,6 +5264,7 @@ def sync_dok4_current_schedule():
 @app.route("/api/sync-riverdale-current-schedule", methods=["POST"])
 def sync_riverdale_current_schedule():
     """Synchronize Riverdale from the latest supplied plan."""
+    return jsonify({"error": "completed one-off endpoint disabled"}), 410
     if request.headers.get("X-Sync-Key") != RIVERDALE_CURRENT_SCHEDULE_KEY:
         return jsonify({"error": "forbidden"}), 403
     mode = request.args.get("mode", "dry-run")
