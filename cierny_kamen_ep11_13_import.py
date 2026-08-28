@@ -162,7 +162,8 @@ def desired_scene(scene, all_scenes, cards, prop_cards, space_cards, mapping):
         previous = next((row for row in reversed(all_scenes[:index]) if key in {folded(x) for x in row.get("characters", [])}), None)
         following = next((row for row in all_scenes[index + 1:] if key in {folded(x) for x in row.get("characters", [])}), None)
         nav.append(f"- {character}: ← {display_link(previous, cards)} | → {display_link(following, cards)}")
-    location_value = ", ".join(f"[{name}]({space_cards[name]['shortUrl']})" for name in canonical_spaces)
+    spaces_by_key = {folded(name): card for name, card in space_cards.items()}
+    location_value = ", ".join(f"[{name}]({spaces_by_key[folded(name)]['shortUrl']})" for name in canonical_spaces)
     location_label = "LOKÁCIE" if len(canonical_spaces) > 1 else "LOKÁCIA"
     chars = scene.get("characters_raw") or "neuvedené"
     desc = (f"## {scene['prepis']}\n\n" + "\n".join(nav) +
@@ -185,7 +186,7 @@ def desired_scene(scene, all_scenes, cards, prop_cards, space_cards, mapping):
             prop_items.append(f"**{row['stable_name']}** — *{row['current_state']}* | KARTA: {url}")
         if row["ambiguity_question"]:
             questions.append(row["ambiguity_question"])
-    set_items = [f"**{name}** — *prostredie obrazu {scene['scene_id']}* | KARTA: {space_cards[name]['shortUrl']}" for name in canonical_spaces]
+    set_items = [f"**{name}** — *prostredie obrazu {scene['scene_id']}* | KARTA: {spaces_by_key[folded(name)]['shortUrl']}" for name in canonical_spaces]
     checklists = {"REKVIZITY": prop_items, "SET": set_items, "INFO Z PORADY": [],
                   "INFO Z NATÁČANIA": [], "OTÁZKY NA PORADU": list(dict.fromkeys(questions))}
     labels = {category for row in records for category in row["categories"] if category in {"Auto", "Nadväzná rekvizita"}}
