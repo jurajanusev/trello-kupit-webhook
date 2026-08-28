@@ -234,7 +234,7 @@ def apply_scene_new(api, state, scene, desired, label_ids, scene_list_id):
     writes = 0
     if not card:
         card = api["trello_post_body"]("/cards", {"idList": scene_list_id, "name": scene["name"],
-                "desc": desc, "pos": "bottom", "idLabels": ",".join(label_ids[name] for name in label_names)})
+                "desc": desc, "pos": "bottom", "idLabels": ",".join(label_ids[folded(name)] for name in label_names)})
         state["cards"].append(card)
         created = True
         writes += 1
@@ -303,7 +303,10 @@ def register_routes(app, api):
         if relevant_collisions:
             return jsonify({"status": "blocked", "scene_collisions": relevant_collisions}), 409
         all_scenes = combined_scenes(api, payload)
-        label_ids = {row["name"]: row["id"] for row in state["labels"]}
+        # Board labels are user-visible and their capitalization has changed over
+        # time. Resolve them by the same accent/case-insensitive key used by the
+        # rest of the importer while retaining the board's real label IDs.
+        label_ids = {folded(row["name"]): row["id"] for row in state["labels"]}
         selected = ([payload["scenes"][0]] if mode == "sample" else payload["scenes"][start:start + limit])
         results = []
         writes = 0
