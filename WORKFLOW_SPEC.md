@@ -178,3 +178,9 @@ Nastenky:
 - Dunaj: `Dunaj - Rekvizity` - `https://trello.com/b/qCPeWA3e/dunaj-rekvizity`
 - DOK 4: `DOK 4` - `https://trello.com/b/lzNy4AtY/dok-4`
 - Riverdale: `Riverdale` - `https://trello.com/b/CzuD55PR/riverdale`
+# Čierny Kameň – autoritatívne scenáre 11–13
+
+- Produkčný payload pokračuje epizódami 11–13 z troch finálnych PDF a spolu obsahuje 672 scén epizód 1–13.
+- Pre epizódy 11–13 je jediným zdrojom rekvizít a priestorov verzovaný explicitný artefakt `cierny_kamen_ep11_13_identity_space_map.json`; identity sa počas zápisu nevytvárajú heuristicky.
+- Mapa musí pokrývať všetkých 158 scene ID priestorovým mapovaním. Rekvizity sa zapisujú iba pri explicitnej fyzickej prítomnosti.
+- Vozidlá smerujú výhradne do `AUTÁ`; osobné rekvizity do zoznamu vlastníka; nejednoznačné identity sa nezlučujú.

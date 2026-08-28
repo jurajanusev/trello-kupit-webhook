@@ -1,6 +1,7 @@
 """Read-only safety audit for authoritative Čierny Kameň episodes 11–13."""
 from __future__ import annotations
 
+import copy
 import json
 import re
 import unicodedata
@@ -36,6 +37,40 @@ def is_scene_list(name):
 def load_sources():
     return (json.loads(PAYLOAD_PATH.read_text(encoding="utf-8")),
             json.loads(MAP_PATH.read_text(encoding="utf-8")))
+
+
+def authoritative_payload(base_payload):
+    """Extend the permanent ep01-10 payload with reviewed ep11-13 data."""
+    result = copy.deepcopy(base_payload)
+    payload, mapping = load_sources()
+    records = defaultdict(list)
+    for row in mapping["props"]:
+        records[row["scene_id"]].append(row)
+    existing = {scene["scene_id"] for scene in result["scenes"]}
+    incoming = {scene["scene_id"] for scene in payload["scenes"]}
+    if existing & incoming:
+        raise ValueError(f"authoritative scene overlap: {sorted(existing & incoming)}")
+    offset = max((int(scene.get("order", 0)) for scene in result["scenes"]), default=-1) + 1
+    for source in payload["scenes"]:
+        scene = copy.deepcopy(source)
+        scene["order"] = offset + int(source.get("order", 0))
+        scene["props"] = [{
+            "stable_name": row["stable_name"],
+            "action": row["current_state"],
+            "source_text": f"{row['stable_name']} — {row['source_evidence']}",
+            "registry_key": re.sub(r"[^a-z0-9]+", "-", folded(row["stable_name"])).strip("-"),
+            "continuity": bool(row["continuity_group"]),
+            "categories": list(row["categories"]),
+        } for row in records[scene["scene_id"]]]
+        scene["questions"] = [row["ambiguity_question"] for row in records[scene["scene_id"]] if row["ambiguity_question"]]
+        scene["labels"] = sorted({category for row in records[scene["scene_id"]] for category in row["categories"] if category in {"Auto", "Nadväzná rekvizita"}}, key=folded)
+        result["scenes"].append(scene)
+    result["source_pdfs"] = [*result.get("source_pdfs", []), *payload.get("source_pdfs", [])]
+    result["episode_counts"] = {**result.get("episode_counts", {}), **payload["episode_counts"]}
+    result["source_kind"] = "thirteen_final_pdfs_ep01_13"
+    result["stats"] = {**result.get("stats", {}), "scenes": len(result["scenes"]),
+                       "unique_scene_ids": len({scene["scene_id"] for scene in result["scenes"]}), "episodes": 13}
+    return result
 
 
 def prop_groups(mapping):

@@ -6688,11 +6688,12 @@ def cierny_kamen_import_payload():
     from cierny_kamen_split_0440 import augment_payload
     from cierny_kamen_split_0535flash import augment_payload as augment_payload_0535flash
     from cierny_kamen_ep07_10_import import authoritative_payload
+    from cierny_kamen_ep11_13_import import authoritative_payload as authoritative_payload_11_13
 
     path = Path(__file__).with_name("cierny_kamen_pdf_payload.json")
-    return authoritative_payload(augment_payload_0535flash(augment_payload(apply_identity_map(
+    return authoritative_payload_11_13(authoritative_payload(augment_payload_0535flash(augment_payload(apply_identity_map(
         json.loads(path.read_text(encoding="utf-8"))
-    ))))
+    )))))
 
 
 def cierny_kamen_import_state(payload):
