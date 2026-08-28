@@ -298,8 +298,10 @@ def register_routes(app, api):
         if len(scene_lists) != 1:
             return jsonify({"status": "blocked", "scene_lists": len(scene_lists)}), 409
         cards, collisions = card_map(api, state)
-        if collisions:
-            return jsonify({"status": "blocked", "scene_collisions": sorted(collisions)}), 409
+        source_ids = {scene["scene_id"] for scene in payload["scenes"]}
+        relevant_collisions = sorted(source_ids & set(collisions))
+        if relevant_collisions:
+            return jsonify({"status": "blocked", "scene_collisions": relevant_collisions}), 409
         all_scenes = combined_scenes(api, payload)
         label_ids = {row["name"]: row["id"] for row in state["labels"]}
         selected = ([payload["scenes"][0]] if mode == "sample" else payload["scenes"][start:start + limit])
