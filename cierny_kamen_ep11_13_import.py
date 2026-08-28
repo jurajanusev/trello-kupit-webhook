@@ -20,7 +20,7 @@ BOARD_REF = "CzuD55PR"
 PAYLOAD_PATH = Path(__file__).with_name("cierny_kamen_ep11_13_scenes.json")
 MAP_PATH = Path(__file__).with_name("cierny_kamen_ep11_13_identity_space_map.json")
 EXCLUDED = ("original screener", "register", "rekvizit", "nadvazne", "todo", "auta")
-_WRITE_STATE_CACHE = {"state": None}
+_WRITE_STATE_CACHE = {"state": None, "all_scenes": None}
 
 
 def scene_info(api, name):
@@ -295,6 +295,7 @@ def register_routes(app, api):
         try:
             if refresh or _WRITE_STATE_CACHE["state"] is None:
                 _WRITE_STATE_CACHE["state"] = runtime_state(api)
+                _WRITE_STATE_CACHE["all_scenes"] = None
             state = _WRITE_STATE_CACHE["state"]
         except Exception as exc:
             return jsonify({"status": "blocked", "stage": "runtime-state", "error": f"{type(exc).__name__}: {exc}"}), 409
@@ -323,7 +324,9 @@ def register_routes(app, api):
             relevant_collisions = sorted(source_ids & set(collisions))
             if relevant_collisions:
                 return jsonify({"status": "blocked", "scene_collisions": relevant_collisions}), 409
-            all_scenes = combined_scenes(api, payload)
+            if _WRITE_STATE_CACHE["all_scenes"] is None:
+                _WRITE_STATE_CACHE["all_scenes"] = combined_scenes(api, payload)
+            all_scenes = _WRITE_STATE_CACHE["all_scenes"]
         except Exception as exc:
             return jsonify({"status": "blocked", "stage": "prepare", "error": f"{type(exc).__name__}: {exc}"}), 409
         # Board labels are user-visible and their capitalization has changed over
