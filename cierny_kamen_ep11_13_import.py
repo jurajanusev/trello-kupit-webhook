@@ -271,13 +271,12 @@ def register_routes(app, api):
         allowed = {"dry-run", "audit", "master-init", "sample", "apply", "finalize", "final-audit"}
         if mode not in allowed:
             return jsonify({"error": "unsupported mode", "writes": 0}), 409
-        report = audit(api)
         if mode in {"dry-run", "audit"}:
+            report = audit(api)
             return jsonify(report), 200 if not report["blockers"] else 409
         if mode == "final-audit":
+            report = audit(api)
             return jsonify(report), 200 if not report["blockers"] and report["create"] == 0 and not report["duplicates"] else 409
-        if report["blockers"]:
-            return jsonify(report), 409
         try:
             start = int(request.args.get("start", "0"))
             limit = int(request.args.get("limit", "5"))
@@ -287,6 +286,13 @@ def register_routes(app, api):
             return jsonify({"error": "invalid start/limit"}), 400
         payload, mapping = load_sources()
         state = runtime_state(api)
+        source_ids = {scene["scene_id"] for scene in payload["scenes"]}
+        if set(mapping["spaces_by_scene"]) != source_ids:
+            return jsonify({"status": "blocked", "error": "identity/space map does not cover source scenes"}), 409
+        prop_plan, space_plan = master_plans(state, payload, mapping)
+        unresolved = [row["name"] for row in [*prop_plan, *space_plan] if row["status"] != "reuse"]
+        if unresolved and mode != "master-init":
+            return jsonify({"status": "blocked", "unresolved_masters": unresolved}), 409
         if mode == "master-init":
             try:
                 result = init_masters(api, state, payload, mapping, start, limit)
@@ -298,7 +304,6 @@ def register_routes(app, api):
         if len(scene_lists) != 1:
             return jsonify({"status": "blocked", "scene_lists": len(scene_lists)}), 409
         cards, collisions = card_map(api, state)
-        source_ids = {scene["scene_id"] for scene in payload["scenes"]}
         relevant_collisions = sorted(source_ids & set(collisions))
         if relevant_collisions:
             return jsonify({"status": "blocked", "scene_collisions": relevant_collisions}), 409
