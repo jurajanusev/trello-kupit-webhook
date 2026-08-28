@@ -1,0 +1,1627 @@
+{
+  "version": 1,
+  "project": "Čierny Kameň",
+  "board_ref": "CzuD55PR",
+  "source_payload": "cierny_kamen_ep11_13_scenes.json",
+  "scene_count": 158,
+  "space_mapping_count": 158,
+  "prop_record_count": 37,
+  "spaces_by_scene": {
+    "11/01": {
+      "raw_heading": "ŠKOLA – HUDOBNÁ MIESTNOSŤ",
+      "canonical_spaces": [
+        "ŠKOLA – HUDOBNÁ MIESTNOSŤ"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/02": {
+      "raw_heading": "ŠKOLA – KLUBOVŇA",
+      "canonical_spaces": [
+        "ŠKOLA – KLUBOVŇA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/03": {
+      "raw_heading": "ŠKOLA – TELOCVIČŇA",
+      "canonical_spaces": [
+        "ŠKOLA – TELOCVIČŇA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/04": {
+      "raw_heading": "ŠKOLA - RIADITEĽŇA",
+      "canonical_spaces": [
+        "ŠKOLA - RIADITEĽŇA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/05": {
+      "raw_heading": "ALEXOV DOM",
+      "canonical_spaces": [
+        "ALEXOV DOM"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/06": {
+      "raw_heading": "VERONIKINA VILA – OBÝVAČKA",
+      "canonical_spaces": [
+        "VERONIKINA VILA – OBÝVAČKA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/07": {
+      "raw_heading": "UBYTOVŇA – ANDYHO BYT",
+      "canonical_spaces": [
+        "UBYTOVŇA – ANDYHO BYT"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/08": {
+      "raw_heading": "ŠKOLA – CHODBA PRI SKRINKÁCH",
+      "canonical_spaces": [
+        "ŠKOLA – CHODBA PRI SKRINKÁCH"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/09": {
+      "raw_heading": "ŠKOLA – REDAKCIA",
+      "canonical_spaces": [
+        "ŠKOLA – REDAKCIA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/10": {
+      "raw_heading": "VILA RÉVAYOVCOV – SPÁLŇA/ŠATNÍK",
+      "canonical_spaces": [
+        "VILA RÉVAYOVCOV – SPÁLŇA/ŠATNÍK"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/11": {
+      "raw_heading": "ŠKOLA - REDAKCIA",
+      "canonical_spaces": [
+        "ŠKOLA - REDAKCIA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/12": {
+      "raw_heading": "ŠKOLA – TRIEDA",
+      "canonical_spaces": [
+        "ŠKOLA – TRIEDA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/13": {
+      "raw_heading": "ALEXOV DOM – VCHOD A KUCHYŇA",
+      "canonical_spaces": [
+        "ALEXOV DOM – VCHOD A KUCHYŇA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/14": {
+      "raw_heading": "ŠKOLA – REDAKCIA",
+      "canonical_spaces": [
+        "ŠKOLA – REDAKCIA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/15": {
+      "raw_heading": "VILA RÉVAYOVCOV – JAKUBOVA SPÁLŇA",
+      "canonical_spaces": [
+        "VILA RÉVAYOVCOV – JAKUBOVA SPÁLŇA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/16": {
+      "raw_heading": "ŠKOLA – REDAKCIA",
+      "canonical_spaces": [
+        "ŠKOLA – REDAKCIA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/17": {
+      "raw_heading": "DOM BETY – KUCHYŇA",
+      "canonical_spaces": [
+        "DOM BETY – KUCHYŇA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/18": {
+      "raw_heading": "ALEXOV DOM – KUCHYŇA",
+      "canonical_spaces": [
+        "ALEXOV DOM – KUCHYŇA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/19": {
+      "raw_heading": "ALEXOV DOM – ALEXOVA IZBA",
+      "canonical_spaces": [
+        "ALEXOV DOM – ALEXOVA IZBA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/20": {
+      "raw_heading": "VERONIKINA VILA – VCHOD",
+      "canonical_spaces": [
+        "VERONIKINA VILA – VCHOD"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/21": {
+      "raw_heading": "VILA RÉVAYOVCOV – SÁRINA IZBA",
+      "canonical_spaces": [
+        "VILA RÉVAYOVCOV – SÁRINA IZBA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/22": {
+      "raw_heading": "VILA RÉVAYOVCOV – SPÁLŇA/ŠATNÍK",
+      "canonical_spaces": [
+        "VILA RÉVAYOVCOV – SPÁLŇA/ŠATNÍK"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/23": {
+      "raw_heading": "DOM BETY – JEDÁLEŇ",
+      "canonical_spaces": [
+        "DOM BETY – JEDÁLEŇ"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/24": {
+      "raw_heading": "DOM BETY – VSTUP/JEDÁLEŇ",
+      "canonical_spaces": [
+        "DOM BETY – VSTUP/JEDÁLEŇ"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/25": {
+      "raw_heading": "UBYTOVŇA – PRED ANDYHO BYTOM",
+      "canonical_spaces": [
+        "UBYTOVŇA – PRED ANDYHO BYTOM"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/26": {
+      "raw_heading": "UBYTOVŇA – ANDYHO BYT",
+      "canonical_spaces": [
+        "UBYTOVŇA – ANDYHO BYT"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/27": {
+      "raw_heading": "VILA RÉVAYOVCOV – OBÝVAČKA",
+      "canonical_spaces": [
+        "VILA RÉVAYOVCOV – OBÝVAČKA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/28": {
+      "raw_heading": "DOM BETY – JEDÁLEŇ",
+      "canonical_spaces": [
+        "DOM BETY – JEDÁLEŇ"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/29": {
+      "raw_heading": "VILA RÉVAYOVCOV – OBÝVAČKA",
+      "canonical_spaces": [
+        "VILA RÉVAYOVCOV – OBÝVAČKA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/30": {
+      "raw_heading": "VILA RÉVAYOVCOV – KÚPEĽŇA",
+      "canonical_spaces": [
+        "VILA RÉVAYOVCOV – KÚPEĽŇA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/31": {
+      "raw_heading": "UBYTOVŇA - ANDYHO BYT",
+      "canonical_spaces": [
+        "UBYTOVŇA - ANDYHO BYT"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/32": {
+      "raw_heading": "ULICA PRED ŠKOLOU",
+      "canonical_spaces": [
+        "ULICA PRED ŠKOLOU"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/33": {
+      "raw_heading": "PRED ŠKOLOU – V AUTE",
+      "canonical_spaces": [
+        "PRED ŠKOLOU – V AUTE"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/34": {
+      "raw_heading": "ŠKOLA – TELOCVIČŇA",
+      "canonical_spaces": [
+        "ŠKOLA – TELOCVIČŇA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/35": {
+      "raw_heading": "ŠKOLA – TELOCVIČŇA",
+      "canonical_spaces": [
+        "ŠKOLA – TELOCVIČŇA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/36": {
+      "raw_heading": "ŠKOLA – TELOCVIČŇA",
+      "canonical_spaces": [
+        "ŠKOLA – TELOCVIČŇA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/37": {
+      "raw_heading": "ŠKOLA – TELOCVIČŇA (PÓDIUM)",
+      "canonical_spaces": [
+        "ŠKOLA – TELOCVIČŇA (PÓDIUM)"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/38": {
+      "raw_heading": "ŠKOLA – TELOCVIČŇA/BACKSTAGE VEDĽA PÓDIA",
+      "canonical_spaces": [
+        "ŠKOLA – TELOCVIČŇA/BACKSTAGE VEDĽA PÓDIA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/39LP": {
+      "raw_heading": "UBYTOVŇA - ANDYHO BYT",
+      "canonical_spaces": [
+        "UBYTOVŇA - ANDYHO BYT"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/40LP": {
+      "raw_heading": "PRED UBYTOVŇOU",
+      "canonical_spaces": [
+        "PRED UBYTOVŇOU"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/41": {
+      "raw_heading": "UBYTOVŇA - ANDYHO BYT",
+      "canonical_spaces": [
+        "UBYTOVŇA - ANDYHO BYT"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/42": {
+      "raw_heading": "ŠKOLA – TELOCVIČŇA (HĽADISKO)",
+      "canonical_spaces": [
+        "ŠKOLA – TELOCVIČŇA (HĽADISKO)"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/43": {
+      "raw_heading": "ŠKOLA – CHODBA PRI SKRINKÁCH",
+      "canonical_spaces": [
+        "ŠKOLA – CHODBA PRI SKRINKÁCH"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/44": {
+      "raw_heading": "ŠKOLA – TELOCVIČŇA",
+      "canonical_spaces": [
+        "ŠKOLA – TELOCVIČŇA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/45": {
+      "raw_heading": "ŠKOLA – CHODBA PRI SKRINKÁCH",
+      "canonical_spaces": [
+        "ŠKOLA – CHODBA PRI SKRINKÁCH"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/46": {
+      "raw_heading": "ŠKOLA - VCHOD",
+      "canonical_spaces": [
+        "ŠKOLA - VCHOD"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/47": {
+      "raw_heading": "UBYTOVŇA - ANDYHO BYT",
+      "canonical_spaces": [
+        "UBYTOVŇA - ANDYHO BYT"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/48": {
+      "raw_heading": "CHODNÍK PRED ŠKOLOU",
+      "canonical_spaces": [
+        "CHODNÍK PRED ŠKOLOU"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/49": {
+      "raw_heading": "VERONIKINA VILA – OBÝVAČKA",
+      "canonical_spaces": [
+        "VERONIKINA VILA – OBÝVAČKA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/50": {
+      "raw_heading": "VILA RÉVAYOVCOV - OBÝVAČKA",
+      "canonical_spaces": [
+        "VILA RÉVAYOVCOV - OBÝVAČKA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "11/51": {
+      "raw_heading": "FEFE BEEF",
+      "canonical_spaces": [
+        "FEFE BEEF"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/01": {
+      "raw_heading": "FEFE BEEF",
+      "canonical_spaces": [
+        "FEFE BEEF"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/02": {
+      "raw_heading": "ALEXOV DOM - KUCHYŇA",
+      "canonical_spaces": [
+        "ALEXOV DOM - KUCHYŇA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/03": {
+      "raw_heading": "DOM BETY – IZBA BETY",
+      "canonical_spaces": [
+        "DOM BETY – IZBA BETY"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/04": {
+      "raw_heading": "ALEXOV DOM – ALEXOVA IZBA",
+      "canonical_spaces": [
+        "ALEXOV DOM – ALEXOVA IZBA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/05": {
+      "raw_heading": "VLAKOVÁ STANICA",
+      "canonical_spaces": [
+        "VLAKOVÁ STANICA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/06": {
+      "raw_heading": "VERONIKINA VILA – OBÝVAČKA",
+      "canonical_spaces": [
+        "VERONIKINA VILA – OBÝVAČKA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/07": {
+      "raw_heading": "PRED VLAKOVOU STANICOU",
+      "canonical_spaces": [
+        "PRED VLAKOVOU STANICOU"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/08": {
+      "raw_heading": "VERONIKINA VILA – OBÝVAČKA",
+      "canonical_spaces": [
+        "VERONIKINA VILA – OBÝVAČKA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/09": {
+      "raw_heading": "FEFE BEEF",
+      "canonical_spaces": [
+        "FEFE BEEF"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/10": {
+      "raw_heading": "POLÍCIA – VYŠETROVAČKA",
+      "canonical_spaces": [
+        "POLÍCIA – VYŠETROVAČKA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/11FLASH": {
+      "raw_heading": "ZA KRČMOU U VLKA",
+      "canonical_spaces": [
+        "ZA KRČMOU U VLKA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/12FLASH": {
+      "raw_heading": "ZA KRČMOU U VLKA",
+      "canonical_spaces": [
+        "ZA KRČMOU U VLKA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/13FLASH": {
+      "raw_heading": "SUTERÉN KRČMY U VLKA",
+      "canonical_spaces": [
+        "SUTERÉN KRČMY U VLKA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/14FLASH": {
+      "raw_heading": "OPUSTENÁ CESTA",
+      "canonical_spaces": [
+        "OPUSTENÁ CESTA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/15": {
+      "raw_heading": "POLÍCIA – CHODBA",
+      "canonical_spaces": [
+        "POLÍCIA – CHODBA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/16": {
+      "raw_heading": "VILA RÉVAYOVCOV – JEDÁLEŇ",
+      "canonical_spaces": [
+        "VILA RÉVAYOVCOV – JEDÁLEŇ"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/17": {
+      "raw_heading": "POLÍCIA – VYŠETROVAČKA",
+      "canonical_spaces": [
+        "POLÍCIA – VYŠETROVAČKA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/18": {
+      "raw_heading": "ŠKOLA – KLUBOVŇA",
+      "canonical_spaces": [
+        "ŠKOLA – KLUBOVŇA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/19": {
+      "raw_heading": "ŠKOLA – ŠATŇA",
+      "canonical_spaces": [
+        "ŠKOLA – ŠATŇA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/20": {
+      "raw_heading": "ŠKOLA – CHODBA S UČEBŇAMI",
+      "canonical_spaces": [
+        "ŠKOLA – CHODBA S UČEBŇAMI"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/21": {
+      "raw_heading": "ALEXOV DOM – KUCHYŇA",
+      "canonical_spaces": [
+        "ALEXOV DOM – KUCHYŇA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/22": {
+      "raw_heading": "ALEXOV DOM – KUCHYŇA/VSTUP",
+      "canonical_spaces": [
+        "ALEXOV DOM – KUCHYŇA/VSTUP"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/23": {
+      "raw_heading": "DOM BETY – IZBA BETY",
+      "canonical_spaces": [
+        "DOM BETY – IZBA BETY"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/24": {
+      "raw_heading": "DOM BETY – VSTUP/KUCHYŇA",
+      "canonical_spaces": [
+        "DOM BETY – VSTUP/KUCHYŇA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/25": {
+      "raw_heading": "DOM BETY – KUCHYŇA",
+      "canonical_spaces": [
+        "DOM BETY – KUCHYŇA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/26": {
+      "raw_heading": "VILA RÉVAYOVCOV – HALA",
+      "canonical_spaces": [
+        "VILA RÉVAYOVCOV – HALA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/27": {
+      "raw_heading": "FEFE BEEF",
+      "canonical_spaces": [
+        "FEFE BEEF"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/28": {
+      "raw_heading": "POLÍCIA – NÁVŠTEVNÁ MIESTNOSŤ",
+      "canonical_spaces": [
+        "POLÍCIA – NÁVŠTEVNÁ MIESTNOSŤ"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/29": {
+      "raw_heading": "VERONIKINA VILA – OBÝVAČKA",
+      "canonical_spaces": [
+        "VERONIKINA VILA – OBÝVAČKA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/30": {
+      "raw_heading": "ALEXOV DOM – OBÝVAČKA",
+      "canonical_spaces": [
+        "ALEXOV DOM – OBÝVAČKA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/31": {
+      "raw_heading": "SUTERÉN KRČMY U VLKA",
+      "canonical_spaces": [
+        "SUTERÉN KRČMY U VLKA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/32": {
+      "raw_heading": "DOM BETY – IZBA BETY",
+      "canonical_spaces": [
+        "DOM BETY – IZBA BETY"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/33": {
+      "raw_heading": "UBYTOVŇA – FARKAŠOV BYT",
+      "canonical_spaces": [
+        "UBYTOVŇA – FARKAŠOV BYT"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/34": {
+      "raw_heading": "PRED UBYTOVŇOU",
+      "canonical_spaces": [
+        "PRED UBYTOVŇOU"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/35": {
+      "raw_heading": "VERONIKINA VILA – VSTUP",
+      "canonical_spaces": [
+        "VERONIKINA VILA – VSTUP"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/36": {
+      "raw_heading": "PRED VLAKOVOU STANICOU",
+      "canonical_spaces": [
+        "PRED VLAKOVOU STANICOU"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/37": {
+      "raw_heading": "ŠKOLA – REDAKCIA",
+      "canonical_spaces": [
+        "ŠKOLA – REDAKCIA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/38": {
+      "raw_heading": "VILA RÉVAYOVCOV – OBÝVAČKA",
+      "canonical_spaces": [
+        "VILA RÉVAYOVCOV – OBÝVAČKA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/39": {
+      "raw_heading": "VINÁRSTVO RÉVAYOVCOV – PRED SKLADOM A SKLAD",
+      "canonical_spaces": [
+        "VINÁRSTVO RÉVAYOVCOV – PRED SKLADOM A SKLAD"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/40": {
+      "raw_heading": "LES – SKRÝŠA",
+      "canonical_spaces": [
+        "LES – SKRÝŠA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/41": {
+      "raw_heading": "ALEXOV DOM – ALEXOVA IZBA",
+      "canonical_spaces": [
+        "ALEXOV DOM – ALEXOVA IZBA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/43": {
+      "raw_heading": "VILA RÉVAYOVCOV – SÁRINA IZBA",
+      "canonical_spaces": [
+        "VILA RÉVAYOVCOV – SÁRINA IZBA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/44": {
+      "raw_heading": "VILA RÉVAYOVCOV – HALA/JEDÁLEŇ",
+      "canonical_spaces": [
+        "VILA RÉVAYOVCOV – HALA/JEDÁLEŇ"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/45": {
+      "raw_heading": "POLÍCIA – KANCELÁRIA",
+      "canonical_spaces": [
+        "POLÍCIA – KANCELÁRIA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/42": {
+      "raw_heading": "B. INT. ALEXOV DOM – ALEXOVA IZBA",
+      "canonical_spaces": [
+        "B. INT. ALEXOV DOM – ALEXOVA IZBA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/46": {
+      "raw_heading": "SUTERÉN KRČMY U VLKA",
+      "canonical_spaces": [
+        "SUTERÉN KRČMY U VLKA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/47LP": {
+      "raw_heading": "POLÍCIA – NÁVŠTEVNÁ MIESTNOSŤ",
+      "canonical_spaces": [
+        "POLÍCIA – NÁVŠTEVNÁ MIESTNOSŤ"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/48": {
+      "raw_heading": "POLÍCIA – CHODBA",
+      "canonical_spaces": [
+        "POLÍCIA – CHODBA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/49": {
+      "raw_heading": "VERONIKINA VILA – OBÝVAČKA",
+      "canonical_spaces": [
+        "VERONIKINA VILA – OBÝVAČKA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/50": {
+      "raw_heading": "ALEXOV DOM – VSTUP",
+      "canonical_spaces": [
+        "ALEXOV DOM – VSTUP"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/51LP": {
+      "raw_heading": "VINÁRSTVO RÉVAYOVCOV",
+      "canonical_spaces": [
+        "VINÁRSTVO RÉVAYOVCOV"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "12/52": {
+      "raw_heading": "VINÁRSTVO RÉVAYOVCOV - SKLAD",
+      "canonical_spaces": [
+        "VINÁRSTVO RÉVAYOVCOV - SKLAD"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/01": {
+      "raw_heading": "FEFE BEEF",
+      "canonical_spaces": [
+        "FEFE BEEF"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/02": {
+      "raw_heading": "VILA RÉVAYOVCOV – VCHOD/HALA",
+      "canonical_spaces": [
+        "VILA RÉVAYOVCOV – VCHOD/HALA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/03": {
+      "raw_heading": "IVANOVA REDAKCIA – PODCASTOVÉ ŠTÚDIO",
+      "canonical_spaces": [
+        "IVANOVA REDAKCIA – PODCASTOVÉ ŠTÚDIO"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/04": {
+      "raw_heading": "VILA RÉVAYOVCOV – HALA",
+      "canonical_spaces": [
+        "VILA RÉVAYOVCOV – HALA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/05": {
+      "raw_heading": "CESTA/ODSTAVNÉ PARKOVISKO",
+      "canonical_spaces": [
+        "CESTA/ODSTAVNÉ PARKOVISKO"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/06": {
+      "raw_heading": "VÄZENIE – VYŠETROVAČKA",
+      "canonical_spaces": [
+        "VÄZENIE – VYŠETROVAČKA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/07": {
+      "raw_heading": "VERONIKINA VILA – JEDÁLEŇ",
+      "canonical_spaces": [
+        "VERONIKINA VILA – JEDÁLEŇ"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/08": {
+      "raw_heading": "ULICA",
+      "canonical_spaces": [
+        "ULICA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/09": {
+      "raw_heading": "ŠKOLA – CHODBA PRI UČEBNIACH",
+      "canonical_spaces": [
+        "ŠKOLA – CHODBA PRI UČEBNIACH"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/10": {
+      "raw_heading": "ŠKOLA – KLUBOVŇA",
+      "canonical_spaces": [
+        "ŠKOLA – KLUBOVŇA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/11": {
+      "raw_heading": "VILA RÉVAYOVCOV – OBÝVAČKA",
+      "canonical_spaces": [
+        "VILA RÉVAYOVCOV – OBÝVAČKA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/12": {
+      "raw_heading": "ŠKOLA – REDAKCIA",
+      "canonical_spaces": [
+        "ŠKOLA – REDAKCIA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/13": {
+      "raw_heading": "LUKÁŠOVA FIRMA – KANCELÁRIA",
+      "canonical_spaces": [
+        "LUKÁŠOVA FIRMA – KANCELÁRIA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/14": {
+      "raw_heading": "DOM BETY - OBÝVAČKA",
+      "canonical_spaces": [
+        "DOM BETY - OBÝVAČKA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/15": {
+      "raw_heading": "ŠKOLA - ŠATŇA",
+      "canonical_spaces": [
+        "ŠKOLA - ŠATŇA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/16": {
+      "raw_heading": "DOM BETY - IZBA BETY",
+      "canonical_spaces": [
+        "DOM BETY - IZBA BETY"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/17": {
+      "raw_heading": "ALEXOV DOM – KUCHYŇA",
+      "canonical_spaces": [
+        "ALEXOV DOM – KUCHYŇA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/18": {
+      "raw_heading": "POLÍCIA – NÁVŠTEVNÁ MIESTNOSŤ",
+      "canonical_spaces": [
+        "POLÍCIA – NÁVŠTEVNÁ MIESTNOSŤ"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/19": {
+      "raw_heading": "ŠKOLA – KLUBOVŇA",
+      "canonical_spaces": [
+        "ŠKOLA – KLUBOVŇA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/20": {
+      "raw_heading": "ŠKOLA - CHODBA SO SKRINKAMI",
+      "canonical_spaces": [
+        "ŠKOLA - CHODBA SO SKRINKAMI"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/21": {
+      "raw_heading": "ALEXOV DOM - KUCHYŇA",
+      "canonical_spaces": [
+        "ALEXOV DOM - KUCHYŇA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/22": {
+      "raw_heading": "ULICA",
+      "canonical_spaces": [
+        "ULICA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/23": {
+      "raw_heading": "VERONIKINA VILA – HALA",
+      "canonical_spaces": [
+        "VERONIKINA VILA – HALA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/24": {
+      "raw_heading": "DOM BETY – OBÝVAČKA",
+      "canonical_spaces": [
+        "DOM BETY – OBÝVAČKA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/25": {
+      "raw_heading": "VILA RÉVAYOVCOV - HALA",
+      "canonical_spaces": [
+        "VILA RÉVAYOVCOV - HALA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/26": {
+      "raw_heading": "DOM BETY - IZBA BETY",
+      "canonical_spaces": [
+        "DOM BETY - IZBA BETY"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/27": {
+      "raw_heading": "ŠKOLA – KLUBOVŇA",
+      "canonical_spaces": [
+        "ŠKOLA – KLUBOVŇA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/28LP": {
+      "raw_heading": "VILA RÉVAYOVCOV – SÁRINA IZBA",
+      "canonical_spaces": [
+        "VILA RÉVAYOVCOV – SÁRINA IZBA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/29": {
+      "raw_heading": "PRED PRIEMYSLOVKOU",
+      "canonical_spaces": [
+        "PRED PRIEMYSLOVKOU"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/30": {
+      "raw_heading": "PRED PRIEMYSLOVKOU",
+      "canonical_spaces": [
+        "PRED PRIEMYSLOVKOU"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/31": {
+      "raw_heading": "PRI RIEKE V OKOLÍ MOSTA",
+      "canonical_spaces": [
+        "PRI RIEKE V OKOLÍ MOSTA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/32": {
+      "raw_heading": "NA MOSTE",
+      "canonical_spaces": [
+        "NA MOSTE"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/33": {
+      "raw_heading": "V RIEKE",
+      "canonical_spaces": [
+        "V RIEKE"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/34": {
+      "raw_heading": "V RIEKE",
+      "canonical_spaces": [
+        "V RIEKE"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/35": {
+      "raw_heading": "NA BREHU RIEKY",
+      "canonical_spaces": [
+        "NA BREHU RIEKY"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/36": {
+      "raw_heading": "VERONIKINA VILA - OBÝVAČKA",
+      "canonical_spaces": [
+        "VERONIKINA VILA - OBÝVAČKA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/37": {
+      "raw_heading": "DOM BETY - IZBA BETY",
+      "canonical_spaces": [
+        "DOM BETY - IZBA BETY"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/38": {
+      "raw_heading": "ALEXOV DOM – KUCHYŇA",
+      "canonical_spaces": [
+        "ALEXOV DOM – KUCHYŇA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/39": {
+      "raw_heading": "POLÍCIA – NÁVŠTEVNÁ MIESTNOSŤ",
+      "canonical_spaces": [
+        "POLÍCIA – NÁVŠTEVNÁ MIESTNOSŤ"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/40": {
+      "raw_heading": "IVANOVA REDAKCIA – PODCASTOVÉ ŠTÚDIO",
+      "canonical_spaces": [
+        "IVANOVA REDAKCIA – PODCASTOVÉ ŠTÚDIO"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/41LP": {
+      "raw_heading": "VILA RÉVAYOVCOV – OBÝVAČKA",
+      "canonical_spaces": [
+        "VILA RÉVAYOVCOV – OBÝVAČKA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/42LP": {
+      "raw_heading": "DOM BETY – OBÝVAČKA",
+      "canonical_spaces": [
+        "DOM BETY – OBÝVAČKA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/43LP": {
+      "raw_heading": "ALEXOV DOM – ALEXOVA IZBA",
+      "canonical_spaces": [
+        "ALEXOV DOM – ALEXOVA IZBA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/44LP": {
+      "raw_heading": "POLICAJNÁ STANICA - KANCELÁRIA",
+      "canonical_spaces": [
+        "POLICAJNÁ STANICA - KANCELÁRIA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/45": {
+      "raw_heading": "FEFE BEEF",
+      "canonical_spaces": [
+        "FEFE BEEF"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/46": {
+      "raw_heading": "ALEXOV DOM – VSTUP",
+      "canonical_spaces": [
+        "ALEXOV DOM – VSTUP"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/47": {
+      "raw_heading": "FEFE BEEF",
+      "canonical_spaces": [
+        "FEFE BEEF"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/48": {
+      "raw_heading": "VINÁRSTVO – SKLAD",
+      "canonical_spaces": [
+        "VINÁRSTVO – SKLAD"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/49": {
+      "raw_heading": "UBYTOVŇA – ANDYHO BYT",
+      "canonical_spaces": [
+        "UBYTOVŇA – ANDYHO BYT"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/50": {
+      "raw_heading": "VERONIKINA VILA – VERONIKINA IZBA",
+      "canonical_spaces": [
+        "VERONIKINA VILA – VERONIKINA IZBA"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/51": {
+      "raw_heading": "UBYTOVŇA – VCHOD",
+      "canonical_spaces": [
+        "UBYTOVŇA – VCHOD"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/52LP": {
+      "raw_heading": "PRED VINÁRSTVOM",
+      "canonical_spaces": [
+        "PRED VINÁRSTVOM"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/53": {
+      "raw_heading": "FEFE BEEF",
+      "canonical_spaces": [
+        "FEFE BEEF"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/54": {
+      "raw_heading": "PRED FEFE BEEFOM",
+      "canonical_spaces": [
+        "PRED FEFE BEEFOM"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    },
+    "13/55LP": {
+      "raw_heading": "FEFE BEEF",
+      "canonical_spaces": [
+        "FEFE BEEF"
+      ],
+      "mapping_evidence": "new exact story-space identity"
+    }
+  },
+  "props": [
+    {
+      "scene_id": "11/02",
+      "stable_name": "Dogyho spisovateľský notebook",
+      "source_evidence": "(Prestrih) Dogy sedí v klubovni a píše do notebooku o dianí v mestečku.",
+      "owner": "DOGY",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "dogy-notebook",
+      "current_state": "Dogy na ňom píše text o dianí v meste",
+      "previous": null,
+      "next": "13/45",
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "11/01",
+      "stable_name": "Fotografie starých školských tabiel",
+      "source_evidence": "(Prestrih) Baby pokračujú v speve. Na stene hudobnej miestnosti vidíme aj fotky starých tabiel, spomienky na históriu školy. Do toho pokračuje Dogyho VO.",
+      "owner": null,
+      "categories": [
+        "Dokument"
+      ],
+      "continuity_group": null,
+      "current_state": "visia v hudobnej miestnosti ako história školy",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "11/03",
+      "stable_name": "Basketbalové dresy mužstva Onyx",
+      "source_evidence": "(Prestrih) Chalani stoja oblečení v basketbalových dresoch v šatni a hecujú sa pred zápasom, dávajú si high five, nejaký pokrik a podobne.",
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "current_state": "hráči ich majú oblečené pred zápasom",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "11/07",
+      "stable_name": "Dve kávy pre Dogyho a Andyho",
+      "source_evidence": "Dogy prišiel za otcom. Nesie dve kávy, vrecko s pečivom a vchádza do izby, ktorú mu Andy práve otvoril. Keď Dogy vojde, prekvapene sa poobzerá - všade je poriadok, čisto. Najväčší šok zažije, keď uvidí Andyho – nielenže je úplne triezvy, ale má čisté oblečenie, je oholený, dokonca stojí pri dvojplatničke a varí nejakú praženicu. Dogy sa zasmeje.",
+      "owner": "DOGY",
+      "categories": [],
+      "continuity_group": null,
+      "current_state": "Dogy ich prináša do Andyho bytu",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "11/07",
+      "stable_name": "Vrecko s pečivom od Dogyho",
+      "source_evidence": "Dogy prišiel za otcom. Nesie dve kávy, vrecko s pečivom a vchádza do izby, ktorú mu Andy práve otvoril. Keď Dogy vojde, prekvapene sa poobzerá - všade je poriadok, čisto. Najväčší šok zažije, keď uvidí Andyho – nielenže je úplne triezvy, ale má čisté oblečenie, je oholený, dokonca stojí pri dvojplatničke a varí nejakú praženicu. Dogy sa zasmeje.",
+      "owner": "DOGY",
+      "categories": [],
+      "continuity_group": null,
+      "current_state": "Dogy ho prináša k raňajkám",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "11/07",
+      "stable_name": "Dogyho rozpracovaný román",
+      "source_evidence": "ANDY Čítal som tých pár kapitol z tvojej knihy, čo si mi dal. Píšeš výborne.",
+      "owner": "DOGY",
+      "categories": [
+        "Dokument",
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "current_state": "Andy číta kapitoly Dogyho knihy",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "11/08",
+      "stable_name": "Veronikin osobný mobil",
+      "source_evidence": "Veronike vtedy zavibruje mobil, pozrie na mobil. Píše jej Bety: Kde si? Alex sa pokúsi zo seba vysúkať pozvanie na rande.",
+      "owner": "VERONIKA",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "current_state": "Veronika prijíma a číta správu",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "11/09",
+      "stable_name": "Nástenka so schémou podozrivých z Jakubovej vraždy",
+      "source_evidence": "(Alica má funkciu poradkyne budúcich novinárov v Scrolle – je to jej voľnočasová aktivita, zadarmo, odovzdávanie skúseností. Navrhol jej to Čmelský a ona prijala. Venuje sa Jakubovej vražde a v rámci inštruktáže do tejto témy zapojí aj Bety a Veroniku). Veronika zavrie dvere a sadne si. Alica ukáže na nástenku so schémou podozrivých z vraždy Jakuba.",
+      "owner": null,
+      "categories": [
+        "Dokument"
+      ],
+      "continuity_group": null,
+      "current_state": "Alica na nej ukazuje mená podozrivých",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "11/22",
+      "stable_name": "Zásnubný rodinný prsteň Jakuba a Sáry",
+      "source_evidence": "Sofia hneď na ňu pozrie, čo sa deje. Sára drží v ruke prsteň.",
+      "owner": "SÁRA",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "zasnubny-prsten-jakuba-a-sary",
+      "current_state": "Sofia ho nájde v Oskarovom saku",
+      "previous": null,
+      "next": "11/38",
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "11/38",
+      "stable_name": "Zásnubný rodinný prsteň Jakuba a Sáry",
+      "source_evidence": "(prestrih na ples-pódium) Alex stále spieva na pódiu, Veronika s Eclipse naboku, bavia sa. Len Sára má v očiach slzy. Siahne si do vrecka a vytiahne prsteň, ktorý nosí pri sebe, lebo jej pripomína Jakuba. Rozplače sa a odchádza rýchlo preč.",
+      "owner": "SÁRA",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "zasnubny-prsten-jakuba-a-sary",
+      "current_state": "Sára ho nosí pri sebe a vytiahne ho počas plesu",
+      "previous": "11/22",
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "11/25",
+      "stable_name": "Kľúč od Andyho bytu",
+      "source_evidence": "Alexovi vtedy napadne, či nebude kľúč niekde ukrytý. Skúsi ohmatať zárubňu dverí zhora, nič tam však nie je. Potom pozrie pod rohožku. Napokon si všimne na stene červené dvere hydrantu. Otvorí ich a po chvíli šmátrania nájde ukrytý kľúč. Strčí ho do zámku.",
+      "owner": "ANDY",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "current_state": "Alex ho nájde v skrinke hydrantu a vloží do zámku",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": "Overiť, či sa ten istý kľúč fyzicky ukáže aj v 11/26 alebo 11/31."
+    },
+    {
+      "scene_id": "11/39LP",
+      "stable_name": "Policajné vozidlo pri ubytovni – 11/39LP",
+      "source_evidence": "(prestrih do Andyho bytu) Andy sedí za stolom, krája si jablko, jedným okom sleduje nejaký športový prenos. Cez okno zbadá blikajúce policajné majáky. Vie, že je zle, ale nepanikári.",
+      "owner": null,
+      "categories": [
+        "Auto"
+      ],
+      "continuity_group": null,
+      "current_state": "Andy vidí jeho blikajúce majáky cez okno",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": "Je to rovnaké vozidlo ako v 11/40LP?"
+    },
+    {
+      "scene_id": "11/40LP",
+      "stable_name": "Policajné vozidlo pri ubytovni – 11/40LP",
+      "source_evidence": "(prestrih pred ubytovňu) Keler a dvaja policajti prichádzajú k ubytovni. Policajné majáky blikajú.",
+      "owner": null,
+      "categories": [
+        "Auto"
+      ],
+      "continuity_group": null,
+      "current_state": "Keler a dvaja policajti ním prichádzajú k ubytovni",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": "Je to rovnaké vozidlo ako v 11/39LP?"
+    },
+    {
+      "scene_id": "11/41",
+      "stable_name": "Vražedná zbraň nájdená v Andyho byte",
+      "source_evidence": "Vidíme, že v kufríku je zbraň. Andy neveriacky pozerá na kufrík.",
+      "owner": null,
+      "categories": [
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": null,
+      "current_state": "policajti ju fyzicky nájdu v kufríku",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": "Potvrdiť pôvod a totožnosť zbrane pred spojením s inou zbraňou."
+    },
+    {
+      "scene_id": "11/33",
+      "stable_name": "Andyho auto – 11/33",
+      "source_evidence": "Dogy za sebou zatvára dvere Andyho auta a tvári sa vážne. Andy je prekvapený, už chcel vyraziť.",
+      "owner": "ANDY",
+      "categories": [
+        "Auto",
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "current_state": "Dogy sedí s Andym vo vozidle pred školou",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": "Neprepájať s iným autom bez potvrdenia konkrétneho kusu."
+    },
+    {
+      "scene_id": "13/30",
+      "stable_name": "Veronikin osobný mobil",
+      "source_evidence": "Alex sa aj nadýchne, ale kým nájde slová, Veronike príde s hlasným cinknutím správa. Veronika vezme mobil.",
+      "owner": "VERONIKA",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "current_state": "Veronika na ňom číta Sárinu správu",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "13/31",
+      "stable_name": "Dogyho osobný mobil",
+      "source_evidence": "(prestrih na breh) Alex, Bety, Veronika a Dogy zhrozene sledujú Sáru padajúcu z mosta do vody. Baby jačia. Sára padá do vody s teatrálnym čľupnutím. Dogy hľadá mobil.",
+      "owner": "DOGY",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "current_state": "Dogy ním volá 112 pri záchrane Sáry",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "13/35",
+      "stable_name": "Betina bunda pri záchrane Sáry",
+      "source_evidence": "Sára je zmätená ale prikývne. Bety Sáru prikryje svojou bundou, tá na ňu vyjavene pozrie a nechá sa prikryť. Všetkým odľahne, len Alex si šúcha zranenú (krvavú) ruku (pravú - oškrel si ju pri skoku do vody o nejaké kamene/konáre).",
+      "owner": "BETY",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "current_state": "Bety ňou prikryje zachránenú Sáru",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "13/40",
+      "stable_name": "Betin podcastový mikrofón",
+      "source_evidence": "Bety sedí pred mikrofónom (aj s kamerou) v redakcii, zapína vysielanie, napraví si pred sebou poznámky, zhlboka sa nadýchne, a spustí podcast.",
+      "owner": "BETY",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "betin-podcast-setup",
+      "current_state": "Bety doň vysiela živý podcast",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "13/40",
+      "stable_name": "Kamera Betinho videopodcastu",
+      "source_evidence": "Bety sedí pred mikrofónom (aj s kamerou) v redakcii, zapína vysielanie, napraví si pred sebou poznámky, zhlboka sa nadýchne, a spustí podcast.",
+      "owner": "BETY",
+      "categories": [
+        "Osobná rekvizita",
+        "Screen",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "betin-podcast-setup",
+      "current_state": "kamera sníma Betin živý podcast",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "13/40",
+      "stable_name": "Betine poznámky k podcastu",
+      "source_evidence": "Bety sedí pred mikrofónom (aj s kamerou) v redakcii, zapína vysielanie, napraví si pred sebou poznámky, zhlboka sa nadýchne, a spustí podcast.",
+      "owner": "BETY",
+      "categories": [
+        "Dokument",
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "current_state": "Bety ich používa pri vysielaní",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "13/45",
+      "stable_name": "Dogyho spisovateľský notebook",
+      "source_evidence": "Fefe sa ustarane pozrie na Dogyho, ktorý sedí za barom a tiež to počúva na počítači.",
+      "owner": "DOGY",
+      "categories": [
+        "Osobná rekvizita",
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "dogy-notebook",
+      "current_state": "Dogy na ňom počúva Betin podcast u Fefeho",
+      "previous": "11/02",
+      "next": null,
+      "ambiguity_question": "Scenár používa slovo počítač; potvrdené zadanie ho mapuje na Dogyho notebook."
+    },
+    {
+      "scene_id": "13/47",
+      "stable_name": "Jedálenská sada partie vo Fefe Beef – 13/47",
+      "source_evidence": "Bety, Alex, Veronika a Dogy sedia u Fefeho pri stole. Pred sebou majú burgre a limonády. Pripíjajú si na dnešok, bol to fakt hustý deň (záchrana Sáry, vzťahové vysvetľovačky, Betin podcast).",
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "current_state": "burgre a limonády štyroch kamarátov na stole",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "13/48",
+      "stable_name": "Benzín vo vinárskom sklade – 13/48",
+      "source_evidence": "Klaudia vchádza do budovy, v ktorej sa obesil Oskar a v ktorej sú ešte stále rôzne krabice (aj tie, ktorých obsah jej Klaudia ukazovala v epi 12). Klaudia okamžite zacíti smrad benzínu, zmätene sa poobzerá a zbadá Sáru, ktorá má ruky vo vreckách a pohľad otočený hore k stropu (kde visel otec).",
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "current_state": "rozliaty spotrebný materiál určený na zapálenie skladu",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "13/48",
+      "stable_name": "Sárin zapaľovač",
+      "source_evidence": "Klaudia sa začína obávať najhoršieho. Sára vytiahne z vrecka ruku v ktorej drží zapaľovač.",
+      "owner": "SÁRA",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "current_state": "Sára ho škrtne a hodí na zem",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "13/48",
+      "stable_name": "Papierové krabice vo vinárskom sklade",
+      "source_evidence": "Škrtne s ním a hodí ho pred seba na zem. Papierové krabice okolo Sáry okamžite vzbĺknu.",
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "current_state": "krabice okolo Sáry vzbĺknu",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "13/51",
+      "stable_name": "Dogyho kožená bunda s Vlčím symbolom",
+      "source_evidence": "Podá Dogymu koženú bundu s Vlčím symbolom na chrbte.",
+      "owner": "DOGY",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "current_state": "Kolečko ju odovzdá Dogymu a Dogy si ju oblečie",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "13/53",
+      "stable_name": "Zbraň Čiernej kukly",
+      "source_evidence": "Alex prejde na druhý koniec baru po slamky a servítky. Je otočený chrbtom k dverám. Do bistra vojde muž s čiernou kuklou na hlave, s vystrihnutými dierami na oči. Alex si ho nevšimne. Ozbrojený muž sa postaví k pultu, vytiahne zbraň a namieri ju na Fefeho.",
+      "owner": null,
+      "categories": [
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "zbran-ciernej-kukly",
+      "current_state": "páchateľ ňou mieri na Fefeho",
+      "previous": null,
+      "next": "13/54",
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "13/54",
+      "stable_name": "Zbraň Čiernej kukly",
+      "source_evidence": "otvoria a zlodej v čiernej kukle uteká preč.",
+      "owner": null,
+      "categories": [
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "zbran-ciernej-kukly",
+      "current_state": "páchateľ s ňou uteká z bistra",
+      "previous": "13/53",
+      "next": null,
+      "ambiguity_question": "Zbraň nie je v skrátenom texte 13/54 výslovne pomenovaná; kontinuita vyplýva z bezprostredného úteku páchateľa."
+    },
+    {
+      "scene_id": "13/53",
+      "stable_name": "Čierna kukla páchateľa",
+      "source_evidence": "Alex prejde na druhý koniec baru po slamky a servítky. Je otočený chrbtom k dverám. Do bistra vojde muž s čiernou kuklou na hlave, s vystrihnutými dierami na oči. Alex si ho nevšimne. Ozbrojený muž sa postaví k pultu, vytiahne zbraň a namieri ju na Fefeho.",
+      "owner": null,
+      "categories": [
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "cierna-kukla-pachatela",
+      "current_state": "páchateľ ju má na hlave pri lúpeži",
+      "previous": null,
+      "next": "13/54",
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "13/54",
+      "stable_name": "Čierna kukla páchateľa",
+      "source_evidence": "otvoria a zlodej v čiernej kukle uteká preč.",
+      "owner": null,
+      "categories": [
+        "Nadväzná rekvizita"
+      ],
+      "continuity_group": "cierna-kukla-pachatela",
+      "current_state": "páchateľ v nej uteká z bistra",
+      "previous": "13/53",
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "13/53",
+      "stable_name": "Peniaze z kasy Fefe Beef",
+      "source_evidence": "ČIERNA KUKLA Peniaze z kasy. Makaj.",
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "current_state": "lupič ich žiada a berie z kasy",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "13/53",
+      "stable_name": "Lukášova peňaženka",
+      "source_evidence": "ČIERNA KUKLA /zakričí/ Ty! Peňaženku a hodinky!",
+      "owner": "LUKÁŠ",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "current_state": "Lukáš ju odovzdáva ozbrojenému páchateľovi",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "13/53",
+      "stable_name": "Lukášove hodinky",
+      "source_evidence": "ČIERNA KUKLA /zakričí/ Ty! Peňaženku a hodinky!",
+      "owner": "LUKÁŠ",
+      "categories": [
+        "Osobná rekvizita"
+      ],
+      "continuity_group": null,
+      "current_state": "páchateľ ich žiada od Lukáša",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "13/53",
+      "stable_name": "Slamky a servítky pri bare Fefe Beef",
+      "source_evidence": "Alex prejde na druhý koniec baru po slamky a servítky. Je otočený chrbtom k dverám. Do bistra vojde muž s čiernou kuklou na hlave, s vystrihnutými dierami na oči. Alex si ho nevšimne. Ozbrojený muž sa postaví k pultu, vytiahne zbraň a namieri ju na Fefeho.",
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "current_state": "Alex je pri nich otočený chrbtom k páchateľovi",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "13/55LP",
+      "stable_name": "Servítky na Lukášovu ranu",
+      "source_evidence": "Postrelený Lukáš leží na zemi, uplakaný Alex mu podopiera hlavu, tlačí mu zakrvavenými rukami servítky na postrelený hrudník. Okolo sú rozhádzané peniaze, plastové vidličky atď., v pozadí roztrasený Fefe volá záchranku. Tragédia ako vyšitá.",
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "current_state": "Alex nimi tlačí Lukášovu ranu",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    },
+    {
+      "scene_id": "13/55LP",
+      "stable_name": "Plastové vidličky rozhádzané vo Fefe Beef",
+      "source_evidence": "Postrelený Lukáš leží na zemi, uplakaný Alex mu podopiera hlavu, tlačí mu zakrvavenými rukami servítky na postrelený hrudník. Okolo sú rozhádzané peniaze, plastové vidličky atď., v pozadí roztrasený Fefe volá záchranku. Tragédia ako vyšitá.",
+      "owner": null,
+      "categories": [],
+      "continuity_group": null,
+      "current_state": "sú rozhádzané po prestrelke",
+      "previous": null,
+      "next": null,
+      "ambiguity_question": null
+    }
+  ]
+}
