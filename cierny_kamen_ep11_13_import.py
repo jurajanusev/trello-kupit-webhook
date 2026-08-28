@@ -5,6 +5,7 @@ import json
 import re
 import unicodedata
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from flask import jsonify, request
@@ -255,12 +256,24 @@ def apply_scene_new(api, state, scene, desired, label_ids, scene_list_id):
     if actual and projection != expected:
         raise ValueError(f"existing checklist conflict: {scene['scene_id']}")
     if not actual:
-        for position, name in enumerate(CHECKLIST_NAMES, 1):
-            checklist = api["trello_post_body"](f"/cards/{card['id']}/checklists", {"name": name, "pos": position * 16384})
-            writes += 1
+        def create_checklist(entry):
+            position, name = entry
+            checklist = api["trello_post_body"](
+                f"/cards/{card['id']}/checklists",
+                {"name": name, "pos": position * 16384},
+            )
+            count = 1
             for item in checklists[name]:
-                api["trello_post_body"](f"/checklists/{checklist['id']}/checkItems", {"name": item, "pos": "bottom"})
-                writes += 1
+                api["trello_post_body"](
+                    f"/checklists/{checklist['id']}/checkItems",
+                    {"name": item, "pos": "bottom"},
+                )
+                count += 1
+            return name, checklist, count
+
+        with ThreadPoolExecutor(max_workers=5) as pool:
+            created_lists = list(pool.map(create_checklist, enumerate(CHECKLIST_NAMES, 1)))
+        writes += sum(row[2] for row in created_lists)
     return card, writes, created
 
 
