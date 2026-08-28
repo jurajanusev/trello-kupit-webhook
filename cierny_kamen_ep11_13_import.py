@@ -14,7 +14,8 @@ from cierny_kamen_ep07_10_import import (
     CHECKLIST_NAMES, SPACE_LIST, PROP_LIST, apply_scene, card_map,
     combined_scenes, ensure_attachments, exact_named, folded,
     prop_registry_block, read_checklists, registry_aliases, runtime_state,
-    scene_readback, space_registry_description,
+    scene_readback, space_registry_description, sync_prop_master,
+    sync_space_master,
 )
 
 KEY = "cierny-kamen-ep11-13-28aug-64d3f5a1"
@@ -344,7 +345,7 @@ def register_routes(app, api):
         if request.headers.get("X-CK-Ep11-13-Key") != KEY:
             return jsonify({"error": "forbidden"}), 403
         mode = request.args.get("mode", "dry-run").casefold()
-        allowed = {"dry-run", "audit", "master-init", "sample", "apply", "fill", "finalize", "final-audit"}
+        allowed = {"dry-run", "audit", "master-init", "sample", "apply", "fill", "finalize", "sync", "final-audit"}
         if mode not in allowed:
             return jsonify({"error": "unsupported mode", "writes": 0}), 409
         if mode in {"dry-run", "audit"}:
@@ -407,6 +408,31 @@ def register_routes(app, api):
         # time. Resolve them by the same accent/case-insensitive key used by the
         # rest of the importer while retaining the board's real label IDs.
         label_ids = {folded(row["name"]): row["id"] for row in state["labels"]}
+        if mode == "sync":
+            scenes_by_id = {scene["scene_id"]: scene for scene in payload["scenes"]}
+            sync_rows = []
+            for row in prop_plan:
+                sync_rows.append(("prop", {**row, "scene_ids": [item["scene_id"] for item in row["rows"]]}))
+            raw_space_map = {}
+            for scene in payload["scenes"]:
+                raw_space_map[scene["location"]] = mapping["spaces_by_scene"][scene["scene_id"]]["canonical_spaces"]
+            sync_rows.extend(("space", row) for row in space_plan)
+            selected_sync = sync_rows[start:start + limit]
+            sync_results = []
+            for kind, row in selected_sync:
+                try:
+                    if kind == "prop":
+                        category_labels = {name: label_ids[folded(name)] for name in row["categories"]}
+                        updated, attachments = sync_prop_master(api, state, row, scenes_by_id, cards, category_labels)
+                    else:
+                        updated, attachments = sync_space_master(api, state, row, payload["scenes"], cards, raw_space_map)
+                except Exception as exc:
+                    return jsonify({"status": "blocked", "mode": mode, "failed_master": row["name"],
+                                    "error": f"{type(exc).__name__}: {exc}", "completed": sync_results}), 409
+                sync_results.append({"type": kind, "name": row["name"], "updated": updated, "attachments": attachments})
+            return jsonify({"status": "applied", "mode": mode, "selected": len(selected_sync),
+                            "writes": sum(int(x["updated"]) + x["attachments"] for x in sync_results),
+                            "remaining": max(0, len(sync_rows) - start - len(selected_sync)), "results": sync_results}), 200
         if mode == "sample":
             selected = [payload["scenes"][0]]
         elif mode == "fill":
