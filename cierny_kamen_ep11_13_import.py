@@ -291,13 +291,19 @@ def register_routes(app, api):
         # download while every created card is appended to this cache below.
         # `refresh=1` remains available for an explicit read-before-write reset.
         refresh = request.args.get("refresh") == "1"
-        if refresh or _WRITE_STATE_CACHE["state"] is None:
-            _WRITE_STATE_CACHE["state"] = runtime_state(api)
-        state = _WRITE_STATE_CACHE["state"]
+        try:
+            if refresh or _WRITE_STATE_CACHE["state"] is None:
+                _WRITE_STATE_CACHE["state"] = runtime_state(api)
+            state = _WRITE_STATE_CACHE["state"]
+        except Exception as exc:
+            return jsonify({"status": "blocked", "stage": "runtime-state", "error": f"{type(exc).__name__}: {exc}"}), 409
         source_ids = {scene["scene_id"] for scene in payload["scenes"]}
         if set(mapping["spaces_by_scene"]) != source_ids:
             return jsonify({"status": "blocked", "error": "identity/space map does not cover source scenes"}), 409
-        prop_plan, space_plan = master_plans(state, payload, mapping)
+        try:
+            prop_plan, space_plan = master_plans(state, payload, mapping)
+        except Exception as exc:
+            return jsonify({"status": "blocked", "stage": "master-plan", "error": f"{type(exc).__name__}: {exc}"}), 409
         unresolved = [row["name"] for row in [*prop_plan, *space_plan] if row["status"] != "reuse"]
         if unresolved and mode != "master-init":
             return jsonify({"status": "blocked", "unresolved_masters": unresolved}), 409
@@ -307,15 +313,18 @@ def register_routes(app, api):
                 return jsonify({"status": "applied", "mode": mode, **result}), 200
             except Exception as exc:
                 return jsonify({"status": "blocked", "error": f"{type(exc).__name__}: {exc}"}), 409
-        prop_cards, space_cards = resolve_master_maps(state, payload, mapping)
-        scene_lists = exact_named(state["lists"], "SCENÁRE")
-        if len(scene_lists) != 1:
-            return jsonify({"status": "blocked", "scene_lists": len(scene_lists)}), 409
-        cards, collisions = card_map(api, state)
-        relevant_collisions = sorted(source_ids & set(collisions))
-        if relevant_collisions:
-            return jsonify({"status": "blocked", "scene_collisions": relevant_collisions}), 409
-        all_scenes = combined_scenes(api, payload)
+        try:
+            prop_cards, space_cards = resolve_master_maps(state, payload, mapping)
+            scene_lists = exact_named(state["lists"], "SCENÁRE")
+            if len(scene_lists) != 1:
+                return jsonify({"status": "blocked", "scene_lists": len(scene_lists)}), 409
+            cards, collisions = card_map(api, state)
+            relevant_collisions = sorted(source_ids & set(collisions))
+            if relevant_collisions:
+                return jsonify({"status": "blocked", "scene_collisions": relevant_collisions}), 409
+            all_scenes = combined_scenes(api, payload)
+        except Exception as exc:
+            return jsonify({"status": "blocked", "stage": "prepare", "error": f"{type(exc).__name__}: {exc}"}), 409
         # Board labels are user-visible and their capitalization has changed over
         # time. Resolve them by the same accent/case-insensitive key used by the
         # rest of the importer while retaining the board's real label IDs.
