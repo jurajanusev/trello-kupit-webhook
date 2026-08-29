@@ -19,6 +19,7 @@ from cierny_kamen_ep07_10_import import (
 )
 
 KEY = "cierny-kamen-ep11-13-28aug-64d3f5a1"
+ENDPOINT_DISABLED = True
 BOARD_REF = "CzuD55PR"
 PAYLOAD_PATH = Path(__file__).with_name("cierny_kamen_ep11_13_scenes.json")
 MAP_PATH = Path(__file__).with_name("cierny_kamen_ep11_13_identity_space_map.json")
@@ -342,6 +343,8 @@ def apply_scene_new(api, state, scene, desired, label_ids, scene_list_id):
 def register_routes(app, api):
     @app.route("/api/cierny-kamen-ep11-13", methods=["POST"])
     def endpoint():
+        if ENDPOINT_DISABLED:
+            return jsonify({"error": "endpoint disabled"}), 410
         if request.headers.get("X-CK-Ep11-13-Key") != KEY:
             return jsonify({"error": "forbidden"}), 403
         mode = request.args.get("mode", "dry-run").casefold()
