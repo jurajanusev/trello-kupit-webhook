@@ -6158,8 +6158,6 @@ def cierny_kamen_scene_name_info(name):
 
 @app.route("/api/audit-cierny-kamen-import", methods=["GET"])
 def audit_cierny_kamen_import():
-    return jsonify({"error": "completed read-only endpoint disabled"}), 410
-
     if request.headers.get("X-Audit-Key") != CIERNY_KAMEN_AUDIT_KEY:
         return jsonify({"error": "forbidden"}), 403
 
@@ -6175,6 +6173,30 @@ def audit_cierny_kamen_import():
         "filter": "all", "limit": 1000,
     })
     lists_by_id = {item["id"]: item for item in lists}
+    requested_scene_cards = []
+    requested_ids = [
+        value.strip().upper() for value in request.args.get("requested", "").split(",")
+        if value.strip()
+    ]
+    for requested_id in requested_ids:
+        match = re.fullmatch(r"0*(\d+)\s*/\s*0*(\d+)([A-Z]*)", requested_id)
+        if not match:
+            continue
+        episode, scene, suffix = match.groups()
+        pattern = re.compile(
+            rf"(?<!\d)0*{int(episode)}\s*/\s*0*{int(scene)}{re.escape(suffix)}(?![A-Z0-9])",
+            flags=re.I,
+        )
+        for card in cards:
+            if not pattern.search(card.get("name", "")):
+                continue
+            board_list = lists_by_id.get(card.get("idList"), {})
+            requested_scene_cards.append({
+                "requested_id": requested_id, "name": card.get("name"),
+                "url": card.get("shortUrl"), "list": board_list.get("name"),
+                "card_closed": bool(card.get("closed")),
+                "list_closed": bool(board_list.get("closed")),
+            })
 
     list_counts = {
         item["id"]: {"open": 0, "closed": 0, "total": 0}
@@ -6317,6 +6339,7 @@ def audit_cierny_kamen_import():
 
     return jsonify({
         "status": "read-only-audit",
+        "requested_scene_cards": requested_scene_cards,
         "board": {
             "id": board["id"], "name": board["name"], "url": board.get("url"),
             "closed": board.get("closed"),
