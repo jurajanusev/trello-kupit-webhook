@@ -24,9 +24,9 @@ DOK4_CURRENT_SCHEDULE_FILE = "dok4_schedule_2026-08-24.json"
 DOK4_CURRENT_SCHEDULE_AS_OF = "2026-08-24"
 DOK4_CURRENT_SCHEDULE_ROWS = 482
 
-RIVERDALE_CURRENT_SCHEDULE_KEY = "riverdale-schedule-28aug-7c4e1a93"
-RIVERDALE_CURRENT_SCHEDULE_FILE = "riverdale_schedule_2026-08-28.json"
-RIVERDALE_CURRENT_SCHEDULE_AS_OF = "2026-08-28"
+RIVERDALE_CURRENT_SCHEDULE_KEY = "riverdale-schedule-30aug-4d82b7f1"
+RIVERDALE_CURRENT_SCHEDULE_FILE = "riverdale_schedule_2026-08-30.json"
+RIVERDALE_CURRENT_SCHEDULE_AS_OF = "2026-08-30"
 RIVERDALE_CURRENT_SCHEDULE_ROWS = 140
 RIVERDALE_BOARD_REF = "CzuD55PR"
 RIVERDALE_START_MARKER = "<!-- RIVERDALE-SCHEDULE-METADATA:START -->"
@@ -5136,7 +5136,6 @@ def repair_dok4_returned_card_date():
 
 @app.route("/api/repair-main-list-due-dates", methods=["POST"])
 def repair_main_list_due_dates():
-    return jsonify({"error": "completed one-off endpoint disabled"}), 410
     if request.headers.get("X-Repair-Key") != "main-list-due-audit-09aug-3db186f4":
         return jsonify({"error": "forbidden"}), 403
     project = request.args.get("project", "").strip().casefold()
@@ -5264,7 +5263,6 @@ def sync_dok4_current_schedule():
 @app.route("/api/sync-riverdale-current-schedule", methods=["POST"])
 def sync_riverdale_current_schedule():
     """Synchronize Riverdale from the latest supplied plan."""
-    return jsonify({"error": "completed one-off endpoint disabled"}), 410
     if request.headers.get("X-Sync-Key") != RIVERDALE_CURRENT_SCHEDULE_KEY:
         return jsonify({"error": "forbidden"}), 403
     mode = request.args.get("mode", "dry-run")
