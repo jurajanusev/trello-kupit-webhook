@@ -6168,10 +6168,27 @@ def audit_cierny_kamen_import():
     labels = trello_get(f"/boards/{board['id']}/labels", {
         "fields": "id,name,color", "limit": 1000,
     })
-    cards = trello_get(f"/boards/{board['id']}/cards", {
-        "fields": "id,name,desc,idList,shortUrl,closed",
-        "filter": "all", "limit": 1000,
-    })
+    cards = []
+    for board_list in lists:
+        before = None
+        seen_page_ends = set()
+        while True:
+            params = {
+                "fields": "id,name,desc,idList,shortUrl,closed",
+                "filter": "all", "limit": 1000,
+            }
+            if before:
+                params["before"] = before
+            page = trello_get(f"/lists/{board_list['id']}/cards", params)
+            cards.extend(page)
+            if len(page) < 1000:
+                break
+            page_end = page[-1]["id"]
+            if page_end in seen_page_ends:
+                return jsonify({"error": "Trello card pagination did not advance"}), 502
+            seen_page_ends.add(page_end)
+            before = page_end
+    cards = list({card["id"]: card for card in cards}.values())
     lists_by_id = {item["id"]: item for item in lists}
     requested_scene_cards = []
     requested_ids = [
