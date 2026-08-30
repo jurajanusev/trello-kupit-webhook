@@ -75,6 +75,11 @@ def normalize_scene(episode, scene):
     return f"{int(episode):02d}/{str(scene).upper().lstrip('0') or '0'}"
 
 
+def scene_numeric_base(scene_id):
+    """Drop every letter suffix from a normalized scene identifier."""
+    return re.sub(r"[A-Z]+$", "", scene_id.upper())
+
+
 def fallback_scene_ids(scene_id):
     """Return safe card variants from most specific to the numeric base.
 
@@ -142,7 +147,7 @@ def pick_anchor(lists):
 def build_state(
     trello, schedule, source_date, as_of, board_ref=BOARD_REF,
     start_marker=START_MARKER, end_marker=END_MARKER,
-    source_label="predbežné dispo DOK 4",
+    source_label="predbežné dispo DOK 4", ignore_scene_suffix=False,
 ):
     board = trello.get(f"/boards/{board_ref}", {"fields": "id,name,url,shortLink"})
     lists = trello.get(f"/boards/{board['id']}/lists", {
@@ -185,7 +190,10 @@ def build_state(
     for card in cards:
         match = SCENE_RE.match(card.get("name", ""))
         if match:
-            cards_by_scene.setdefault(normalize_scene(match.group(1), match.group(2)), []).append(card)
+            card_scene_id = normalize_scene(match.group(1), match.group(2))
+            if ignore_scene_suffix:
+                card_scene_id = scene_numeric_base(card_scene_id)
+            cards_by_scene.setdefault(card_scene_id, []).append(card)
 
     matches = []
     missing = []
@@ -196,9 +204,9 @@ def build_state(
     card_usage = {}
     for row in schedule:
         planned_id = row["scene_id"]
-        matched_id = planned_id
-        candidates = cards_by_scene.get(planned_id, [])
-        fallback = False
+        matched_id = scene_numeric_base(planned_id) if ignore_scene_suffix else planned_id
+        candidates = cards_by_scene.get(matched_id, [])
+        fallback = matched_id != planned_id
         if not candidates:
             for fallback_id in fallback_scene_ids(planned_id):
                 fallback_candidates = cards_by_scene.get(fallback_id, [])

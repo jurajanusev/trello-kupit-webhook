@@ -5264,7 +5264,6 @@ def sync_dok4_current_schedule():
 @app.route("/api/sync-riverdale-current-schedule", methods=["POST"])
 def sync_riverdale_current_schedule():
     """Synchronize Riverdale from the latest supplied plan."""
-    return jsonify({"error": "completed one-off endpoint disabled"}), 410
     if request.headers.get("X-Sync-Key") != RIVERDALE_CURRENT_SCHEDULE_KEY:
         return jsonify({"error": "forbidden"}), 403
     mode = request.args.get("mode", "dry-run")
@@ -5305,6 +5304,7 @@ def sync_riverdale_current_schedule():
         start_marker=RIVERDALE_START_MARKER,
         end_marker=RIVERDALE_END_MARKER,
         source_label=RIVERDALE_SOURCE_LABEL,
+        ignore_scene_suffix=True,
     )
     if mode == "dry-run":
         return jsonify(summarize_dok4_schedule(state, schedule))
