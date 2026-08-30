@@ -6188,12 +6188,17 @@ def audit_cierny_kamen_import():
             flags=re.I,
         )
         for card in cards:
-            if not pattern.search(card.get("name", "")):
+            matched_fields = [
+                field for field in ("name", "desc")
+                if pattern.search(card.get(field, ""))
+            ]
+            if not matched_fields:
                 continue
             board_list = lists_by_id.get(card.get("idList"), {})
             requested_scene_cards.append({
                 "requested_id": requested_id, "name": card.get("name"),
                 "url": card.get("shortUrl"), "list": board_list.get("name"),
+                "matched_fields": matched_fields,
                 "card_closed": bool(card.get("closed")),
                 "list_closed": bool(board_list.get("closed")),
             })
