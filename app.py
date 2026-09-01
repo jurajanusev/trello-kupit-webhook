@@ -8529,6 +8529,10 @@ from cierny_kamen_ep11_13_import import register_routes as register_ep11_13_rout
 
 register_ep11_13_routes(app, globals())
 
+from riverdale_due_only_20260828 import register_routes as register_riverdale_due_only_routes
+
+register_riverdale_due_only_routes(app, globals())
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)

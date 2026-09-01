@@ -7,6 +7,9 @@ import pdfplumber
 
 
 DAY_RE = re.compile(r"Day\s*#(\d+):.*?(\d{2}/\d{2}/\d{4})", re.I)
+UNNUMBERED_DAY_RE = re.compile(
+    r"^(?:Po|Ut|St|Št|Pi|So|Ne),\s*(\d{2}/\d{2}/\d{4})", re.I
+)
 SOURCE_DATE_RE = re.compile(r"dated:\s*(\d{1,2}\.\d{1,2}\.\d{4})", re.I)
 EPISODE_RE = re.compile(r"Episode:\s*(\d+)", re.I)
 SCENE_RE = re.compile(r"^\d+[A-Z]*$", re.I)
@@ -23,7 +26,7 @@ def normalize_scene(episode, scene):
     return f"{int(episode):02d}/{int(match.group(1))}{match.group(2).upper()}"
 
 
-def parse(pdf_path):
+def parse(pdf_path, include_after_shoot_end=False):
     rows = []
     with pdfplumber.open(pdf_path) as pdf:
         first_text = pdf.pages[0].extract_text() or ""
@@ -46,8 +49,13 @@ def parse(pdf_path):
                     else:
                         first, setting, text, detail = (values + [""] * 4)[:4]
                     if "SHOOT END" in first.upper():
-                        stopped = True
-                        break
+                        if not include_after_shoot_end:
+                            stopped = True
+                            break
+                        current_day = None
+                        current_date = None
+                        pending = None
+                        continue
                     if "DAY OFF" in first.upper():
                         current_day = None
                         current_date = None
@@ -59,6 +67,15 @@ def parse(pdf_path):
                         current_day = int(day_match.group(1))
                         current_date = datetime.strptime(
                             day_match.group(2), "%m/%d/%Y"
+                        ).date().isoformat()
+                        order = 0
+                        pending = None
+                        continue
+                    unnumbered_match = UNNUMBERED_DAY_RE.search(first)
+                    if include_after_shoot_end and unnumbered_match:
+                        current_day = (current_day or 14) + 1
+                        current_date = datetime.strptime(
+                            unnumbered_match.group(1), "%m/%d/%Y"
                         ).date().isoformat()
                         order = 0
                         pending = None
