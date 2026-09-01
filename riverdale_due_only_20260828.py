@@ -111,7 +111,7 @@ def register_routes(app, api):
     from flask import jsonify, request
 
     @app.route("/api/riverdale-due-only-20260828", methods=["POST"])
-    def endpoint():
+    def riverdale_due_only_20260828_endpoint():
         if request.headers.get("X-Riverdale-Due-Key") != KEY:
             return jsonify({"error": "forbidden"}), 403
         mode = request.args.get("mode", "dry-run")
