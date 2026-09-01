@@ -5236,7 +5236,8 @@ def sync_dok4_current_schedule():
         }), 409
     trello = Dok4ScheduleTrello(API_KEY, TOKEN)
     state = build_dok4_schedule_state(
-        trello, schedule, source_date=source_date, as_of=as_of
+        trello, schedule, source_date=source_date, as_of=as_of,
+        ignore_scene_suffix=True,
     )
     if mode == "dry-run":
         return jsonify(summarize_dok4_schedule(state, schedule))
