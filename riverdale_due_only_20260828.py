@@ -107,6 +107,46 @@ def public_report(state, scene_updates, todo_updates, blockers):
     }
 
 
+def microsoft_due_report(api):
+    lists = api["trello_get"](f"/boards/{BOARD_REF}/lists", {
+        "fields": "id,name,closed", "filter": "open",
+    })
+    todo_lists = [item for item in lists if item.get("name", "").strip().casefold() == "todo"]
+    if len(todo_lists) != 1:
+        return None, [], [], [{"reason": "todo-list-count", "count": len(todo_lists)}]
+    cards = api["trello_get"](f"/lists/{todo_lists[0]['id']}/cards", {
+        "fields": "id,name,desc,due,shortUrl,closed,pos", "filter": "open", "limit": 1000,
+    })
+    token = api["get_microsoft_access_token"]()
+    tasks = api["graph_get_all"](
+        f"/me/todo/lists/{api['TODO_LIST_ID']}/tasks", token
+    )
+    by_title = {}
+    for task in tasks:
+        by_title.setdefault(task.get("title", "").strip().casefold(), []).append(task)
+    plans = []
+    missing = []
+    conflicts = []
+    for card in cards:
+        url_matches = [task for task in tasks
+                       if card["shortUrl"] in (task.get("body") or {}).get("content", "")]
+        title_matches = by_title.get(card["name"].strip().casefold(), [])
+        matches = url_matches or title_matches
+        if not matches:
+            missing.append({"name": card["name"], "url": card["shortUrl"]})
+            continue
+        if len(matches) > 1:
+            conflicts.append({"name": card["name"], "url": card["shortUrl"],
+                              "matches": len(matches)})
+            continue
+        task = matches[0]
+        current_due = ((task.get("dueDateTime") or {}).get("dateTime") or "")[:10]
+        desired_due = date_only(card.get("due"))
+        plans.append({"card": card, "task": task, "current_due": current_due,
+                      "desired_due": desired_due})
+    return token, plans, missing, conflicts
+
+
 def register_routes(app, api):
     from flask import jsonify, request
 
@@ -115,8 +155,38 @@ def register_routes(app, api):
         if request.headers.get("X-Riverdale-Due-Key") != KEY:
             return jsonify({"error": "forbidden"}), 403
         mode = request.args.get("mode", "dry-run")
-        if mode not in {"dry-run", "apply-scenes", "apply-todo"}:
+        if mode not in {"dry-run", "apply-scenes", "apply-todo", "ms-dry-run", "ms-apply"}:
             return jsonify({"error": "unsupported mode"}), 400
+        if mode in {"ms-dry-run", "ms-apply"}:
+            token, plans, missing, conflicts = microsoft_due_report(api)
+            updates = [item for item in plans if item["current_due"] != item["desired_due"]]
+            report = {
+                "status": "dry-run", "writes": 0, "matched": len(plans),
+                "to_create": 0, "missing_existing_tasks": len(missing),
+                "to_update": len(updates), "duplicate_exact_titles": len(conflicts),
+                "sample": [{"name": item["card"]["name"],
+                            "current_due": item["current_due"] or None,
+                            "desired_due": item["desired_due"] or None}
+                           for item in updates[:100]],
+                "allowed_write_fields": ["dueDateTime"],
+            }
+            if conflicts:
+                return jsonify({**report, "conflicts": conflicts}), 409
+            if mode == "ms-dry-run":
+                return jsonify(report)
+            limit = min(25, max(1, int(request.args.get("limit", "20"))))
+            selected = updates[:limit]
+            updated = []
+            for item in selected:
+                payload = api["todo_due_payload"](item["card"].get("due")) if item["desired_due"] else None
+                result = api["graph_patch"](
+                    f"/me/todo/lists/{api['TODO_LIST_ID']}/tasks/{item['task']['id']}",
+                    token, {"dueDateTime": payload},
+                )
+                updated.append({"title": result.get("title"), "due": item["desired_due"] or None})
+            return jsonify({"status": "applied", "selected": len(selected), "updated": updated,
+                            "remaining": max(0, len(updates) - len(selected)),
+                            "missing_existing_tasks": len(missing), "created": 0})
         trello, state, scene_updates, todo_updates, blockers = build_report(api)
         report = public_report(state, scene_updates, todo_updates, blockers)
         if any(blockers.values()):
