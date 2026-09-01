@@ -19,10 +19,10 @@ from update_dok4_plan_local import (
 
 app = Flask(__name__)
 
-DOK4_CURRENT_SCHEDULE_KEY = "dok4-schedule-24aug-61b7d4e9"
-DOK4_CURRENT_SCHEDULE_FILE = "dok4_schedule_2026-08-24.json"
-DOK4_CURRENT_SCHEDULE_AS_OF = "2026-08-24"
-DOK4_CURRENT_SCHEDULE_ROWS = 482
+DOK4_CURRENT_SCHEDULE_KEY = "dok4-schedule-1sep-8f5c2d41"
+DOK4_CURRENT_SCHEDULE_FILE = "dok4_schedule_2026-09-01.json"
+DOK4_CURRENT_SCHEDULE_AS_OF = "2026-09-01"
+DOK4_CURRENT_SCHEDULE_ROWS = 349
 
 RIVERDALE_CURRENT_SCHEDULE_KEY = "riverdale-schedule-30aug-4d82b7f1"
 RIVERDALE_CURRENT_SCHEDULE_FILE = "riverdale_schedule_2026-08-30.json"
@@ -5198,7 +5198,6 @@ def sync_dok4_current_schedule():
     The active window is the next seven shooting dates on or after ``as_of``.
     Calendar days without shooting never consume a slot.
     """
-    return jsonify({"error": "completed one-off endpoint disabled"}), 410
     if request.headers.get("X-Sync-Key") != DOK4_CURRENT_SCHEDULE_KEY:
         return jsonify({"error": "forbidden"}), 403
 
