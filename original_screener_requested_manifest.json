@@ -2304,7 +2304,22 @@
   },
   {
     "episode": 5,
-    "scene_id": "05/02LP",
+    "scene_id": "05/02A_LP",
+    "title": "Sárin sen o oživnutom Jakubovi",
+    "heading": "INT. VILA RÉVAYOVCOV – OBÝVAČKA – NIGHT 16",
+    "start": 63.0,
+    "end": 81.0,
+    "anchor": 69.4,
+    "anchor_score": 0.545,
+    "expected_center": 66.6,
+    "duration": 18.0,
+    "clip_path": "C:\\Users\\juraj\\Documents\\Trello - screener\\outputs\\original_screener_episode05\\05_02A_LP_original_screener.mp4",
+    "clip_bytes": 2435745,
+    "boundary_review": "trello_split_variant"
+  },
+  {
+    "episode": 5,
+    "scene_id": "05/02B_LP",
     "title": "Sárin sen o oživnutom Jakubovi",
     "heading": "INT. VILA RÉVAYOVCOV – JAKUBOVA IZBA – NIGHT 16",
     "start": 63.0,
@@ -2313,8 +2328,9 @@
     "anchor_score": 0.545,
     "expected_center": 66.6,
     "duration": 18.0,
-    "clip_path": "C:\\Users\\juraj\\Documents\\Trello - screener\\outputs\\original_screener_episode05\\05_02LP_original_screener.mp4",
-    "clip_bytes": 2435745
+    "clip_path": "C:\\Users\\juraj\\Documents\\Trello - screener\\outputs\\original_screener_episode05\\05_02B_LP_original_screener.mp4",
+    "clip_bytes": 2435745,
+    "boundary_review": "trello_split_variant"
   },
   {
     "episode": 5,
