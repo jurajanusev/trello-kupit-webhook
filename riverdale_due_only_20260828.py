@@ -10,6 +10,7 @@ from zoneinfo import ZoneInfo
 KEY = "riverdale-due-only-28aug-91c7e430"
 BOARD_REF = "CzuD55PR"
 SCHEDULE_PATH = Path(__file__).with_name("riverdale_schedule_due_only_2026-08-28.json")
+ENDPOINT_DISABLED = True
 
 
 def due_utc(date_text):
@@ -168,6 +169,8 @@ def register_routes(app, api):
 
     @app.route("/api/riverdale-due-only-20260828", methods=["POST"])
     def riverdale_due_only_20260828_endpoint():
+        if ENDPOINT_DISABLED:
+            return jsonify({"error": "endpoint disabled"}), 410
         if request.headers.get("X-Riverdale-Due-Key") != KEY:
             return jsonify({"error": "forbidden"}), 403
         mode = request.args.get("mode", "dry-run")
