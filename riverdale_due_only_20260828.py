@@ -23,6 +23,22 @@ def date_only(value):
     return (value or "")[:10]
 
 
+def microsoft_due_date(task):
+    due = task.get("dueDateTime") or {}
+    value = due.get("dateTime") or ""
+    if not value:
+        return ""
+    if (due.get("timeZone") or "").strip().upper() == "UTC":
+        normalized = value.rstrip("Z")
+        # Graph commonly returns seven fractional digits; Python supports six.
+        if "." in normalized:
+            head, fraction = normalized.split(".", 1)
+            normalized = head + "." + fraction[:6]
+        utc_value = datetime.fromisoformat(normalized).replace(tzinfo=ZoneInfo("UTC"))
+        return utc_value.astimezone(ZoneInfo("Europe/Bratislava")).date().isoformat()
+    return value[:10]
+
+
 def todo_due_plan(state):
     todo_lists = [item for item in state["lists"] if item["name"].strip().casefold() == "todo"]
     if len(todo_lists) != 1:
@@ -140,7 +156,7 @@ def microsoft_due_report(api):
                               "matches": len(matches)})
             continue
         task = matches[0]
-        current_due = ((task.get("dueDateTime") or {}).get("dateTime") or "")[:10]
+        current_due = microsoft_due_date(task)
         desired_due = date_only(card.get("due"))
         plans.append({"card": card, "task": task, "current_due": current_due,
                       "desired_due": desired_due})

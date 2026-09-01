@@ -1,6 +1,6 @@
 import unittest
 from parse_riverdale_dispo import parse
-from riverdale_due_only_20260828 import date_only, due_utc, microsoft_due_report
+from riverdale_due_only_20260828 import date_only, due_utc, microsoft_due_date, microsoft_due_report
 
 
 class RiverdaleDueOnlyTests(unittest.TestCase):
@@ -10,6 +10,10 @@ class RiverdaleDueOnlyTests(unittest.TestCase):
     def test_date_only(self):
         self.assertEqual(date_only("2026-09-11T10:00:00.000Z"), "2026-09-11")
         self.assertEqual(date_only(None), "")
+
+    def test_microsoft_utc_due_is_compared_in_bratislava(self):
+        task = {"dueDateTime": {"dateTime": "2026-09-06T22:00:00.0000000", "timeZone": "UTC"}}
+        self.assertEqual(microsoft_due_date(task), "2026-09-07")
 
     def test_complete_pdf_mode_includes_post_shoot_end_dates(self):
         result = parse(r"C:\Users\juraj\Desktop\plan update river 27.8.pdf", include_after_shoot_end=True)
