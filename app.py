@@ -3615,10 +3615,18 @@ def sync_dunaj_schedule():
             token for token in location.split()
             if len(token) >= 3 and token not in {"int", "ext", "den", "noc"}
         }
+        character_tokens = {
+            token for token in folded_match_text(row.get("characters")).split()
+            if len(token) >= 3 and token not in {"komparz", "videohovor"}
+        }
         scored = []
         for card in candidates:
             title_tokens = set(folded_match_text(card.get("name")).split())
-            scored.append((len(location_tokens & title_tokens), card))
+            score = (
+                3 * len(location_tokens & title_tokens)
+                + len(character_tokens & title_tokens)
+            )
+            scored.append((score, card))
         best = max((score for score, _ in scored), default=0)
         best_cards = [card for score, card in scored if score == best and score > 0]
         return best_cards if len(best_cards) == 1 else candidates
