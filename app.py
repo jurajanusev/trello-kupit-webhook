@@ -33,11 +33,11 @@ RIVERDALE_START_MARKER = "<!-- RIVERDALE-SCHEDULE-METADATA:START -->"
 RIVERDALE_END_MARKER = "<!-- RIVERDALE-SCHEDULE-METADATA:END -->"
 RIVERDALE_SOURCE_LABEL = "predbežné dispo Riverdale / Čierny Kameň"
 
-DUNAJ_CURRENT_SCHEDULE_KEY = "dunaj-schedule-14aug-5e8c219d"
-DUNAJ_CURRENT_SCHEDULE_FILE = "dunaj_schedule_2026-08-14.json"
-DUNAJ_CURRENT_SCHEDULE_AS_OF = "2026-08-14"
-DUNAJ_CURRENT_SOURCE_LABEL = "predbežná dispo DUNAJ 16 z 14. 8. 2026"
-DUNAJ_CURRENT_SOURCE_ROWS = 1148
+DUNAJ_CURRENT_SCHEDULE_KEY = "dunaj-schedule-6sep-74c1e9a2"
+DUNAJ_CURRENT_SCHEDULE_FILE = "dunaj_schedule_2026-09-06.json"
+DUNAJ_CURRENT_SCHEDULE_AS_OF = "2026-09-06"
+DUNAJ_CURRENT_SOURCE_LABEL = "predbežná dispo DUNAJ 17 z 6. 9. 2026"
+DUNAJ_CURRENT_SOURCE_ROWS = 203
 
 
 def canonicalize_dunaj_schedule_rows(source_rows):
@@ -3511,7 +3511,6 @@ def find_dunaj_board():
 
 @app.route("/api/sync-dunaj-schedule", methods=["POST"])
 def sync_dunaj_schedule():
-    return jsonify({"error": "endpoint disabled"}), 410
     if request.headers.get("X-Sync-Key") != DUNAJ_CURRENT_SCHEDULE_KEY:
         return jsonify({"error": "forbidden"}), 403
 

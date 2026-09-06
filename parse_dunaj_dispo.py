@@ -29,12 +29,12 @@ def parse(pdf_path):
             if source_label is None:
                 header = page.extract_text() or ""
                 source_match = re.search(
-                    r"DUNAJ\s+16.*?\b(\d{1,2})\.(\d{1,2})\.(\d{4})\b",
+                    r"DUNAJ\s+(\d+).*?\b(\d{1,2})\.(\d{1,2})\.(\d{4})\b",
                     header, flags=re.I | re.S,
                 )
                 if source_match:
-                    day, month, year = map(int, source_match.groups())
-                    source_label = f"predbežná dispo DUNAJ 16 z {day}. {month}. {year}"
+                    series, day, month, year = map(int, source_match.groups())
+                    source_label = f"predbežná dispo DUNAJ {series} z {day}. {month}. {year}"
             for table in page.extract_tables():
                 for cells in table:
                     first = clean(cells[0])
@@ -75,7 +75,9 @@ def parse(pdf_path):
                         continue
                     if pending_scene and SPLIT_SCENE_RE.fullmatch(first) and second:
                         detail = clean(cells[3] if len(cells) > 3 else "")
-                        episode_match = re.search(r"Epi.*?da:\s*(\d+)", detail, flags=re.I)
+                        episode_match = re.search(
+                            r"Epi.*?da:\s*[A-Z]*(\d+)", detail, flags=re.I
+                        )
                         if not episode_match:
                             raise ValueError(
                                 f"episode marker missing on page {page_number}: {detail}"
