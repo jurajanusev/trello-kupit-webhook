@@ -3591,6 +3591,38 @@ def sync_dunaj_schedule():
             if scene_id:
                 cards_by_scene.setdefault(scene_id, []).append(card)
 
+    def folded_match_text(value):
+        value = "".join(
+            char for char in unicodedata.normalize("NFKD", value or "")
+            if not unicodedata.combining(char)
+        ).casefold()
+        return " ".join(re.findall(r"[a-z0-9]+", value))
+
+    def select_location_candidate(candidates, row):
+        """Resolve reused scene numbers by the plan's production location."""
+        if len(candidates) <= 1:
+            return candidates
+        location = folded_match_text(row.get("location"))
+        if not location:
+            return candidates
+        exact = [
+            card for card in candidates
+            if location in folded_match_text(card.get("name"))
+        ]
+        if len(exact) == 1:
+            return exact
+        location_tokens = {
+            token for token in location.split()
+            if len(token) >= 3 and token not in {"int", "ext", "den", "noc"}
+        }
+        scored = []
+        for card in candidates:
+            title_tokens = set(folded_match_text(card.get("name")).split())
+            scored.append((len(location_tokens & title_tokens), card))
+        best = max((score for score, _ in scored), default=0)
+        best_cards = [card for score, card in scored if score == best and score > 0]
+        return best_cards if len(best_cards) == 1 else candidates
+
     matched = []
     missing = []
     duplicate_ids = []
@@ -3605,6 +3637,7 @@ def sync_dunaj_schedule():
                 candidates = cards_by_scene.get(base_scene_id, [])
                 matched_scene_id = base_scene_id
                 fallback_match = bool(candidates)
+        candidates = select_location_candidate(candidates, row)
         if not candidates:
             missing.append(scene_id)
         else:
@@ -3664,6 +3697,7 @@ def sync_dunaj_schedule():
                             candidates.append(candidate)
                 matched_scene_id = base_scene_id
                 fallback_match = bool(candidates)
+        candidates = select_location_candidate(candidates, row)
         if not candidates:
             window_missing.append(row["scene_id"])
         elif len(candidates) > 1:
