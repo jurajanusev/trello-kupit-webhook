@@ -1,6 +1,7 @@
 import argparse
 import json
 import re
+import unicodedata
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from pathlib import Path
@@ -224,6 +225,29 @@ def build_state(
         if not candidates:
             missing.append({"scene_id": planned_id, "base_id": matched_id, "date": row["shooting_date"]})
             continue
+        if len(candidates) > 1 and row["shooting_date"] < as_of:
+            shot_candidates = [
+                card for card in candidates
+                if "natoc" in "".join(
+                    char for char in unicodedata.normalize(
+                        "NFKD", lists_by_id[card["idList"]]["name"]
+                    ) if not unicodedata.combining(char)
+                ).casefold()
+            ]
+            if shot_candidates:
+                selected = max(
+                    shot_candidates,
+                    key=lambda card: (len(card.get("desc", "")), card["id"]),
+                )
+                ignored_reference_duplicates.append({
+                    "scene_id": planned_id,
+                    "selected": {"id": selected["id"], "url": selected["shortUrl"]},
+                    "ignored": [
+                        {"id": card["id"], "url": card["shortUrl"]}
+                        for card in candidates if card["id"] != selected["id"]
+                    ],
+                })
+                candidates = [selected]
         if len(candidates) > 1:
             working = [
                 card for card in candidates
