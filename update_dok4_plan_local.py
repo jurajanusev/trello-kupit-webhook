@@ -17,6 +17,13 @@ WINDOW_SHOOTING_DAYS = 7
 START_MARKER = "<!-- DOK4-SCHEDULE-METADATA:START -->"
 END_MARKER = "<!-- DOK4-SCHEDULE-METADATA:END -->"
 DATE_LIST_RE = re.compile(r"^(\d{1,2})\.(\d{1,2})\.$")
+
+
+def date_from_list_name(name, year=2026):
+    match = DATE_LIST_RE.match(name or "")
+    if not match:
+        return None
+    return f"{year:04d}-{int(match.group(2)):02d}-{int(match.group(1)):02d}"
 SCENE_RE = re.compile(r"^\s*(\d{1,2})\s*/\s*(\d+[A-Z]*)(?:\.|\s|$)", re.I)
 CANONICAL_CARD_IDS = {
     "05/26": "6a10d965fb3475dfaaa0b7b0",
@@ -149,7 +156,9 @@ def build_state(
     trello, schedule, source_date, as_of, board_ref=BOARD_REF,
     start_marker=START_MARKER, end_marker=END_MARKER,
     source_label="predbežné dispo DOK 4", ignore_scene_suffix=False,
+    protected_dates=None,
 ):
+    protected_dates = set(protected_dates or [])
     board = trello.get(f"/boards/{board_ref}", {"fields": "id,name,url,shortLink"})
     lists = trello.get(f"/boards/{board['id']}/lists", {
         "fields": "id,name,pos,closed", "filter": "open"
@@ -329,11 +338,16 @@ def build_state(
         name: [{"id": item["id"], "pos": item["pos"]} for item in values]
         for name, values in lists_by_name.items() if name in target_names.values() and len(values) > 1
     }
-    window_matches = [item for item in matches if item["row"]["shooting_date"] in shooting_date_set]
+    window_matches = [
+        item for item in matches
+        if item["row"]["shooting_date"] in shooting_date_set
+        and item["row"]["shooting_date"] not in protected_dates
+    ]
     expected_window_card_ids = {item["card"]["id"] for item in window_matches}
     stale_window_cards = [
         card for card in cards
         if DATE_LIST_RE.match(lists_by_id[card["idList"]]["name"])
+        and date_from_list_name(lists_by_id[card["idList"]]["name"]) not in protected_dates
         and SCENE_RE.match(card.get("name", ""))
         and card["id"] not in expected_window_card_ids
     ]
@@ -350,6 +364,8 @@ def build_state(
 
     update_count = 0
     for item in matches:
+        if item["row"]["shooting_date"] in protected_dates:
+            continue
         expected_desc = merged_description(
             item["card"].get("desc", ""), item["row"], source_date,
             start_marker, end_marker, source_label,
@@ -386,6 +402,7 @@ def build_state(
         "as_of": as_of, "source_date": source_date, "board_ref": board_ref,
         "start_marker": start_marker, "end_marker": end_marker,
         "source_label": source_label,
+        "protected_dates": protected_dates,
     }
 
 
@@ -423,6 +440,7 @@ def summary(state, schedule):
             "from": state["lists_by_id"][card["idList"]]["name"],
         } for card in state["stale_window_cards"]],
         "shooting_dates": state["shooting_dates"],
+        "protected_dates": sorted(state.get("protected_dates", [])),
         "shooting_days_selected": len(state["shooting_dates"]),
         "rows_by_date": by_date, "missing_target_lists": state["missing_lists"],
         "duplicate_target_lists": state["duplicate_target_lists"],
@@ -462,6 +480,8 @@ def apply(trello, state, metadata_only=False, skip_metadata=False, metadata_limi
     metadata_processed = 0
     for item in ([] if skip_metadata else state["matches"]):
         row = item["row"]
+        if row["shooting_date"] in state.get("protected_dates", set()):
+            continue
         card = item["card"]
         payload = {}
         new_desc = merged_description(
@@ -543,6 +563,8 @@ def apply(trello, state, metadata_only=False, skip_metadata=False, metadata_limi
     retained_old_lists = []
     active_date_names = set(state["target_names"].values())
     for _, _, old_list in state["date_lists"]:
+        if date_from_list_name(old_list["name"]) in state.get("protected_dates", set()):
+            continue
         if old_list["name"] in active_date_names:
             continue
         remaining_cards = trello.get(f"/lists/{old_list['id']}/cards", {
@@ -577,6 +599,8 @@ def apply(trello, state, metadata_only=False, skip_metadata=False, metadata_limi
     list_order_updates = []
     list_order_errors = []
     for index, (_, _, item) in enumerate(date_items, start=1):
+        if date_from_list_name(item["name"]) in state.get("protected_dates", set()):
+            continue
         desired_pos = anchor["pos"] + step * index
         try:
             result = trello.put(f"/lists/{item['id']}", {"pos": desired_pos})
