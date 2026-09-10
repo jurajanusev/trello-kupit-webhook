@@ -28,6 +28,10 @@ SCENE_RE = re.compile(r"^\s*(\d{1,2})\s*/\s*(\d+[A-Z]*)(?:\.|\s|$)", re.I)
 CANONICAL_CARD_IDS = {
     "05/26": "6a10d965fb3475dfaaa0b7b0",
     "09/23": "6a5631d02a3481e3d024ff28",
+    # Keep the established scheduled card, and use the already-shot card for
+    # the explicit retake instead of the duplicate reference copies.
+    "16/42": "6a82f45350fce685be64de99",
+    "16/17": "6a82f4069de88b5c9c107808",
 }
 
 
