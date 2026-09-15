@@ -19,16 +19,16 @@ from update_dok4_plan_local import (
 
 app = Flask(__name__)
 
-DOK4_CURRENT_SCHEDULE_KEY = "dok4-schedule-10sep-72e5d9a1"
-DOK4_CURRENT_SCHEDULE_FILE = "dok4_schedule_2026-09-10.json"
-DOK4_CURRENT_SCHEDULE_AS_OF = "2026-09-10"
-DOK4_CURRENT_SCHEDULE_ROWS = 827
+DOK4_CURRENT_SCHEDULE_KEY = "dok4-schedule-15sep-6d31a8f4"
+DOK4_CURRENT_SCHEDULE_FILE = "dok4_schedule_2026-09-15.json"
+DOK4_CURRENT_SCHEDULE_AS_OF = "2026-09-15"
+DOK4_CURRENT_SCHEDULE_ROWS = 826
 
-RIVERDALE_CURRENT_SCHEDULE_KEY = "riverdale-schedule-12sep-4b76d2e9"
-RIVERDALE_CURRENT_SCHEDULE_FILE = "riverdale_schedule_2026-09-12.json"
-RIVERDALE_CURRENT_SCHEDULE_AS_OF = "2026-09-12"
-RIVERDALE_CURRENT_SCHEDULE_ROWS = 125
-RIVERDALE_PROTECTED_DATES = set()
+RIVERDALE_CURRENT_SCHEDULE_KEY = "riverdale-schedule-15sep-93c7e2b5"
+RIVERDALE_CURRENT_SCHEDULE_FILE = "riverdale_schedule_2026-09-15.json"
+RIVERDALE_CURRENT_SCHEDULE_AS_OF = "2026-09-15"
+RIVERDALE_CURRENT_SCHEDULE_ROWS = 121
+RIVERDALE_PROTECTED_DATES = {"2026-09-15"}
 RIVERDALE_BOARD_REF = "CzuD55PR"
 RIVERDALE_START_MARKER = "<!-- RIVERDALE-SCHEDULE-METADATA:START -->"
 RIVERDALE_END_MARKER = "<!-- RIVERDALE-SCHEDULE-METADATA:END -->"
@@ -5241,7 +5241,6 @@ def sync_dok4_current_schedule():
     The active window is the next seven shooting dates on or after ``as_of``.
     Calendar days without shooting never consume a slot.
     """
-    return jsonify({"error": "completed one-off endpoint disabled"}), 410
     if request.headers.get("X-Sync-Key") != DOK4_CURRENT_SCHEDULE_KEY:
         return jsonify({"error": "forbidden"}), 403
 
@@ -5308,7 +5307,6 @@ def sync_dok4_current_schedule():
 @app.route("/api/sync-riverdale-current-schedule", methods=["POST"])
 def sync_riverdale_current_schedule():
     """Synchronize Riverdale from the latest supplied plan."""
-    return jsonify({"error": "completed one-off endpoint disabled"}), 410
     if request.headers.get("X-Sync-Key") != RIVERDALE_CURRENT_SCHEDULE_KEY:
         return jsonify({"error": "forbidden"}), 403
     mode = request.args.get("mode", "dry-run")

@@ -45,6 +45,16 @@ class September10ScheduleTests(unittest.TestCase):
             "2026-09-20", "2026-09-22", "2026-09-24",
         ], as_of="2026-09-12")
 
+    def test_september_15_plans(self):
+        self.check_plan("riverdale_schedule_2026-09-15.json", 121, [
+            "2026-09-15", "2026-09-16", "2026-09-20", "2026-09-22",
+            "2026-09-24", "2026-09-25", "2026-09-26",
+        ], as_of="2026-09-15")
+        self.check_plan("dok4_schedule_2026-09-15.json", 826, [
+            "2026-09-15", "2026-09-19", "2026-09-20", "2026-09-21",
+            "2026-09-22", "2026-09-24", "2026-09-26",
+        ], as_of="2026-09-15")
+
 
 if __name__ == "__main__":
     unittest.main()
