@@ -32,6 +32,10 @@ CANONICAL_CARD_IDS = {
     # the explicit retake instead of the duplicate reference copies.
     "16/42": "6a82f45350fce685be64de99",
     "16/17": "6a82f4069de88b5c9c107808",
+    # Riverdale 06/37A and 06/37B are variants of the established full
+    # production card; ignore the short helper duplicate.
+    "06/37A": "6a6ba5a04153adc9b90c60f0",
+    "06/37B": "6a6ba5a04153adc9b90c60f0",
 }
 
 
