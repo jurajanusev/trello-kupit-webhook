@@ -4184,9 +4184,9 @@ def sync_dunaj_schedule():
         })
 
     if mode == "cleanup-stale":
-        series_list = lists_by_name.get("SERIA 15,16")
+        series_list = lists_by_name.get("SERIA 17,18")
         if not series_list:
-            return jsonify({"error": "SERIA 15,16 list not found"}), 404
+            return jsonify({"error": "SERIA 17,18 list not found"}), 404
         moved = []
         errors = []
         batch_start = max(0, int(request.args.get("start", "0")))
@@ -4200,7 +4200,7 @@ def sync_dunaj_schedule():
                 })
                 moved.append({
                     "scene_id": item["scene_id"], "from": item["from"],
-                    "to": "SERIA 15,16", "url": result["shortUrl"],
+                    "to": "SERIA 17,18", "url": result["shortUrl"],
                     "due_cleared": True,
                 })
             except Exception as exc:
