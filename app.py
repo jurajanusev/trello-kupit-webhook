@@ -19,26 +19,28 @@ from update_dok4_plan_local import (
 
 app = Flask(__name__)
 
-DOK4_CURRENT_SCHEDULE_KEY = "dok4-schedule-15sep-6d31a8f4"
-DOK4_CURRENT_SCHEDULE_FILE = "dok4_schedule_2026-09-15.json"
-DOK4_CURRENT_SCHEDULE_AS_OF = "2026-09-15"
+DOK4_CURRENT_SCHEDULE_KEY = "dok4-schedule-19sep-71b4e6c2"
+DOK4_CURRENT_SCHEDULE_FILE = "dok4_schedule_2026-09-19.json"
+DOK4_CURRENT_SCHEDULE_AS_OF = "2026-09-20"
+DOK4_CURRENT_SOURCE_DATE = "2026-09-19"
 DOK4_CURRENT_SCHEDULE_ROWS = 826
+DOK4_PROTECTED_DATES = {"2026-09-19"}
 
-RIVERDALE_CURRENT_SCHEDULE_KEY = "riverdale-schedule-15sep-93c7e2b5"
-RIVERDALE_CURRENT_SCHEDULE_FILE = "riverdale_schedule_2026-09-15.json"
-RIVERDALE_CURRENT_SCHEDULE_AS_OF = "2026-09-15"
-RIVERDALE_CURRENT_SCHEDULE_ROWS = 121
-RIVERDALE_PROTECTED_DATES = {"2026-09-15"}
+RIVERDALE_CURRENT_SCHEDULE_KEY = "riverdale-schedule-19sep-52a9d7f3"
+RIVERDALE_CURRENT_SCHEDULE_FILE = "riverdale_schedule_2026-09-19.json"
+RIVERDALE_CURRENT_SCHEDULE_AS_OF = "2026-09-19"
+RIVERDALE_CURRENT_SCHEDULE_ROWS = 355
+RIVERDALE_PROTECTED_DATES = set()
 RIVERDALE_BOARD_REF = "CzuD55PR"
 RIVERDALE_START_MARKER = "<!-- RIVERDALE-SCHEDULE-METADATA:START -->"
 RIVERDALE_END_MARKER = "<!-- RIVERDALE-SCHEDULE-METADATA:END -->"
 RIVERDALE_SOURCE_LABEL = "predbežné dispo Riverdale / Čierny Kameň"
 
-DUNAJ_CURRENT_SCHEDULE_KEY = "dunaj-schedule-10sep-5c94e2b7"
-DUNAJ_CURRENT_SCHEDULE_FILE = "dunaj_schedule_2026-09-10.json"
-DUNAJ_CURRENT_SCHEDULE_AS_OF = "2026-09-10"
-DUNAJ_CURRENT_SOURCE_LABEL = "predbežná dispo DUNAJ 17 z 10. 9. 2026"
-DUNAJ_CURRENT_SOURCE_ROWS = 203
+DUNAJ_CURRENT_SCHEDULE_KEY = "dunaj-schedule-19sep-8c35f1a6"
+DUNAJ_CURRENT_SCHEDULE_FILE = "dunaj_schedule_2026-09-19.json"
+DUNAJ_CURRENT_SCHEDULE_AS_OF = "2026-09-19"
+DUNAJ_CURRENT_SOURCE_LABEL = "predbežná dispo DUNAJ 17 z 19. 9. 2026"
+DUNAJ_CURRENT_SOURCE_ROWS = 435
 
 
 def canonicalize_dunaj_schedule_rows(source_rows):
@@ -3512,7 +3514,6 @@ def find_dunaj_board():
 
 @app.route("/api/sync-dunaj-schedule", methods=["POST"])
 def sync_dunaj_schedule():
-    return jsonify({"error": "completed one-off endpoint disabled"}), 410
     if request.headers.get("X-Sync-Key") != DUNAJ_CURRENT_SCHEDULE_KEY:
         return jsonify({"error": "forbidden"}), 403
 
@@ -5241,7 +5242,6 @@ def sync_dok4_current_schedule():
     The active window is the next seven shooting dates on or after ``as_of``.
     Calendar days without shooting never consume a slot.
     """
-    return jsonify({"error": "completed one-off endpoint disabled"}), 410
     if request.headers.get("X-Sync-Key") != DOK4_CURRENT_SCHEDULE_KEY:
         return jsonify({"error": "forbidden"}), 403
 
@@ -5267,7 +5267,7 @@ def sync_dok4_current_schedule():
     schedule = schedule_document["rows"]
     unique_scene_ids = {row.get("scene_id") for row in schedule}
     if (
-        source_date != DOK4_CURRENT_SCHEDULE_AS_OF
+        source_date != DOK4_CURRENT_SOURCE_DATE
         or len(schedule) != DOK4_CURRENT_SCHEDULE_ROWS
         or len(unique_scene_ids) != DOK4_CURRENT_SCHEDULE_ROWS
         or None in unique_scene_ids
@@ -5282,6 +5282,7 @@ def sync_dok4_current_schedule():
     state = build_dok4_schedule_state(
         trello, schedule, source_date=source_date, as_of=as_of,
         ignore_scene_suffix=True,
+        protected_dates=DOK4_PROTECTED_DATES,
     )
     if mode == "dry-run":
         return jsonify(summarize_dok4_schedule(state, schedule))
@@ -5308,7 +5309,6 @@ def sync_dok4_current_schedule():
 @app.route("/api/sync-riverdale-current-schedule", methods=["POST"])
 def sync_riverdale_current_schedule():
     """Synchronize Riverdale from the latest supplied plan."""
-    return jsonify({"error": "completed one-off endpoint disabled"}), 410
     if request.headers.get("X-Sync-Key") != RIVERDALE_CURRENT_SCHEDULE_KEY:
         return jsonify({"error": "forbidden"}), 403
     mode = request.args.get("mode", "dry-run")
