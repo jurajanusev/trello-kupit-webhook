@@ -3556,7 +3556,7 @@ def sync_dunaj_schedule():
     board_lists = trello_get(f"/boards/{board['id']}/lists", {"fields": "id,name,closed"})
     open_lists = {item["id"]: item for item in board_lists if not item.get("closed")}
     lists_by_name = {item["name"]: item for item in open_lists.values()}
-    series_list = lists_by_name.get("SERIA 15,16")
+    series_list = lists_by_name.get("SERIA 17,18")
     shot_list = next((item for item in open_lists.values() if "NATOC" in "".join(
         char for char in unicodedata.normalize("NFKD", item["name"])
         if not unicodedata.combining(char)
@@ -3634,6 +3634,21 @@ def sync_dunaj_schedule():
         best_cards = [card for score, card in scored if score == best and score > 0]
         return best_cards if len(best_cards) == 1 else candidates
 
+    def select_current_series_candidate(candidates):
+        if len(candidates) <= 1:
+            return candidates
+        scheduled = [
+            card for card in candidates
+            if re.fullmatch(r"\d{1,2}\.\d{1,2}\.", open_lists.get(card["idList"], {}).get("name", ""))
+        ]
+        if len(scheduled) == 1:
+            return scheduled
+        current = [
+            card for card in candidates
+            if open_lists.get(card["idList"], {}).get("name") == "SERIA 17,18"
+        ]
+        return current if len(current) == 1 else candidates
+
     matched = []
     missing = []
     duplicate_ids = []
@@ -3644,11 +3659,12 @@ def sync_dunaj_schedule():
         fallback_match = False
         if not candidates:
             base_scene_id = re.sub(r"[A-Z]+$", "", scene_id, flags=re.I)
-            if base_scene_id != scene_id:
+            if base_scene_id != scene_id and base_scene_id not in row_by_scene:
                 candidates = cards_by_scene.get(base_scene_id, [])
                 matched_scene_id = base_scene_id
                 fallback_match = bool(candidates)
         candidates = select_location_candidate(candidates, row)
+        candidates = select_current_series_candidate(candidates)
         if not candidates:
             missing.append(scene_id)
         else:
@@ -3693,7 +3709,7 @@ def sync_dunaj_schedule():
         fallback_match = False
         if not candidates:
             base_scene_id = re.sub(r"[A-Z]+$", "", row["scene_id"], flags=re.I)
-            if base_scene_id != row["scene_id"]:
+            if base_scene_id != row["scene_id"] and base_scene_id not in row_by_scene:
                 candidates = cards_by_scene.get(base_scene_id, [])
                 if not candidates:
                     search_result = trello_get("/search", {
@@ -3709,6 +3725,7 @@ def sync_dunaj_schedule():
                 matched_scene_id = base_scene_id
                 fallback_match = bool(candidates)
         candidates = select_location_candidate(candidates, row)
+        candidates = select_current_series_candidate(candidates)
         if not candidates:
             window_missing.append(row["scene_id"])
         elif len(candidates) > 1:
@@ -3789,7 +3806,7 @@ def sync_dunaj_schedule():
             continue
         stale_date_cards.append({
             "id": card["id"], "scene_id": scene_id, "name": card["name"],
-            "from": current_list, "to": "SERIA 15,16", "url": card["shortUrl"],
+            "from": current_list, "to": "SERIA 17,18", "url": card["shortUrl"],
         })
         stale_by_list[current_list] = stale_by_list.get(current_list, 0) + 1
 
@@ -3931,7 +3948,7 @@ def sync_dunaj_schedule():
             "future_to_series_sample": [{
                 "scene_id": item["row"]["scene_id"],
                 "date": item["row"]["shooting_date"],
-                "from": item["current_list"], "to": "SERIA 15,16",
+                "from": item["current_list"], "to": "SERIA 17,18",
                 "url": item["card"]["shortUrl"],
             } for item in future_actions[:50]],
             "shot_list_found": bool(shot_list), "series_list_found": bool(series_list),
@@ -3956,12 +3973,12 @@ def sync_dunaj_schedule():
         if historical_actions and not shot_list:
             return jsonify({"error": "NATOČENÉ OBRAZY list not found"}), 404
         if future_actions and not series_list:
-            return jsonify({"error": "SERIA 15,16 list not found"}), 404
+            return jsonify({"error": "SERIA 17,18 list not found"}), 404
         actions = [
             {**item, "target": shot_list, "target_name": shot_list["name"]}
             for item in historical_actions
         ] + [
-            {**item, "target": series_list, "target_name": "SERIA 15,16"}
+            {**item, "target": series_list, "target_name": "SERIA 17,18"}
             for item in future_actions
         ]
         actions.sort(key=lambda item: (
