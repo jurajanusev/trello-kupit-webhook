@@ -19,28 +19,28 @@ from update_dok4_plan_local import (
 
 app = Flask(__name__)
 
-DOK4_CURRENT_SCHEDULE_KEY = "dok4-schedule-19sep-71b4e6c2"
-DOK4_CURRENT_SCHEDULE_FILE = "dok4_schedule_2026-09-19.json"
-DOK4_CURRENT_SCHEDULE_AS_OF = "2026-09-20"
-DOK4_CURRENT_SOURCE_DATE = "2026-09-19"
-DOK4_CURRENT_SCHEDULE_ROWS = 826
-DOK4_PROTECTED_DATES = {"2026-09-19"}
+DOK4_CURRENT_SCHEDULE_KEY = "dok4-schedule-26sep-8f4c2a71"
+DOK4_CURRENT_SCHEDULE_FILE = "dok4_schedule_2026-09-26.json"
+DOK4_CURRENT_SCHEDULE_AS_OF = "2026-09-27"
+DOK4_CURRENT_SOURCE_DATE = "2026-09-26"
+DOK4_CURRENT_SCHEDULE_ROWS = 825
+DOK4_PROTECTED_DATES = {"2026-09-26"}
 
-RIVERDALE_CURRENT_SCHEDULE_KEY = "riverdale-schedule-19sep-52a9d7f3"
-RIVERDALE_CURRENT_SCHEDULE_FILE = "riverdale_schedule_2026-09-19.json"
-RIVERDALE_CURRENT_SCHEDULE_AS_OF = "2026-09-19"
-RIVERDALE_CURRENT_SCHEDULE_ROWS = 355
-RIVERDALE_PROTECTED_DATES = set()
+RIVERDALE_CURRENT_SCHEDULE_KEY = "riverdale-schedule-26sep-3d9a6b52"
+RIVERDALE_CURRENT_SCHEDULE_FILE = "riverdale_schedule_2026-09-26.json"
+RIVERDALE_CURRENT_SCHEDULE_AS_OF = "2026-09-27"
+RIVERDALE_CURRENT_SCHEDULE_ROWS = 348
+RIVERDALE_PROTECTED_DATES = {"2026-09-26"}
 RIVERDALE_BOARD_REF = "CzuD55PR"
 RIVERDALE_START_MARKER = "<!-- RIVERDALE-SCHEDULE-METADATA:START -->"
 RIVERDALE_END_MARKER = "<!-- RIVERDALE-SCHEDULE-METADATA:END -->"
 RIVERDALE_SOURCE_LABEL = "predbežné dispo Riverdale / Čierny Kameň"
 
-DUNAJ_CURRENT_SCHEDULE_KEY = "dunaj-schedule-19sep-8c35f1a6"
-DUNAJ_CURRENT_SCHEDULE_FILE = "dunaj_schedule_2026-09-19.json"
-DUNAJ_CURRENT_SCHEDULE_AS_OF = "2026-09-19"
-DUNAJ_CURRENT_SOURCE_LABEL = "predbežná dispo DUNAJ 17 z 19. 9. 2026"
-DUNAJ_CURRENT_SOURCE_ROWS = 435
+DUNAJ_CURRENT_SCHEDULE_KEY = "dunaj-schedule-26sep-6b1e4d83"
+DUNAJ_CURRENT_SCHEDULE_FILE = "dunaj_schedule_2026-09-26.json"
+DUNAJ_CURRENT_SCHEDULE_AS_OF = "2026-09-27"
+DUNAJ_CURRENT_SOURCE_LABEL = "predbežná dispo DUNAJ 17 z 26. 9. 2026"
+DUNAJ_CURRENT_SOURCE_ROWS = 330
 
 
 def canonicalize_dunaj_schedule_rows(source_rows):
@@ -3558,10 +3558,9 @@ def sync_dunaj_schedule():
     open_lists = {item["id"]: item for item in board_lists if not item.get("closed")}
     lists_by_name = {item["name"]: item for item in open_lists.values()}
     series_list = lists_by_name.get("SERIA 17,18")
-    shot_list = next((item for item in open_lists.values() if "NATOC" in "".join(
-        char for char in unicodedata.normalize("NFKD", item["name"])
-        if not unicodedata.combining(char)
-    ).upper()), None)
+    # The current series has its own shot archive. Never select an older or
+    # generic list merely because its name also contains "NATOC".
+    shot_list = lists_by_name.get("17/18 NATOČENÉ OBRAZY")
     cards = []
     for list_id in open_lists:
         before = None
