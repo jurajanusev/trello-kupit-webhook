@@ -3515,6 +3515,7 @@ def find_dunaj_board():
 
 @app.route("/api/sync-dunaj-schedule", methods=["POST"])
 def sync_dunaj_schedule():
+    return jsonify({"error": "completed one-off endpoint disabled"}), 410
     if request.headers.get("X-Sync-Key") != DUNAJ_CURRENT_SCHEDULE_KEY:
         return jsonify({"error": "forbidden"}), 403
 
@@ -5259,6 +5260,7 @@ def sync_dok4_current_schedule():
     The active window is the next seven shooting dates on or after ``as_of``.
     Calendar days without shooting never consume a slot.
     """
+    return jsonify({"error": "completed one-off endpoint disabled"}), 410
     if request.headers.get("X-Sync-Key") != DOK4_CURRENT_SCHEDULE_KEY:
         return jsonify({"error": "forbidden"}), 403
 
@@ -5326,6 +5328,7 @@ def sync_dok4_current_schedule():
 @app.route("/api/sync-riverdale-current-schedule", methods=["POST"])
 def sync_riverdale_current_schedule():
     """Synchronize Riverdale from the latest supplied plan."""
+    return jsonify({"error": "completed one-off endpoint disabled"}), 410
     if request.headers.get("X-Sync-Key") != RIVERDALE_CURRENT_SCHEDULE_KEY:
         return jsonify({"error": "forbidden"}), 403
     mode = request.args.get("mode", "dry-run")
@@ -5392,7 +5395,6 @@ def sync_riverdale_current_schedule():
 
 @app.route("/api/handoff-automation-deployment", methods=["POST"])
 def handoff_automation_deployment():
-    return jsonify({"error": "completed one-off endpoint disabled"}), 410
     if request.headers.get("X-Sync-Key") != DOK4_CURRENT_SCHEDULE_KEY:
         return jsonify({"error": "forbidden"}), 403
 
@@ -5437,16 +5439,19 @@ def handoff_automation_deployment():
         }), 409
 
     note = (
-        "Dunaj - doplnenie chýbajúcich obrazov z plánu 25. 7. 2026\n\n"
-        "Nasadené produkčné commity: 66eb42d, c93dd5c.\n"
-        "Trvalé párovanie: 23/34F -> existujúca karta 23/34FLASH; "
-        "24/08A + 24/08B -> jedna existujúca karta 24/08.\n"
-        "23/34FLASH: natáčací deň 81, 6. 8. 2026, poradie 2, "
-        "1st unit, KLAUSOVCI - SALÓN, Oleg/Astrid/Boris; karta presunutá na 6.8.\n"
-        "24/08: spoločné poradie 8-9, natáčací deň 87, 16. 8. 2026, "
-        "lokácie KABARET - ZÁZEMIE / KABARET, postavy René/Lena/Gita.\n"
-        "Finálny dry-run: čakajúce zmeny 0, chýbajúce 0, duplicity 0, "
-        "fallback 0, kolízie 0. Jednorazový opravný endpoint vypnutý."
+        "Aktualizácia natáčacích plánov 26. 9. 2026 - Dunaj, DOK 4 a Riverdale.\n\n"
+        "Nasadené produkčné commity: 1da46b3, 54a96a8, b4cee9e, 99d2316.\n"
+        "Aktívne okná používajú najbližších 7 natáčacích dní od 27. 9.; "
+        "26. 9. je vo všetkých projektoch vynechaný a chránený pred zmenami.\n"
+        "Dunaj historické obrazy smeruje výhradne do zoznamu "
+        "17/18 NATOČENÉ OBRAZY.\n"
+        "Finálny audit: čakajúce presuny 0, neaktuálne dátumové karty 0, "
+        "duplicity 0, fallback kolízie 0. Trello ToDo aj Microsoft To Do: "
+        "to_create 0, to_update 0, duplicity 0 pre všetky tri projekty.\n"
+        "Nevytvorené chýbajúce karty: Dunaj aktívne 12/18, 11/28, 11/24, "
+        "11/38, 12/7; DOK 4 aktívne 14/24 a historické 09/28, 11/42, 14/48; "
+        "Riverdale mimo aktívneho okna 05/2A. Jednorazové synchronizačné "
+        "endpointy boli po kontrole vypnuté."
     )
     action = trello_post_body(
         f"/cards/{candidates[0]['id']}/actions/comments", {"text": note}
