@@ -5307,7 +5307,7 @@ def sync_dok4_current_schedule():
     if mode == "metadata":
         result = apply_dok4_schedule(
             trello, state, metadata_only=True,
-            metadata_limit=min(40, max(1, int(request.args.get("limit", "35")))),
+            metadata_limit=min(200, max(1, int(request.args.get("limit", "150")))),
         )
     elif mode == "window":
         result = apply_dok4_schedule(trello, state, skip_metadata=True)
@@ -5374,7 +5374,7 @@ def sync_riverdale_current_schedule():
     if mode == "metadata":
         result = apply_dok4_schedule(
             trello, state, metadata_only=True,
-            metadata_limit=min(40, max(1, int(request.args.get("limit", "35")))),
+            metadata_limit=min(200, max(1, int(request.args.get("limit", "150")))),
         )
     elif mode == "window":
         result = apply_dok4_schedule(trello, state, skip_metadata=True)
