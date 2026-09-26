@@ -29,6 +29,7 @@ DOK4_PROTECTED_DATES = {"2026-09-26"}
 RIVERDALE_CURRENT_SCHEDULE_KEY = "riverdale-schedule-26sep-3d9a6b52"
 RIVERDALE_CURRENT_SCHEDULE_FILE = "riverdale_schedule_2026-09-26.json"
 RIVERDALE_CURRENT_SCHEDULE_AS_OF = "2026-09-27"
+RIVERDALE_CURRENT_SOURCE_DATE = "2026-09-26"
 RIVERDALE_CURRENT_SCHEDULE_ROWS = 348
 RIVERDALE_PROTECTED_DATES = {"2026-09-26"}
 RIVERDALE_BOARD_REF = "CzuD55PR"
@@ -5347,7 +5348,7 @@ def sync_riverdale_current_schedule():
     schedule = schedule_document["rows"]
     unique_scene_ids = {row.get("scene_id") for row in schedule}
     if (
-        source_date != RIVERDALE_CURRENT_SCHEDULE_AS_OF
+        source_date != RIVERDALE_CURRENT_SOURCE_DATE
         or len(schedule) != RIVERDALE_CURRENT_SCHEDULE_ROWS
         or len(unique_scene_ids) != RIVERDALE_CURRENT_SCHEDULE_ROWS
         or None in unique_scene_ids
