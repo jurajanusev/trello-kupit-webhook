@@ -3514,7 +3514,6 @@ def find_dunaj_board():
 
 @app.route("/api/sync-dunaj-schedule", methods=["POST"])
 def sync_dunaj_schedule():
-    return jsonify({"error": "completed one-off endpoint disabled"}), 410
     if request.headers.get("X-Sync-Key") != DUNAJ_CURRENT_SCHEDULE_KEY:
         return jsonify({"error": "forbidden"}), 403
 
@@ -5259,7 +5258,6 @@ def sync_dok4_current_schedule():
     The active window is the next seven shooting dates on or after ``as_of``.
     Calendar days without shooting never consume a slot.
     """
-    return jsonify({"error": "completed one-off endpoint disabled"}), 410
     if request.headers.get("X-Sync-Key") != DOK4_CURRENT_SCHEDULE_KEY:
         return jsonify({"error": "forbidden"}), 403
 
@@ -5327,7 +5325,6 @@ def sync_dok4_current_schedule():
 @app.route("/api/sync-riverdale-current-schedule", methods=["POST"])
 def sync_riverdale_current_schedule():
     """Synchronize Riverdale from the latest supplied plan."""
-    return jsonify({"error": "completed one-off endpoint disabled"}), 410
     if request.headers.get("X-Sync-Key") != RIVERDALE_CURRENT_SCHEDULE_KEY:
         return jsonify({"error": "forbidden"}), 403
     mode = request.args.get("mode", "dry-run")
