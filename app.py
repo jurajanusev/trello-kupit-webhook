@@ -50,6 +50,8 @@ def canonicalize_dunaj_schedule_rows(source_rows):
     merged_24 = None
     for source_row in source_rows:
         row = dict(source_row)
+        if re.sub(r"[A-Z]+$", "", row["scene_id"], flags=re.I) == "13/14":
+            continue
         if row["scene_id"] == "23/34F":
             row["scene_id"] = "23/34FLASH"
             row["scene"] = "34FLASH"
