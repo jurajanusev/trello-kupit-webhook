@@ -3547,7 +3547,7 @@ def sync_dunaj_schedule():
     shooting_dates = sorted({
         row["shooting_date"] for row in schedule_rows
         if row["shooting_date"] >= as_of
-    })[:17]
+    })[:7]
     shooting_date_set = set(shooting_dates)
     window_start = shooting_dates[0] if shooting_dates else None
     window_end = shooting_dates[-1] if shooting_dates else None
