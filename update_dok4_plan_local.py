@@ -13,7 +13,8 @@ from zoneinfo import ZoneInfo
 
 BASE = "https://api.trello.com/1"
 BOARD_REF = "lzNy4AtY"
-WINDOW_SHOOTING_DAYS = 7
+PRIMARY_SHOOTING_DAYS = 7
+WINDOW_SHOOTING_DAYS = 17
 START_MARKER = "<!-- DOK4-SCHEDULE-METADATA:START -->"
 END_MARKER = "<!-- DOK4-SCHEDULE-METADATA:END -->"
 DATE_LIST_RE = re.compile(r"^(\d{1,2})\.(\d{1,2})\.$")
@@ -597,21 +598,35 @@ def apply(trello, state, metadata_only=False, skip_metadata=False, metadata_limi
         if match:
             date_items.append((int(match.group(2)), int(match.group(1)), item))
     date_items.sort(key=lambda value: (value[0], value[1]))
+    primary_names = {
+        state["target_names"][date]
+        for date in state["shooting_dates"][:PRIMARY_SHOOTING_DAYS]
+    }
+    primary_items = [item for item in date_items if item[2]["name"] in primary_names]
+    tail_items = [item for item in date_items if item[2]["name"] not in primary_names]
     date_ids = {item[2]["id"] for item in date_items}
     following = [item for item in refreshed_lists if item["id"] not in date_ids and item["pos"] > anchor["pos"]]
     if following:
         next_pos = following[0]["pos"]
-        step = (next_pos - anchor["pos"]) / (len(date_items) + 1)
+        step = (next_pos - anchor["pos"]) / (len(primary_items) + 1)
     else:
         step = 16384
     list_order_updates = []
     list_order_errors = []
-    for index, (_, _, item) in enumerate(date_items, start=1):
+    for index, (_, _, item) in enumerate(primary_items, start=1):
         if date_from_list_name(item["name"]) in state.get("protected_dates", set()):
             continue
         desired_pos = anchor["pos"] + step * index
         try:
             result = trello.put(f"/lists/{item['id']}", {"pos": desired_pos})
+            list_order_updates.append({"name": result["name"], "pos": result["pos"]})
+        except Exception as exc:
+            list_order_errors.append({"name": item["name"], "error": str(exc)})
+    for _, _, item in tail_items:
+        if date_from_list_name(item["name"]) in state.get("protected_dates", set()):
+            continue
+        try:
+            result = trello.put(f"/lists/{item['id']}", {"pos": "bottom"})
             list_order_updates.append({"name": result["name"], "pos": result["pos"]})
         except Exception as exc:
             list_order_errors.append({"name": item["name"], "error": str(exc)})
