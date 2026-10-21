@@ -25,7 +25,10 @@ def date_from_list_name(name, year=2026):
     if not match:
         return None
     return f"{year:04d}-{int(match.group(2)):02d}-{int(match.group(1)):02d}"
-SCENE_RE = re.compile(r"^\s*(\d{1,2})\s*/\s*(\d+[A-Z]*)(?:\.|\s|$)", re.I)
+SCENE_RE = re.compile(
+    r"^\s*(\d{1,2})\s*/\s*(\d+(?:[A-Z]+|\.\s*[A-Z]+)?)(?:\.|\s|$)",
+    re.I,
+)
 CANONICAL_CARD_IDS = {
     "05/26": "6a10d965fb3475dfaaa0b7b0",
     "09/23": "6a5631d02a3481e3d024ff28",
@@ -89,7 +92,8 @@ class Trello:
 
 
 def normalize_scene(episode, scene):
-    return f"{int(episode):02d}/{str(scene).upper().lstrip('0') or '0'}"
+    normalized = re.sub(r"[^0-9A-Z]", "", str(scene).upper()).lstrip("0") or "0"
+    return f"{int(episode):02d}/{normalized}"
 
 
 def scene_numeric_base(scene_id):
