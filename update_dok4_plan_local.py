@@ -26,7 +26,7 @@ def date_from_list_name(name, year=2026):
         return None
     return f"{year:04d}-{int(match.group(2)):02d}-{int(match.group(1)):02d}"
 SCENE_RE = re.compile(
-    r"^\s*(\d{1,2})\s*/\s*(\d+(?:[A-Z]+|\.\s*[A-Z]+)?)(?:\.|\s|$)",
+    r"^\s*(\d{1,2})\s*/\s*(\d+(?:[A-Z]+|\.\s*[A-Z](?=\.|\s))?)(?:\.|\s|$)",
     re.I,
 )
 CANONICAL_CARD_IDS = {
