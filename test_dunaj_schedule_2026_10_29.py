@@ -77,6 +77,21 @@ class October29Tests(unittest.TestCase):
         self.assertEqual(response.status_code, 404)
         self.assertFalse(self.writes)
 
+    def test_cleanup_preserves_past_days_and_clears_stale_future_dates(self):
+        for list_id, name in [("past", "29.10."), ("future", "9.11.")]:
+            self.lists.append({"id": list_id, "name": name, "pos": 5000})
+            card = copy.deepcopy(self.cards[0])
+            card.update(id=list_id, name="99/" + ("1" if list_id == "past" else "2") + ". TEST", idList=list_id, due="2026-11-09T10:00:00.000Z", dueComplete=True)
+            self.cards.append(card)
+        result = self.call("mode=dry-run").get_json()
+        self.assertEqual(result["past_date_cards_preserved_count"], 1)
+        self.assertEqual(result["stale_date_cards_count"], 1)
+        self.assertEqual(self.call("mode=cleanup-stale").status_code, 200)
+        self.assertEqual(len(self.writes), 1)
+        self.assertEqual(self.writes[0][0], "/cards/future")
+        self.assertEqual(self.writes[0][1]["due"], "")
+        self.assertEqual(self.writes[0][1]["dueComplete"], "false")
+
 
 if __name__ == "__main__":
     unittest.main()

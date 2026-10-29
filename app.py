@@ -3556,6 +3556,16 @@ def sync_dunaj_schedule():
     row_by_scene = {row["scene_id"]: row for row in schedule_rows}
 
     board = trello_get("/boards/qCPeWA3e", {"fields": "id,name,url"})
+    if request.args.get("mode") == "lookup-scene":
+        lookup_id = request.args.get("scene", "")
+        if not re.fullmatch(r"\d{1,2}/\d+[A-Z]*", lookup_id):
+            return jsonify({"error": "invalid scene identifier"}), 400
+        result = trello_get("/search", {
+            "query": lookup_id, "idBoards": board["id"], "modelTypes": "cards",
+            "cards_limit": 100,
+            "card_fields": "id,name,desc,idList,shortUrl,due,dueComplete,pos,closed",
+        })
+        return jsonify({"scene_id": lookup_id, "search_result": result})
     board_lists = trello_get(f"/boards/{board['id']}/lists", {"fields": "id,name,pos,closed"})
     open_lists = {item["id"]: item for item in board_lists if not item.get("closed")}
     lists_by_name = {item["name"]: item for item in open_lists.values()}
@@ -3796,6 +3806,7 @@ def sync_dunaj_schedule():
         item["card"]["id"] for item in historical_actions + future_actions
     }
     stale_date_cards = []
+    past_date_cards_review = []
     stale_by_list = {}
     for card in cards:
         current_list = open_lists.get(card["idList"], {}).get("name", "")
@@ -3807,6 +3818,14 @@ def sync_dunaj_schedule():
             or card["id"] in expected_target_by_card_id
             or card["id"] in matched_nonwindow_card_ids
         ):
+            continue
+        day, month = (int(part) for part in current_list.rstrip(".").split("."))
+        list_date = f"{as_of[:4]}-{month:02d}-{day:02d}"
+        if list_date < as_of:
+            past_date_cards_review.append({
+                "id": card["id"], "scene_id": scene_id,
+                "from": current_list, "url": card["shortUrl"],
+            })
             continue
         stale_date_cards.append({
             "id": card["id"], "scene_id": scene_id, "name": card["name"],
@@ -3944,6 +3963,8 @@ def sync_dunaj_schedule():
             "shooting_days_selected": len(shooting_dates),
             "missing_target_lists": missing_target_lists, "window_by_date": window_by_date,
             "stale_date_cards_count": len(stale_date_cards),
+            "past_date_cards_preserved_count": len(past_date_cards_review),
+            "past_date_cards_preserved": past_date_cards_review,
             "stale_date_cards_by_list": stale_by_list,
             "stale_date_cards": stale_date_cards,
             "window_pending_updates_count": len(window_pending_updates),
