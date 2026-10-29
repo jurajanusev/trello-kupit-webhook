@@ -3517,6 +3517,8 @@ def find_dunaj_board():
 
 @app.route("/api/sync-dunaj-schedule", methods=["POST"])
 def sync_dunaj_schedule():
+    return jsonify({"error": "this one-off endpoint is disabled"}), 410
+
     if request.headers.get("X-Sync-Key") != DUNAJ_CURRENT_SCHEDULE_KEY:
         return jsonify({"error": "forbidden"}), 403
 
@@ -3556,16 +3558,6 @@ def sync_dunaj_schedule():
     row_by_scene = {row["scene_id"]: row for row in schedule_rows}
 
     board = trello_get("/boards/qCPeWA3e", {"fields": "id,name,url"})
-    if request.args.get("mode") == "lookup-scene":
-        lookup_id = request.args.get("scene", "")
-        if not re.fullmatch(r"\d{1,2}/\d+[A-Z]*", lookup_id):
-            return jsonify({"error": "invalid scene identifier"}), 400
-        result = trello_get("/search", {
-            "query": lookup_id, "idBoards": board["id"], "modelTypes": "cards",
-            "cards_limit": 100,
-            "card_fields": "id,name,desc,idList,shortUrl,due,dueComplete,pos,closed",
-        })
-        return jsonify({"scene_id": lookup_id, "search_result": result})
     board_lists = trello_get(f"/boards/{board['id']}/lists", {"fields": "id,name,pos,closed"})
     open_lists = {item["id"]: item for item in board_lists if not item.get("closed")}
     lists_by_name = {item["name"]: item for item in open_lists.values()}

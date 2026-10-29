@@ -134,7 +134,8 @@ Tento postup sa pouziva pre projekty Dunaj, DOK 4 a Riverdale:
 - Ak neexistuje ani zakladna karta, karta sa nevytvara naslepo. Chybajuci obraz sa oznami a po doplneni karty sa synchronizacia zopakuje.
 - Pripravuju sa iba zoznamy pre najblizsich 7 natacacich dni. Dni volna sa do limitu nepocitaju a prazdny zoznam sa pre ne nevytvara.
 - Prvych 7 najblizsich natacacich dni sa na nastenke zaraduje hned za hlavny serialovy zoznam: `SERIA 17,18` na Dunaji, `VSETKY EPIZODY` na DOK 4 a `SCENARE` na Riverdale.
-- Za prvymi 7 dnami sa pripravi aj nasledujucich 10 natacacich dni. Ich datove zoznamy sa zaradia na koniec prislusnej nastenky; dni volna sa ani do tohto limitu nepocitaju.
+- Na DOK 4 a Riverdale sa za prvymi 7 dnami pripravi aj nasledujucich 10 natacacich dni. Ich datove zoznamy sa zaradia na koniec prislusnej nastenky; dni volna sa ani do tohto limitu nepocitaju. Dunaj pouziva iba 7 najblizsich natacacich dni, chronologicky hned za `SERIA 17,18`, bez dalsich buducich zoznamov na konci nastenky.
+- Na Dunaji sa starsie datove zoznamy a ich karty bez potvrdenia natocenia zachovavaju. Cistenie neaktualnych datovych kariet sa tyka buducich dni; pri navrate do `SERIA 17,18` sa vymaze due date a zrusi dueComplete. Dry-run samostatne hlasi zachovane starsie karty aj nevyhovujuce poradie zoznamov.
 - Obraz oznaceny v zdrojovom natacacom plane zelenou fajkou sa povazuje za natoceny a povodna karta sa presunie do projektoveho zoznamu natocenych obrazov. Znak sa musi potvrdit z vizualnej vrstvy PDF; samotna zelena farba riadku, prestavky alebo ine zelene prvky nie su dokazom natocenia.
 - Karty sa presunu do datovych zoznamov a zoradia podla poradia dna. Retake sa moze vratit aj zo zoznamu natocenych a vtedy sa `dueComplete` nastavi na `false`.
 - Datove zoznamy sa zoradia chronologicky hned za hlavnym zoznamom serialu.

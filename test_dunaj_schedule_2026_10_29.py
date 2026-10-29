@@ -1,4 +1,6 @@
 import copy
+import ast
+import inspect
 import json
 import os
 from pathlib import Path
@@ -11,6 +13,20 @@ import app
 
 
 class October29Tests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        # Exercise maintenance logic in an isolated app while the production
+        # one-off route remains disabled between schedule updates.
+        module = ast.parse(inspect.getsource(app.sync_dunaj_schedule))
+        function = module.body[0]
+        function.decorator_list = []
+        if isinstance(function.body[0], ast.Return):
+            function.body.pop(0)
+        scope = {}
+        exec(compile(module, app.__file__, "exec"), vars(app), scope)
+        cls.test_app = app.Flask("dunaj-schedule-regression")
+        cls.test_app.add_url_rule("/api/sync-dunaj-schedule", view_func=scope["sync_dunaj_schedule"], methods=["POST"])
+
     def setUp(self):
         self.document = json.loads((Path(__file__).parent / app.DUNAJ_CURRENT_SCHEDULE_FILE).read_text(encoding="utf-8"))
         self.rows = app.canonicalize_dunaj_schedule_rows(self.document["rows"])
@@ -46,7 +62,12 @@ class October29Tests(unittest.TestCase):
 
     def call(self, query):
         with patch.object(app, "trello_get", side_effect=self.get), patch.object(app, "trello_put_body", side_effect=self.put):
-            return app.app.test_client().post("/api/sync-dunaj-schedule?" + query, headers={"X-Sync-Key": app.DUNAJ_CURRENT_SCHEDULE_KEY})
+            return self.test_app.test_client().post("/api/sync-dunaj-schedule?" + query, headers={"X-Sync-Key": app.DUNAJ_CURRENT_SCHEDULE_KEY})
+
+    def test_production_one_off_route_is_disabled(self):
+        with patch.object(app, "trello_get", side_effect=AssertionError("disabled route must not call Trello")):
+            response = app.app.test_client().post("/api/sync-dunaj-schedule", headers={"X-Sync-Key": app.DUNAJ_CURRENT_SCHEDULE_KEY})
+        self.assertEqual(response.status_code, 410)
 
     def test_complete_source_and_seven_shooting_days(self):
         self.assertEqual(len(self.rows), 333)
