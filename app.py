@@ -37,11 +37,11 @@ RIVERDALE_START_MARKER = "<!-- RIVERDALE-SCHEDULE-METADATA:START -->"
 RIVERDALE_END_MARKER = "<!-- RIVERDALE-SCHEDULE-METADATA:END -->"
 RIVERDALE_SOURCE_LABEL = "predbežné dispo Riverdale / Čierny Kameň"
 
-DUNAJ_CURRENT_SCHEDULE_KEY = "dunaj-schedule-26oct-6b1e4d83"
-DUNAJ_CURRENT_SCHEDULE_FILE = "dunaj_schedule_2026-10-26.json"
-DUNAJ_CURRENT_SCHEDULE_AS_OF = "2026-10-27"
-DUNAJ_CURRENT_SOURCE_LABEL = "predbežná dispo DUNAJ 17 z 26. 10. 2026"
-DUNAJ_CURRENT_SOURCE_ROWS = 359
+DUNAJ_CURRENT_SCHEDULE_KEY = "dunaj-schedule-29oct-7402e8b6"
+DUNAJ_CURRENT_SCHEDULE_FILE = "dunaj_schedule_2026-10-29.json"
+DUNAJ_CURRENT_SCHEDULE_AS_OF = "2026-10-30"
+DUNAJ_CURRENT_SOURCE_LABEL = "predbežná dispo DUNAJ 17 z 29. 10. 2026"
+DUNAJ_CURRENT_SOURCE_ROWS = 333
 
 
 def canonicalize_dunaj_schedule_rows(source_rows):
@@ -3517,8 +3517,6 @@ def find_dunaj_board():
 
 @app.route("/api/sync-dunaj-schedule", methods=["POST"])
 def sync_dunaj_schedule():
-    return jsonify({"error": "this one-off endpoint is disabled"}), 410
-
     if request.headers.get("X-Sync-Key") != DUNAJ_CURRENT_SCHEDULE_KEY:
         return jsonify({"error": "forbidden"}), 403
 
@@ -3558,10 +3556,12 @@ def sync_dunaj_schedule():
     row_by_scene = {row["scene_id"]: row for row in schedule_rows}
 
     board = trello_get("/boards/qCPeWA3e", {"fields": "id,name,url"})
-    board_lists = trello_get(f"/boards/{board['id']}/lists", {"fields": "id,name,closed"})
+    board_lists = trello_get(f"/boards/{board['id']}/lists", {"fields": "id,name,pos,closed"})
     open_lists = {item["id"]: item for item in board_lists if not item.get("closed")}
     lists_by_name = {item["name"]: item for item in open_lists.values()}
     series_list = lists_by_name.get("SERIA 17,18")
+    if request.args.get("mode", "dry-run") == "apply-window" and not series_list:
+        return jsonify({"error": "SERIA 17,18 list not found"}), 404
     # The current series has its own shot archive. Never select an older or
     # generic list merely because its name also contains "NATOC".
     shot_list = lists_by_name.get("17/18 NATOČENÉ OBRAZY")
@@ -3888,6 +3888,12 @@ def sync_dunaj_schedule():
     if mode not in {"dry-run", "apply-window", "cleanup-stale", "metadata", "reconcile-history"}:
         return jsonify({"error": "apply modes disabled pending dry-run approval"}), 409
     if mode == "dry-run":
+        ordered_names = [item["name"] for item in sorted(
+            open_lists.values(), key=lambda item: item["pos"]
+        )]
+        expected_date_order = list(target_names.values())
+        anchor_index = ordered_names.index("SERIA 17,18") if series_list else -1
+        actual_date_order = ordered_names[anchor_index + 1:anchor_index + 1 + len(expected_date_order)] if series_list else []
         matched_by_list = {}
         for item in matched:
             name = open_lists.get(item["card"]["idList"], {}).get("name", "UNKNOWN")
@@ -3911,6 +3917,11 @@ def sync_dunaj_schedule():
             "canonical_schedule_rows": len(schedule_rows),
             "open_lists": [item["name"] for item in open_lists.values()],
             "board_list_order": [item["name"] for item in open_lists.values()],
+            "expected_date_list_order": expected_date_order,
+            "list_order_pending_count": sum(
+                index >= len(actual_date_order) or actual_date_order[index] != name
+                for index, name in enumerate(expected_date_order)
+            ),
             "existing_date_lists": [
                 item["name"] for item in open_lists.values()
                 if re.fullmatch(r"\d{1,2}\.\d{1,2}\.", item["name"])
@@ -3968,6 +3979,13 @@ def sync_dunaj_schedule():
             } for item in window_cards[:40]],
         })
 
+    if duplicate_ids or fallback_card_collisions:
+        return jsonify({
+            "error": "schedule writes blocked by duplicate or colliding matches",
+            "duplicate_scene_ids": duplicate_ids,
+            "fallback_card_collisions": fallback_card_collisions,
+        }), 409
+
     if mode == "reconcile-history":
         if history_target_collisions:
             return jsonify({
@@ -4015,6 +4033,8 @@ def sync_dunaj_schedule():
         })
 
     if mode == "apply-window":
+        if not series_list:
+            return jsonify({"error": "SERIA 17,18 list not found"}), 404
         if (
             window_duplicates
             or len(window_cards) + len(window_missing) != len(window_rows)
@@ -4139,7 +4159,7 @@ def sync_dunaj_schedule():
             })
             ordered_lists.sort(key=lambda value: value["pos"])
             anchor = next(
-                (value for value in ordered_lists if value["name"] == "SERIA 15,16"),
+                (value for value in ordered_lists if value["name"] == "SERIA 17,18"),
                 None,
             )
             date_lists = [
@@ -4526,9 +4546,9 @@ def reorder_dunaj_date_lists():
     board = trello_get("/boards/qCPeWA3e", {"fields": "id,name,url"})
     lists = trello_get(f"/boards/{board['id']}/lists", {"fields": "id,name,pos,closed", "filter": "open"})
     lists = sorted(lists, key=lambda item: item["pos"])
-    anchor = next((item for item in lists if item["name"] == "SERIA 15,16"), None)
+    anchor = next((item for item in lists if item["name"] == "SERIA 17,18"), None)
     if not anchor:
-        return jsonify({"error": "SERIA 15,16 list not found"}), 404
+        return jsonify({"error": "SERIA 17,18 list not found"}), 404
 
     target_names = ["20.7.", "22.7.", "23.7.", "24.7.", "25.7."]
     selected = []

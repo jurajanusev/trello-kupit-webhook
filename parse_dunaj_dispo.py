@@ -8,7 +8,7 @@ import pdfplumber
 
 SCENE_RE = re.compile(r"^\s*(\d{1,2})\s*/\s*(\d+[A-Z]*)\s*$", re.I)
 DAY_RE = re.compile(r"^Day #(\d+):.*?(\d{2}/\d{2}/\d{4})")
-SPLIT_SCENE_RE = re.compile(r"^\d+[A-Z]*$", re.I)
+SPLIT_SCENE_RE = re.compile(r"^\d+(?:[A-Z]*|m\.o\.?)$", re.I)
 
 
 def clean(value):
@@ -29,7 +29,7 @@ def parse(pdf_path):
             if source_label is None:
                 header = page.extract_text() or ""
                 source_match = re.search(
-                    r"DUNAJ\s+(\d+).*?\b(\d{1,2})\.(\d{1,2})\.(\d{4})\b",
+                    r"DUNAJ\s+(\d+).*?\b(\d{1,2})\.\s*(\d{1,2})\.\s*(\d{4})\b",
                     header, flags=re.I | re.S,
                 )
                 if source_match:
@@ -65,15 +65,17 @@ def parse(pdf_path):
                     # the following row contains script day, setting, cast and
                     # an ``Epizóda`` marker from which the episode is recovered.
                     second = clean(cells[1] if len(cells) > 1 else "")
-                    if SPLIT_SCENE_RE.fullmatch(first) and not second:
+                    detail = clean(cells[3] if len(cells) > 3 else "")
+                    episode_match = re.search(r"Epi.*?da:\s*[A-Z]*(\d+)", detail, flags=re.I)
+                    if SPLIT_SCENE_RE.fullmatch(first) and not second and not episode_match:
                         pending_scene = {
-                            "scene": first.upper(),
+                            "scene": re.sub(r"m\.o\.?$", "", first, flags=re.I).upper(),
                             "location": clean(cells[2] if len(cells) > 2 else ""),
                             "story": clean(cells[3] if len(cells) > 3 else ""),
                             "source_page": page_number,
                         }
                         continue
-                    if pending_scene and SPLIT_SCENE_RE.fullmatch(first) and second:
+                    if pending_scene and SPLIT_SCENE_RE.fullmatch(first) and episode_match:
                         detail = clean(cells[3] if len(cells) > 3 else "")
                         episode_match = re.search(
                             r"Epi.*?da:\s*[A-Z]*(\d+)", detail, flags=re.I
