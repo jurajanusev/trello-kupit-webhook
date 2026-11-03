@@ -5496,6 +5496,8 @@ def sync_riverdale_current_schedule():
 
 @app.route("/api/handoff-automation-deployment", methods=["POST"])
 def handoff_automation_deployment():
+    return jsonify({"error": "completed one-off endpoint disabled"}), 410
+
     if request.headers.get("X-Sync-Key") != DOK4_CURRENT_SCHEDULE_KEY:
         return jsonify({"error": "forbidden"}), 403
 
