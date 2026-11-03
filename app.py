@@ -3900,7 +3900,10 @@ def sync_dunaj_schedule():
             })
 
     mode = request.args.get("mode", "dry-run")
-    if mode not in {"dry-run", "apply-window", "cleanup-stale", "metadata", "reconcile-history"}:
+    if mode not in {
+        "dry-run", "apply-window", "create-window-missing", "cleanup-stale",
+        "metadata", "reconcile-history",
+    }:
         return jsonify({"error": "apply modes disabled pending dry-run approval"}), 409
     if mode == "dry-run":
         ordered_names = [item["name"] for item in sorted(
@@ -4004,6 +4007,56 @@ def sync_dunaj_schedule():
             "duplicate_scene_ids": duplicate_ids,
             "fallback_card_collisions": fallback_card_collisions,
         }), 409
+
+    if mode == "create-window-missing":
+        created_lists = []
+        for date_text, name in target_names.items():
+            if name not in lists_by_name:
+                lists_by_name[name] = trello_post_body("/lists", {
+                    "idBoard": board["id"], "name": name, "pos": "bottom",
+                })
+                created_lists.append(name)
+        created = []
+        errors = []
+        for scene_id in window_missing:
+            row = row_by_scene[scene_id]
+            target = lists_by_name[target_names[row["shooting_date"]]]
+            title = (
+                f"{row['scene_id']}. {row['setting']} {row['location']}"
+                f" — {row['characters']}"
+            ).strip()
+            description = (
+                "<!-- DUNAJ-SCHEDULE-METADATA:START -->\n"
+                f"**ČÍSLO OBRAZU:** {row['scene_id']}\n"
+                f"**ZDROJ:** {DUNAJ_CURRENT_SOURCE_LABEL}\n"
+                f"**NATÁČACÍ DEŇ:** {row['shooting_day']}\n"
+                f"**DÁTUM NATÁČANIA:** {row['shooting_date']}\n"
+                f"**PORADIE DŇA:** {row['order']}\n"
+                f"**UNIT:** {row['unit']}\n"
+                f"**LOKÁCIA:** {row['location']}\n"
+                f"**POSTAVY:** {row['characters']}\n"
+                "<!-- DUNAJ-SCHEDULE-METADATA:END -->"
+            )
+            try:
+                card = trello_post_body("/cards", {
+                    "idList": target["id"], "name": title,
+                    "desc": description,
+                    "due": f"{row['shooting_date']}T10:00:00.000Z",
+                    "pos": row["order"] * 16384,
+                })
+                created.append({
+                    "scene_id": scene_id, "date": row["shooting_date"],
+                    "list": target_names[row["shooting_date"]],
+                    "url": card["shortUrl"],
+                })
+            except Exception as exc:
+                errors.append({"scene_id": scene_id, "error": str(exc)})
+        return jsonify({
+            "status": "window-missing-created", "planned": len(window_missing),
+            "created_count": len(created), "created": created,
+            "created_lists": created_lists,
+            "errors_count": len(errors), "errors": errors,
+        })
 
     if mode == "reconcile-history":
         if history_target_collisions:
