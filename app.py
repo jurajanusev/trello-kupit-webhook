@@ -37,11 +37,12 @@ RIVERDALE_START_MARKER = "<!-- RIVERDALE-SCHEDULE-METADATA:START -->"
 RIVERDALE_END_MARKER = "<!-- RIVERDALE-SCHEDULE-METADATA:END -->"
 RIVERDALE_SOURCE_LABEL = "predbežné dispo Riverdale / Čierny Kameň"
 
-DUNAJ_CURRENT_SCHEDULE_KEY = "dunaj-schedule-29oct-7402e8b6"
-DUNAJ_CURRENT_SCHEDULE_FILE = "dunaj_schedule_2026-10-29.json"
-DUNAJ_CURRENT_SCHEDULE_AS_OF = "2026-10-30"
-DUNAJ_CURRENT_SOURCE_LABEL = "predbežná dispo DUNAJ 17 z 29. 10. 2026"
-DUNAJ_CURRENT_SOURCE_ROWS = 333
+DUNAJ_CURRENT_SCHEDULE_KEY = "dunaj-schedule-3nov-6b1e4d83"
+DUNAJ_CURRENT_SCHEDULE_FILE = "dunaj_schedule_2026-11-03.json"
+DUNAJ_CURRENT_SCHEDULE_AS_OF = "2026-11-04"
+DUNAJ_CURRENT_SOURCE_LABEL = "predbežná dispo DUNAJ 17 z 3. 11. 2026"
+DUNAJ_CURRENT_SOURCE_ROWS = 289
+DUNAJ_PROTECTED_DATES = {"2026-11-03"}
 
 
 def canonicalize_dunaj_schedule_rows(source_rows):
@@ -3517,8 +3518,6 @@ def find_dunaj_board():
 
 @app.route("/api/sync-dunaj-schedule", methods=["POST"])
 def sync_dunaj_schedule():
-    return jsonify({"error": "this one-off endpoint is disabled"}), 410
-
     if request.headers.get("X-Sync-Key") != DUNAJ_CURRENT_SCHEDULE_KEY:
         return jsonify({"error": "forbidden"}), 403
 
@@ -3750,6 +3749,9 @@ def sync_dunaj_schedule():
         return f"{day}.{month}."
 
     target_names = {date_text: date_list_name(date_text) for date_text in shooting_dates}
+    protected_list_names = {
+        date_list_name(date_text) for date_text in DUNAJ_PROTECTED_DATES
+    }
     missing_target_lists = [name for name in target_names.values() if name not in lists_by_name]
 
     nonwindow_groups = {}
@@ -3803,6 +3805,8 @@ def sync_dunaj_schedule():
     for card in cards:
         current_list = open_lists.get(card["idList"], {}).get("name", "")
         if not re.fullmatch(r"\d{1,2}\.\d{1,2}\.", current_list):
+            continue
+        if current_list in protected_list_names:
             continue
         scene_id = scene_id_from_card_name(card.get("name"))
         if (
@@ -3951,6 +3955,8 @@ def sync_dunaj_schedule():
             "window_duplicates_count": len(window_duplicates), "window_duplicates": window_duplicates[:20],
             "window_type": "next_shooting_days",
             "window_as_of": as_of,
+            "protected_dates": sorted(DUNAJ_PROTECTED_DATES),
+            "protected_lists": sorted(protected_list_names),
             "shooting_dates": shooting_dates,
             "shooting_days_selected": len(shooting_dates),
             "missing_target_lists": missing_target_lists, "window_by_date": window_by_date,
@@ -4143,6 +4149,8 @@ def sync_dunaj_schedule():
                 if not re.fullmatch(r"\d{1,2}\.\d{1,2}\.", old_list["name"]):
                     continue
                 if old_list["name"] in active_names:
+                    continue
+                if old_list["name"] in protected_list_names:
                     continue
                 try:
                     remaining_cards = trello_get(f"/lists/{old_list['id']}/cards", {
