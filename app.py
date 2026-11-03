@@ -5496,7 +5496,6 @@ def sync_riverdale_current_schedule():
 
 @app.route("/api/handoff-automation-deployment", methods=["POST"])
 def handoff_automation_deployment():
-    return jsonify({"error": "completed one-off endpoint disabled"}), 410
     if request.headers.get("X-Sync-Key") != DOK4_CURRENT_SCHEDULE_KEY:
         return jsonify({"error": "forbidden"}), 403
 
@@ -5541,19 +5540,16 @@ def handoff_automation_deployment():
         }), 409
 
     note = (
-        "Aktualizácia natáčacích plánov 26. 9. 2026 - Dunaj, DOK 4 a Riverdale.\n\n"
-        "Nasadené produkčné commity: 1da46b3, 54a96a8, b4cee9e, 99d2316.\n"
-        "Aktívne okná používajú najbližších 7 natáčacích dní od 27. 9.; "
-        "26. 9. je vo všetkých projektoch vynechaný a chránený pred zmenami.\n"
-        "Dunaj historické obrazy smeruje výhradne do zoznamu "
-        "17/18 NATOČENÉ OBRAZY.\n"
-        "Finálny audit: čakajúce presuny 0, neaktuálne dátumové karty 0, "
-        "duplicity 0, fallback kolízie 0. Trello ToDo aj Microsoft To Do: "
-        "to_create 0, to_update 0, duplicity 0 pre všetky tri projekty.\n"
-        "Nevytvorené chýbajúce karty: Dunaj aktívne 12/18, 11/28, 11/24, "
-        "11/38, 12/7; DOK 4 aktívne 14/24 a historické 09/28, 11/42, 14/48; "
-        "Riverdale mimo aktívneho okna 05/2A. Jednorazové synchronizačné "
-        "endpointy boli po kontrole vypnuté."
+        "Aktualizácia natáčacieho plánu Dunaj z 3. 11. 2026.\n\n"
+        "Nasadené produkčné commity: e59a8dd, 099bd20, 3ffa661.\n"
+        "Aktívne okno obsahuje 7 najbližších natáčacích dní: 4., 5., 6., "
+        "8., 9., 10. a 11. 11. 2026. Zoznam 3. 11. bol vynechaný, chránený "
+        "pred presunmi, čistením aj archiváciou a zostal nedotknutý.\n"
+        "Doplnené boli chýbajúce karty 21/3 a 22/13. Finálny audit: "
+        "chýbajúce 0, duplicity 0, fallback kolízie 0, čakajúce presuny 0, "
+        "neaktuálne termíny/metadáta 0, neaktuálne dátumové karty 0 a "
+        "čakajúce zmeny poradia zoznamov 0. Jednorazový synchronizačný "
+        "endpoint Dunaja bol po kontrole vypnutý."
     )
     action = trello_post_body(
         f"/cards/{candidates[0]['id']}/actions/comments", {"text": note}
