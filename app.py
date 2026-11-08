@@ -39,7 +39,7 @@ RIVERDALE_SOURCE_LABEL = "predbežné dispo Riverdale / Čierny Kameň"
 
 DUNAJ_CURRENT_SCHEDULE_KEY = "dunaj-schedule-8nov-57c836ae"
 DUNAJ_CURRENT_SCHEDULE_FILE = "dunaj_schedule_2026-11-08.json"
-DUNAJ_CURRENT_SCHEDULE_AS_OF = "2026-11-08"
+DUNAJ_CURRENT_SCHEDULE_AS_OF = "2026-11-09"
 DUNAJ_CURRENT_SOURCE_LABEL = "predbežná dispo DUNAJ 17 z 8. 11. 2026"
 DUNAJ_CURRENT_SOURCE_ROWS = 411
 DUNAJ_PROTECTED_DATES = {"2026-11-03"}
@@ -3794,6 +3794,11 @@ def sync_dunaj_schedule():
             not series_list or card.get("idList") != series_list["id"]
             or card.get("due") or card.get("dueComplete")
         ):
+            # Do not reopen archived scenes outside the seven-day window.
+            # Older series reuse these numbers; retakes are restored only
+            # when they enter the active window and have been reviewed.
+            if "NATOC" in unicodedata.normalize("NFKD", current_list or "").encode("ascii", "ignore").decode().upper():
+                continue
             future_actions.append({**item, "current_list": current_list, "scene_ids": scene_ids})
 
     expected_target_by_card_id = {
