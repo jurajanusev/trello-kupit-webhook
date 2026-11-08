@@ -55,6 +55,8 @@ class TrelloFixture:
         data = dict(data)
         if data.get('pos') == 'bottom':
             data['pos'] = max(v.get('pos',0) for v in collection)+16384
+        elif data.get('pos') == 'top':
+            data['pos'] = min(v.get('pos',0) for v in collection)-16384
         item.update(data)
         return copy.deepcopy(item)
 
@@ -131,6 +133,18 @@ class November08PlansTests(unittest.TestCase):
         self.assertEqual(result['restored_count'],1)
         self.assertFalse(card['closed'])
         self.assertEqual(card['due'],'2026-11-09T10:00:00.000Z')
+
+    def test_rebalanced_positions_are_accepted_when_order_is_correct(self):
+        t=TrelloFixture()
+        # Three scenes share a date; their nonstandard positions preserve order.
+        for i in range(3):
+            t.rows[i].update(shooting_date='2026-11-09',order=i+1)
+        state=build_state(t,t.rows,'2026-11-08','2026-11-09',preserve_past_dates=True)
+        apply(t,state)
+        for i in range(3):
+            next(c for c in t.cards if c['id']==f'card{i}')['pos']=(i+1)*0.125
+        state=build_state(t,t.rows,'2026-11-08','2026-11-09',preserve_past_dates=True)
+        self.assertEqual(summary(state,t.rows)['window_pending_count'],0)
 
 
 if __name__=='__main__':

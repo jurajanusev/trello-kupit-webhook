@@ -432,6 +432,22 @@ def build_state(
     }
 
 
+def window_order_mismatches(state):
+    groups = {}
+    for item in state['window_matches']:
+        target = state['target_names'][item['row']['shooting_date']]
+        if state['lists_by_id'][item['card']['idList']]['name'] == target:
+            groups.setdefault(target, []).append(item)
+    mismatches = set()
+    for items in groups.values():
+        wanted = sorted(items, key=lambda i: i['row']['order'])
+        actual = sorted(items, key=lambda i: float(i['card'].get('pos') or 0))
+        for a,b in zip(wanted,actual):
+            if a['card']['id'] != b['card']['id']:
+                mismatches.add(a['card']['id'])
+    return mismatches
+
+
 def summary(state, schedule):
     by_date = {}
     for row in state["window_rows"]:
@@ -444,9 +460,10 @@ def summary(state, schedule):
     primary_actual = actual[anchor_index + 1:anchor_index + 1 + len(primary)]
     tail_actual = actual[-len(tail):] if tail else []
     order_pending = sum(a != b for a,b in zip(primary + tail, primary_actual + tail_actual)) + max(0, len(primary + tail) - len(primary_actual + tail_actual))
+    order_mismatches = window_order_mismatches(state)
     pending_cards = sum(
         state['lists_by_id'][item['card']['idList']]['name'] != state['target_names'][item['row']['shooting_date']]
-        or abs(float(item['card'].get('pos') or 0) - item['row']['order'] * 16384) > 0.5
+        or item['card']['id'] in order_mismatches
         or bool(item['card'].get('dueComplete'))
         for item in state['window_matches']
     )
@@ -573,16 +590,30 @@ def apply(trello, state, metadata_only=False, skip_metadata=False, metadata_limi
     move_errors = []
     window_unchanged = 0
     window_processed = 0
+    order_mismatches = window_order_mismatches(state)
     for item in sorted(state["window_matches"], key=lambda value: (value["row"]["shooting_date"], value["row"]["order"])):
         row = item["row"]
         card = item["card"]
         target = lists_by_name[state["target_names"][row["shooting_date"]]]
-        expected_pos = row["order"] * 16384
         payload = {}
         if card["idList"] != target["id"]:
             payload["idList"] = target["id"]
-        if abs(float(card.get("pos") or 0) - expected_pos) > 0.5:
-            payload["pos"] = expected_pos
+        if card['idList'] != target['id'] or card['id'] in order_mismatches:
+            # Insert after the preceding planned card. Trello can rebalance
+            # numeric positions, so only relative order is authoritative.
+            preceding = [other for other in state['window_matches']
+                         if other['row']['shooting_date'] == row['shooting_date']
+                         and other['row']['order'] < row['order']
+                         and other['card']['idList'] == target['id']]
+            if not preceding:
+                payload['pos'] = 'top'
+            else:
+                previous = max(preceding,key=lambda i:i['row']['order'])['card']
+                previous_pos = float(previous.get('pos') or 0)
+                next_positions = [float(c.get('pos') or 0) for c in state['cards']
+                                  if c['idList'] == target['id'] and c['id'] != card['id']
+                                  and float(c.get('pos') or 0) > previous_pos]
+                payload['pos'] = (previous_pos + min(next_positions))/2 if next_positions else previous_pos + 16384
         current_name = state["lists_by_id"][card["idList"]]["name"]
         if "NATOČEN" in current_name.upper() or card.get("dueComplete"):
             payload["dueComplete"] = False
@@ -594,6 +625,7 @@ def apply(trello, state, metadata_only=False, skip_metadata=False, metadata_limi
         window_processed += 1
         try:
             result = trello.put(f"/cards/{card['id']}", payload)
+            card.update({key: result[key] for key in ('idList','pos','dueComplete') if key in result})
             entry = {
                 "scene_id": row["scene_id"], "list": target["name"],
                 "order": row["order"], "url": result["shortUrl"],
