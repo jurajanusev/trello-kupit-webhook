@@ -13,7 +13,7 @@ class TrelloFixture:
         self.lists = [
             {'id':'anchor', 'name':'VŠETKY EPIZÓDY', 'pos':1000},
             {'id':'other', 'name':'REKVIZITY', 'pos':2000},
-            {'id':'past', 'name':'7.11.', 'pos':3000},
+            {'id':'past', 'name':'7.11.', 'pos':1100},
             {'id':'stale', 'name':'30.12.', 'pos':4000},
         ]
         self.cards = [

@@ -643,7 +643,8 @@ def apply(trello, state, metadata_only=False, skip_metadata=False, metadata_limi
     }
     primary_items = [item for item in date_items if item[2]["name"] in primary_names]
     tail_items = [item for item in date_items if item[2]["name"] not in primary_names and (not state.get('preserve_past_dates') or item[2]['name'] in active_date_names)]
-    date_ids = {item[2]["id"] for item in date_items}
+    date_ids = {item[2]["id"] for item in date_items
+                if not state.get('preserve_past_dates') or item[2]['name'] in active_date_names}
     following = [item for item in refreshed_lists if item["id"] not in date_ids and item["pos"] > anchor["pos"]]
     if following:
         next_pos = following[0]["pos"]
