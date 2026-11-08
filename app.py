@@ -15,6 +15,7 @@ from update_dok4_plan_local import (
     apply as apply_dok4_schedule,
     build_state as build_dok4_schedule_state,
     summary as summarize_dok4_schedule,
+    create_missing_placeholders as create_schedule_placeholders,
 )
 
 app = Flask(__name__)
@@ -5417,6 +5418,7 @@ def sync_dok4_current_schedule():
         ignore_scene_suffix=True,
         protected_dates=DOK4_PROTECTED_DATES,
         preserve_past_dates=True,
+        preferred_card_ids={'16/41':'6a82f450608c69aed621f454'},
     )
     if mode == "dry-run":
         return jsonify(summarize_dok4_schedule(state, schedule))
@@ -5447,7 +5449,7 @@ def sync_riverdale_current_schedule():
     if request.headers.get("X-Sync-Key") != RIVERDALE_CURRENT_SCHEDULE_KEY:
         return jsonify({"error": "forbidden"}), 403
     mode = request.args.get("mode", "dry-run")
-    if mode not in {"dry-run", "apply", "metadata", "window"}:
+    if mode not in {"dry-run", "apply", "metadata", "window", "create-missing"}:
         return jsonify({
             "error": "mode must be dry-run, apply, metadata, or window"
         }), 400
@@ -5491,6 +5493,8 @@ def sync_riverdale_current_schedule():
     )
     if mode == "dry-run":
         return jsonify(summarize_dok4_schedule(state, schedule))
+    if mode == 'create-missing':
+        return jsonify(create_schedule_placeholders(trello, state))
     if mode == "metadata":
         result = apply_dok4_schedule(
             trello, state, metadata_only=True,

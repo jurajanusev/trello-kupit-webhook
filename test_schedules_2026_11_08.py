@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 import unittest
 
-from update_dok4_plan_local import build_state, summary, apply
+from update_dok4_plan_local import build_state, summary, apply, create_missing_placeholders
 
 ROOT = Path(__file__).parent
 
@@ -101,6 +101,36 @@ class November08PlansTests(unittest.TestCase):
         result=apply(t,state,skip_metadata=True,window_limit=2,cleanup_limit=1)
         self.assertEqual(result['moved_count'],2)
         self.assertEqual(summary(build_state(t,t.rows,'2026-11-08','2026-11-09',preserve_past_dates=True),t.rows)['window_pending_count'],13)
+
+    def test_reviewed_working_card_preserves_other_copy(self):
+        t=TrelloFixture()
+        duplicate=copy.deepcopy(t.cards[2])
+        duplicate.update(id='reference',dueComplete=True)
+        t.cards.append(duplicate)
+        state=build_state(t,t.rows,'2026-11-08','2026-11-09',preserve_past_dates=True,preferred_card_ids={'01/1':'card0'})
+        self.assertFalse(state['duplicates'])
+        self.assertEqual(state['ignored_reference_duplicates'][0]['selected']['id'],'card0')
+        apply(t,state)
+        self.assertFalse(next(c for c in t.cards if c['id']=='reference').get('closed'))
+
+    def test_archived_missing_card_is_restored_instead_of_duplicated(self):
+        t=TrelloFixture()
+        card=t.cards[2]
+        card['closed']=True
+        original_get=t.get
+        def get(path,params=None):
+            if path=='/search':
+                self.assertIn('is:archived',params['query'])
+                return {'cards':[copy.deepcopy(card)]}
+            return original_get(path,params)
+        t.get=get
+        state=build_state(t,t.rows,'2026-11-08','2026-11-09',preserve_past_dates=True)
+        self.assertEqual(len(state['missing']),1)
+        result=create_missing_placeholders(t,state)
+        self.assertEqual(result['created_count'],0)
+        self.assertEqual(result['restored_count'],1)
+        self.assertFalse(card['closed'])
+        self.assertEqual(card['due'],'2026-11-09T10:00:00.000Z')
 
 
 if __name__=='__main__':

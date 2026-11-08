@@ -169,7 +169,7 @@ def build_state(
     trello, schedule, source_date, as_of, board_ref=BOARD_REF,
     start_marker=START_MARKER, end_marker=END_MARKER,
     source_label="predbežné dispo DOK 4", ignore_scene_suffix=False,
-    protected_dates=None, preserve_past_dates=False,
+    protected_dates=None, preserve_past_dates=False, preferred_card_ids=None,
 ):
     protected_dates = set(protected_dates or [])
     board = trello.get(f"/boards/{board_ref}", {"fields": "id,name,url,shortLink"})
@@ -247,6 +247,17 @@ def build_state(
         if not candidates:
             missing.append({"scene_id": planned_id, "base_id": matched_id, "date": row["shooting_date"]})
             continue
+        preferred_id = (preferred_card_ids or {}).get(planned_id)
+        if len(candidates) > 1 and preferred_id:
+            preferred = next((c for c in candidates if c['id'] == preferred_id), None)
+            if preferred:
+                ignored_reference_duplicates.append({
+                    'scene_id': planned_id,
+                    'reason': 'Reviewed existing scheduled working card; other copies preserved',
+                    'selected': {'id': preferred['id'], 'url': preferred['shortUrl']},
+                    'ignored': [{'id': c['id'], 'url': c['shortUrl']} for c in candidates if c['id'] != preferred_id],
+                })
+                candidates = [preferred]
         if len(candidates) > 1 and row["shooting_date"] < as_of:
             shot_candidates = [
                 card for card in candidates
@@ -697,6 +708,48 @@ def cleanup_stale(trello, state, limit=None):
             "to": state["anchor"]["name"], "due_cleared": True,
         })
     return returned
+
+
+def create_missing_placeholders(trello, state):
+    """Restore a unique archived scene or create a visibly temporary card."""
+    if state['duplicates'] or state['reused_card_conflicts'] or not state['anchor']:
+        raise RuntimeError('Missing-card creation blocked by ambiguous state')
+    rows = {r['scene_id']: r for r in state['window_rows']}
+    created = []
+    restored = []
+    for missing in state['missing']:
+        scene_id = missing['scene_id']
+        if scene_id not in rows:
+            continue
+        row = rows[scene_id]
+        archived = trello.get('/search', {
+            'query': f"board:{state['board_ref']} is:archived {scene_id}",
+            'idBoards': state['board']['id'], 'modelTypes': 'cards',
+            'cards_limit': 100, 'card_fields': 'id,name,idBoard,idList,closed,shortUrl',
+        }).get('cards', [])
+        exact = []
+        for card in archived:
+            match = SCENE_RE.match(card.get('name',''))
+            if match and normalize_scene(match.group(1),match.group(2)) == scene_id:
+                exact.append(card)
+        if len(exact)>1:
+            raise RuntimeError('Multiple archived cards for '+scene_id)
+        name = state['target_names'][row['shooting_date']]
+        target = next(iter(state['lists_by_name'].get(name, [])), None)
+        if not target:
+            target = trello.post('/lists', {'idBoard':state['board']['id'],'name':name,'pos':'bottom'})
+            state['lists_by_name'][name] = [target]
+        payload = {'idList':target['id'],'due':row['shooting_date']+'T10:00:00.000Z',
+                   'dueComplete':False,'pos':row['order']*16384}
+        if exact:
+            card = trello.put('/cards/'+exact[0]['id'],dict(payload,closed=False))
+            restored.append({'scene_id':scene_id,'url':card['shortUrl']})
+        else:
+            desc = metadata(row,state['source_date'],state['start_marker'],state['end_marker'],state['source_label'])
+            desc += '\n\n**DOPLNIT — DOČASNÁ KARTA:** Doplniť scenár a rekvizity. Vytvorené iba podľa plánu.\n\n**DEJ PODĽA PLÁNU:** '+row.get('story','')
+            card = trello.post('/cards',dict(payload,name=f"{scene_id}. {row.get('setting','')} {row['location']} — {row['characters']} [DOPLNIT]",desc=desc))
+            created.append({'scene_id':scene_id,'url':card['shortUrl']})
+    return {'status':'missing-cards-resolved','created_count':len(created),'restored_count':len(restored),'created':created,'restored':restored}
 
 
 def main():
