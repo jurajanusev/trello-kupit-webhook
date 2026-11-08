@@ -53,6 +53,13 @@ def parse(pdf_path):
                         order = 0
                         pending_scene = None
                         continue
+                    undated_day = re.match(r"^[a-zá-ž]{2}\s+(\d{2}/\d{2}/\d{4})(?:\s|$)", first, re.I)
+                    if undated_day:
+                        current_date = datetime.strptime(undated_day.group(1), "%m/%d/%Y").date().isoformat()
+                        current_day = None
+                        order = 0
+                        pending_scene = None
+                        continue
                     if first.startswith("1st unit"):
                         current_unit = "1st unit"
                         continue
@@ -66,7 +73,7 @@ def parse(pdf_path):
                     # an ``Epizóda`` marker from which the episode is recovered.
                     second = clean(cells[1] if len(cells) > 1 else "")
                     detail = clean(cells[3] if len(cells) > 3 else "")
-                    episode_match = re.search(r"Epi.*?da:\s*[A-Z]*(\d+)", detail, flags=re.I)
+                    episode_match = re.search(r"Epi.*?da:\s*(\d+|V)(?=\s*[,;]|\s*$)", detail, flags=re.I)
                     if SPLIT_SCENE_RE.fullmatch(first) and not second and not episode_match:
                         pending_scene = {
                             "scene": re.sub(r"m\.o\.?$", "", first, flags=re.I).upper(),
@@ -75,16 +82,17 @@ def parse(pdf_path):
                             "source_page": page_number,
                         }
                         continue
-                    if pending_scene and SPLIT_SCENE_RE.fullmatch(first) and episode_match:
+                    if pending_scene and episode_match:
                         detail = clean(cells[3] if len(cells) > 3 else "")
                         episode_match = re.search(
-                            r"Epi.*?da:\s*[A-Z]*(\d+)", detail, flags=re.I
+                            r"Epi.*?da:\s*(\d+|V)(?=\s*[,;]|\s*$)", detail, flags=re.I
                         )
                         if not episode_match:
                             raise ValueError(
                                 f"episode marker missing on page {page_number}: {detail}"
                             )
-                        episode = int(episode_match.group(1))
+                        episode = int(episode_match.group(1)) if episode_match.group(1).isdigit() else "V"
+                        episode_id = f"{episode:02d}" if isinstance(episode, int) else episode
                         before_episode = detail[:episode_match.start()].strip(" ,")
                         cast_parts = [part.strip() for part in before_episode.split(",") if part.strip()]
                         extras_parts = [part for part in cast_parts if "komparz" in part.casefold()]
@@ -105,7 +113,7 @@ def parse(pdf_path):
                         order += 1
                         scene = pending_scene["scene"]
                         rows.append({
-                            "scene_id": f"{episode:02d}/{scene}",
+                            "scene_id": f"{episode_id}/{scene}",
                             "episode": episode,
                             "scene": scene,
                             "shooting_day": current_day,

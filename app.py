@@ -37,11 +37,11 @@ RIVERDALE_START_MARKER = "<!-- RIVERDALE-SCHEDULE-METADATA:START -->"
 RIVERDALE_END_MARKER = "<!-- RIVERDALE-SCHEDULE-METADATA:END -->"
 RIVERDALE_SOURCE_LABEL = "predbežné dispo Riverdale / Čierny Kameň"
 
-DUNAJ_CURRENT_SCHEDULE_KEY = "dunaj-schedule-3nov-6b1e4d83"
-DUNAJ_CURRENT_SCHEDULE_FILE = "dunaj_schedule_2026-11-03.json"
-DUNAJ_CURRENT_SCHEDULE_AS_OF = "2026-11-04"
-DUNAJ_CURRENT_SOURCE_LABEL = "predbežná dispo DUNAJ 17 z 3. 11. 2026"
-DUNAJ_CURRENT_SOURCE_ROWS = 289
+DUNAJ_CURRENT_SCHEDULE_KEY = "dunaj-schedule-8nov-57c836ae"
+DUNAJ_CURRENT_SCHEDULE_FILE = "dunaj_schedule_2026-11-08.json"
+DUNAJ_CURRENT_SCHEDULE_AS_OF = "2026-11-08"
+DUNAJ_CURRENT_SOURCE_LABEL = "predbežná dispo DUNAJ 17 z 8. 11. 2026"
+DUNAJ_CURRENT_SOURCE_ROWS = 411
 DUNAJ_PROTECTED_DATES = {"2026-11-03"}
 
 
@@ -3518,8 +3518,6 @@ def find_dunaj_board():
 
 @app.route("/api/sync-dunaj-schedule", methods=["POST"])
 def sync_dunaj_schedule():
-    return jsonify({"error": "this one-off endpoint is disabled"}), 410
-
     if request.headers.get("X-Sync-Key") != DUNAJ_CURRENT_SCHEDULE_KEY:
         return jsonify({"error": "forbidden"}), 403
 
@@ -3593,13 +3591,17 @@ def sync_dunaj_schedule():
     # one current copy of each physical card before matching scene numbers.
     cards = list({card["id"]: card for card in cards}.values())
 
+    def schedule_scene_id(name):
+        special = re.match(r"^\s*V\s*/\s*0*(\d+)([A-Z]*)(?:\.|\s|$)", name or "", re.I)
+        if special:
+            return f"V/{int(special.group(1))}{special.group(2).upper()}"
+        return scene_id_from_card_name(name or "")
+
     cards_by_scene = {}
     for card in cards:
-        match = re.match(r"^\s*([0-9]{1,2})\s*/\s*([0-9]+[A-Z]*)(?:\.|\s|$)", card.get("name", ""), re.I)
-        if match:
-            scene_id = normalize_scene_id(match.group(1), match.group(2))
-            if scene_id:
-                cards_by_scene.setdefault(scene_id, []).append(card)
+        scene_id = schedule_scene_id(card.get("name"))
+        if scene_id:
+            cards_by_scene.setdefault(scene_id, []).append(card)
 
     def folded_match_text(value):
         value = "".join(
@@ -4003,11 +4005,12 @@ def sync_dunaj_schedule():
             } for item in window_cards[:40]],
         })
 
-    if duplicate_ids or fallback_card_collisions:
+    if duplicate_ids or fallback_card_collisions or window_duplicates:
         return jsonify({
             "error": "schedule writes blocked by duplicate or colliding matches",
             "duplicate_scene_ids": duplicate_ids,
             "fallback_card_collisions": fallback_card_collisions,
+            "window_duplicates": window_duplicates,
         }), 409
 
     if mode == "create-window-missing":
@@ -4025,7 +4028,7 @@ def sync_dunaj_schedule():
             target = lists_by_name[target_names[row["shooting_date"]]]
             title = (
                 f"{row['scene_id']}. {row['setting']} {row['location']}"
-                f" — {row['characters']}"
+                f" — {row['characters']} [DOPLNIT]"
             ).strip()
             description = (
                 "<!-- DUNAJ-SCHEDULE-METADATA:START -->\n"
@@ -4037,7 +4040,10 @@ def sync_dunaj_schedule():
                 f"**UNIT:** {row['unit']}\n"
                 f"**LOKÁCIA:** {row['location']}\n"
                 f"**POSTAVY:** {row['characters']}\n"
-                "<!-- DUNAJ-SCHEDULE-METADATA:END -->"
+                "<!-- DUNAJ-SCHEDULE-METADATA:END -->\n\n"
+                "**DOPLNIT — DOČASNÁ KARTA:** Vytvorená iba podľa natáčacieho plánu. "
+                "Doplniť scenár, rekvizity a overiť detaily obrazu.\n\n"
+                f"**DEJ PODĽA PLÁNU:** {row.get('story', '')}"
             )
             try:
                 card = trello_post_body("/cards", {
