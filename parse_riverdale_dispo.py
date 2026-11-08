@@ -7,7 +7,7 @@ import pdfplumber
 
 
 DAY_RE = re.compile(r"^Day #(\d+):.*?(\d{2}/\d{2}/\d{4})")
-SCENE_RE = re.compile(r"^\d+[A-Z]*$", re.I)
+SCENE_RE = re.compile(r"^\d+(?:\s*[A-Z])*$", re.I)
 
 
 def clean(value):
@@ -21,9 +21,15 @@ def parse(pdf_path):
     current_unit = "1st unit"
     order = 0
     pending = None
+    source_date = None
 
     with pdfplumber.open(pdf_path) as pdf:
         for page_number, page in enumerate(pdf.pages, start=1):
+            if source_date is None:
+                dated = re.search(r"(?:dated:|Čierny kameň\s*-)\s*(\d+)\.\s*(\d+)\.\s*(\d{4})", page.extract_text() or "", re.I)
+                if dated:
+                    day, month, year = map(int, dated.groups())
+                    source_date = datetime(year, month, day).date().isoformat()
             for table in page.extract_tables():
                 for cells in table:
                     first = clean(cells[0] if cells else "")
@@ -56,7 +62,7 @@ def parse(pdf_path):
 
                     if SCENE_RE.fullmatch(first) and setting:
                         pending = {
-                            "scene": first.upper(),
+                            "scene": re.sub(r"\s+", "", first).upper(),
                             "setting": setting,
                             "location": clean(cells[3] if len(cells) > 3 else ""),
                             "characters": clean(cells[4] if len(cells) > 4 else ""),
@@ -88,7 +94,7 @@ def parse(pdf_path):
     return {
         "source": {
             "title": "Schedule Style A - Cierny kamen",
-            "dated": "2026-10-11",
+            "dated": source_date,
             "file": pdf_path,
             "date_derivation": "Explicit date from each numbered Day header.",
         },

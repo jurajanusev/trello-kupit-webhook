@@ -6,7 +6,7 @@ from datetime import datetime
 import pdfplumber
 
 
-SCENE_RE = re.compile(r"^\s*(\d{1,2})\s*/\s*(\d+[A-Z]*)\s*$", re.I)
+SCENE_RE = re.compile(r"^\s*(\d{1,2})\s*/\s*(\d+(?:\s*[A-Z])*)\s*$", re.I)
 DAY_RE = re.compile(r"^Day #(\d+):.*?(\d{2}/\d{2}/\d{4})(?:\s|$)")
 
 
@@ -21,9 +21,15 @@ def parse(pdf_path):
     current_unit = "1st unit"
     order = 0
     stopped = False
+    source_date = None
 
     with pdfplumber.open(pdf_path) as pdf:
         for page_number, page in enumerate(pdf.pages, start=1):
+            if source_date is None:
+                dated = re.search(r"dated:\s*(\d+)\.\s*(\d+)\.\s*(\d{4})", page.extract_text() or "", re.I)
+                if dated:
+                    day, month, year = map(int, dated.groups())
+                    source_date = datetime(year, month, day).date().isoformat()
             for table in page.extract_tables():
                 for cells in table:
                     first = clean(cells[0])
@@ -49,7 +55,7 @@ def parse(pdf_path):
                     if not scene_match or current_day is None or current_date is None:
                         continue
                     episode = int(scene_match.group(1))
-                    scene = scene_match.group(2).upper()
+                    scene = re.sub(r"\s+", "", scene_match.group(2)).upper()
                     order += 1
                     rows.append({
                         "scene_id": f"{episode:02d}/{scene}",
@@ -72,7 +78,7 @@ def parse(pdf_path):
     return {
         "source": {
             "title": "PREDBEZNE DISPO - DRUHA SANCA 4",
-            "dated": datetime.fromtimestamp(
+            "dated": source_date or datetime.fromtimestamp(
                 __import__("os").path.getmtime(pdf_path)
             ).date().isoformat(),
             "file": pdf_path,

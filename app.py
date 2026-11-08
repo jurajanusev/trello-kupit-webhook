@@ -19,18 +19,18 @@ from update_dok4_plan_local import (
 
 app = Flask(__name__)
 
-DOK4_CURRENT_SCHEDULE_KEY = "dok4-schedule-21oct-8f4c2a71"
-DOK4_CURRENT_SCHEDULE_FILE = "dok4_schedule_2026-10-20.json"
-DOK4_CURRENT_SCHEDULE_AS_OF = "2026-10-22"
-DOK4_CURRENT_SOURCE_DATE = "2026-10-21"
-DOK4_CURRENT_SCHEDULE_ROWS = 149
+DOK4_CURRENT_SCHEDULE_KEY = "dok4-schedule-8nov-d05a162e"
+DOK4_CURRENT_SCHEDULE_FILE = "dok4_schedule_2026-11-08.json"
+DOK4_CURRENT_SCHEDULE_AS_OF = "2026-11-09"
+DOK4_CURRENT_SOURCE_DATE = "2026-11-08"
+DOK4_CURRENT_SCHEDULE_ROWS = 920
 DOK4_PROTECTED_DATES = {"2026-10-02", "2026-10-21"}
 
-RIVERDALE_CURRENT_SCHEDULE_KEY = "riverdale-schedule-21oct-3d9a6b52"
-RIVERDALE_CURRENT_SCHEDULE_FILE = "riverdale_schedule_2026-10-20.json"
-RIVERDALE_CURRENT_SCHEDULE_AS_OF = "2026-10-22"
-RIVERDALE_CURRENT_SOURCE_DATE = "2026-10-21"
-RIVERDALE_CURRENT_SCHEDULE_ROWS = 387
+RIVERDALE_CURRENT_SCHEDULE_KEY = "riverdale-schedule-8nov-63b7e42f"
+RIVERDALE_CURRENT_SCHEDULE_FILE = "riverdale_schedule_2026-11-08.json"
+RIVERDALE_CURRENT_SCHEDULE_AS_OF = "2026-11-09"
+RIVERDALE_CURRENT_SOURCE_DATE = "2026-11-08"
+RIVERDALE_CURRENT_SCHEDULE_ROWS = 229
 RIVERDALE_PROTECTED_DATES = {"2026-10-02"}
 RIVERDALE_BOARD_REF = "CzuD55PR"
 RIVERDALE_START_MARKER = "<!-- RIVERDALE-SCHEDULE-METADATA:START -->"
@@ -5372,8 +5372,6 @@ def sync_dok4_current_schedule():
     The active window is the next seven shooting dates on or after ``as_of``.
     Calendar days without shooting never consume a slot.
     """
-    return jsonify({"error": "this one-off endpoint is disabled"}), 410
-
     if request.headers.get("X-Sync-Key") != DOK4_CURRENT_SCHEDULE_KEY:
         return jsonify({"error": "forbidden"}), 403
 
@@ -5410,11 +5408,15 @@ def sync_dok4_current_schedule():
             "rows": len(schedule),
             "unique_scene_ids": len(unique_scene_ids),
         }), 409
+    # The historical part of this PDF contains no green shot checkmarks.
+    # Only future rows participate in this maintenance run.
+    schedule = [row for row in schedule if row['shooting_date'] >= as_of]
     trello = Dok4ScheduleTrello(API_KEY, TOKEN)
     state = build_dok4_schedule_state(
         trello, schedule, source_date=source_date, as_of=as_of,
         ignore_scene_suffix=True,
         protected_dates=DOK4_PROTECTED_DATES,
+        preserve_past_dates=True,
     )
     if mode == "dry-run":
         return jsonify(summarize_dok4_schedule(state, schedule))
@@ -5425,7 +5427,8 @@ def sync_dok4_current_schedule():
             metadata_limit=min(200, max(1, int(request.args.get("limit", "150")))),
         )
     elif mode == "window":
-        result = apply_dok4_schedule(trello, state, skip_metadata=True)
+        result = apply_dok4_schedule(trello, state, skip_metadata=True,
+                                    window_limit=12, cleanup_limit=12)
     else:
         result = apply_dok4_schedule(trello, state)
     result.update({
@@ -5441,8 +5444,6 @@ def sync_dok4_current_schedule():
 @app.route("/api/sync-riverdale-current-schedule", methods=["POST"])
 def sync_riverdale_current_schedule():
     """Synchronize Riverdale from the latest supplied plan."""
-    return jsonify({"error": "this one-off endpoint is disabled"}), 410
-
     if request.headers.get("X-Sync-Key") != RIVERDALE_CURRENT_SCHEDULE_KEY:
         return jsonify({"error": "forbidden"}), 403
     mode = request.args.get("mode", "dry-run")
@@ -5476,6 +5477,7 @@ def sync_riverdale_current_schedule():
             "rows": len(schedule),
             "unique_scene_ids": len(unique_scene_ids),
         }), 409
+    schedule = [row for row in schedule if row['shooting_date'] >= as_of]
     trello = Dok4ScheduleTrello(API_KEY, TOKEN)
     state = build_dok4_schedule_state(
         trello, schedule, source_date=source_date, as_of=as_of,
@@ -5485,6 +5487,7 @@ def sync_riverdale_current_schedule():
         source_label=RIVERDALE_SOURCE_LABEL,
         ignore_scene_suffix=True,
         protected_dates=RIVERDALE_PROTECTED_DATES,
+        preserve_past_dates=True,
     )
     if mode == "dry-run":
         return jsonify(summarize_dok4_schedule(state, schedule))
@@ -5494,7 +5497,8 @@ def sync_riverdale_current_schedule():
             metadata_limit=min(200, max(1, int(request.args.get("limit", "150")))),
         )
     elif mode == "window":
-        result = apply_dok4_schedule(trello, state, skip_metadata=True)
+        result = apply_dok4_schedule(trello, state, skip_metadata=True,
+                                    window_limit=12, cleanup_limit=12)
     else:
         result = apply_dok4_schedule(trello, state)
     result.update({

@@ -169,7 +169,7 @@ def build_state(
     trello, schedule, source_date, as_of, board_ref=BOARD_REF,
     start_marker=START_MARKER, end_marker=END_MARKER,
     source_label="predbežné dispo DOK 4", ignore_scene_suffix=False,
-    protected_dates=None,
+    protected_dates=None, preserve_past_dates=False,
 ):
     protected_dates = set(protected_dates or [])
     board = trello.get(f"/boards/{board_ref}", {"fields": "id,name,url,shortLink"})
@@ -361,6 +361,7 @@ def build_state(
         card for card in cards
         if DATE_LIST_RE.match(lists_by_id[card["idList"]]["name"])
         and date_from_list_name(lists_by_id[card["idList"]]["name"]) not in protected_dates
+        and (not preserve_past_dates or date_from_list_name(lists_by_id[card["idList"]]["name"]) >= as_of)
         and SCENE_RE.match(card.get("name", ""))
         and card["id"] not in expected_window_card_ids
     ]
@@ -416,6 +417,7 @@ def build_state(
         "start_marker": start_marker, "end_marker": end_marker,
         "source_label": source_label,
         "protected_dates": protected_dates,
+        "preserve_past_dates": preserve_past_dates,
     }
 
 
@@ -424,6 +426,19 @@ def summary(state, schedule):
     for row in state["window_rows"]:
         by_date.setdefault(row["shooting_date"], 0)
         by_date[row["shooting_date"]] += 1
+    primary = [state['target_names'][d] for d in state['shooting_dates'][:PRIMARY_SHOOTING_DAYS]]
+    tail = [state['target_names'][d] for d in state['shooting_dates'][PRIMARY_SHOOTING_DAYS:]]
+    actual = [item['name'] for item in state['lists']]
+    anchor_index = actual.index(state['anchor']['name']) if state['anchor'] else -1
+    primary_actual = actual[anchor_index + 1:anchor_index + 1 + len(primary)]
+    tail_actual = actual[-len(tail):] if tail else []
+    order_pending = sum(a != b for a,b in zip(primary + tail, primary_actual + tail_actual)) + max(0, len(primary + tail) - len(primary_actual + tail_actual))
+    pending_cards = sum(
+        state['lists_by_id'][item['card']['idList']]['name'] != state['target_names'][item['row']['shooting_date']]
+        or abs(float(item['card'].get('pos') or 0) - item['row']['order'] * 16384) > 0.5
+        or bool(item['card'].get('dueComplete'))
+        for item in state['window_matches']
+    )
     return {
         "status": "dry-run",
         "board": state["board"]["name"], "board_url": state["board"]["url"],
@@ -447,6 +462,9 @@ def summary(state, schedule):
         "window_end": (state["shooting_dates"][-1] if state["shooting_dates"] else None),
         "window_schedule_rows": len(state["window_rows"]), "window_matches": len(state["window_matches"]),
         "window_to_move": len(state["window_moves"]), "window_moves": state["window_moves"],
+        "window_pending_count": pending_cards,
+        "list_order_pending_count": order_pending,
+        "expected_primary_lists": primary, "expected_tail_lists": tail,
         "stale_window_count": len(state["stale_window_cards"]),
         "stale_window_cards": [{
             "name": card["name"], "url": card["shortUrl"],
@@ -464,7 +482,7 @@ def summary(state, schedule):
     }
 
 
-def apply(trello, state, metadata_only=False, skip_metadata=False, metadata_limit=None):
+def apply(trello, state, metadata_only=False, skip_metadata=False, metadata_limit=None, window_limit=None, cleanup_limit=None):
     blockers = {
         "wrong_board": state["board"].get("shortLink") != state.get("board_ref", BOARD_REF),
         "duplicates": len(state["duplicates"]),
@@ -485,7 +503,7 @@ def apply(trello, state, metadata_only=False, skip_metadata=False, metadata_limi
                 lists_by_name[name] = item
                 created_lists.append(name)
 
-    stale_returned = [] if metadata_only else cleanup_stale(trello, state)
+    stale_returned = [] if metadata_only else cleanup_stale(trello, state, limit=cleanup_limit)
 
     metadata_due_updated = []
     metadata_errors = []
@@ -543,6 +561,7 @@ def apply(trello, state, metadata_only=False, skip_metadata=False, metadata_limi
     reordered = []
     move_errors = []
     window_unchanged = 0
+    window_processed = 0
     for item in sorted(state["window_matches"], key=lambda value: (value["row"]["shooting_date"], value["row"]["order"])):
         row = item["row"]
         card = item["card"]
@@ -559,6 +578,9 @@ def apply(trello, state, metadata_only=False, skip_metadata=False, metadata_limi
         if not payload:
             window_unchanged += 1
             continue
+        if window_limit is not None and window_processed >= window_limit:
+            continue
+        window_processed += 1
         try:
             result = trello.put(f"/cards/{card['id']}", payload)
             entry = {
@@ -576,6 +598,8 @@ def apply(trello, state, metadata_only=False, skip_metadata=False, metadata_limi
     retained_old_lists = []
     active_date_names = set(state["target_names"].values())
     for _, _, old_list in state["date_lists"]:
+        if state.get('preserve_past_dates') and date_from_list_name(old_list['name']) < state['as_of']:
+            continue
         if date_from_list_name(old_list["name"]) in state.get("protected_dates", set()):
             continue
         if old_list["name"] in active_date_names:
@@ -607,7 +631,7 @@ def apply(trello, state, metadata_only=False, skip_metadata=False, metadata_limi
         for date in state["shooting_dates"][:PRIMARY_SHOOTING_DAYS]
     }
     primary_items = [item for item in date_items if item[2]["name"] in primary_names]
-    tail_items = [item for item in date_items if item[2]["name"] not in primary_names]
+    tail_items = [item for item in date_items if item[2]["name"] not in primary_names and (not state.get('preserve_past_dates') or item[2]['name'] in active_date_names)]
     date_ids = {item[2]["id"] for item in date_items}
     following = [item for item in refreshed_lists if item["id"] not in date_ids and item["pos"] > anchor["pos"]]
     if following:
@@ -658,11 +682,11 @@ def apply(trello, state, metadata_only=False, skip_metadata=False, metadata_limi
     }
 
 
-def cleanup_stale(trello, state):
+def cleanup_stale(trello, state, limit=None):
     if state["board"].get("shortLink") != state.get("board_ref", BOARD_REF) or not state["anchor"]:
         raise RuntimeError("cleanup blocked: wrong board or missing series anchor")
     returned = []
-    for card in state["stale_window_cards"]:
+    for card in state["stale_window_cards"][:limit]:
         result = trello.put(f"/cards/{card['id']}", {
             "idList": state["anchor"]["id"], "pos": "bottom",
             "due": "", "dueComplete": False,
