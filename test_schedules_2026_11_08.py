@@ -62,6 +62,17 @@ class TrelloFixture:
 
 
 class November08PlansTests(unittest.TestCase):
+    def test_completed_maintenance_routes_are_disabled(self):
+        import os
+        from unittest.mock import patch
+        os.environ.setdefault('TRELLO_KEY','test-key')
+        os.environ.setdefault('TRELLO_TOKEN','test-token')
+        import app
+        with patch.object(app,'Dok4ScheduleTrello',side_effect=AssertionError('disabled endpoint cannot access Trello')):
+            for project in ('dok4','riverdale'):
+                response=app.app.test_client().post(f'/api/sync-{project}-current-schedule')
+                self.assertEqual(response.status_code,410)
+
     def test_full_sources_and_remaining_dates(self):
         for filename,count,remaining in [('dok4_schedule_2026-11-08.json',920,49),('riverdale_schedule_2026-11-08.json',229,229)]:
             d=json.loads((ROOT/filename).read_text(encoding='utf-8'))
