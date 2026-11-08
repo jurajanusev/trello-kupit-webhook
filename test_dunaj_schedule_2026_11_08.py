@@ -10,7 +10,15 @@ class November08Tests(October29Tests):
     def test_production_one_off_route_is_disabled(self):
         with patch.object(app, "trello_get", side_effect=AssertionError("unauthorized request")):
             response = app.app.test_client().post("/api/sync-dunaj-schedule")
-        self.assertIn(response.status_code, (403, 410))
+        self.assertEqual(response.status_code, 410)
+
+    def test_future_archive_is_not_reopened_outside_active_window(self):
+        row = next(r for r in self.rows if r['shooting_date'] > self.dates[-1])
+        card = next(c for c in self.cards if c['id'] == row['scene_id'])
+        card.update(idList='shot', due='2026-10-01T10:00:00.000Z', dueComplete=True)
+        result = self.call('mode=dry-run').get_json()
+        self.assertEqual(result['future_to_series_count'], 0)
+        self.assertFalse(self.writes)
 
     def test_complete_source_and_seven_shooting_days(self):
         self.assertEqual(len(self.rows), 411)
