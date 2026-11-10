@@ -69,7 +69,7 @@ class ShootingPropsBriefTests(unittest.TestCase):
         brief = self.build()[0]
         task = {"id": "ms", "title": brief["title"], "body": {"content": brief["body"].replace("\n", "\r\n")}}
         self.assertEqual(task_plan(brief, [task])["action"], "unchanged")
-        task["body"]["content"] = "Moje poznámky\n" + brief["body"].replace(brief["digest"], "stary-hash") + "\nDoplnené ručne"
+        task["body"]["content"] = "Moje poznámky\n" + brief["body"].replace("rekvizita", "stará rekvizita") + "\nDoplnené ručne"
         plan = task_plan(brief, [task])
         self.assertEqual(plan["action"], "update")
         self.assertTrue(plan["changes"]["body"]["content"].startswith("Moje poznámky"))
@@ -78,6 +78,13 @@ class ShootingPropsBriefTests(unittest.TestCase):
         self.assertEqual(task_plan(brief, [task])["action"], "completed")
         with self.assertRaises(ValueError):
             task_plan(brief, [task, task])
+
+    def test_placeholder_x_is_a_warning_not_a_prop(self):
+        a, b, c = self.fixture(text="x")
+        brief = self.build(a, b, c)[0]
+        self.assertEqual(brief["prop_count"], 0)
+        self.assertEqual(brief["unique_prop_count"], 0)
+        self.assertTrue(any("nešpecifikovaná" in value for value in brief["warnings"]))
 
 
 if __name__ == "__main__":
