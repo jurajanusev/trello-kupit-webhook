@@ -262,6 +262,8 @@ def register_routes(app, api):
         except ValueError as exc:
             return jsonify({"error": str(exc), "writes": 0}), 409
         summary = {"project": PROJECTS[project][1], "list_name": LIST_NAME,
+                   "destination_found": bool(target), "existing_tasks": len(tasks),
+                   "destination_id": target["id"] if target else None,
                    "window_start": as_of.isoformat(),
                    "window_end": (as_of + timedelta(days=days - 1)).isoformat(),
                    "timezone": "Europe/Bratislava", "briefs": len(plans),
@@ -272,6 +274,7 @@ def register_routes(app, api):
                    "completed": sum(p["action"] == "completed" for p in plans)}
         if mode == "dry-run":
             return jsonify({"status": "dry-run", **summary,
+                            "existing_brief_sample": [{"title": task.get("title"), "body_type": (task.get("body") or {}).get("contentType"), "body_start": body_text(task)[:300]} for task in tasks[:2]],
                             "days": [{k: p[k] for k in ("title", "date", "part", "parts", "scene_count", "prop_count", "unique_prop_count", "warnings", "action", "body")} for p in plans]})
         actionable = [plan for plan in plans if plan["action"] in {"create", "update"}]
         if actionable and not target:
