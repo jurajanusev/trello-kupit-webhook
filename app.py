@@ -10,6 +10,8 @@ import os
 import json
 import unicodedata
 import time
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 from update_dok4_plan_local import (
     Trello as Dok4ScheduleTrello,
     apply as apply_dok4_schedule,
@@ -463,6 +465,16 @@ def sync_project_microsoft_todo(project):
     if not config:
         return jsonify({"error": "unknown project"}), 404
 
+    # Optional rolling window: today and the following days in Bratislava.
+    # Omitting days preserves the existing full-list synchronization.
+    days_raw = request.args.get("days")
+    window = None
+    if days_raw is not None:
+        if not re.fullmatch(r"[0-9]{1,2}", days_raw) or not 1 <= int(days_raw) <= 31:
+            return jsonify({"error": "days must be an integer from 1 to 31"}), 400
+        first_day = datetime.now(ZoneInfo("Europe/Bratislava")).date()
+        window = (first_day, first_day + timedelta(days=int(days_raw) - 1))
+
     lists = trello_get(f"/boards/{config['board']}/lists", {
         "fields": "id,name,closed", "filter": "open"
     })
@@ -470,8 +482,24 @@ def sync_project_microsoft_todo(project):
     if not todo_list:
         return jsonify({"error": f"{config['name']} ToDo list not found"}), 404
     cards = trello_get(f"/lists/{todo_list['id']}/cards", {
-        "fields": "id,name,desc,due,shortUrl,closed,pos", "filter": "open", "limit": 1000
+        "fields": "id,name,desc,due,dueComplete,shortUrl,closed,pos", "filter": "open", "limit": 1000
     })
+    total_cards = len(cards)
+    if window:
+        selected = []
+        for card in cards:
+            if card.get("closed") or card.get("dueComplete") or not card.get("due"):
+                continue
+            try:
+                due = datetime.fromisoformat(card["due"].replace("Z", "+00:00"))
+                if due.tzinfo is None:
+                    continue
+                local_date = due.astimezone(ZoneInfo("Europe/Bratislava")).date()
+            except (ValueError, TypeError):
+                continue
+            if window[0] <= local_date <= window[1]:
+                selected.append({**card, "due": local_date.isoformat() + "T12:00:00"})
+        cards = selected
     cards.sort(key=lambda card: (card.get("name", "").casefold(), card.get("id", "")))
 
     try:
@@ -491,6 +519,11 @@ def sync_project_microsoft_todo(project):
     plans = []
     for card in cards:
         title_matches = tasks_by_title.get(card["name"].strip().casefold(), [])
+        if window:
+            # Names alone can collide across projects in the shared To Do list.
+            title_matches = [task for task in title_matches if
+                             f"SYNC PROJECT: {config['name']}\n" in
+                             (task.get("body") or {}).get("content", "").replace("\r\n", "\n")]
         url_matches = [task for task in tasks
                        if card["shortUrl"] in (task.get("body") or {}).get("content", "")]
         matches = url_matches or title_matches
@@ -507,7 +540,8 @@ def sync_project_microsoft_todo(project):
         )[:24000]
         primary = matches[0] if matches else None
         changes = {}
-        if primary:
+        completed = bool(primary and primary.get("status") == "completed")
+        if primary and not (window and completed):
             current_body = (primary.get("body") or {}).get("content", "")
             desired_due_marker = desired_date or "NONE"
             due_marker_present = bool(re.search(
@@ -524,6 +558,7 @@ def sync_project_microsoft_todo(project):
             "card": card, "task": primary, "changes": changes,
             "duplicate_tasks": matches[1:], "desired_due": desired_due,
             "desired_body": desired_body,
+            "completed": completed,
         })
 
     summary = {
@@ -536,12 +571,20 @@ def sync_project_microsoft_todo(project):
         "duplicate_exact_titles": sum(len(plan["duplicate_tasks"]) for plan in plans),
         "without_due": sum(1 for card in cards if not card.get("due")),
     }
+    if window:
+        summary.update({
+            "window_start": window[0].isoformat(), "window_end": window[1].isoformat(),
+            "timezone": "Europe/Bratislava", "total_trello_cards": total_cards,
+            "completed_preserved": sum(1 for plan in plans if plan["completed"]),
+        })
     mode = request.args.get("mode", "dry-run")
     if mode == "dry-run":
         return jsonify({"status": "dry-run", **summary, "sample": [{
             "title": plan["card"]["name"], "trello_due": (plan["card"].get("due") or "")[:10] or None,
             "action": "create" if not plan["task"] else ("update" if plan["changes"] else "unchanged"),
             "fields": sorted(plan["changes"]), "duplicates": len(plan["duplicate_tasks"]),
+            "trello_url": plan["card"]["shortUrl"],
+            "completed": plan["completed"],
         } for plan in plans[:30]]})
     if mode != "apply":
         return jsonify({"error": "invalid mode"}), 400
