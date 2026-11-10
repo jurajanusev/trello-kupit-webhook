@@ -1,4 +1,5 @@
 import unittest
+import html
 from datetime import date
 from shooting_props_brief import day_briefs, list_date, task_plan, START, END
 
@@ -85,6 +86,15 @@ class ShootingPropsBriefTests(unittest.TestCase):
         self.assertEqual(brief["prop_count"], 0)
         self.assertEqual(brief["unique_prop_count"], 0)
         self.assertTrue(any("nešpecifikovaná" in value for value in brief["warnings"]))
+
+    def test_graph_html_normalization_does_not_create_duplicates(self):
+        brief = self.build()[0]
+        content = "<html><body>" + "".join("<p>" + html.escape(line).replace(" ", "&nbsp;") + "</p>" for line in brief["body"].splitlines()) + "</body></html>"
+        task = {"id": "ms", "title": brief["title"], "body": {"contentType": "html", "content": content}}
+        self.assertEqual(task_plan(brief, [task])["action"], "unchanged")
+        task["body"]["content"] = "Unrecognized body"
+        with self.assertRaises(ValueError):
+            task_plan(brief, [task])
 
 
 if __name__ == "__main__":
