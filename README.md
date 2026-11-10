@@ -16,7 +16,28 @@ TODO_TASK_TITLE_TEMPLATE={item} - {card}
 
 Ak tieto hodnoty nie su nastavene, povodne Trello kopirovanie funguje dalej a To Do cast sa preskoci.
 
-### Ranný prehľad na päť dní
+### Súhrn rekvizít na naplánované natáčanie (hlavný ranný systém)
+
+`POST /api/shooting-props-brief/<project>?mode=dry-run&days=5` číta dátumové
+stĺpce, obrazové karty a všetky ich checklisty, nie zoznam Trello ToDo.
+Projekty: `dunaj`, `dok4`, `riverdale`; existujúca hlavička `X-Microsoft-Sync-Key`.
+Predvolené okno je dnešok a štyri ďalšie dni v Europe/Bratislava. Voliteľné
+`as_of=YYYY-MM-DD` umožňuje začať napríklad zajtrajškom pri večernej príprave.
+
+Súhrn obsahuje spoločný zoznam presne zhodných názvov rekvizít s výskytmi
+v obrazoch, podrobnosti podľa obrazov, SET, kontinuitu, porady, otázky,
+ručné doplnenia a denné prípravné poznámky. Zaškrtnuté rekvizity zostávajú
+viditeľné. Prázdne REKVIZITY znamenajú potrebu kontroly scenára. Systém
+neodvodzuje nové predmety zo samotných dialógov a nesčítava množstvá naslepo.
+
+`mode=apply&limit=2` vytvorí alebo aktualizuje najviac dva denné súhrny
+v samostatnom Microsoft zozname **Natáčanie – rekvizity**. Volanie opakovať,
+kým `remaining=0`, a overiť dry-run bez zmien. Stabilná identita je projekt,
+dátum a časť; dlhé dni sa rozdelia bez straty textu. Dokončené úlohy sa
+neotvárajú, ručné poznámky mimo automatického bloku sa zachovajú. Trello sa
+týmto systémom nemení. Staré denné súhrny zostávajú ako história.
+
+### Pôvodná synchronizácia Trello ToDo podľa termínov
 
 Existujúci endpoint `POST /api/sync-<project>-microsoft-todo` podporuje
 voliteľný parameter `days=5` pre projekty `dunaj`, `dok4`, `riverdale`.
