@@ -4,6 +4,7 @@ import hmac
 import re
 from collections import defaultdict
 from datetime import date, datetime, timedelta
+from html.parser import HTMLParser
 from zoneinfo import ZoneInfo
 
 from flask import jsonify, request
@@ -163,18 +164,47 @@ def day_briefs(project, lists, cards, checklists, as_of, days=5):
     return briefs
 
 
+def body_text(task):
+    body = task.get("body") or {}
+    content = body.get("content", "")
+    if body.get("contentType", "").lower() != "html" and not re.search(r"<(?:html|body|div|p)(?:\s|>)", content, re.I):
+        return content.replace("\r\n", "\n")
+
+    class TextParser(HTMLParser):
+        def __init__(self):
+            super().__init__(convert_charrefs=True)
+            self.parts = []
+
+        def handle_data(self, data):
+            self.parts.append(data)
+
+        def handle_starttag(self, tag, attrs):
+            if tag in {"br", "p", "div", "li", "pre"}:
+                self.parts.append("\n")
+
+        def handle_endtag(self, tag):
+            if tag in {"p", "div", "li", "pre"}:
+                self.parts.append("\n")
+
+    parser = TextParser()
+    parser.feed(content)
+    return "".join(parser.parts).replace("\xa0", " ").replace("\r\n", "\n")
+
+
 def task_plan(brief, tasks):
     matches = [task for task in tasks if re.search(
         r"(?m)^" + re.escape(brief["marker"]) + r"\s*$",
-        (task.get("body") or {}).get("content", "").replace("\r\n", "\n"))]
+        body_text(task))]
     if len(matches) > 1:
         raise ValueError("Duplicate daily brief identity")
     if not matches:
+        if any(task.get("title") == brief["title"] for task in tasks):
+            raise ValueError("Existing title without matching brief identity; duplicate creation blocked")
         return {"action": "create", "task": None, "changes": {}}
     task = matches[0]
     if task.get("status") == "completed":
         return {"action": "completed", "task": task, "changes": {}}
-    body = (task.get("body") or {}).get("content", "")
+    body = body_text(task)
     changes = {}
     if START not in body or END not in body:
         raise ValueError("Managed brief boundaries missing")
