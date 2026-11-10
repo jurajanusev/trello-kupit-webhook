@@ -284,8 +284,12 @@ def normalize_scene_id(episode, scene):
 
 
 def microsoft_enabled():
-    # Microsoft To Do automation paused at the user's request on 2026-11-10.
-    return False
+    return all([
+        MICROSOFT_CLIENT_ID,
+        MICROSOFT_CLIENT_SECRET,
+        MICROSOFT_REFRESH_TOKEN,
+        TODO_LIST_ID
+    ])
 
 
 def get_microsoft_access_token():
@@ -8762,6 +8766,10 @@ register_ep11_13_routes(app, globals())
 from riverdale_due_only_20260828 import register_routes as register_riverdale_due_only_routes
 
 register_riverdale_due_only_routes(app, globals())
+
+from shooting_props_brief import register_routes as register_shooting_props_brief_routes
+
+register_shooting_props_brief_routes(app, globals())
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
