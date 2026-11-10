@@ -14,8 +14,8 @@ PROJECTS = {
     "riverdale": ("CzuD55PR", "RIVERDALE"),
 }
 LIST_NAME = "Natáčanie – rekvizity"
-START = "--- ZACIATOK AUTOMATICKEHO SUHRNU ---"
-END = "--- KONIEC AUTOMATICKEHO SUHRNU ---"
+START = "DENNÝ SÚHRN REKVIZÍT"
+END = "VLASTNÉ POZNÁMKY:"
 SCENE = re.compile(r"^\s*\d+\s*/\s*\d+", re.I)
 BODY_LIMIT = 22000
 
@@ -95,6 +95,12 @@ def day_briefs(project, lists, cards, checklists, as_of, days=5):
                         continue
                     lines.append(checklist["name"] + ":")
                     for item in items:
+                        placeholder = fold(item.get("name", "")) in {"X", "?", "-", "TBD"}
+                        if fold(checklist["name"]) == "REKVIZITY" and placeholder:
+                            warning = f"{name.split('.')[0]}: nešpecifikovaná položka „{item.get('name', '')}“ – preveriť"
+                            warnings.append(warning)
+                            lines.append("- NA OVERENIE: " + warning)
+                            continue
                         if fold(checklist["name"]) == "REKVIZITY":
                             props_count += 1
                             prop_name = item.get("name", "").strip()
@@ -122,6 +128,8 @@ def day_briefs(project, lists, cards, checklists, as_of, days=5):
                 status = "zaškrtnuté vo všetkých výskytoch" if entry["checked"] else "preveriť prípravu / nezaškrtnuté"
                 prop_lines.append(f"- {prop_name} | obrazy: {', '.join(entry['scenes'])} | {status}")
             blocks.insert(0, "\n".join(prop_lines) + "\n\nPODROBNOSTI PODĽA OBRAZOV:")
+        if warnings:
+            blocks.insert(0, "NA OVERENIE:\n" + "\n".join("- " + value for value in warnings))
         intro = (f"{PROJECTS[project][1]} | {shooting_date.strftime('%d.%m.%Y')}\n"
                  f"Obrazy: {scene_count} | Položky REKVIZITY: {props_count}\n"
                  "Zdroj: obrazové karty v dátumových stĺpcoch Trella.\n"
@@ -143,9 +151,9 @@ def day_briefs(project, lists, cards, checklists, as_of, days=5):
         if chunk.strip() != intro.strip():
             chunks.append(chunk.rstrip())
         for part, content in enumerate(chunks, 1):
-            marker = f"SHOOTING PROPS: {project}:{shooting_date.isoformat()}:{part}"
+            marker = f"Seriál: {PROJECTS[project][1]} | Natáčanie: {shooting_date.strftime('%d.%m.%Y')} | Časť: {part}"
             digest = hashlib.sha256(content.encode()).hexdigest()
-            body = f"{START}\n{marker}\nSOURCE SHA256: {digest}\n{content}\n{END}"
+            body = f"{START}\n{marker}\n\n{content}\n\n{END}\n"
             suffix = f" ({part}/{len(chunks)})" if len(chunks) > 1 else ""
             briefs.append({"marker": marker, "digest": digest, "body": body,
                            "title": f"{PROJECTS[project][1]} | {shooting_date.strftime('%d.%m.')} | Rekvizity na natáčanie{suffix}",
@@ -168,11 +176,12 @@ def task_plan(brief, tasks):
         return {"action": "completed", "task": task, "changes": {}}
     body = (task.get("body") or {}).get("content", "")
     changes = {}
-    if f"SOURCE SHA256: {brief['digest']}" not in body:
-        if START not in body or END not in body:
-            raise ValueError("Managed brief boundaries missing")
-        beginning, rest = body.split(START, 1)
-        _, ending = rest.split(END, 1)
+    if START not in body or END not in body:
+        raise ValueError("Managed brief boundaries missing")
+    beginning, rest = body.split(START, 1)
+    current, ending = rest.split(END, 1)
+    desired = brief["body"].split(START, 1)[1].split(END, 1)[0]
+    if " ".join(current.split()) != " ".join(desired.split()):
         changes["body"] = {"contentType": "text", "content": beginning + brief["body"] + ending}
     if task.get("title") != brief["title"]:
         changes["title"] = brief["title"]
