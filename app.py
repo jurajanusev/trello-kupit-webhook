@@ -8767,6 +8767,10 @@ from riverdale_due_only_20260828 import register_routes as register_riverdale_du
 
 register_riverdale_due_only_routes(app, globals())
 
+from shooting_props_brief import register_routes as register_shooting_props_brief_routes
+
+register_shooting_props_brief_routes(app, globals())
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
